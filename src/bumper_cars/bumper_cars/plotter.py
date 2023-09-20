@@ -10,6 +10,8 @@ from custom_message.msg import ControlInputs
 import pygame
 import math
 from matplotlib import pyplot as plt
+from custom_message.msg import ControlInputs, State
+
 
 class Plotter(Node):
 
@@ -17,28 +19,27 @@ class Plotter(Node):
         super().__init__("plotter")
         self.get_logger().info("Plotter has been started")
         
-        self.plotter_subscriber_ = self.create_subscription(Pose, "/turtle1/pose", self.plotter_callback, 10)
+        self.plotter_subscriber_ = self.create_subscription(State, "/robot_state", self.plotter_callback, 10)
         
-    def plotter_callback(self, pose: Pose):
+    def plotter_callback(self, pose: State):
         
-        msg = Pose()
+        msg = State()
 
         msg.x = pose.x
         msg.y = pose.y
-        msg.theta = pose.theta
-        msg.linear_velocity = pose.linear_velocity
-        msg.angular_velocity = pose.angular_velocity
+        msg.yaw = pose.yaw
+        msg.v = pose.v
         
-        plt.plot(msg.x, msg.y,'k.')
+        # add arrow to put in the direction, make plotting fancier
+        plt.plot(msg.x, msg.y, 'k.')
         plt.axis("equal")
         plt.draw()
         plt.pause(0.00000000001)
 
         self.get_logger().info("x: " + str(msg.x) + ", " +
                                "y: " + str(msg.y) + ", " +
-                               "theta: " + str(msg.theta) + ", " +
-                               "linear velocity: " + str(msg.linear_velocity) + ", " +
-                               "angular velocity: " + str(msg.angular_velocity))
+                               "theta: " + str(msg.yaw) + ", " +
+                               "linear velocity: " + str(msg.v))
 
 
 

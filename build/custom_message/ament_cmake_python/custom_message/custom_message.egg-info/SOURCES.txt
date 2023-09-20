@@ -6,3 +6,4 @@ custom_message.egg-info/dependency_links.txt
 custom_message.egg-info/top_level.txt
 custom_message/msg/__init__.py
 custom_message/msg/_control_inputs.py
+custom_message/msg/_state.py

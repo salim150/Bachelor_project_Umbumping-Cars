@@ -25,7 +25,8 @@ setup(
             "state_subscriber = bumper_cars.state_subscriber:main",
             "sensor = bumper_cars.sensor:main",
             "model = bumper_cars.car_model:main",
-            "plotter = bumper_cars.plotter:main"
+            "plotter = bumper_cars.plotter:main",
+            "robot_model = bumper_cars.car_model:main"
         ],
     },
 )

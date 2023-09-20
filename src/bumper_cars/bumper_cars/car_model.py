@@ -5,8 +5,11 @@ from rclpy.node import Node
 from turtlesim.msg import Pose
 from custom_message.msg import ControlInputs, State
 import numpy as np
+import time
 
 max_steer = np.radians(30.0)  # [rad] max steering angle
+max_speed = 5 # [m/s]
+min_speed = 0 # [m/s]
 L = 2.9  # [m] Wheel base of vehicle
 # dt = 0.1
 Lr = L / 2.0  # [m]
@@ -22,30 +25,54 @@ class CarModel(Node):
     def __init__(self):
         super().__init__("car_model")
 
-        self.measurement_publisher_ = self.create_publisher(State, "/robot_state", 10)
-        self.state_subscriber_ = self.create_subscription(State,
-                                                         "/robot_state", qos_profile=10) 
+        # Initializing the robot
+        self.initial_state = State()
+        self.initial_state.x = 0.0
+        self.initial_state.y = 0.0
+        self.initial_state.yaw = 0.0
+        self.initial_state.v = 0.0
+
+        self.state_publisher_ = self.create_publisher(State, "/robot_state", 10)
+        self.state_publisher_.publish(self.initial_state)
+
+        """self.state_subscriber_ = self.create_subscription(State,
+                                                         "/robot_state", self.model_callback, 10)""" 
         self.control_subscriber_ = self.create_subscription(ControlInputs,
                                                          "/robot_control", 
                                                          self.model_callback, 10) 
-        # TODO: change the topics name and create new ones. the subscriber of this class should be subscribed to the /control_input topic and publishing the 
-        # /current_pose topic
+        self.timer = self.create_timer(0.1, self.update)
         
-        self.get_logger().info("Car model started succesfully")
-        
-    def model_callback(self, pose: State, cmd: ControlInputs):
-        new_state = State()
+        self.get_logger().info("Car model started succesfully at position x: " + str(self.initial_state.x) + " , y: " + str(self.initial_state.y))
 
-        dt = 0.1
+        self.new_state = self.initial_state
+        self.old_time = time.time()
+
+    def model_callback(self, cmd: ControlInputs):
+        
+        self.get_logger().info("Command inputs, delta: " + str(cmd.delta) + ",  throttle: " + str(cmd.throttle))
+
+
+        dt = time.time() - self.old_time
+        self.old_time = time.time()
+        # dt = 0.1
         cmd.delta = np.clip(cmd.delta, -max_steer, max_steer)
 
-        new_state.x += pose.v * np.cos(pose.yaw) * dt
-        new_state.y += pose.v * np.sin(pose.yaw) * dt
-        new_state.yaw += pose.v / L * np.tan(cmd.delta) * dt
-        new_state.yaw = self.normalize_angle(pose.yaw)
-        new_state.v += cmd.throttle * dt
+        self.new_state.x += self.initial_state.v * np.cos(self.initial_state.yaw) * dt
+        self.new_state.y += self.initial_state.v * np.sin(self.initial_state.yaw) * dt
+        self.new_state.yaw += self.initial_state.v / L * np.tan(cmd.delta) * dt
+        print(f'Yaw: {self.new_state.yaw}')
+        self.new_state.yaw = self.normalize_angle(self.new_state.yaw)
+        self.new_state.v += cmd.throttle * dt
+        self.new_state.v = np.clip(self.new_state.v, min_speed, max_speed)
 
-    def normalize_angle(angle):
+        self.state_publisher_.publish(self.new_state)
+    
+    def update(self):
+        self.state_publisher_.publish(self.new_state)
+        self.get_logger().info("Publishing state")
+        self.initial_state = self.new_state
+
+    def normalize_angle(self, angle):
         """
         Normalize an angle to [-pi, pi].
         :param angle: (float)
@@ -64,7 +91,8 @@ class CarModel(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-
+    
+    # maybe add initialization of the robots here in the main
     node = CarModel()
     rclpy.spin(node)
 

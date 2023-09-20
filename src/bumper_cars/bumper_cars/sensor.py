@@ -6,7 +6,7 @@ from turtlesim.msg import Pose
 from geometry_msgs.msg import Twist
 from turtlesim.srv import SetPen
 from functools import partial
-from custom_message.msg import ControlInputs
+from custom_message.msg import ControlInputs, State
 
 class SensorMeasurement(Node):
 
@@ -14,27 +14,25 @@ class SensorMeasurement(Node):
         super().__init__("sensor")
         self.get_logger().info("Sensor has been started")
 
-        self.measurement_publisher_ = self.create_publisher(Pose, "/sensor_measurement", 10)
-        self.pose_subscriber_ = self.create_subscription(Pose,
-                                                         "/turtle1/pose", 
+        self.measurement_publisher_ = self.create_publisher(State, "/sensor_measurement", 10)
+        self.pose_subscriber_ = self.create_subscription(State,
+                                                         "/robot_state", 
                                                          self.pose_callback, 10) # replace with topic /robot_state
         
-    def pose_callback(self, pose: Pose):
+    def pose_callback(self, pose: State):
         
-        msg = Pose()
+        msg = State()
 
         msg.x = pose.x
         msg.y = pose.y
-        msg.theta = pose.theta
-        msg.linear_velocity = pose.linear_velocity
-        msg.angular_velocity = pose.angular_velocity
+        msg.yaw = pose.yaw
+        msg.v = pose.v
 
         self.measurement_publisher_.publish(msg)
         self.get_logger().info("x: " + str(msg.x) + ", " +
                                "y: " + str(msg.y) + ", " +
-                               "theta: " + str(msg.theta) + ", " +
-                               "linear velocity: " + str(msg.linear_velocity) + ", " +
-                               "angular velocity: " + str(msg.angular_velocity))
+                               "yaw: " + str(msg.yaw) + ", " +
+                               "linear velocity: " + str(msg.v))
 
 
 

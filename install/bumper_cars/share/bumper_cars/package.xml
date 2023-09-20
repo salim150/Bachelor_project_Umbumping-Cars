@@ -15,6 +15,7 @@
   <depend>pygame</depend>
   <depend>math</depend>
   <depend>matplotlib</depend>
+  <depend>numpy</depend>
 
 
   <test_depend>ament_copyright</test_depend>
