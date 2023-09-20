@@ -1,0 +1,55 @@
+[0.737s] Invoking command in '/home/giacomo/thesis_ws/build/bumper_cars': CMAKE_PREFIX_PATH=/home/giacomo/thesis_ws/install/custom_message:/home/giacomo/thesis_ws/src/install/custom_message:/home/giacomo/thesis_ws/install/custom_interfaces:/home/giacomo/ros2_ws/install/tutorial_interfaces:/home/giacomo/ros2_ws/install/turtlesim LD_LIBRARY_PATH=/home/giacomo/thesis_ws/install/custom_message/lib:/home/giacomo/thesis_ws/src/install/custom_message/lib:/home/giacomo/thesis_ws/install/custom_interfaces/lib:/home/giacomo/ros2_ws/install/tutorial_interfaces/lib:/home/giacomo/ros2_ws/install/turtlesim/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib PYTHONPATH=/home/giacomo/thesis_ws/build/bumper_cars/prefix_override:/home/giacomo/thesis_ws/install/bumper_cars/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --editable --build-directory /home/giacomo/thesis_ws/build/bumper_cars/build --no-deps install_data
+[1.042s] running develop
+[1.042s] /home/giacomo/.local/lib/python3.10/site-packages/setuptools/command/develop.py:40: EasyInstallDeprecationWarning: easy_install command is deprecated.
+[1.043s] !!
+[1.043s] 
+[1.043s]         ********************************************************************************
+[1.043s]         Please avoid running ``setup.py`` and ``easy_install``.
+[1.043s]         Instead, use pypa/build, pypa/installer or other
+[1.043s]         standards-based tools.
+[1.043s] 
+[1.043s]         See https://github.com/pypa/setuptools/issues/917 for details.
+[1.043s]         ********************************************************************************
+[1.043s] 
+[1.043s] !!
+[1.043s]   easy_install.initialize_options(self)
+[1.073s] /home/giacomo/.local/lib/python3.10/site-packages/setuptools/_distutils/cmd.py:66: SetuptoolsDeprecationWarning: setup.py install is deprecated.
+[1.073s] !!
+[1.073s] 
+[1.073s]         ********************************************************************************
+[1.073s]         Please avoid running ``setup.py`` directly.
+[1.073s]         Instead, use pypa/build, pypa/installer or other
+[1.073s]         standards-based tools.
+[1.073s] 
+[1.073s]         See https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html for details.
+[1.073s]         ********************************************************************************
+[1.074s] 
+[1.074s] !!
+[1.074s]   self.initialize_options()
+[1.323s] running egg_info
+[1.323s] creating bumper_cars.egg-info
+[1.352s] writing bumper_cars.egg-info/PKG-INFO
+[1.358s] writing dependency_links to bumper_cars.egg-info/dependency_links.txt
+[1.358s] writing entry points to bumper_cars.egg-info/entry_points.txt
+[1.358s] writing requirements to bumper_cars.egg-info/requires.txt
+[1.358s] writing top-level names to bumper_cars.egg-info/top_level.txt
+[1.358s] writing manifest file 'bumper_cars.egg-info/SOURCES.txt'
+[1.416s] reading manifest file 'bumper_cars.egg-info/SOURCES.txt'
+[1.417s] writing manifest file 'bumper_cars.egg-info/SOURCES.txt'
+[1.437s] running build_ext
+[1.437s] Creating /home/giacomo/thesis_ws/install/bumper_cars/lib/python3.10/site-packages/bumper-cars.egg-link (link to .)
+[1.438s] Installing controller script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars
+[1.438s] Installing model script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars
+[1.439s] Installing plotter script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars
+[1.439s] Installing sensor script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars
+[1.439s] Installing state_publisher script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars
+[1.439s] Installing state_subscriber script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars
+[1.440s] 
+[1.440s] Installed /home/giacomo/thesis_ws/build/bumper_cars
+[1.440s] running install_data
+[1.440s] creating /home/giacomo/thesis_ws/install/bumper_cars/share/ament_index
+[1.440s] creating /home/giacomo/thesis_ws/install/bumper_cars/share/ament_index/resource_index
+[1.441s] creating /home/giacomo/thesis_ws/install/bumper_cars/share/ament_index/resource_index/packages
+[1.441s] copying resource/bumper_cars -> /home/giacomo/thesis_ws/install/bumper_cars/share/ament_index/resource_index/packages
+[1.441s] copying package.xml -> /home/giacomo/thesis_ws/install/bumper_cars/share/bumper_cars
+[1.495s] Invoked command in '/home/giacomo/thesis_ws/build/bumper_cars' returned '0': CMAKE_PREFIX_PATH=/home/giacomo/thesis_ws/install/custom_message:/home/giacomo/thesis_ws/src/install/custom_message:/home/giacomo/thesis_ws/install/custom_interfaces:/home/giacomo/ros2_ws/install/tutorial_interfaces:/home/giacomo/ros2_ws/install/turtlesim LD_LIBRARY_PATH=/home/giacomo/thesis_ws/install/custom_message/lib:/home/giacomo/thesis_ws/src/install/custom_message/lib:/home/giacomo/thesis_ws/install/custom_interfaces/lib:/home/giacomo/ros2_ws/install/tutorial_interfaces/lib:/home/giacomo/ros2_ws/install/turtlesim/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib PYTHONPATH=/home/giacomo/thesis_ws/build/bumper_cars/prefix_override:/home/giacomo/thesis_ws/install/bumper_cars/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --editable --build-directory /home/giacomo/thesis_ws/build/bumper_cars/build --no-deps install_data
