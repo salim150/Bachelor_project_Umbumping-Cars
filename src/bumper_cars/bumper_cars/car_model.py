@@ -22,8 +22,8 @@ m = 1500.0  # kg
 
 class CarModel(Node):
 
-    def __init__(self):
-        super().__init__("car_model")
+    def __init__(self, robot_name: str):
+        super().__init__(robot_name + "_model")
 
         # Initializing the robot
         self.initial_state = State()
@@ -32,15 +32,15 @@ class CarModel(Node):
         self.initial_state.yaw = 0.0
         self.initial_state.v = 0.0
 
-        self.state_publisher_ = self.create_publisher(State, "/robot_state", 10)
+        self.state_publisher_ = self.create_publisher(State, "/" + robot_name + "_state", 10)
         self.state_publisher_.publish(self.initial_state)
 
         """self.state_subscriber_ = self.create_subscription(State,
                                                          "/robot_state", self.model_callback, 10)""" 
         self.control_subscriber_ = self.create_subscription(ControlInputs,
-                                                         "/robot_control", 
+                                                         "/" + robot_name + "_control", 
                                                          self.model_callback, 10) 
-        self.timer = self.create_timer(0.1, self.update)
+        #self.timer = self.create_timer(0.1, self.update)
         
         self.get_logger().info("Car model started succesfully at position x: " + str(self.initial_state.x) + " , y: " + str(self.initial_state.y))
 
@@ -93,7 +93,9 @@ def main(args=None):
     rclpy.init(args=args)
     
     # maybe add initialization of the robots here in the main
-    node = CarModel()
-    rclpy.spin(node)
+    node1 = CarModel("robot1")
+    node2 = CarModel("robot2")
+    rclpy.spin(node1)
+    rclpy.spin(node2)
 
     rclpy.shutdown()

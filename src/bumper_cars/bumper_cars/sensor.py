@@ -10,13 +10,13 @@ from custom_message.msg import ControlInputs, State
 
 class SensorMeasurement(Node):
 
-    def __init__(self):
-        super().__init__("sensor")
+    def __init__(self, robot_name: str):
+        super().__init__(robot_name + "_sensor")
         self.get_logger().info("Sensor has been started")
 
-        self.measurement_publisher_ = self.create_publisher(State, "/sensor_measurement", 10)
+        self.measurement_publisher_ = self.create_publisher(State, "/" + robot_name + "_measurement", 10)
         self.pose_subscriber_ = self.create_subscription(State,
-                                                         "/robot_state", 
+                                                         "/" + robot_name + "_state", 
                                                          self.pose_callback, 10) # replace with topic /robot_state
         
     def pose_callback(self, pose: State):
@@ -39,7 +39,9 @@ class SensorMeasurement(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    node = SensorMeasurement()
-    rclpy.spin(node)
+    node1 = SensorMeasurement("robot1")
+    node2 = SensorMeasurement("robot2")
+    rclpy.spin(node1)
+    rclpy.spin(node2)
 
     rclpy.shutdown()

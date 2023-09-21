@@ -15,11 +15,12 @@ from custom_message.msg import ControlInputs, State
 
 class Plotter(Node):
 
-    def __init__(self):
-        super().__init__("plotter")
+    def __init__(self, robot_name: str, color: str):
+        super().__init__(robot_name + "_plotter")
         self.get_logger().info("Plotter has been started")
         
-        self.plotter_subscriber_ = self.create_subscription(State, "/robot_state", self.plotter_callback, 10)
+        self.plotter_subscriber_ = self.create_subscription(State, "/" + robot_name + "_state", self.plotter_callback, 10)
+        self.color = color
         
     def plotter_callback(self, pose: State):
         
@@ -31,7 +32,8 @@ class Plotter(Node):
         msg.v = pose.v
         
         # add arrow to put in the direction, make plotting fancier
-        plt.plot(msg.x, msg.y, 'k.')
+        plt.figure()
+        plt.plot(msg.x, msg.y, self.color)
         plt.axis("equal")
         plt.draw()
         plt.pause(0.00000000001)
@@ -46,8 +48,10 @@ class Plotter(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    node = Plotter()
-    rclpy.spin(node)
+    node1 = Plotter("robot1", 'k.')
+    node2 = Plotter("robot2", 'g.')
+    rclpy.spin(node1)
+    rclpy.spin(node2)
 
     rclpy.shutdown()
 

@@ -9,14 +9,14 @@ from functools import partial
 from custom_message.msg import ControlInputs, State
 class Controller(Node):
 
-    def __init__(self):
-        super().__init__("bumper_car_controller")
+    def __init__(self, robot_name):
+        super().__init__(robot_name + "_controller")
         self.previous_x = 0
         self.get_logger().info("Controller has been started")
 
-        self.control_publisher_ = self.create_publisher(ControlInputs, "/robot_control", 10)
+        self.control_publisher_ = self.create_publisher(ControlInputs, "/" + robot_name + "_control", 10)
         self.pose_subscriber_ = self.create_subscription(State,
-                                                         "/robot_state", 
+                                                         "/" + robot_name + "_measurement", 
                                                          self.pose_callback, 10)
         
     def pose_callback(self, pose: State):
@@ -33,7 +33,9 @@ class Controller(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    node = Controller()
-    rclpy.spin(node)
+    node1 = Controller("robot1")
+    node2 = Controller("robot2")
+    rclpy.spin(node1)
+    rclpy.spin(node2)
 
     rclpy.shutdown()
