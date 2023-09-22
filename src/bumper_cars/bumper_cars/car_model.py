@@ -6,6 +6,7 @@ from turtlesim.msg import Pose
 from custom_message.msg import ControlInputs, State
 import numpy as np
 import time
+import message_filters
 
 max_steer = np.radians(30.0)  # [rad] max steering angle
 max_speed = 5 # [m/s]
@@ -22,55 +23,90 @@ m = 1500.0  # kg
 
 class CarModel(Node):
 
-    def __init__(self, robot_name: str):
-        super().__init__(robot_name + "_model")
+    def __init__(self):
+        super().__init__("robot_models")
 
         # Initializing the robot
-        self.initial_state = State()
-        self.initial_state.x = 0.0
-        self.initial_state.y = 0.0
-        self.initial_state.yaw = 0.0
-        self.initial_state.v = 0.0
+        self.initial_state1 = State()
+        self.initial_state1.x = 0.0
+        self.initial_state1.y = 0.0
+        self.initial_state1.yaw = 0.0
+        self.initial_state1.v = 0.0
 
-        self.state_publisher_ = self.create_publisher(State, "/" + robot_name + "_state", 10)
-        self.state_publisher_.publish(self.initial_state)
+        self.initial_state2 = State()
+        self.initial_state2.x = 0.0
+        self.initial_state2.y = 0.0
+        self.initial_state2.yaw = 0.0
+        self.initial_state2.v = 0.0
 
-        """self.state_subscriber_ = self.create_subscription(State,
-                                                         "/robot_state", self.model_callback, 10)""" 
-        self.control_subscriber_ = self.create_subscription(ControlInputs,
-                                                         "/" + robot_name + "_control", 
-                                                         self.model_callback, 10) 
-        #self.timer = self.create_timer(0.1, self.update)
+        self.state1_publisher_ = self.create_publisher(State, "/robot1_state", 1)
+        self.state1_publisher_.publish(self.initial_state1)
+
+        self.state2_publisher_ = self.create_publisher(State, "/robot2_state", 1)
+        self.state2_publisher_.publish(self.initial_state2)
+
+        control1_subscriber = message_filters.Subscriber(self, ControlInputs, "/robot1_control")
+        control2_subscriber = message_filters.Subscriber(self, ControlInputs, "/robot2_control")
+
+        ts = message_filters.ApproximateTimeSynchronizer([control1_subscriber, control2_subscriber], 2, 0.1, allow_headerless=True)
+        ts.registerCallback(self.general_model_callback)
+
+        # self.timer = self.create_timer(0.1, self.update)
         
-        self.get_logger().info("Car model started succesfully at position x: " + str(self.initial_state.x) + " , y: " + str(self.initial_state.y))
+        #self.get_logger().info(robot_name + "_model started succesfully at position x: " + str(self.initial_state.x) + " , y: " + str(self.initial_state.y))
 
-        self.new_state = self.initial_state
-        self.old_time = time.time()
+        self.new_state1 = self.initial_state1
+        self.new_state2 = self.initial_state2
 
-    def model_callback(self, cmd: ControlInputs):
+        self.old_time1 = time.time()
+        self.old_time2 = time.time()
+
+        self.get_logger().info("Robots models initialized correctly")
+
+    def general_model_callback(self, control1: ControlInputs, control2: ControlInputs):
+
+        self.new_state1, self.old_time1 = self.linear_model_callback(self.initial_state1, control1, self.old_time1)
+        self.new_state2, self.old_time2 = self.linear_model_callback(self.initial_state2, control2, self.old_time2)
+
+        self.initial_state1 = self.new_state1
+        self.initial_state2 = self.new_state2
+
         
-        self.get_logger().info("Command inputs, delta: " + str(cmd.delta) + ",  throttle: " + str(cmd.throttle))
 
+        """self.get_logger().info("Publishing robot1 new state, x: " + str(self.new_state1.x) + ", " +
+                               "y: " + str(self.new_state1.y) + ", " +
+                               "theta: " + str(self.new_state1.yaw) + ", " +
+                               "linear velocity: " + str(self.new_state1.v))"""
+        self.state1_publisher_.publish(self.new_state1)
+        """self.get_logger().info("Publishing robot2 new state, x: " + str(self.new_state2.x) + ", " +
+                               "y: " + str(self.new_state2.y) + ", " +
+                               "theta: " + str(self.new_state2.yaw) + ", " +
+                               "linear velocity: " + str(self.new_state2.v))"""
+        self.state2_publisher_.publish(self.new_state2)
 
-        dt = time.time() - self.old_time
-        self.old_time = time.time()
-        # dt = 0.1
+    def linear_model_callback(self, initial_state: State, cmd: ControlInputs, old_time: float):
+        
+        new_state = State()
+        # self.get_logger().info("Command inputs, delta: " + str(cmd.delta) + ",  throttle: " + str(cmd.throttle))
+
+        dt = time.time() - old_time
+        print(dt)
+        old_time = time.time()
         cmd.delta = np.clip(cmd.delta, -max_steer, max_steer)
 
-        self.new_state.x += self.initial_state.v * np.cos(self.initial_state.yaw) * dt
-        self.new_state.y += self.initial_state.v * np.sin(self.initial_state.yaw) * dt
-        self.new_state.yaw += self.initial_state.v / L * np.tan(cmd.delta) * dt
-        print(f'Yaw: {self.new_state.yaw}')
-        self.new_state.yaw = self.normalize_angle(self.new_state.yaw)
-        self.new_state.v += cmd.throttle * dt
-        self.new_state.v = np.clip(self.new_state.v, min_speed, max_speed)
+        new_state.x += initial_state.v * np.cos(initial_state.yaw) * dt
+        new_state.y += initial_state.v * np.sin(initial_state.yaw) * dt
+        new_state.yaw += initial_state.v / L * np.tan(cmd.delta) * dt
+        new_state.yaw = self.normalize_angle(new_state.yaw)
+        new_state.v += cmd.throttle * dt
+        new_state.v = np.clip(new_state.v, min_speed, max_speed)
 
-        self.state_publisher_.publish(self.new_state)
+        return new_state, old_time
     
-    def update(self):
+    """def update(self):
         self.state_publisher_.publish(self.new_state)
-        self.get_logger().info("Publishing state")
-        self.initial_state = self.new_state
+        self.get_logger().info("Publishing state: " + self.robot_name)
+        self.initial_state = self.new_state"""
 
     def normalize_angle(self, angle):
         """
@@ -92,10 +128,7 @@ class CarModel(Node):
 def main(args=None):
     rclpy.init(args=args)
     
-    # maybe add initialization of the robots here in the main
-    node1 = CarModel("robot1")
-    node2 = CarModel("robot2")
-    rclpy.spin(node1)
-    rclpy.spin(node2)
+    node = CarModel()
+    rclpy.spin(node)
 
     rclpy.shutdown()

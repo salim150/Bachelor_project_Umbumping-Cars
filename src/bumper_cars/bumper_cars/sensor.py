@@ -7,41 +7,39 @@ from geometry_msgs.msg import Twist
 from turtlesim.srv import SetPen
 from functools import partial
 from custom_message.msg import ControlInputs, State
+import message_filters
 
 class SensorMeasurement(Node):
 
-    def __init__(self, robot_name: str):
-        super().__init__(robot_name + "_sensor")
-        self.get_logger().info("Sensor has been started")
+    def __init__(self):
+        super().__init__("sensor")
 
-        self.measurement_publisher_ = self.create_publisher(State, "/" + robot_name + "_measurement", 10)
-        self.pose_subscriber_ = self.create_subscription(State,
+        self.measurement1_publisher_ = self.create_publisher(State, "/robot1_measurement", 1)
+        self.measurement2_publisher_ = self.create_publisher(State, "/robot2_measurement", 1)
+        """self.pose_subscriber_ = self.create_subscription(State,
                                                          "/" + robot_name + "_state", 
-                                                         self.pose_callback, 10) # replace with topic /robot_state
+                                                         self.pose_callback, 1) # replace with topic /robot_state"""
         
-    def pose_callback(self, pose: State):
+        state1_subscriber = message_filters.Subscriber(self, State, "/robot1_state")
+        state2_subscriber = message_filters.Subscriber(self, State, "/robot2_state")
+
+        ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber], 2, 0.1, allow_headerless=True)
+        ts.registerCallback(self.sensor_callback)
+
+        self.get_logger().info("Sensor has been started")
         
-        msg = State()
+    def sensor_callback(self, state1: State, state2: State):
 
-        msg.x = pose.x
-        msg.y = pose.y
-        msg.yaw = pose.yaw
-        msg.v = pose.v
-
-        self.measurement_publisher_.publish(msg)
-        self.get_logger().info("x: " + str(msg.x) + ", " +
-                               "y: " + str(msg.y) + ", " +
-                               "yaw: " + str(msg.yaw) + ", " +
-                               "linear velocity: " + str(msg.v))
+        self.measurement1_publisher_.publish(state1)
+        self.measurement2_publisher_.publish(state2)
+        
 
 
 
 def main(args=None):
     rclpy.init(args=args)
 
-    node1 = SensorMeasurement("robot1")
-    node2 = SensorMeasurement("robot2")
-    rclpy.spin(node1)
-    rclpy.spin(node2)
+    node = SensorMeasurement()
+    rclpy.spin(node)
 
     rclpy.shutdown()

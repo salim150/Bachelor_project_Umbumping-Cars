@@ -11,47 +11,47 @@ import pygame
 import math
 from matplotlib import pyplot as plt
 from custom_message.msg import ControlInputs, State
+import message_filters
 
 
 class Plotter(Node):
 
-    def __init__(self, robot_name: str, color: str):
-        super().__init__(robot_name + "_plotter")
+    def __init__(self):
+        super().__init__("plotter")
         self.get_logger().info("Plotter has been started")
         
-        self.plotter_subscriber_ = self.create_subscription(State, "/" + robot_name + "_state", self.plotter_callback, 10)
-        self.color = color
-        
-    def plotter_callback(self, pose: State):
-        
-        msg = State()
+        # self.plotter_subscriber_ = self.create_subscription(State, "/" + robot_name + "_state", self.plotter_callback, 1)
+        state1_subscriber = message_filters.Subscriber(self, State, "/robot1_state")
+        state2_subscriber = message_filters.Subscriber(self, State, "/robot2_state")
 
-        msg.x = pose.x
-        msg.y = pose.y
-        msg.yaw = pose.yaw
-        msg.v = pose.v
+        ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber], 10, 1, allow_headerless=True)
+        ts.registerCallback(self.plotter_callback)
+        
+    def plotter_callback(self, state1: State, state2: State):
         
         # add arrow to put in the direction, make plotting fancier
-        plt.figure()
-        plt.plot(msg.x, msg.y, self.color)
+        plt.plot(state1.x, state1.y, 'k.')
+        plt.plot(state2.x, state2.y, 'b.')
         plt.axis("equal")
         plt.draw()
         plt.pause(0.00000000001)
 
-        self.get_logger().info("x: " + str(msg.x) + ", " +
-                               "y: " + str(msg.y) + ", " +
-                               "theta: " + str(msg.yaw) + ", " +
-                               "linear velocity: " + str(msg.v))
+        self.get_logger().info("robot1, x: " + str(state1.x) + ", " +
+                               "y: " + str(state1.y) + ", " +
+                               "theta: " + str(state1.yaw) + ", " +
+                               "linear velocity: " + str(state1.v))
+        self.get_logger().info("robot2, x: " + str(state2.x) + ", " +
+                               "y: " + str(state2.y) + ", " +
+                               "theta: " + str(state2.yaw) + ", " +
+                               "linear velocity: " + str(state2.v))
 
 
 
 def main(args=None):
     rclpy.init(args=args)
 
-    node1 = Plotter("robot1", 'k.')
-    node2 = Plotter("robot2", 'g.')
-    rclpy.spin(node1)
-    rclpy.spin(node2)
+    node = Plotter()
+    rclpy.spin(node)
 
     rclpy.shutdown()
 
