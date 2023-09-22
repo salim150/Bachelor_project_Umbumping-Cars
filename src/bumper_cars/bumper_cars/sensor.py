@@ -31,7 +31,15 @@ class SensorMeasurement(Node):
     def sensor_callback(self, state1: State, state2: State):
 
         self.measurement1_publisher_.publish(state1)
+        self.get_logger().info("Publishing robot1 new state, x: " + str(state1.x) + ", " +
+                               "y: " + str(state1.y) + ", " +
+                               "theta: " + str(state1.yaw) + ", " +
+                               "linear velocity: " + str(state1.v))
         self.measurement2_publisher_.publish(state2)
+        self.get_logger().info("Publishing robot2 new state, x: " + str(state2.x) + ", " +
+                               "y: " + str(state2.y) + ", " +
+                               "theta: " + str(state2.yaw) + ", " +
+                               "linear velocity: " + str(state2.v))
         
 
 

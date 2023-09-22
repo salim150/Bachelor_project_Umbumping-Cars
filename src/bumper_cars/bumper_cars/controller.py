@@ -17,13 +17,6 @@ class Controller(Node):
 
         self.control1_publisher_ = self.create_publisher(ControlInputs, "/robot1_control", 1)
         self.control2_publisher_ = self.create_publisher(ControlInputs, "/robot2_control", 1)
-
-        """self.pose1_subscriber_ = self.create_subscription(State,
-                                                         "/robot1_measurement", 
-                                                         self.pose1_callback, 10)
-        self.pose2_subscriber_ = self.create_subscription(State,
-                                                         "/robot2_measurement", 
-                                                         self.pose2_callback, 1)"""
         
         state1_subscriber = message_filters.Subscriber(self, State, "/robot1_state")
         state2_subscriber = message_filters.Subscriber(self, State, "/robot2_state")
@@ -46,13 +39,15 @@ class Controller(Node):
         cmd.delta = 30.0
         cmd.throttle = 2.0
         self.control1_publisher_.publish(cmd)
+        self.get_logger().info("Control input robot1, delta:" + str(cmd.delta) + " , throttle: " + str(cmd.throttle))
 
     def pose2_callback(self, pose: State):
     
         cmd = ControlInputs()
-        cmd.delta = 30.0
-        cmd.throttle = 1.0
+        cmd.delta = 15.0
+        cmd.throttle = 2.0
         self.control2_publisher_.publish(cmd)
+        self.get_logger().info("Control input robot2, delta:" + str(cmd.delta) + " , throttle: " + str(cmd.throttle))
 
    
 
