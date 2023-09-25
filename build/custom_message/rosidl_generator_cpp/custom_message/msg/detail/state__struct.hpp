@@ -38,10 +38,10 @@ struct State_
     if (rosidl_runtime_cpp::MessageInitialization::ALL == _init ||
       rosidl_runtime_cpp::MessageInitialization::ZERO == _init)
     {
-      this->x = 0.0f;
-      this->y = 0.0f;
-      this->yaw = 0.0f;
-      this->v = 0.0f;
+      this->x = 0.0;
+      this->y = 0.0;
+      this->yaw = 0.0;
+      this->v = 0.0;
     }
   }
 
@@ -51,48 +51,48 @@ struct State_
     if (rosidl_runtime_cpp::MessageInitialization::ALL == _init ||
       rosidl_runtime_cpp::MessageInitialization::ZERO == _init)
     {
-      this->x = 0.0f;
-      this->y = 0.0f;
-      this->yaw = 0.0f;
-      this->v = 0.0f;
+      this->x = 0.0;
+      this->y = 0.0;
+      this->yaw = 0.0;
+      this->v = 0.0;
     }
   }
 
   // field types and members
   using _x_type =
-    float;
+    double;
   _x_type x;
   using _y_type =
-    float;
+    double;
   _y_type y;
   using _yaw_type =
-    float;
+    double;
   _yaw_type yaw;
   using _v_type =
-    float;
+    double;
   _v_type v;
 
   // setters for named parameter idiom
   Type & set__x(
-    const float & _arg)
+    const double & _arg)
   {
     this->x = _arg;
     return *this;
   }
   Type & set__y(
-    const float & _arg)
+    const double & _arg)
   {
     this->y = _arg;
     return *this;
   }
   Type & set__yaw(
-    const float & _arg)
+    const double & _arg)
   {
     this->yaw = _arg;
     return *this;
   }
   Type & set__v(
-    const float & _arg)
+    const double & _arg)
   {
     this->v = _arg;
     return *this;

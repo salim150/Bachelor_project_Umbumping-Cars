@@ -64,17 +64,17 @@ class State(metaclass=Metaclass_State):
     ]
 
     _fields_and_field_types = {
-        'x': 'float',
-        'y': 'float',
-        'yaw': 'float',
-        'v': 'float',
+        'x': 'double',
+        'y': 'double',
+        'yaw': 'double',
+        'v': 'double',
     }
 
     SLOT_TYPES = (
-        rosidl_parser.definition.BasicType('float'),  # noqa: E501
-        rosidl_parser.definition.BasicType('float'),  # noqa: E501
-        rosidl_parser.definition.BasicType('float'),  # noqa: E501
-        rosidl_parser.definition.BasicType('float'),  # noqa: E501
+        rosidl_parser.definition.BasicType('double'),  # noqa: E501
+        rosidl_parser.definition.BasicType('double'),  # noqa: E501
+        rosidl_parser.definition.BasicType('double'),  # noqa: E501
+        rosidl_parser.definition.BasicType('double'),  # noqa: E501
     )
 
     def __init__(self, **kwargs):
@@ -141,8 +141,8 @@ class State(metaclass=Metaclass_State):
             assert \
                 isinstance(value, float), \
                 "The 'x' field must be of type 'float'"
-            assert not (value < -3.402823466e+38 or value > 3.402823466e+38) or math.isinf(value), \
-                "The 'x' field must be a float in [-3.402823466e+38, 3.402823466e+38]"
+            assert not (value < -1.7976931348623157e+308 or value > 1.7976931348623157e+308) or math.isinf(value), \
+                "The 'x' field must be a double in [-1.7976931348623157e+308, 1.7976931348623157e+308]"
         self._x = value
 
     @builtins.property
@@ -156,8 +156,8 @@ class State(metaclass=Metaclass_State):
             assert \
                 isinstance(value, float), \
                 "The 'y' field must be of type 'float'"
-            assert not (value < -3.402823466e+38 or value > 3.402823466e+38) or math.isinf(value), \
-                "The 'y' field must be a float in [-3.402823466e+38, 3.402823466e+38]"
+            assert not (value < -1.7976931348623157e+308 or value > 1.7976931348623157e+308) or math.isinf(value), \
+                "The 'y' field must be a double in [-1.7976931348623157e+308, 1.7976931348623157e+308]"
         self._y = value
 
     @builtins.property
@@ -171,8 +171,8 @@ class State(metaclass=Metaclass_State):
             assert \
                 isinstance(value, float), \
                 "The 'yaw' field must be of type 'float'"
-            assert not (value < -3.402823466e+38 or value > 3.402823466e+38) or math.isinf(value), \
-                "The 'yaw' field must be a float in [-3.402823466e+38, 3.402823466e+38]"
+            assert not (value < -1.7976931348623157e+308 or value > 1.7976931348623157e+308) or math.isinf(value), \
+                "The 'yaw' field must be a double in [-1.7976931348623157e+308, 1.7976931348623157e+308]"
         self._yaw = value
 
     @builtins.property
@@ -186,6 +186,6 @@ class State(metaclass=Metaclass_State):
             assert \
                 isinstance(value, float), \
                 "The 'v' field must be of type 'float'"
-            assert not (value < -3.402823466e+38 or value > 3.402823466e+38) or math.isinf(value), \
-                "The 'v' field must be a float in [-3.402823466e+38, 3.402823466e+38]"
+            assert not (value < -1.7976931348623157e+308 or value > 1.7976931348623157e+308) or math.isinf(value), \
+                "The 'v' field must be a double in [-1.7976931348623157e+308, 1.7976931348623157e+308]"
         self._v = value

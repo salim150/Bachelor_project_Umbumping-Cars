@@ -17,6 +17,8 @@ set(CMAKE_MULTIPLE_OUTPUT_PAIRS
   "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_py/custom_message/msg/__init__.py" "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_fastrtps_c.c"
   "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_py/custom_message/msg/_control_inputs.py" "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_fastrtps_c.c"
   "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_py/custom_message/msg/_control_inputs_s.c" "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_fastrtps_c.c"
+  "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_py/custom_message/msg/_full_state.py" "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_fastrtps_c.c"
+  "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_py/custom_message/msg/_full_state_s.c" "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_fastrtps_c.c"
   "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_py/custom_message/msg/_state.py" "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_fastrtps_c.c"
   "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_py/custom_message/msg/_state_s.c" "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_fastrtps_c.c"
   )

@@ -6,13 +6,13 @@
 module custom_message {
   module msg {
     struct State {
-      float x;
+      double x;
 
-      float y;
+      double y;
 
-      float yaw;
+      double yaw;
 
-      float v;
+      double v;
     };
   };
 };

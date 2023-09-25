@@ -3,7 +3,7 @@
 import rclpy
 from rclpy.node import Node
 from turtlesim.msg import Pose
-from custom_message.msg import ControlInputs, State
+from custom_message.msg import ControlInputs, State, FullState
 import numpy as np
 import time
 import message_filters
@@ -33,15 +33,14 @@ class CarModel(Node):
         self.state1_publisher_ = self.create_publisher(State, "/robot1_state", 1)
         self.state2_publisher_ = self.create_publisher(State, "/robot2_state", 1)
 
-        control1_subscriber = message_filters.Subscriber(self, ControlInputs, "/robot1_control")
-        control2_subscriber = message_filters.Subscriber(self, ControlInputs, "/robot2_control")
+        self.control1_subscriber = message_filters.Subscriber(self, ControlInputs, "/robot1_control")
+        self.control2_subscriber = message_filters.Subscriber(self, ControlInputs, "/robot2_control")
 
-        ts = message_filters.ApproximateTimeSynchronizer([control1_subscriber, control2_subscriber], 2, 0.1, allow_headerless=True)
+        self.fullstate1_publisher_ = self.create_publisher(FullState, "robot1_fullstate", 1)
+        self.fullstate2_publisher_ = self.create_publisher(FullState, "robot2_fullstate", 1)
+
+        ts = message_filters.ApproximateTimeSynchronizer([self.control1_subscriber, self.control2_subscriber], 2, 0.1, allow_headerless=True)
         ts.registerCallback(self.general_model_callback)
-
-        # self.timer = self.create_timer(0.1, self.update)
-        
-        #self.get_logger().info(robot_name + "_model started succesfully at position x: " + str(self.initial_state.x) + " , y: " + str(self.initial_state.y))
 
         self.old_time1 = time.time()
         self.old_time2 = time.time()
@@ -57,14 +56,20 @@ class CarModel(Node):
 
         self.state1_publisher_.publish(self.initial_state1)
         self.state2_publisher_.publish(self.initial_state2)
+        
+        fullstate1 = FullState(x=float(self.initial_state1.x), y=float(self.initial_state1.y), yaw=float(self.initial_state1.yaw), v=float(self.initial_state1.v),
+                                                     delta=float(control1.delta), throttle=float(control1.throttle))
+        self.fullstate1_publisher_.publish(fullstate1)
+        fullstate2 = FullState(x=float(self.initial_state2.x), y=float(self.initial_state2.y), yaw=float(self.initial_state2.yaw), v=float(self.initial_state2.v),
+                                                     delta=float(control2.delta), throttle=float(control2.throttle))
+        self.fullstate2_publisher_.publish(fullstate2)
 
     def linear_model_callback(self, state: State, cmd: ControlInputs, old_time: float):
         
         new_state = State()
-        # self.get_logger().info("Command inputs, delta: " + str(cmd.delta) + ",  throttle: " + str(cmd.throttle))
 
         dt = time.time() - old_time
-        print(dt)
+        #print(dt)
         cmd.delta = np.clip(np.radians(cmd.delta), -max_steer, max_steer)
 
         state.x += state.v * np.cos(state.yaw) * dt
@@ -96,8 +101,6 @@ class CarModel(Node):
         return angle
         
         
-        
-
 def main(args=None):
     rclpy.init(args=args)
     

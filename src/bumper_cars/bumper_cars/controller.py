@@ -18,8 +18,8 @@ class Controller(Node):
         self.control1_publisher_ = self.create_publisher(ControlInputs, "/robot1_control", 1)
         self.control2_publisher_ = self.create_publisher(ControlInputs, "/robot2_control", 1)
         
-        state1_subscriber = message_filters.Subscriber(self, State, "/robot1_state")
-        state2_subscriber = message_filters.Subscriber(self, State, "/robot2_state")
+        state1_subscriber = message_filters.Subscriber(self, State, "/robot1_measurement")
+        state2_subscriber = message_filters.Subscriber(self, State, "/robot2_measurement")
 
         ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber], 2, 0.1, allow_headerless=True)
         ts.registerCallback(self.general_pose_callback)
