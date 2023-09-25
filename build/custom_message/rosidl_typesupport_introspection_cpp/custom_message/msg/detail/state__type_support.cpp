@@ -37,7 +37,7 @@ void State_fini_function(void * message_memory)
   typed_message->~State();
 }
 
-static const ::rosidl_typesupport_introspection_cpp::MessageMember State_message_member_array[4] = {
+static const ::rosidl_typesupport_introspection_cpp::MessageMember State_message_member_array[5] = {
   {
     "x",  // name
     ::rosidl_typesupport_introspection_cpp::ROS_TYPE_DOUBLE,  // type
@@ -105,13 +105,30 @@ static const ::rosidl_typesupport_introspection_cpp::MessageMember State_message
     nullptr,  // fetch(index, &value) function pointer
     nullptr,  // assign(index, value) function pointer
     nullptr  // resize(index) function pointer
+  },
+  {
+    "omega",  // name
+    ::rosidl_typesupport_introspection_cpp::ROS_TYPE_DOUBLE,  // type
+    0,  // upper bound of string
+    nullptr,  // members of sub message
+    false,  // is array
+    0,  // array size
+    false,  // is upper bound
+    offsetof(custom_message::msg::State, omega),  // bytes offset in struct
+    nullptr,  // default value
+    nullptr,  // size() function pointer
+    nullptr,  // get_const(index) function pointer
+    nullptr,  // get(index) function pointer
+    nullptr,  // fetch(index, &value) function pointer
+    nullptr,  // assign(index, value) function pointer
+    nullptr  // resize(index) function pointer
   }
 };
 
 static const ::rosidl_typesupport_introspection_cpp::MessageMembers State_message_members = {
   "custom_message::msg",  // message namespace
   "State",  // message name
-  4,  // number of fields
+  5,  // number of fields
   sizeof(custom_message::msg::State),
   State_message_member_array,  // message members
   State_init_function,  // function to initialize message memory (memory has to be allocated)

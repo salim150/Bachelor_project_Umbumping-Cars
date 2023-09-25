@@ -24,6 +24,7 @@ typedef struct custom_message__msg__State
   double y;
   double yaw;
   double v;
+  double omega;
 } custom_message__msg__State;
 
 // Struct for a sequence of custom_message__msg__State.

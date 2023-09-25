@@ -42,6 +42,7 @@ struct State_
       this->y = 0.0;
       this->yaw = 0.0;
       this->v = 0.0;
+      this->omega = 0.0;
     }
   }
 
@@ -55,6 +56,7 @@ struct State_
       this->y = 0.0;
       this->yaw = 0.0;
       this->v = 0.0;
+      this->omega = 0.0;
     }
   }
 
@@ -71,6 +73,9 @@ struct State_
   using _v_type =
     double;
   _v_type v;
+  using _omega_type =
+    double;
+  _omega_type omega;
 
   // setters for named parameter idiom
   Type & set__x(
@@ -95,6 +100,12 @@ struct State_
     const double & _arg)
   {
     this->v = _arg;
+    return *this;
+  }
+  Type & set__omega(
+    const double & _arg)
+  {
+    this->omega = _arg;
     return *this;
   }
 
@@ -150,6 +161,9 @@ struct State_
       return false;
     }
     if (this->v != other.v) {
+      return false;
+    }
+    if (this->omega != other.omega) {
       return false;
     }
     return true;

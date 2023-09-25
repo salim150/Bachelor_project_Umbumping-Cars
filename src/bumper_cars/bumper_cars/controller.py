@@ -9,6 +9,8 @@ from functools import partial
 from custom_message.msg import ControlInputs, State
 import message_filters
 
+debug = False
+
 class Controller(Node):
 
     def __init__(self):
@@ -36,18 +38,22 @@ class Controller(Node):
     def pose1_callback(self, pose: State):
     
         cmd = ControlInputs()
-        cmd.delta = 30.0
+        cmd.delta = 10.0
         cmd.throttle = 2.0
         self.control1_publisher_.publish(cmd)
-        self.get_logger().info("Control input robot1, delta:" + str(cmd.delta) + " , throttle: " + str(cmd.throttle))
+        
+        if debug:
+            self.get_logger().info("Control input robot1, delta:" + str(cmd.delta) + " , throttle: " + str(cmd.throttle))
 
     def pose2_callback(self, pose: State):
     
         cmd = ControlInputs()
-        cmd.delta = 15.0
+        cmd.delta = 10.0
         cmd.throttle = 2.0
         self.control2_publisher_.publish(cmd)
-        self.get_logger().info("Control input robot2, delta:" + str(cmd.delta) + " , throttle: " + str(cmd.throttle))
+        
+        if debug:
+            self.get_logger().info("Control input robot2, delta:" + str(cmd.delta) + " , throttle: " + str(cmd.throttle))
 
    
 

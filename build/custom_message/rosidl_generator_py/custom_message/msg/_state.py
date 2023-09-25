@@ -61,6 +61,7 @@ class State(metaclass=Metaclass_State):
         '_y',
         '_yaw',
         '_v',
+        '_omega',
     ]
 
     _fields_and_field_types = {
@@ -68,9 +69,11 @@ class State(metaclass=Metaclass_State):
         'y': 'double',
         'yaw': 'double',
         'v': 'double',
+        'omega': 'double',
     }
 
     SLOT_TYPES = (
+        rosidl_parser.definition.BasicType('double'),  # noqa: E501
         rosidl_parser.definition.BasicType('double'),  # noqa: E501
         rosidl_parser.definition.BasicType('double'),  # noqa: E501
         rosidl_parser.definition.BasicType('double'),  # noqa: E501
@@ -85,6 +88,7 @@ class State(metaclass=Metaclass_State):
         self.y = kwargs.get('y', float())
         self.yaw = kwargs.get('yaw', float())
         self.v = kwargs.get('v', float())
+        self.omega = kwargs.get('omega', float())
 
     def __repr__(self):
         typename = self.__class__.__module__.split('.')
@@ -122,6 +126,8 @@ class State(metaclass=Metaclass_State):
         if self.yaw != other.yaw:
             return False
         if self.v != other.v:
+            return False
+        if self.omega != other.omega:
             return False
         return True
 
@@ -189,3 +195,18 @@ class State(metaclass=Metaclass_State):
             assert not (value < -1.7976931348623157e+308 or value > 1.7976931348623157e+308) or math.isinf(value), \
                 "The 'v' field must be a double in [-1.7976931348623157e+308, 1.7976931348623157e+308]"
         self._v = value
+
+    @builtins.property
+    def omega(self):
+        """Message field 'omega'."""
+        return self._omega
+
+    @omega.setter
+    def omega(self, value):
+        if __debug__:
+            assert \
+                isinstance(value, float), \
+                "The 'omega' field must be of type 'float'"
+            assert not (value < -1.7976931348623157e+308 or value > 1.7976931348623157e+308) or math.isinf(value), \
+                "The 'omega' field must be a double in [-1.7976931348623157e+308, 1.7976931348623157e+308]"
+        self._omega = value

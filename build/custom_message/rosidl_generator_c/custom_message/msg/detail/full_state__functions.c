@@ -21,6 +21,7 @@ custom_message__msg__FullState__init(custom_message__msg__FullState * msg)
   // y
   // yaw
   // v
+  // omega
   // delta
   // throttle
   return true;
@@ -36,6 +37,7 @@ custom_message__msg__FullState__fini(custom_message__msg__FullState * msg)
   // y
   // yaw
   // v
+  // omega
   // delta
   // throttle
 }
@@ -60,6 +62,10 @@ custom_message__msg__FullState__are_equal(const custom_message__msg__FullState *
   }
   // v
   if (lhs->v != rhs->v) {
+    return false;
+  }
+  // omega
+  if (lhs->omega != rhs->omega) {
     return false;
   }
   // delta
@@ -89,6 +95,8 @@ custom_message__msg__FullState__copy(
   output->yaw = input->yaw;
   // v
   output->v = input->v;
+  // omega
+  output->omega = input->omega;
   // delta
   output->delta = input->delta;
   // throttle

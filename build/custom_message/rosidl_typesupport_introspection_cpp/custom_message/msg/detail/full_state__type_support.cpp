@@ -37,7 +37,7 @@ void FullState_fini_function(void * message_memory)
   typed_message->~FullState();
 }
 
-static const ::rosidl_typesupport_introspection_cpp::MessageMember FullState_message_member_array[6] = {
+static const ::rosidl_typesupport_introspection_cpp::MessageMember FullState_message_member_array[7] = {
   {
     "x",  // name
     ::rosidl_typesupport_introspection_cpp::ROS_TYPE_DOUBLE,  // type
@@ -107,6 +107,23 @@ static const ::rosidl_typesupport_introspection_cpp::MessageMember FullState_mes
     nullptr  // resize(index) function pointer
   },
   {
+    "omega",  // name
+    ::rosidl_typesupport_introspection_cpp::ROS_TYPE_DOUBLE,  // type
+    0,  // upper bound of string
+    nullptr,  // members of sub message
+    false,  // is array
+    0,  // array size
+    false,  // is upper bound
+    offsetof(custom_message::msg::FullState, omega),  // bytes offset in struct
+    nullptr,  // default value
+    nullptr,  // size() function pointer
+    nullptr,  // get_const(index) function pointer
+    nullptr,  // get(index) function pointer
+    nullptr,  // fetch(index, &value) function pointer
+    nullptr,  // assign(index, value) function pointer
+    nullptr  // resize(index) function pointer
+  },
+  {
     "delta",  // name
     ::rosidl_typesupport_introspection_cpp::ROS_TYPE_DOUBLE,  // type
     0,  // upper bound of string
@@ -145,7 +162,7 @@ static const ::rosidl_typesupport_introspection_cpp::MessageMember FullState_mes
 static const ::rosidl_typesupport_introspection_cpp::MessageMembers FullState_message_members = {
   "custom_message::msg",  // message namespace
   "FullState",  // message name
-  6,  // number of fields
+  7,  // number of fields
   sizeof(custom_message::msg::FullState),
   FullState_message_member_array,  // message members
   FullState_init_function,  // function to initialize message memory (memory has to be allocated)

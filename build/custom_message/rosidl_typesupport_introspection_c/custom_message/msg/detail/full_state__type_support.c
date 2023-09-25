@@ -31,7 +31,7 @@ void custom_message__msg__FullState__rosidl_typesupport_introspection_c__FullSta
   custom_message__msg__FullState__fini(message_memory);
 }
 
-static rosidl_typesupport_introspection_c__MessageMember custom_message__msg__FullState__rosidl_typesupport_introspection_c__FullState_message_member_array[6] = {
+static rosidl_typesupport_introspection_c__MessageMember custom_message__msg__FullState__rosidl_typesupport_introspection_c__FullState_message_member_array[7] = {
   {
     "x",  // name
     rosidl_typesupport_introspection_c__ROS_TYPE_DOUBLE,  // type
@@ -101,6 +101,23 @@ static rosidl_typesupport_introspection_c__MessageMember custom_message__msg__Fu
     NULL  // resize(index) function pointer
   },
   {
+    "omega",  // name
+    rosidl_typesupport_introspection_c__ROS_TYPE_DOUBLE,  // type
+    0,  // upper bound of string
+    NULL,  // members of sub message
+    false,  // is array
+    0,  // array size
+    false,  // is upper bound
+    offsetof(custom_message__msg__FullState, omega),  // bytes offset in struct
+    NULL,  // default value
+    NULL,  // size() function pointer
+    NULL,  // get_const(index) function pointer
+    NULL,  // get(index) function pointer
+    NULL,  // fetch(index, &value) function pointer
+    NULL,  // assign(index, value) function pointer
+    NULL  // resize(index) function pointer
+  },
+  {
     "delta",  // name
     rosidl_typesupport_introspection_c__ROS_TYPE_DOUBLE,  // type
     0,  // upper bound of string
@@ -139,7 +156,7 @@ static rosidl_typesupport_introspection_c__MessageMember custom_message__msg__Fu
 static const rosidl_typesupport_introspection_c__MessageMembers custom_message__msg__FullState__rosidl_typesupport_introspection_c__FullState_message_members = {
   "custom_message__msg",  // message namespace
   "FullState",  // message name
-  6,  // number of fields
+  7,  // number of fields
   sizeof(custom_message__msg__FullState),
   custom_message__msg__FullState__rosidl_typesupport_introspection_c__FullState_message_member_array,  // message members
   custom_message__msg__FullState__rosidl_typesupport_introspection_c__FullState_init_function,  // function to initialize message memory (memory has to be allocated)

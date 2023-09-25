@@ -86,6 +86,15 @@ bool custom_message__msg__state__convert_from_py(PyObject * _pymsg, void * _ros_
     ros_message->v = PyFloat_AS_DOUBLE(field);
     Py_DECREF(field);
   }
+  {  // omega
+    PyObject * field = PyObject_GetAttrString(_pymsg, "omega");
+    if (!field) {
+      return false;
+    }
+    assert(PyFloat_Check(field));
+    ros_message->omega = PyFloat_AS_DOUBLE(field);
+    Py_DECREF(field);
+  }
 
   return true;
 }
@@ -146,6 +155,17 @@ PyObject * custom_message__msg__state__convert_to_py(void * raw_ros_message)
     field = PyFloat_FromDouble(ros_message->v);
     {
       int rc = PyObject_SetAttrString(_pymessage, "v", field);
+      Py_DECREF(field);
+      if (rc) {
+        return NULL;
+      }
+    }
+  }
+  {  // omega
+    PyObject * field = NULL;
+    field = PyFloat_FromDouble(ros_message->omega);
+    {
+      int rc = PyObject_SetAttrString(_pymessage, "omega", field);
       Py_DECREF(field);
       if (rc) {
         return NULL;

@@ -51,11 +51,21 @@ class Plotter(Node):
         state1_subscriber = message_filters.Subscriber(self, FullState, "/robot1_fullstate")
         state2_subscriber = message_filters.Subscriber(self, FullState, "/robot2_fullstate")
 
+        self.state1_buf = np.array([0,0])
+        self.state2_buf = np.array([0,0])
+
         ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber], 10, 1, allow_headerless=True)
         ts.registerCallback(self.plotter_callback)
         
     def plotter_callback(self, state1: FullState, state2: FullState):
-        
+    
+        self.state1_buf = np.vstack((self.state1_buf, [state1.x, state1.y]))
+        self.state2_buf = np.vstack((self.state2_buf, [state2.x, state2.y]))
+        if len(self.state1_buf) > 500:
+            self.state1_buf = np.delete(self.state1_buf, 0, 0)
+        if len(self.state2_buf) > 500:
+            self.state2_buf = np.delete(self.state2_buf, 0, 0)
+
         plt.cla()
         # for stopping simulation with the esc key.
         plt.gcf().canvas.mpl_connect(
@@ -65,6 +75,8 @@ class Plotter(Node):
         self.plot_robot(state1)
         self.plot_robot(state2)
 
+        plt.scatter(self.state1_buf[:,0], self.state1_buf[:,1])
+        plt.scatter(self.state2_buf[:,0], self.state2_buf[:,1])
         plt.plot(state1.x, state1.y, 'k.')
         plt.plot(state2.x, state2.y, 'b.')
         plt.axis("equal")

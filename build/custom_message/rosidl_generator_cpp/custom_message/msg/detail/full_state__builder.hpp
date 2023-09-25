@@ -53,16 +53,32 @@ private:
   ::custom_message::msg::FullState msg_;
 };
 
+class Init_FullState_omega
+{
+public:
+  explicit Init_FullState_omega(::custom_message::msg::FullState & msg)
+  : msg_(msg)
+  {}
+  Init_FullState_delta omega(::custom_message::msg::FullState::_omega_type arg)
+  {
+    msg_.omega = std::move(arg);
+    return Init_FullState_delta(msg_);
+  }
+
+private:
+  ::custom_message::msg::FullState msg_;
+};
+
 class Init_FullState_v
 {
 public:
   explicit Init_FullState_v(::custom_message::msg::FullState & msg)
   : msg_(msg)
   {}
-  Init_FullState_delta v(::custom_message::msg::FullState::_v_type arg)
+  Init_FullState_omega v(::custom_message::msg::FullState::_v_type arg)
   {
     msg_.v = std::move(arg);
-    return Init_FullState_delta(msg_);
+    return Init_FullState_omega(msg_);
   }
 
 private:

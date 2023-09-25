@@ -248,8 +248,17 @@ CMakeFiles/custom_message__rosidl_typesupport_c__pyext.dir/rosidl_generator_py/c
   rosidl_generator_c/custom_message/msg/detail/control_inputs__functions.h \
   rosidl_generator_c/custom_message/msg/detail/state__type_support.h \
   rosidl_generator_c/custom_message/msg/detail/state__struct.h \
-  rosidl_generator_c/custom_message/msg/detail/state__functions.h
+  rosidl_generator_c/custom_message/msg/detail/state__functions.h \
+  rosidl_generator_c/custom_message/msg/detail/full_state__type_support.h \
+  rosidl_generator_c/custom_message/msg/detail/full_state__struct.h \
+  rosidl_generator_c/custom_message/msg/detail/full_state__functions.h
 
+
+rosidl_generator_c/custom_message/msg/detail/full_state__functions.h:
+
+rosidl_generator_c/custom_message/msg/detail/full_state__struct.h:
+
+rosidl_generator_c/custom_message/msg/detail/full_state__type_support.h:
 
 rosidl_generator_c/custom_message/msg/detail/state__functions.h:
 

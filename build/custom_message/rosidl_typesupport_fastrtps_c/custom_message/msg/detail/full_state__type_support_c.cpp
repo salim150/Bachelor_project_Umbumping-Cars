@@ -69,6 +69,11 @@ static bool _FullState__cdr_serialize(
     cdr << ros_message->v;
   }
 
+  // Field name: omega
+  {
+    cdr << ros_message->omega;
+  }
+
   // Field name: delta
   {
     cdr << ros_message->delta;
@@ -109,6 +114,11 @@ static bool _FullState__cdr_deserialize(
   // Field name: v
   {
     cdr >> ros_message->v;
+  }
+
+  // Field name: omega
+  {
+    cdr >> ros_message->omega;
   }
 
   // Field name: delta
@@ -159,6 +169,12 @@ size_t get_serialized_size_custom_message__msg__FullState(
   // field.name v
   {
     size_t item_size = sizeof(ros_message->v);
+    current_alignment += item_size +
+      eprosima::fastcdr::Cdr::alignment(current_alignment, item_size);
+  }
+  // field.name omega
+  {
+    size_t item_size = sizeof(ros_message->omega);
     current_alignment += item_size +
       eprosima::fastcdr::Cdr::alignment(current_alignment, item_size);
   }
@@ -223,6 +239,13 @@ size_t max_serialized_size_custom_message__msg__FullState(
       eprosima::fastcdr::Cdr::alignment(current_alignment, sizeof(uint64_t));
   }
   // member: v
+  {
+    size_t array_size = 1;
+
+    current_alignment += array_size * sizeof(uint64_t) +
+      eprosima::fastcdr::Cdr::alignment(current_alignment, sizeof(uint64_t));
+  }
+  // member: omega
   {
     size_t array_size = 1;
 

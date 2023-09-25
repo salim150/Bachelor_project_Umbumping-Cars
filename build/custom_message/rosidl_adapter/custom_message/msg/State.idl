@@ -13,6 +13,8 @@ module custom_message {
       double yaw;
 
       double v;
+
+      double omega;
     };
   };
 };

@@ -61,6 +61,7 @@ class FullState(metaclass=Metaclass_FullState):
         '_y',
         '_yaw',
         '_v',
+        '_omega',
         '_delta',
         '_throttle',
     ]
@@ -70,11 +71,13 @@ class FullState(metaclass=Metaclass_FullState):
         'y': 'double',
         'yaw': 'double',
         'v': 'double',
+        'omega': 'double',
         'delta': 'double',
         'throttle': 'double',
     }
 
     SLOT_TYPES = (
+        rosidl_parser.definition.BasicType('double'),  # noqa: E501
         rosidl_parser.definition.BasicType('double'),  # noqa: E501
         rosidl_parser.definition.BasicType('double'),  # noqa: E501
         rosidl_parser.definition.BasicType('double'),  # noqa: E501
@@ -91,6 +94,7 @@ class FullState(metaclass=Metaclass_FullState):
         self.y = kwargs.get('y', float())
         self.yaw = kwargs.get('yaw', float())
         self.v = kwargs.get('v', float())
+        self.omega = kwargs.get('omega', float())
         self.delta = kwargs.get('delta', float())
         self.throttle = kwargs.get('throttle', float())
 
@@ -130,6 +134,8 @@ class FullState(metaclass=Metaclass_FullState):
         if self.yaw != other.yaw:
             return False
         if self.v != other.v:
+            return False
+        if self.omega != other.omega:
             return False
         if self.delta != other.delta:
             return False
@@ -201,6 +207,21 @@ class FullState(metaclass=Metaclass_FullState):
             assert not (value < -1.7976931348623157e+308 or value > 1.7976931348623157e+308) or math.isinf(value), \
                 "The 'v' field must be a double in [-1.7976931348623157e+308, 1.7976931348623157e+308]"
         self._v = value
+
+    @builtins.property
+    def omega(self):
+        """Message field 'omega'."""
+        return self._omega
+
+    @omega.setter
+    def omega(self, value):
+        if __debug__:
+            assert \
+                isinstance(value, float), \
+                "The 'omega' field must be of type 'float'"
+            assert not (value < -1.7976931348623157e+308 or value > 1.7976931348623157e+308) or math.isinf(value), \
+                "The 'omega' field must be a double in [-1.7976931348623157e+308, 1.7976931348623157e+308]"
+        self._omega = value
 
     @builtins.property
     def delta(self):

@@ -42,6 +42,7 @@ struct FullState_
       this->y = 0.0;
       this->yaw = 0.0;
       this->v = 0.0;
+      this->omega = 0.0;
       this->delta = 0.0;
       this->throttle = 0.0;
     }
@@ -57,6 +58,7 @@ struct FullState_
       this->y = 0.0;
       this->yaw = 0.0;
       this->v = 0.0;
+      this->omega = 0.0;
       this->delta = 0.0;
       this->throttle = 0.0;
     }
@@ -75,6 +77,9 @@ struct FullState_
   using _v_type =
     double;
   _v_type v;
+  using _omega_type =
+    double;
+  _omega_type omega;
   using _delta_type =
     double;
   _delta_type delta;
@@ -105,6 +110,12 @@ struct FullState_
     const double & _arg)
   {
     this->v = _arg;
+    return *this;
+  }
+  Type & set__omega(
+    const double & _arg)
+  {
+    this->omega = _arg;
     return *this;
   }
   Type & set__delta(
@@ -172,6 +183,9 @@ struct FullState_
       return false;
     }
     if (this->v != other.v) {
+      return false;
+    }
+    if (this->omega != other.omega) {
       return false;
     }
     if (this->delta != other.delta) {

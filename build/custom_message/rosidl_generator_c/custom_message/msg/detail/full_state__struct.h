@@ -24,6 +24,7 @@ typedef struct custom_message__msg__FullState
   double y;
   double yaw;
   double v;
+  double omega;
   double delta;
   double throttle;
 } custom_message__msg__FullState;
