@@ -75,9 +75,6 @@ class Plotter(Node):
         self.plot_robot(state1)
         self.plot_robot(state2)
 
-        beta = math.atan2((1.45 * math.tan(state2.delta) / 2.9), 1.0)
-        self.plot_arrow(state2.x,state2.y, beta + state2.yaw, length= 2)
-
         plt.scatter(self.state1_buf[:,0], self.state1_buf[:,1], linewidths=0.5)
         plt.scatter(self.state2_buf[:,0], self.state2_buf[:,1], linewidths=0.5)
         plt.plot(state1.x, state1.y, 'k.')
@@ -99,7 +96,7 @@ class Plotter(Node):
     def plot_robot(self, fullstate: FullState):
         self.plot_rect(fullstate.x, fullstate.y, fullstate.yaw, config)
         self.plot_cs_robot(fullstate.x, fullstate.y, fullstate.yaw)
-        self.plot_arrow(fullstate.x, fullstate.y, fullstate.yaw + fullstate.delta)
+        self.plot_arrow(fullstate.x, fullstate.y, fullstate.yaw + fullstate.delta, length=2)
 
     def plot_arrow(self, x, y, yaw, length=0.5, width=0.1):  # pragma: no cover
         plt.arrow(x, y, length * math.cos(yaw), length * math.sin(yaw),
