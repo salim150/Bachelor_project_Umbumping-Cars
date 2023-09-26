@@ -75,8 +75,11 @@ class Plotter(Node):
         self.plot_robot(state1)
         self.plot_robot(state2)
 
-        plt.scatter(self.state1_buf[:,0], self.state1_buf[:,1])
-        plt.scatter(self.state2_buf[:,0], self.state2_buf[:,1])
+        beta = math.atan2((1.45 * math.tan(state2.delta) / 2.9), 1.0)
+        self.plot_arrow(state2.x,state2.y, beta + state2.yaw, length= 2)
+
+        plt.scatter(self.state1_buf[:,0], self.state1_buf[:,1], linewidths=0.5)
+        plt.scatter(self.state2_buf[:,0], self.state2_buf[:,1], linewidths=0.5)
         plt.plot(state1.x, state1.y, 'k.')
         plt.plot(state2.x, state2.y, 'b.')
         plt.axis("equal")

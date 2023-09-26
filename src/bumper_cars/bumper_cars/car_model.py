@@ -10,7 +10,7 @@ import message_filters
 import math
 
 max_steer = np.radians(30.0)  # [rad] max steering angle
-max_speed = 5 # [m/s]
+max_speed = 10 # [m/s]
 min_speed = 0.0 # [m/s]
 L = 2.9  # [m] Wheel base of vehicle
 # dt = 0.1
@@ -73,6 +73,7 @@ class CarModel(Node):
     def linear_model_callback(self, state: State, cmd: ControlInputs, old_time: float):
 
         dt = time.time() - old_time
+        old_time = time.time()
         cmd.delta = np.clip(np.radians(cmd.delta), -max_steer, max_steer)
 
         state.x += state.v * np.cos(state.yaw) * dt
@@ -82,19 +83,20 @@ class CarModel(Node):
         state.v += cmd.throttle * dt
         state.v = np.clip(state.v, min_speed, max_speed)
 
-        return state, time.time()
+        return state, old_time
     
     def nonlinear_model_callback(self, state: State, cmd: ControlInputs, old_time: float):
 
         dt = time.time() - old_time
+        old_time = time.time()
+        cmd.delta = np.clip(np.radians(cmd.delta), -max_steer, max_steer)
+
         beta = math.atan2((Lr * math.tan(cmd.delta) / L), 1.0)
         vx = state.v * math.cos(beta)
         vy = state.v * math.sin(beta)
 
-        cmd.delta = np.clip(np.radians(cmd.delta), -max_steer, max_steer)
-
-        Ffy = -Cf * math.atan2(((vy + Lf * state.omega) / (vx + 0.0001) - cmd.delta), 1.0)
-        Fry = -Cr * math.atan2((vy - Lr * state.omega) / (vx + 0.0001), 1.0)
+        Ffy = -Cf * ((vy + Lf * state.omega) / (vx + 0.0001) - cmd.delta)
+        Fry = -Cr * (vy - Lr * state.omega) / (vx + 0.0001)
         R_x = c_r1 * abs(vx)
         F_aero = c_a * vx ** 2
         F_load = F_aero + R_x
@@ -111,7 +113,7 @@ class CarModel(Node):
         state.v = math.sqrt(vx ** 2 + vy ** 2)
         state.v = np.clip(state.v, min_speed, max_speed)
 
-        return state, time.time()
+        return state, old_time
 
 
     def normalize_angle(self, angle):

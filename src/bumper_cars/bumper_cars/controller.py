@@ -38,8 +38,8 @@ class Controller(Node):
     def pose1_callback(self, pose: State):
     
         cmd = ControlInputs()
-        cmd.delta = 10.0
-        cmd.throttle = 2.0
+        cmd.delta =15.0
+        cmd.throttle = 3.0
         self.control1_publisher_.publish(cmd)
         
         if debug:
@@ -48,8 +48,8 @@ class Controller(Node):
     def pose2_callback(self, pose: State):
     
         cmd = ControlInputs()
-        cmd.delta = 10.0
-        cmd.throttle = 2.0
+        cmd.delta = 15.0
+        cmd.throttle = 3.0
         self.control2_publisher_.publish(cmd)
         
         if debug:
