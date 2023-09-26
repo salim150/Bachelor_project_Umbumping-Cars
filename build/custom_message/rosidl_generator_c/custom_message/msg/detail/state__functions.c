@@ -21,6 +21,7 @@ custom_message__msg__State__init(custom_message__msg__State * msg)
   // y
   // yaw
   // v
+  // omega
   return true;
 }
 
@@ -34,6 +35,7 @@ custom_message__msg__State__fini(custom_message__msg__State * msg)
   // y
   // yaw
   // v
+  // omega
 }
 
 bool
@@ -58,6 +60,10 @@ custom_message__msg__State__are_equal(const custom_message__msg__State * lhs, co
   if (lhs->v != rhs->v) {
     return false;
   }
+  // omega
+  if (lhs->omega != rhs->omega) {
+    return false;
+  }
   return true;
 }
 
@@ -77,6 +83,8 @@ custom_message__msg__State__copy(
   output->yaw = input->yaw;
   // v
   output->v = input->v;
+  // omega
+  output->omega = input->omega;
   return true;
 }
 

@@ -1,4 +1,5 @@
-float32 x
-float32 y
-float32 yaw
-float32 v
+float64 x
+float64 y
+float64 yaw
+float64 v
+float64 omega

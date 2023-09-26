@@ -15,9 +15,13 @@ set(CMAKE_MULTIPLE_OUTPUT_PAIRS
   "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_cpp/custom_message/msg/detail/control_inputs__builder.hpp" "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_cpp/custom_message/msg/control_inputs.hpp"
   "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_cpp/custom_message/msg/detail/control_inputs__struct.hpp" "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_cpp/custom_message/msg/control_inputs.hpp"
   "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_cpp/custom_message/msg/detail/control_inputs__traits.hpp" "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_cpp/custom_message/msg/control_inputs.hpp"
+  "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_cpp/custom_message/msg/detail/full_state__builder.hpp" "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_cpp/custom_message/msg/control_inputs.hpp"
+  "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_cpp/custom_message/msg/detail/full_state__struct.hpp" "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_cpp/custom_message/msg/control_inputs.hpp"
+  "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_cpp/custom_message/msg/detail/full_state__traits.hpp" "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_cpp/custom_message/msg/control_inputs.hpp"
   "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_cpp/custom_message/msg/detail/state__builder.hpp" "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_cpp/custom_message/msg/control_inputs.hpp"
   "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_cpp/custom_message/msg/detail/state__struct.hpp" "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_cpp/custom_message/msg/control_inputs.hpp"
   "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_cpp/custom_message/msg/detail/state__traits.hpp" "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_cpp/custom_message/msg/control_inputs.hpp"
+  "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_cpp/custom_message/msg/full_state.hpp" "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_cpp/custom_message/msg/control_inputs.hpp"
   "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_cpp/custom_message/msg/state.hpp" "/home/giacomo/thesis_ws/build/custom_message/rosidl_generator_cpp/custom_message/msg/control_inputs.hpp"
   )
 

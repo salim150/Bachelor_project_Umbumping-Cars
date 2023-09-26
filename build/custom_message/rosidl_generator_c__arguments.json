@@ -4,7 +4,8 @@
   "template_dir": "/opt/ros/humble/share/rosidl_generator_c/cmake/../resource",
   "idl_tuples": [
     "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message:msg/ControlInputs.idl",
-    "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message:msg/State.idl"
+    "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message:msg/State.idl",
+    "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message:msg/FullState.idl"
   ],
   "target_dependencies": [
     "/opt/ros/humble/share/rosidl_generator_c/cmake/../../../lib/rosidl_generator_c/rosidl_generator_c",
@@ -21,6 +22,7 @@
     "/opt/ros/humble/share/rosidl_generator_c/cmake/../resource/msg__type_support.h.em",
     "/opt/ros/humble/share/rosidl_generator_c/cmake/../resource/srv__type_support.h.em",
     "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message/msg/ControlInputs.idl",
-    "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message/msg/State.idl"
+    "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message/msg/State.idl",
+    "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message/msg/FullState.idl"
   ]
 }

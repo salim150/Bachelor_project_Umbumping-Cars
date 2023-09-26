@@ -20,10 +20,11 @@ extern "C"
 /// Struct defined in msg/State in the package custom_message.
 typedef struct custom_message__msg__State
 {
-  float x;
-  float y;
-  float yaw;
-  float v;
+  double x;
+  double y;
+  double yaw;
+  double v;
+  double omega;
 } custom_message__msg__State;
 
 // Struct for a sequence of custom_message__msg__State.

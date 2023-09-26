@@ -31,10 +31,10 @@ void custom_message__msg__State__rosidl_typesupport_introspection_c__State_fini_
   custom_message__msg__State__fini(message_memory);
 }
 
-static rosidl_typesupport_introspection_c__MessageMember custom_message__msg__State__rosidl_typesupport_introspection_c__State_message_member_array[4] = {
+static rosidl_typesupport_introspection_c__MessageMember custom_message__msg__State__rosidl_typesupport_introspection_c__State_message_member_array[5] = {
   {
     "x",  // name
-    rosidl_typesupport_introspection_c__ROS_TYPE_FLOAT,  // type
+    rosidl_typesupport_introspection_c__ROS_TYPE_DOUBLE,  // type
     0,  // upper bound of string
     NULL,  // members of sub message
     false,  // is array
@@ -51,7 +51,7 @@ static rosidl_typesupport_introspection_c__MessageMember custom_message__msg__St
   },
   {
     "y",  // name
-    rosidl_typesupport_introspection_c__ROS_TYPE_FLOAT,  // type
+    rosidl_typesupport_introspection_c__ROS_TYPE_DOUBLE,  // type
     0,  // upper bound of string
     NULL,  // members of sub message
     false,  // is array
@@ -68,7 +68,7 @@ static rosidl_typesupport_introspection_c__MessageMember custom_message__msg__St
   },
   {
     "yaw",  // name
-    rosidl_typesupport_introspection_c__ROS_TYPE_FLOAT,  // type
+    rosidl_typesupport_introspection_c__ROS_TYPE_DOUBLE,  // type
     0,  // upper bound of string
     NULL,  // members of sub message
     false,  // is array
@@ -85,7 +85,7 @@ static rosidl_typesupport_introspection_c__MessageMember custom_message__msg__St
   },
   {
     "v",  // name
-    rosidl_typesupport_introspection_c__ROS_TYPE_FLOAT,  // type
+    rosidl_typesupport_introspection_c__ROS_TYPE_DOUBLE,  // type
     0,  // upper bound of string
     NULL,  // members of sub message
     false,  // is array
@@ -99,13 +99,30 @@ static rosidl_typesupport_introspection_c__MessageMember custom_message__msg__St
     NULL,  // fetch(index, &value) function pointer
     NULL,  // assign(index, value) function pointer
     NULL  // resize(index) function pointer
+  },
+  {
+    "omega",  // name
+    rosidl_typesupport_introspection_c__ROS_TYPE_DOUBLE,  // type
+    0,  // upper bound of string
+    NULL,  // members of sub message
+    false,  // is array
+    0,  // array size
+    false,  // is upper bound
+    offsetof(custom_message__msg__State, omega),  // bytes offset in struct
+    NULL,  // default value
+    NULL,  // size() function pointer
+    NULL,  // get_const(index) function pointer
+    NULL,  // get(index) function pointer
+    NULL,  // fetch(index, &value) function pointer
+    NULL,  // assign(index, value) function pointer
+    NULL  // resize(index) function pointer
   }
 };
 
 static const rosidl_typesupport_introspection_c__MessageMembers custom_message__msg__State__rosidl_typesupport_introspection_c__State_message_members = {
   "custom_message__msg",  // message namespace
   "State",  // message name
-  4,  // number of fields
+  5,  // number of fields
   sizeof(custom_message__msg__State),
   custom_message__msg__State__rosidl_typesupport_introspection_c__State_message_member_array,  // message members
   custom_message__msg__State__rosidl_typesupport_introspection_c__State_init_function,  // function to initialize message memory (memory has to be allocated)

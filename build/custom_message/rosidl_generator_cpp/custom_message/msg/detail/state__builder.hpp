@@ -21,16 +21,32 @@ namespace msg
 namespace builder
 {
 
+class Init_State_omega
+{
+public:
+  explicit Init_State_omega(::custom_message::msg::State & msg)
+  : msg_(msg)
+  {}
+  ::custom_message::msg::State omega(::custom_message::msg::State::_omega_type arg)
+  {
+    msg_.omega = std::move(arg);
+    return std::move(msg_);
+  }
+
+private:
+  ::custom_message::msg::State msg_;
+};
+
 class Init_State_v
 {
 public:
   explicit Init_State_v(::custom_message::msg::State & msg)
   : msg_(msg)
   {}
-  ::custom_message::msg::State v(::custom_message::msg::State::_v_type arg)
+  Init_State_omega v(::custom_message::msg::State::_v_type arg)
   {
     msg_.v = std::move(arg);
-    return std::move(msg_);
+    return Init_State_omega(msg_);
   }
 
 private:

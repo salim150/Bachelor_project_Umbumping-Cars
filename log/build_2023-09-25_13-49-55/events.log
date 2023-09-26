@@ -1,0 +1,379 @@
+[0.000000] (-) TimerEvent: {}
+[0.000168] (custom_message) JobQueued: {'identifier': 'custom_message', 'dependencies': OrderedDict()}
+[0.000253] (bumper_cars) JobQueued: {'identifier': 'bumper_cars', 'dependencies': OrderedDict([('custom_message', '/home/giacomo/thesis_ws/install/custom_message')])}
+[0.000281] (custom_message) JobStarted: {'identifier': 'custom_message'}
+[0.010199] (custom_message) JobProgress: {'identifier': 'custom_message', 'progress': 'cmake'}
+[0.011797] (custom_message) JobProgress: {'identifier': 'custom_message', 'progress': 'build'}
+[0.011877] (custom_message) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/giacomo/thesis_ws/build/custom_message', '--', '-j8', '-l8'], 'cwd': '/home/giacomo/thesis_ws/build/custom_message', 'env': OrderedDict([('GJS_DEBUG_TOPICS', 'JS ERROR;JS LOG'), ('LESSOPEN', '| /usr/bin/lesspipe %s'), ('LANGUAGE', 'it_CH:it'), ('USER', 'giacomo'), ('XDG_SESSION_TYPE', 'wayland'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/home/giacomo/thesis_ws/install/custom_message/lib:/home/giacomo/ros2_ws/install/tutorial_interfaces/lib:/home/giacomo/ros2_ws/install/turtlesim/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/home/giacomo'), ('OLDPWD', '/home/giacomo'), ('DESKTOP_SESSION', 'ubuntu'), ('GIO_LAUNCHED_DESKTOP_FILE', '/usr/share/applications/terminator.desktop'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('MANAGERPID', '1405'), ('SYSTEMD_EXEC_PID', '1608'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('GIO_LAUNCHED_DESKTOP_FILE_PID', '3371'), ('IM_CONFIG_PHASE', '1'), ('WAYLAND_DISPLAY', 'wayland-0'), ('COLCON_PREFIX_PATH', '/home/giacomo/thesis_ws/install:/home/giacomo/ros2_ws/install'), ('ROS_DISTRO', 'humble'), ('LOGNAME', 'giacomo'), ('JOURNAL_STREAM', '8:32977'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'giacomo'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin'), ('SESSION_MANAGER', 'local/giacomo-N13-N140ZU:@/tmp/.ICE-unix/1565,unix/giacomo-N13-N140ZU:/tmp/.ICE-unix/1565'), ('INVOCATION_ID', '95a751b05b2041688b9ed9528449ab69'), ('XDG_MENU_PREFIX', 'gnome-'), ('GNOME_SETUP_DISPLAY', ':1'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('DISPLAY', ':0'), ('LANG', 'it_CH.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('IBUS_DISABLE_SNOOPER', '1'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/.mutter-Xwaylandauth.0IJ4B2'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('SSH_AGENT_LAUNCHER', 'gnome-keyring'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('AMENT_PREFIX_PATH', '/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/thesis_ws/install/custom_message:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/tutorial_interfaces:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/turtlesim:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('TERMINATOR_UUID', 'urn:uuid:2e7a978a-b6a6-4984-8f53-a99e8abb0b4d'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('GJS_DEBUG_OUTPUT', 'stderr'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/giacomo/thesis_ws/build/custom_message'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/giacomo/thesis_ws/build/bumper_cars:/home/giacomo/thesis_ws/install/bumper_cars/lib/python3.10/site-packages:/home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages:/home/giacomo/ros2_ws/install/py_pubsub/lib/python3.10/site-packages:/home/giacomo/ros2_ws/install/tutorial_interfaces/local/lib/python3.10/dist-packages:/home/giacomo/ros2_ws/build/my_robot_controller:/home/giacomo/ros2_ws/install/my_robot_controller/lib/python3.10/site-packages:/home/giacomo/ros2_ws/install/turtlesim/local/lib/python3.10/dist-packages:/home/giacomo/ros2_ws/build/py_srvcli:/home/giacomo/ros2_ws/install/py_srvcli/lib/python3.10/site-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('VTE_VERSION', '6800'), ('CMAKE_PREFIX_PATH', '/home/giacomo/thesis_ws/install/custom_message:/home/giacomo/ros2_ws/install/tutorial_interfaces:/home/giacomo/ros2_ws/install/turtlesim:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble')]), 'shell': False}
+[0.040964] (custom_message) StdoutLine: {'line': b'-- Found ament_cmake: 1.3.5 (/opt/ros/humble/share/ament_cmake/cmake)\n'}
+[0.099175] (-) TimerEvent: {}
+[0.190835] (custom_message) StdoutLine: {'line': b'-- Override CMake install command with custom implementation using symlinks instead of copying resources\n'}
+[0.197186] (custom_message) StdoutLine: {'line': b'-- Found rosidl_default_generators: 1.2.0 (/opt/ros/humble/share/rosidl_default_generators/cmake)\n'}
+[0.199314] (-) TimerEvent: {}
+[0.199573] (custom_message) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[0.202098] (custom_message) StdoutLine: {'line': b'-- Found rosidl_adapter: 3.1.5 (/opt/ros/humble/share/rosidl_adapter/cmake)\n'}
+[0.233871] (custom_message) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[0.299432] (-) TimerEvent: {}
+[0.399764] (-) TimerEvent: {}
+[0.500049] (-) TimerEvent: {}
+[0.511845] (custom_message) StdoutLine: {'line': b'-- Found ament_cmake_ros: 0.10.0 (/opt/ros/humble/share/ament_cmake_ros/cmake)\n'}
+[0.600176] (-) TimerEvent: {}
+[0.700464] (-) TimerEvent: {}
+[0.708056] (custom_message) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[0.800596] (-) TimerEvent: {}
+[0.900854] (-) TimerEvent: {}
+[0.964540] (custom_message) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[0.987412] (custom_message) StdoutLine: {'line': b'-- Found python_cmake_module: 0.10.0 (/opt/ros/humble/share/python_cmake_module/cmake)\n'}
+[1.000973] (-) TimerEvent: {}
+[1.009577] (custom_message) StdoutLine: {'line': b'-- Using PYTHON_EXECUTABLE: /usr/bin/python3\n'}
+[1.009759] (custom_message) StdoutLine: {'line': b'-- Using PYTHON_INCLUDE_DIRS: /usr/include/python3.10\n'}
+[1.009858] (custom_message) StdoutLine: {'line': b'-- Using PYTHON_LIBRARIES: /usr/lib/x86_64-linux-gnu/libpython3.10.so\n'}
+[1.031551] (custom_message) StdoutLine: {'line': b'-- Configuring done\n'}
+[1.066352] (custom_message) StdoutLine: {'line': b'-- Generating done\n'}
+[1.069418] (custom_message) StdoutLine: {'line': b'-- Build files have been written to: /home/giacomo/thesis_ws/build/custom_message\n'}
+[1.098919] (custom_message) StdoutLine: {'line': b'[  2%] \x1b[34m\x1b[1mGenerating C code for ROS interfaces\x1b[0m\n'}
+[1.101053] (-) TimerEvent: {}
+[1.110349] (custom_message) StdoutLine: {'line': b'[  4%] \x1b[34m\x1b[1mGenerating C++ code for ROS interfaces\x1b[0m\n'}
+[1.120342] (custom_message) StdoutLine: {'line': b'[  4%] Built target ament_cmake_python_symlink_custom_message\n'}
+[1.201162] (-) TimerEvent: {}
+[1.301470] (-) TimerEvent: {}
+[1.380904] (custom_message) StdoutLine: {'line': b'running egg_info\n'}
+[1.400923] (custom_message) StdoutLine: {'line': b'writing custom_message.egg-info/PKG-INFO\n'}
+[1.401357] (custom_message) StdoutLine: {'line': b'writing dependency_links to custom_message.egg-info/dependency_links.txt\n'}
+[1.401518] (-) TimerEvent: {}
+[1.401735] (custom_message) StdoutLine: {'line': b'writing top-level names to custom_message.egg-info/top_level.txt\n'}
+[1.462630] (custom_message) StdoutLine: {'line': b"reading manifest file 'custom_message.egg-info/SOURCES.txt'\n"}
+[1.463414] (custom_message) StdoutLine: {'line': b"writing manifest file 'custom_message.egg-info/SOURCES.txt'\n"}
+[1.493853] (custom_message) StdoutLine: {'line': b'[  4%] Built target ament_cmake_python_build_custom_message_egg\n'}
+[1.501647] (-) TimerEvent: {}
+[1.544142] (custom_message) StdoutLine: {'line': b'[  4%] Built target custom_message__cpp\n'}
+[1.563610] (custom_message) StdoutLine: {'line': b'[  6%] \x1b[34m\x1b[1mGenerating C++ type support dispatch for ROS interfaces\x1b[0m\n'}
+[1.569817] (custom_message) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target custom_message__rosidl_generator_c\x1b[0m\n'}
+[1.570204] (custom_message) StdoutLine: {'line': b'[  8%] \x1b[34m\x1b[1mGenerating C++ type support for eProsima Fast-RTPS\x1b[0m\n'}
+[1.570621] (custom_message) StdoutLine: {'line': b'[ 10%] \x1b[34m\x1b[1mGenerating C++ introspection for ROS interfaces\x1b[0m\n'}
+[1.591163] (custom_message) StdoutLine: {'line': b'[ 14%] \x1b[32mBuilding C object CMakeFiles/custom_message__rosidl_generator_c.dir/rosidl_generator_c/custom_message/msg/detail/control_inputs__functions.c.o\x1b[0m\n'}
+[1.591586] (custom_message) StdoutLine: {'line': b'[ 14%] \x1b[32mBuilding C object CMakeFiles/custom_message__rosidl_generator_c.dir/rosidl_generator_c/custom_message/msg/detail/state__functions.c.o\x1b[0m\n'}
+[1.591877] (custom_message) StdoutLine: {'line': b'[ 17%] \x1b[32mBuilding C object CMakeFiles/custom_message__rosidl_generator_c.dir/rosidl_generator_c/custom_message/msg/detail/full_state__functions.c.o\x1b[0m\n'}
+[1.601766] (-) TimerEvent: {}
+[1.693511] (custom_message) StdoutLine: {'line': b'[ 19%] \x1b[32m\x1b[1mLinking C shared library libcustom_message__rosidl_generator_c.so\x1b[0m\n'}
+[1.701866] (-) TimerEvent: {}
+[1.745402] (custom_message) StdoutLine: {'line': b'[ 19%] Built target custom_message__rosidl_generator_c\n'}
+[1.765383] (custom_message) StdoutLine: {'line': b'[ 23%] \x1b[34m\x1b[1mGenerating C introspection for ROS interfaces\x1b[0m\n'}
+[1.765769] (custom_message) StdoutLine: {'line': b'[ 25%] \x1b[34m\x1b[1mGenerating C type support dispatch for ROS interfaces\x1b[0m\n'}
+[1.766173] (custom_message) StdoutLine: {'line': b'[ 25%] \x1b[34m\x1b[1mGenerating C type support for eProsima Fast-RTPS\x1b[0m\n'}
+[1.801969] (-) TimerEvent: {}
+[1.910506] (-) TimerEvent: {}
+[2.010887] (-) TimerEvent: {}
+[2.111270] (-) TimerEvent: {}
+[2.166510] (custom_message) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target custom_message__rosidl_typesupport_cpp\x1b[0m\n'}
+[2.197257] (custom_message) StdoutLine: {'line': b'[ 27%] \x1b[32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/custom_message/msg/control_inputs__type_support.cpp.o\x1b[0m\n'}
+[2.211360] (-) TimerEvent: {}
+[2.213702] (custom_message) StdoutLine: {'line': b'[ 29%] \x1b[32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/custom_message/msg/state__type_support.cpp.o\x1b[0m\n'}
+[2.258663] (custom_message) StdoutLine: {'line': b'[ 31%] \x1b[32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/custom_message/msg/full_state__type_support.cpp.o\x1b[0m\n'}
+[2.316571] (-) TimerEvent: {}
+[2.418620] (-) TimerEvent: {}
+[2.519121] (-) TimerEvent: {}
+[2.619511] (-) TimerEvent: {}
+[2.658856] (custom_message) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target custom_message__rosidl_typesupport_fastrtps_cpp\x1b[0m\n'}
+[2.666622] (custom_message) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target custom_message__rosidl_typesupport_introspection_cpp\x1b[0m\n'}
+[2.666960] (custom_message) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target custom_message__rosidl_typesupport_c\x1b[0m\n'}
+[2.721083] (-) TimerEvent: {}
+[2.721456] (custom_message) StdoutLine: {'line': b'[ 34%] \x1b[32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_c.dir/rosidl_typesupport_c/custom_message/msg/control_inputs__type_support.cpp.o\x1b[0m\n'}
+[2.741645] (custom_message) StdoutLine: {'line': b'[ 36%] \x1b[32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/control_inputs__type_support.cpp.o\x1b[0m\n'}
+[2.742580] (custom_message) StdoutLine: {'line': b'[ 38%] \x1b[32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/custom_message/msg/detail/control_inputs__type_support.cpp.o\x1b[0m\n'}
+[2.821211] (-) TimerEvent: {}
+[2.858508] (custom_message) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target custom_message__rosidl_typesupport_introspection_c\x1b[0m\n'}
+[2.881140] (custom_message) StdoutLine: {'line': b'[ 40%] \x1b[32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_c.dir/rosidl_typesupport_c/custom_message/msg/state__type_support.cpp.o\x1b[0m\n'}
+[2.921322] (-) TimerEvent: {}
+[2.933899] (custom_message) StdoutLine: {'line': b'[ 42%] \x1b[32mBuilding C object CMakeFiles/custom_message__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/custom_message/msg/detail/control_inputs__type_support.c.o\x1b[0m\n'}
+[2.983972] (custom_message) StdoutLine: {'line': b'[ 44%] \x1b[32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_c.dir/rosidl_typesupport_c/custom_message/msg/full_state__type_support.cpp.o\x1b[0m\n'}
+[3.021443] (-) TimerEvent: {}
+[3.045296] (custom_message) StdoutLine: {'line': b'[ 46%] \x1b[32mBuilding C object CMakeFiles/custom_message__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/custom_message/msg/detail/state__type_support.c.o\x1b[0m\n'}
+[3.053742] (custom_message) StdoutLine: {'line': b'[ 48%] \x1b[32m\x1b[1mLinking CXX shared library libcustom_message__rosidl_typesupport_cpp.so\x1b[0m\n'}
+[3.058456] (custom_message) StdoutLine: {'line': b'[ 51%] \x1b[32mBuilding C object CMakeFiles/custom_message__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/custom_message/msg/detail/full_state__type_support.c.o\x1b[0m\n'}
+[3.065678] (custom_message) StdoutLine: {'line': b'[ 53%] \x1b[32m\x1b[1mLinking CXX shared library libcustom_message__rosidl_typesupport_c.so\x1b[0m\n'}
+[3.072399] (custom_message) StdoutLine: {'line': b'[ 55%] \x1b[32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/custom_message/msg/detail/state__type_support.cpp.o\x1b[0m\n'}
+[3.096011] (custom_message) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target custom_message__rosidl_typesupport_fastrtps_c\x1b[0m\n'}
+[3.121557] (-) TimerEvent: {}
+[3.152040] (custom_message) StdoutLine: {'line': b'[ 57%] \x1b[32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/custom_message/msg/detail/control_inputs__type_support_c.cpp.o\x1b[0m\n'}
+[3.159150] (custom_message) StdoutLine: {'line': b'[ 59%] \x1b[32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/custom_message/msg/detail/full_state__type_support.cpp.o\x1b[0m\n'}
+[3.214600] (custom_message) StdoutLine: {'line': b'[ 61%] \x1b[32m\x1b[1mLinking C shared library libcustom_message__rosidl_typesupport_introspection_c.so\x1b[0m\n'}
+[3.221695] (-) TimerEvent: {}
+[3.236862] (custom_message) StdoutLine: {'line': b'[ 61%] Built target custom_message__rosidl_typesupport_c\n'}
+[3.255607] (custom_message) StdoutLine: {'line': b'[ 61%] Built target custom_message__rosidl_typesupport_cpp\n'}
+[3.274908] (custom_message) StdoutLine: {'line': b'[ 63%] \x1b[32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/custom_message/msg/detail/full_state__type_support_c.cpp.o\x1b[0m\n'}
+[3.321830] (-) TimerEvent: {}
+[3.326646] (custom_message) StdoutLine: {'line': b'[ 65%] \x1b[32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/custom_message/msg/detail/state__type_support_c.cpp.o\x1b[0m\n'}
+[3.362052] (custom_message) StdoutLine: {'line': b'[ 65%] Built target custom_message__rosidl_typesupport_introspection_c\n'}
+[3.421946] (-) TimerEvent: {}
+[3.438598] (custom_message) StdoutLine: {'line': b'[ 68%] \x1b[32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/state__type_support.cpp.o\x1b[0m\n'}
+[3.522068] (-) TimerEvent: {}
+[3.622807] (-) TimerEvent: {}
+[3.723560] (-) TimerEvent: {}
+[3.824173] (-) TimerEvent: {}
+[3.924923] (-) TimerEvent: {}
+[3.933280] (custom_message) StdoutLine: {'line': b'[ 70%] \x1b[32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/full_state__type_support.cpp.o\x1b[0m\n'}
+[4.025063] (-) TimerEvent: {}
+[4.125496] (-) TimerEvent: {}
+[4.225914] (-) TimerEvent: {}
+[4.326344] (-) TimerEvent: {}
+[4.328954] (custom_message) StdoutLine: {'line': b'[ 72%] \x1b[32m\x1b[1mLinking CXX shared library libcustom_message__rosidl_typesupport_fastrtps_c.so\x1b[0m\n'}
+[4.360391] (custom_message) StdoutLine: {'line': b'[ 74%] \x1b[32m\x1b[1mLinking CXX shared library libcustom_message__rosidl_typesupport_introspection_cpp.so\x1b[0m\n'}
+[4.426560] (-) TimerEvent: {}
+[4.459455] (custom_message) StdoutLine: {'line': b'[ 74%] Built target custom_message__rosidl_typesupport_introspection_cpp\n'}
+[4.516492] (custom_message) StdoutLine: {'line': b'[ 74%] Built target custom_message__rosidl_typesupport_fastrtps_c\n'}
+[4.526690] (-) TimerEvent: {}
+[4.627036] (-) TimerEvent: {}
+[4.727411] (-) TimerEvent: {}
+[4.803553] (custom_message) StdoutLine: {'line': b'[ 76%] \x1b[32m\x1b[1mLinking CXX shared library libcustom_message__rosidl_typesupport_fastrtps_cpp.so\x1b[0m\n'}
+[4.827536] (-) TimerEvent: {}
+[4.928148] (-) TimerEvent: {}
+[4.943181] (custom_message) StdoutLine: {'line': b'[ 76%] Built target custom_message__rosidl_typesupport_fastrtps_cpp\n'}
+[4.976502] (custom_message) StdoutLine: {'line': b'[ 76%] Built target custom_message\n'}
+[5.009595] (custom_message) StdoutLine: {'line': b'[ 78%] \x1b[34m\x1b[1mGenerating Python code for ROS interfaces\x1b[0m\n'}
+[5.028243] (-) TimerEvent: {}
+[5.128582] (-) TimerEvent: {}
+[5.228899] (-) TimerEvent: {}
+[5.329269] (-) TimerEvent: {}
+[5.429596] (-) TimerEvent: {}
+[5.529985] (-) TimerEvent: {}
+[5.630368] (-) TimerEvent: {}
+[5.730808] (-) TimerEvent: {}
+[5.833639] (-) TimerEvent: {}
+[5.865180] (custom_message) StdoutLine: {'line': b'[ 78%] Built target custom_message__py\n'}
+[5.880510] (custom_message) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target custom_message__rosidl_generator_py\x1b[0m\n'}
+[5.901462] (custom_message) StdoutLine: {'line': b'[ 85%] \x1b[32mBuilding C object CMakeFiles/custom_message__rosidl_generator_py.dir/rosidl_generator_py/custom_message/msg/_control_inputs_s.c.o\x1b[0m\n'}
+[5.901784] (custom_message) StdoutLine: {'line': b'[ 85%] \x1b[32mBuilding C object CMakeFiles/custom_message__rosidl_generator_py.dir/rosidl_generator_py/custom_message/msg/_state_s.c.o\x1b[0m\n'}
+[5.901972] (custom_message) StdoutLine: {'line': b'[ 85%] \x1b[32mBuilding C object CMakeFiles/custom_message__rosidl_generator_py.dir/rosidl_generator_py/custom_message/msg/_full_state_s.c.o\x1b[0m\n'}
+[5.933756] (-) TimerEvent: {}
+[6.034180] (-) TimerEvent: {}
+[6.045805] (custom_message) StdoutLine: {'line': b'[ 87%] \x1b[32m\x1b[1mLinking C shared library rosidl_generator_py/custom_message/libcustom_message__rosidl_generator_py.so\x1b[0m\n'}
+[6.117343] (custom_message) StdoutLine: {'line': b'[ 87%] Built target custom_message__rosidl_generator_py\n'}
+[6.137964] (custom_message) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target custom_message__rosidl_typesupport_fastrtps_c__pyext\x1b[0m\n'}
+[6.138255] (-) TimerEvent: {}
+[6.141963] (custom_message) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target custom_message__rosidl_typesupport_c__pyext\x1b[0m\n'}
+[6.142563] (custom_message) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target custom_message__rosidl_typesupport_introspection_c__pyext\x1b[0m\n'}
+[6.168261] (custom_message) StdoutLine: {'line': b'[ 89%] \x1b[32mBuilding C object CMakeFiles/custom_message__rosidl_typesupport_c__pyext.dir/rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_c.c.o\x1b[0m\n'}
+[6.169176] (custom_message) StdoutLine: {'line': b'[ 91%] \x1b[32mBuilding C object CMakeFiles/custom_message__rosidl_typesupport_introspection_c__pyext.dir/rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_introspection_c.c.o\x1b[0m\n'}
+[6.169494] (custom_message) StdoutLine: {'line': b'[ 93%] \x1b[32mBuilding C object CMakeFiles/custom_message__rosidl_typesupport_fastrtps_c__pyext.dir/rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_fastrtps_c.c.o\x1b[0m\n'}
+[6.238384] (-) TimerEvent: {}
+[6.301954] (custom_message) StdoutLine: {'line': b'[ 95%] \x1b[32m\x1b[1mLinking C shared library rosidl_generator_py/custom_message/custom_message_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so\x1b[0m\n'}
+[6.315004] (custom_message) StdoutLine: {'line': b'[ 97%] \x1b[32m\x1b[1mLinking C shared library rosidl_generator_py/custom_message/custom_message_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so\x1b[0m\n'}
+[6.338480] (-) TimerEvent: {}
+[6.345058] (custom_message) StdoutLine: {'line': b'[ 97%] Built target custom_message__rosidl_typesupport_c__pyext\n'}
+[6.360488] (custom_message) StdoutLine: {'line': b'[ 97%] Built target custom_message__rosidl_typesupport_fastrtps_c__pyext\n'}
+[6.373231] (custom_message) StdoutLine: {'line': b'[100%] \x1b[32m\x1b[1mLinking C shared library rosidl_generator_py/custom_message/custom_message_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so\x1b[0m\n'}
+[6.409414] (custom_message) StdoutLine: {'line': b'[100%] Built target custom_message__rosidl_typesupport_introspection_c__pyext\n'}
+[6.422546] (custom_message) CommandEnded: {'returncode': 0}
+[6.438600] (-) TimerEvent: {}
+[6.532348] (custom_message) JobProgress: {'identifier': 'custom_message', 'progress': 'install'}
+[6.538737] (-) TimerEvent: {}
+[6.544920] (custom_message) Command: {'cmd': ['/usr/bin/cmake', '--install', '/home/giacomo/thesis_ws/build/custom_message'], 'cwd': '/home/giacomo/thesis_ws/build/custom_message', 'env': OrderedDict([('GJS_DEBUG_TOPICS', 'JS ERROR;JS LOG'), ('LESSOPEN', '| /usr/bin/lesspipe %s'), ('LANGUAGE', 'it_CH:it'), ('USER', 'giacomo'), ('XDG_SESSION_TYPE', 'wayland'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/home/giacomo/thesis_ws/install/custom_message/lib:/home/giacomo/ros2_ws/install/tutorial_interfaces/lib:/home/giacomo/ros2_ws/install/turtlesim/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/home/giacomo'), ('OLDPWD', '/home/giacomo'), ('DESKTOP_SESSION', 'ubuntu'), ('GIO_LAUNCHED_DESKTOP_FILE', '/usr/share/applications/terminator.desktop'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('MANAGERPID', '1405'), ('SYSTEMD_EXEC_PID', '1608'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('GIO_LAUNCHED_DESKTOP_FILE_PID', '3371'), ('IM_CONFIG_PHASE', '1'), ('WAYLAND_DISPLAY', 'wayland-0'), ('COLCON_PREFIX_PATH', '/home/giacomo/thesis_ws/install:/home/giacomo/ros2_ws/install'), ('ROS_DISTRO', 'humble'), ('LOGNAME', 'giacomo'), ('JOURNAL_STREAM', '8:32977'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'giacomo'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin'), ('SESSION_MANAGER', 'local/giacomo-N13-N140ZU:@/tmp/.ICE-unix/1565,unix/giacomo-N13-N140ZU:/tmp/.ICE-unix/1565'), ('INVOCATION_ID', '95a751b05b2041688b9ed9528449ab69'), ('XDG_MENU_PREFIX', 'gnome-'), ('GNOME_SETUP_DISPLAY', ':1'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('DISPLAY', ':0'), ('LANG', 'it_CH.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('IBUS_DISABLE_SNOOPER', '1'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/.mutter-Xwaylandauth.0IJ4B2'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('SSH_AGENT_LAUNCHER', 'gnome-keyring'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('AMENT_PREFIX_PATH', '/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/thesis_ws/install/custom_message:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/tutorial_interfaces:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/turtlesim:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('TERMINATOR_UUID', 'urn:uuid:2e7a978a-b6a6-4984-8f53-a99e8abb0b4d'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('GJS_DEBUG_OUTPUT', 'stderr'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/giacomo/thesis_ws/build/custom_message'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/giacomo/thesis_ws/build/bumper_cars:/home/giacomo/thesis_ws/install/bumper_cars/lib/python3.10/site-packages:/home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages:/home/giacomo/ros2_ws/install/py_pubsub/lib/python3.10/site-packages:/home/giacomo/ros2_ws/install/tutorial_interfaces/local/lib/python3.10/dist-packages:/home/giacomo/ros2_ws/build/my_robot_controller:/home/giacomo/ros2_ws/install/my_robot_controller/lib/python3.10/site-packages:/home/giacomo/ros2_ws/install/turtlesim/local/lib/python3.10/dist-packages:/home/giacomo/ros2_ws/build/py_srvcli:/home/giacomo/ros2_ws/install/py_srvcli/lib/python3.10/site-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('VTE_VERSION', '6800'), ('CMAKE_PREFIX_PATH', '/home/giacomo/thesis_ws/install/custom_message:/home/giacomo/ros2_ws/install/tutorial_interfaces:/home/giacomo/ros2_ws/install/turtlesim:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble')]), 'shell': False}
+[6.558800] (custom_message) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[6.559305] (custom_message) StdoutLine: {'line': b'-- Execute custom install script\n'}
+[6.559601] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/ament_index/resource_index/rosidl_interfaces/custom_message\n'}
+[6.560078] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/control_inputs.h\n'}
+[6.560232] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/control_inputs__functions.h\n'}
+[6.560380] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/control_inputs__struct.h\n'}
+[6.560489] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/control_inputs__type_support.h\n'}
+[6.560686] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__functions.h\n'}
+[6.560856] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__struct.h\n'}
+[6.560976] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__type_support.h\n'}
+[6.561086] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/state__functions.h\n'}
+[6.561254] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/state__struct.h\n'}
+[6.561435] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/state__type_support.h\n'}
+[6.561561] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/full_state.h\n'}
+[6.561769] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/rosidl_generator_c__visibility_control.h\n'}
+[6.562022] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/state.h\n'}
+[6.562340] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/environment/library_path.sh\n'}
+[6.562609] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/environment/library_path.dsv\n'}
+[6.563138] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/control_inputs__rosidl_typesupport_fastrtps_c.h\n'}
+[6.563257] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__rosidl_typesupport_fastrtps_c.h\n'}
+[6.563392] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/state__rosidl_typesupport_fastrtps_c.h\n'}
+[6.563532] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/rosidl_typesupport_fastrtps_c__visibility_control.h\n'}
+[6.563994] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/control_inputs__rosidl_typesupport_introspection_c.h\n'}
+[6.564220] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__rosidl_typesupport_introspection_c.h\n'}
+[6.564356] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/state__rosidl_typesupport_introspection_c.h\n'}
+[6.564544] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/rosidl_typesupport_introspection_c__visibility_control.h\n'}
+[6.565454] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/control_inputs.hpp\n'}
+[6.565747] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/control_inputs__builder.hpp\n'}
+[6.565981] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/control_inputs__struct.hpp\n'}
+[6.566201] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/control_inputs__traits.hpp\n'}
+[6.566434] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__builder.hpp\n'}
+[6.566705] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__struct.hpp\n'}
+[6.566923] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__traits.hpp\n'}
+[6.567134] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/state__builder.hpp\n'}
+[6.567354] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/state__struct.hpp\n'}
+[6.567626] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/state__traits.hpp\n'}
+[6.567892] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/full_state.hpp\n'}
+[6.568174] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/state.hpp\n'}
+[6.569013] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/control_inputs__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[6.569277] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[6.569520] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/state__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[6.569752] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h\n'}
+[6.570145] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/control_inputs__rosidl_typesupport_introspection_cpp.hpp\n'}
+[6.570356] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__rosidl_typesupport_introspection_cpp.hpp\n'}
+[6.570907] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/state__rosidl_typesupport_introspection_cpp.hpp\n'}
+[6.571271] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/environment/pythonpath.sh\n'}
+[6.571630] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/environment/pythonpath.dsv\n'}
+[6.572189] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message-0.0.0-py3.10.egg-info/PKG-INFO\n'}
+[6.572361] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message-0.0.0-py3.10.egg-info/SOURCES.txt\n'}
+[6.572567] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message-0.0.0-py3.10.egg-info/dependency_links.txt\n'}
+[6.572776] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message-0.0.0-py3.10.egg-info/top_level.txt\n'}
+[6.573565] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/__init__.py\n'}
+[6.573742] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/_custom_message_s.ep.rosidl_typesupport_c.c\n'}
+[6.573958] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/_custom_message_s.ep.rosidl_typesupport_fastrtps_c.c\n'}
+[6.574189] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/_custom_message_s.ep.rosidl_typesupport_introspection_c.c\n'}
+[6.574436] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/custom_message_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so\n'}
+[6.574695] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/custom_message_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so\n'}
+[6.574941] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/custom_message_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so\n'}
+[6.575183] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/libcustom_message__rosidl_generator_py.so\n'}
+[6.575422] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/__init__.py\n'}
+[6.575660] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_control_inputs.py\n'}
+[6.575874] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_control_inputs_s.c\n'}
+[6.576086] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_full_state.py\n'}
+[6.576325] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_full_state_s.c\n'}
+[6.576487] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_state.py\n'}
+[6.576709] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_state_s.c\n'}
+[6.577159] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/custom_message_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so\n'}
+[6.577582] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/custom_message_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so\n'}
+[6.577988] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/custom_message_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so\n'}
+[6.578287] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/ControlInputs.idl\n'}
+[6.578605] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/State.idl\n'}
+[6.578902] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/FullState.idl\n'}
+[6.579083] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/ControlInputs.msg\n'}
+[6.579256] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/State.msg\n'}
+[6.579443] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/FullState.msg\n'}
+[6.579741] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/ament_index/resource_index/package_run_dependencies/custom_message\n'}
+[6.580046] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/ament_index/resource_index/parent_prefix_path/custom_message\n'}
+[6.580314] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/environment/ament_prefix_path.sh\n'}
+[6.580593] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/environment/ament_prefix_path.dsv\n'}
+[6.580796] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/environment/path.sh\n'}
+[6.580966] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/environment/path.dsv\n'}
+[6.581220] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/local_setup.bash\n'}
+[6.581507] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/local_setup.sh\n'}
+[6.581744] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/local_setup.zsh\n'}
+[6.581919] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/local_setup.dsv\n'}
+[6.582081] (custom_message) StdoutLine: {'line': b'-- Symlinking: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/package.dsv\n'}
+[6.593366] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/ament_index/resource_index/packages/custom_message\n'}
+[6.593647] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/rosidl_cmake-extras.cmake\n'}
+[6.593835] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/ament_cmake_export_include_directories-extras.cmake\n'}
+[6.594050] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/ament_cmake_export_libraries-extras.cmake\n'}
+[6.594288] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/ament_cmake_export_targets-extras.cmake\n'}
+[6.594624] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/rosidl_cmake_export_typesupport_targets-extras.cmake\n'}
+[6.594921] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/ament_cmake_export_dependencies-extras.cmake\n'}
+[6.595208] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/rosidl_cmake_export_typesupport_libraries-extras.cmake\n'}
+[6.595483] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/custom_messageConfig.cmake\n'}
+[6.595810] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/custom_messageConfig-version.cmake\n'}
+[6.596253] (custom_message) StdoutLine: {'line': b'-- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/package.xml\n'}
+[6.596465] (custom_message) StdoutLine: {'line': b'-- Installing: /home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_generator_c.so\n'}
+[6.597034] (custom_message) StdoutLine: {'line': b'-- Set runtime path of "/home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_generator_c.so" to ""\n'}
+[6.597327] (custom_message) StdoutLine: {'line': b'-- Installing: /home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_typesupport_fastrtps_c.so\n'}
+[6.597864] (custom_message) StdoutLine: {'line': b'-- Set runtime path of "/home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_typesupport_fastrtps_c.so" to ""\n'}
+[6.598059] (custom_message) StdoutLine: {'line': b'-- Installing: /home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_typesupport_introspection_c.so\n'}
+[6.598587] (custom_message) StdoutLine: {'line': b'-- Set runtime path of "/home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_typesupport_introspection_c.so" to ""\n'}
+[6.598792] (custom_message) StdoutLine: {'line': b'-- Installing: /home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_typesupport_c.so\n'}
+[6.599314] (custom_message) StdoutLine: {'line': b'-- Set runtime path of "/home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_typesupport_c.so" to ""\n'}
+[6.599577] (custom_message) StdoutLine: {'line': b'-- Installing: /home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_typesupport_fastrtps_cpp.so\n'}
+[6.600233] (custom_message) StdoutLine: {'line': b'-- Set runtime path of "/home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_typesupport_fastrtps_cpp.so" to ""\n'}
+[6.600547] (custom_message) StdoutLine: {'line': b'-- Installing: /home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_typesupport_introspection_cpp.so\n'}
+[6.601089] (custom_message) StdoutLine: {'line': b'-- Set runtime path of "/home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_typesupport_introspection_cpp.so" to ""\n'}
+[6.601283] (custom_message) StdoutLine: {'line': b'-- Installing: /home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_typesupport_cpp.so\n'}
+[6.601677] (custom_message) StdoutLine: {'line': b'-- Set runtime path of "/home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_typesupport_cpp.so" to ""\n'}
+[6.638827] (-) TimerEvent: {}
+[6.643704] (custom_message) StdoutLine: {'line': b"Listing '/home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message'...\n"}
+[6.643967] (custom_message) StdoutLine: {'line': b"Compiling '/home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/__init__.py'...\n"}
+[6.644132] (custom_message) StdoutLine: {'line': b"Listing '/home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg'...\n"}
+[6.644272] (custom_message) StdoutLine: {'line': b"Compiling '/home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/__init__.py'...\n"}
+[6.644417] (custom_message) StdoutLine: {'line': b"Compiling '/home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_control_inputs.py'...\n"}
+[6.644559] (custom_message) StdoutLine: {'line': b"Compiling '/home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_full_state.py'...\n"}
+[6.644721] (custom_message) StdoutLine: {'line': b"Compiling '/home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_state.py'...\n"}
+[6.649087] (custom_message) StdoutLine: {'line': b'-- Installing: /home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_generator_py.so\n'}
+[6.649617] (custom_message) StdoutLine: {'line': b'-- Set runtime path of "/home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_generator_py.so" to ""\n'}
+[6.649874] (custom_message) StdoutLine: {'line': b'-- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/export_custom_message__rosidl_generator_cExport.cmake\n'}
+[6.650038] (custom_message) StdoutLine: {'line': b'-- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/export_custom_message__rosidl_generator_cExport-noconfig.cmake\n'}
+[6.650267] (custom_message) StdoutLine: {'line': b'-- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/export_custom_message__rosidl_typesupport_fastrtps_cExport.cmake\n'}
+[6.650479] (custom_message) StdoutLine: {'line': b'-- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/export_custom_message__rosidl_typesupport_fastrtps_cExport-noconfig.cmake\n'}
+[6.650651] (custom_message) StdoutLine: {'line': b'-- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/custom_message__rosidl_typesupport_introspection_cExport.cmake\n'}
+[6.650859] (custom_message) StdoutLine: {'line': b'-- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/custom_message__rosidl_typesupport_introspection_cExport-noconfig.cmake\n'}
+[6.651090] (custom_message) StdoutLine: {'line': b'-- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/custom_message__rosidl_typesupport_cExport.cmake\n'}
+[6.651237] (custom_message) StdoutLine: {'line': b'-- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/custom_message__rosidl_typesupport_cExport-noconfig.cmake\n'}
+[6.651378] (custom_message) StdoutLine: {'line': b'-- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/export_custom_message__rosidl_generator_cppExport.cmake\n'}
+[6.651508] (custom_message) StdoutLine: {'line': b'-- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/export_custom_message__rosidl_typesupport_fastrtps_cppExport.cmake\n'}
+[6.651641] (custom_message) StdoutLine: {'line': b'-- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/export_custom_message__rosidl_typesupport_fastrtps_cppExport-noconfig.cmake\n'}
+[6.651779] (custom_message) StdoutLine: {'line': b'-- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/custom_message__rosidl_typesupport_introspection_cppExport.cmake\n'}
+[6.651930] (custom_message) StdoutLine: {'line': b'-- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/custom_message__rosidl_typesupport_introspection_cppExport-noconfig.cmake\n'}
+[6.652076] (custom_message) StdoutLine: {'line': b'-- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/custom_message__rosidl_typesupport_cppExport.cmake\n'}
+[6.652219] (custom_message) StdoutLine: {'line': b'-- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/custom_message__rosidl_typesupport_cppExport-noconfig.cmake\n'}
+[6.652360] (custom_message) StdoutLine: {'line': b'-- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/export_custom_message__rosidl_generator_pyExport.cmake\n'}
+[6.652499] (custom_message) StdoutLine: {'line': b'-- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/export_custom_message__rosidl_generator_pyExport-noconfig.cmake\n'}
+[6.655026] (custom_message) CommandEnded: {'returncode': 0}
+[6.738963] (-) TimerEvent: {}
+[6.804158] (custom_message) JobEnded: {'identifier': 'custom_message', 'rc': 0}
+[6.805057] (bumper_cars) JobStarted: {'identifier': 'bumper_cars'}
+[6.839084] (-) TimerEvent: {}
+[6.939357] (-) TimerEvent: {}
+[7.040360] (-) TimerEvent: {}
+[7.140700] (-) TimerEvent: {}
+[7.240994] (-) TimerEvent: {}
+[7.341263] (-) TimerEvent: {}
+[7.441565] (-) TimerEvent: {}
+[7.541916] (-) TimerEvent: {}
+[7.601669] (bumper_cars) Command: {'cmd': ['/usr/bin/python3', 'setup.py', 'develop', '--editable', '--build-directory', '/home/giacomo/thesis_ws/build/bumper_cars/build', '--no-deps', 'install_data'], 'cwd': '/home/giacomo/thesis_ws/build/bumper_cars', 'env': {'GJS_DEBUG_TOPICS': 'JS ERROR;JS LOG', 'LESSOPEN': '| /usr/bin/lesspipe %s', 'LANGUAGE': 'it_CH:it', 'USER': 'giacomo', 'XDG_SESSION_TYPE': 'wayland', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/home/giacomo/thesis_ws/install/custom_message/lib:/home/giacomo/ros2_ws/install/tutorial_interfaces/lib:/home/giacomo/ros2_ws/install/turtlesim/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib', 'HOME': '/home/giacomo', 'OLDPWD': '/home/giacomo', 'DESKTOP_SESSION': 'ubuntu', 'GIO_LAUNCHED_DESKTOP_FILE': '/usr/share/applications/terminator.desktop', 'ROS_PYTHON_VERSION': '3', 'GNOME_SHELL_SESSION_MODE': 'ubuntu', 'GTK_MODULES': 'gail:atk-bridge', 'MANAGERPID': '1405', 'SYSTEMD_EXEC_PID': '1608', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'COLORTERM': 'truecolor', 'GIO_LAUNCHED_DESKTOP_FILE_PID': '3371', 'IM_CONFIG_PHASE': '1', 'WAYLAND_DISPLAY': 'wayland-0', 'COLCON_PREFIX_PATH': '/home/giacomo/thesis_ws/install:/home/giacomo/ros2_ws/install', 'ROS_DISTRO': 'humble', 'LOGNAME': 'giacomo', 'JOURNAL_STREAM': '8:32977', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'XDG_SESSION_CLASS': 'user', 'USERNAME': 'giacomo', 'TERM': 'xterm-256color', 'GNOME_DESKTOP_SESSION_ID': 'this-is-deprecated', 'ROS_LOCALHOST_ONLY': '0', 'PATH': '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin', 'SESSION_MANAGER': 'local/giacomo-N13-N140ZU:@/tmp/.ICE-unix/1565,unix/giacomo-N13-N140ZU:/tmp/.ICE-unix/1565', 'INVOCATION_ID': '95a751b05b2041688b9ed9528449ab69', 'XDG_MENU_PREFIX': 'gnome-', 'GNOME_SETUP_DISPLAY': ':1', 'XDG_RUNTIME_DIR': '/run/user/1000', 'DISPLAY': ':0', 'LANG': 'it_CH.UTF-8', 'XDG_CURRENT_DESKTOP': 'ubuntu:GNOME', 'IBUS_DISABLE_SNOOPER': '1', 'XMODIFIERS': '@im=ibus', 'XDG_SESSION_DESKTOP': 'ubuntu', 'XAUTHORITY': '/run/user/1000/.mutter-Xwaylandauth.0IJ4B2', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:', 'SSH_AGENT_LAUNCHER': 'gnome-keyring', 'SSH_AUTH_SOCK': '/run/user/1000/keyring/ssh', 'AMENT_PREFIX_PATH': '/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/thesis_ws/install/custom_message:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/tutorial_interfaces:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/turtlesim:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble', 'SHELL': '/bin/bash', 'TERMINATOR_UUID': 'urn:uuid:2e7a978a-b6a6-4984-8f53-a99e8abb0b4d', 'QT_ACCESSIBILITY': '1', 'GDMSESSION': 'ubuntu', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'GJS_DEBUG_OUTPUT': 'stderr', 'QT_IM_MODULE': 'ibus', 'PWD': '/home/giacomo/thesis_ws/build/bumper_cars', 'XDG_CONFIG_DIRS': '/etc/xdg/xdg-ubuntu:/etc/xdg', 'XDG_DATA_DIRS': '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop', 'PYTHONPATH': '/home/giacomo/thesis_ws/build/bumper_cars/prefix_override:/home/giacomo/thesis_ws/install/bumper_cars/lib/python3.10/site-packages:/home/giacomo/thesis_ws/build/bumper_cars:/home/giacomo/thesis_ws/install/bumper_cars/lib/python3.10/site-packages:/home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages:/home/giacomo/ros2_ws/install/py_pubsub/lib/python3.10/site-packages:/home/giacomo/ros2_ws/install/tutorial_interfaces/local/lib/python3.10/dist-packages:/home/giacomo/ros2_ws/build/my_robot_controller:/home/giacomo/ros2_ws/install/my_robot_controller/lib/python3.10/site-packages:/home/giacomo/ros2_ws/install/turtlesim/local/lib/python3.10/dist-packages:/home/giacomo/ros2_ws/build/py_srvcli:/home/giacomo/ros2_ws/install/py_srvcli/lib/python3.10/site-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages', 'COLCON': '1', 'VTE_VERSION': '6800', 'CMAKE_PREFIX_PATH': '/home/giacomo/thesis_ws/install/custom_message:/home/giacomo/ros2_ws/install/tutorial_interfaces:/home/giacomo/ros2_ws/install/turtlesim'}, 'shell': False}
+[7.642052] (-) TimerEvent: {}
+[7.742342] (-) TimerEvent: {}
+[7.842639] (-) TimerEvent: {}
+[7.940322] (bumper_cars) StdoutLine: {'line': b'running develop\n'}
+[7.940645] (bumper_cars) StderrLine: {'line': b'/home/giacomo/.local/lib/python3.10/site-packages/setuptools/command/develop.py:40: EasyInstallDeprecationWarning: easy_install command is deprecated.\n'}
+[7.940749] (bumper_cars) StderrLine: {'line': b'!!\n'}
+[7.940818] (bumper_cars) StderrLine: {'line': b'\n'}
+[7.940881] (bumper_cars) StderrLine: {'line': b'        ********************************************************************************\n'}
+[7.940944] (bumper_cars) StderrLine: {'line': b'        Please avoid running ``setup.py`` and ``easy_install``.\n'}
+[7.941004] (bumper_cars) StderrLine: {'line': b'        Instead, use pypa/build, pypa/installer or other\n'}
+[7.941065] (bumper_cars) StderrLine: {'line': b'        standards-based tools.\n'}
+[7.941126] (bumper_cars) StderrLine: {'line': b'\n'}
+[7.941186] (bumper_cars) StderrLine: {'line': b'        See https://github.com/pypa/setuptools/issues/917 for details.\n'}
+[7.941247] (bumper_cars) StderrLine: {'line': b'        ********************************************************************************\n'}
+[7.941308] (bumper_cars) StderrLine: {'line': b'\n'}
+[7.941368] (bumper_cars) StderrLine: {'line': b'!!\n'}
+[7.941427] (bumper_cars) StderrLine: {'line': b'  easy_install.initialize_options(self)\n'}
+[7.942734] (-) TimerEvent: {}
+[7.976982] (bumper_cars) StderrLine: {'line': b'/home/giacomo/.local/lib/python3.10/site-packages/setuptools/_distutils/cmd.py:66: SetuptoolsDeprecationWarning: setup.py install is deprecated.\n'}
+[7.977145] (bumper_cars) StderrLine: {'line': b'!!\n'}
+[7.977213] (bumper_cars) StderrLine: {'line': b'\n'}
+[7.977275] (bumper_cars) StderrLine: {'line': b'        ********************************************************************************\n'}
+[7.977338] (bumper_cars) StderrLine: {'line': b'        Please avoid running ``setup.py`` directly.\n'}
+[7.977399] (bumper_cars) StderrLine: {'line': b'        Instead, use pypa/build, pypa/installer or other\n'}
+[7.977458] (bumper_cars) StderrLine: {'line': b'        standards-based tools.\n'}
+[7.977528] (bumper_cars) StderrLine: {'line': b'\n'}
+[7.977586] (bumper_cars) StderrLine: {'line': b'        See https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html for details.\n'}
+[7.977644] (bumper_cars) StderrLine: {'line': b'        ********************************************************************************\n'}
+[7.977703] (bumper_cars) StderrLine: {'line': b'\n'}
+[7.977760] (bumper_cars) StderrLine: {'line': b'!!\n'}
+[7.977818] (bumper_cars) StderrLine: {'line': b'  self.initialize_options()\n'}
+[8.042859] (-) TimerEvent: {}
+[8.143204] (-) TimerEvent: {}
+[8.177523] (bumper_cars) StdoutLine: {'line': b'running egg_info\n'}
+[8.193760] (bumper_cars) StdoutLine: {'line': b'writing bumper_cars.egg-info/PKG-INFO\n'}
+[8.194272] (bumper_cars) StdoutLine: {'line': b'writing dependency_links to bumper_cars.egg-info/dependency_links.txt\n'}
+[8.194690] (bumper_cars) StdoutLine: {'line': b'writing entry points to bumper_cars.egg-info/entry_points.txt\n'}
+[8.195116] (bumper_cars) StdoutLine: {'line': b'writing requirements to bumper_cars.egg-info/requires.txt\n'}
+[8.195303] (bumper_cars) StdoutLine: {'line': b'writing top-level names to bumper_cars.egg-info/top_level.txt\n'}
+[8.227578] (bumper_cars) StdoutLine: {'line': b"reading manifest file 'bumper_cars.egg-info/SOURCES.txt'\n"}
+[8.228510] (bumper_cars) StdoutLine: {'line': b"writing manifest file 'bumper_cars.egg-info/SOURCES.txt'\n"}
+[8.243292] (-) TimerEvent: {}
+[8.245963] (bumper_cars) StdoutLine: {'line': b'running build_ext\n'}
+[8.246230] (bumper_cars) StdoutLine: {'line': b'Creating /home/giacomo/thesis_ws/install/bumper_cars/lib/python3.10/site-packages/bumper-cars.egg-link (link to .)\n'}
+[8.247106] (bumper_cars) StdoutLine: {'line': b'Installing controller script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars\n'}
+[8.247436] (bumper_cars) StdoutLine: {'line': b'Installing model script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars\n'}
+[8.247695] (bumper_cars) StdoutLine: {'line': b'Installing plotter script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars\n'}
+[8.247904] (bumper_cars) StdoutLine: {'line': b'Installing robot_model script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars\n'}
+[8.248080] (bumper_cars) StdoutLine: {'line': b'Installing sensor script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars\n'}
+[8.248199] (bumper_cars) StdoutLine: {'line': b'Installing state_publisher script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars\n'}
+[8.248338] (bumper_cars) StdoutLine: {'line': b'Installing state_subscriber script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars\n'}
+[8.248498] (bumper_cars) StdoutLine: {'line': b'\n'}
+[8.248628] (bumper_cars) StdoutLine: {'line': b'Installed /home/giacomo/thesis_ws/build/bumper_cars\n'}
+[8.248801] (bumper_cars) StdoutLine: {'line': b'running install_data\n'}
+[8.283736] (bumper_cars) CommandEnded: {'returncode': 0}
+[8.297331] (bumper_cars) JobEnded: {'identifier': 'bumper_cars', 'rc': 0}
+[8.298158] (-) EventReactorShutdown: {}

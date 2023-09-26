@@ -61,20 +61,23 @@ class State(metaclass=Metaclass_State):
         '_y',
         '_yaw',
         '_v',
+        '_omega',
     ]
 
     _fields_and_field_types = {
-        'x': 'float',
-        'y': 'float',
-        'yaw': 'float',
-        'v': 'float',
+        'x': 'double',
+        'y': 'double',
+        'yaw': 'double',
+        'v': 'double',
+        'omega': 'double',
     }
 
     SLOT_TYPES = (
-        rosidl_parser.definition.BasicType('float'),  # noqa: E501
-        rosidl_parser.definition.BasicType('float'),  # noqa: E501
-        rosidl_parser.definition.BasicType('float'),  # noqa: E501
-        rosidl_parser.definition.BasicType('float'),  # noqa: E501
+        rosidl_parser.definition.BasicType('double'),  # noqa: E501
+        rosidl_parser.definition.BasicType('double'),  # noqa: E501
+        rosidl_parser.definition.BasicType('double'),  # noqa: E501
+        rosidl_parser.definition.BasicType('double'),  # noqa: E501
+        rosidl_parser.definition.BasicType('double'),  # noqa: E501
     )
 
     def __init__(self, **kwargs):
@@ -85,6 +88,7 @@ class State(metaclass=Metaclass_State):
         self.y = kwargs.get('y', float())
         self.yaw = kwargs.get('yaw', float())
         self.v = kwargs.get('v', float())
+        self.omega = kwargs.get('omega', float())
 
     def __repr__(self):
         typename = self.__class__.__module__.split('.')
@@ -123,6 +127,8 @@ class State(metaclass=Metaclass_State):
             return False
         if self.v != other.v:
             return False
+        if self.omega != other.omega:
+            return False
         return True
 
     @classmethod
@@ -141,8 +147,8 @@ class State(metaclass=Metaclass_State):
             assert \
                 isinstance(value, float), \
                 "The 'x' field must be of type 'float'"
-            assert not (value < -3.402823466e+38 or value > 3.402823466e+38) or math.isinf(value), \
-                "The 'x' field must be a float in [-3.402823466e+38, 3.402823466e+38]"
+            assert not (value < -1.7976931348623157e+308 or value > 1.7976931348623157e+308) or math.isinf(value), \
+                "The 'x' field must be a double in [-1.7976931348623157e+308, 1.7976931348623157e+308]"
         self._x = value
 
     @builtins.property
@@ -156,8 +162,8 @@ class State(metaclass=Metaclass_State):
             assert \
                 isinstance(value, float), \
                 "The 'y' field must be of type 'float'"
-            assert not (value < -3.402823466e+38 or value > 3.402823466e+38) or math.isinf(value), \
-                "The 'y' field must be a float in [-3.402823466e+38, 3.402823466e+38]"
+            assert not (value < -1.7976931348623157e+308 or value > 1.7976931348623157e+308) or math.isinf(value), \
+                "The 'y' field must be a double in [-1.7976931348623157e+308, 1.7976931348623157e+308]"
         self._y = value
 
     @builtins.property
@@ -171,8 +177,8 @@ class State(metaclass=Metaclass_State):
             assert \
                 isinstance(value, float), \
                 "The 'yaw' field must be of type 'float'"
-            assert not (value < -3.402823466e+38 or value > 3.402823466e+38) or math.isinf(value), \
-                "The 'yaw' field must be a float in [-3.402823466e+38, 3.402823466e+38]"
+            assert not (value < -1.7976931348623157e+308 or value > 1.7976931348623157e+308) or math.isinf(value), \
+                "The 'yaw' field must be a double in [-1.7976931348623157e+308, 1.7976931348623157e+308]"
         self._yaw = value
 
     @builtins.property
@@ -186,6 +192,21 @@ class State(metaclass=Metaclass_State):
             assert \
                 isinstance(value, float), \
                 "The 'v' field must be of type 'float'"
-            assert not (value < -3.402823466e+38 or value > 3.402823466e+38) or math.isinf(value), \
-                "The 'v' field must be a float in [-3.402823466e+38, 3.402823466e+38]"
+            assert not (value < -1.7976931348623157e+308 or value > 1.7976931348623157e+308) or math.isinf(value), \
+                "The 'v' field must be a double in [-1.7976931348623157e+308, 1.7976931348623157e+308]"
         self._v = value
+
+    @builtins.property
+    def omega(self):
+        """Message field 'omega'."""
+        return self._omega
+
+    @omega.setter
+    def omega(self, value):
+        if __debug__:
+            assert \
+                isinstance(value, float), \
+                "The 'omega' field must be of type 'float'"
+            assert not (value < -1.7976931348623157e+308 or value > 1.7976931348623157e+308) or math.isinf(value), \
+                "The 'omega' field must be a double in [-1.7976931348623157e+308, 1.7976931348623157e+308]"
+        self._omega = value

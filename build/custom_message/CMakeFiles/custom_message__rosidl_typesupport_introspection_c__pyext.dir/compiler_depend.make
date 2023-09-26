@@ -245,14 +245,28 @@ CMakeFiles/custom_message__rosidl_typesupport_introspection_c__pyext.dir/rosidl_
   rosidl_generator_c/custom_message/msg/detail/control_inputs__type_support.h \
   rosidl_generator_c/custom_message/msg/rosidl_generator_c__visibility_control.h \
   rosidl_generator_c/custom_message/msg/detail/control_inputs__struct.h \
-  /opt/ros/humble/include/rosidl_runtime_c/rosidl_runtime_c/string.h \
-  /opt/ros/humble/include/rosidl_runtime_c/rosidl_runtime_c/primitives_sequence.h \
-  rosidl_generator_c/custom_message/msg/detail/control_inputs__functions.h
+  rosidl_generator_c/custom_message/msg/detail/control_inputs__functions.h \
+  rosidl_generator_c/custom_message/msg/detail/state__type_support.h \
+  rosidl_generator_c/custom_message/msg/detail/state__struct.h \
+  rosidl_generator_c/custom_message/msg/detail/state__functions.h \
+  rosidl_generator_c/custom_message/msg/detail/full_state__type_support.h \
+  rosidl_generator_c/custom_message/msg/detail/full_state__struct.h \
+  rosidl_generator_c/custom_message/msg/detail/full_state__functions.h
 
+
+rosidl_generator_c/custom_message/msg/detail/full_state__functions.h:
+
+rosidl_generator_c/custom_message/msg/detail/full_state__struct.h:
+
+rosidl_generator_c/custom_message/msg/detail/full_state__type_support.h:
+
+rosidl_generator_c/custom_message/msg/detail/state__functions.h:
+
+rosidl_generator_c/custom_message/msg/detail/state__struct.h:
+
+rosidl_generator_c/custom_message/msg/detail/state__type_support.h:
 
 rosidl_generator_c/custom_message/msg/detail/control_inputs__functions.h:
-
-/opt/ros/humble/include/rosidl_runtime_c/rosidl_runtime_c/string.h:
 
 /usr/include/python3.10/fileutils.h:
 
@@ -381,8 +395,6 @@ rosidl_generator_c/custom_message/msg/detail/control_inputs__functions.h:
 /usr/include/python3.10/fileobject.h:
 
 /usr/include/x86_64-linux-gnu/bits/statx-generic.h:
-
-/opt/ros/humble/include/rosidl_runtime_c/rosidl_runtime_c/primitives_sequence.h:
 
 /usr/include/x86_64-linux-gnu/sys/types.h:
 
