@@ -39,6 +39,8 @@ class Config:
         self.robot_length = 1.2  # [m] for collision check
         # obstacles [x(m) y(m), ....]
 
+        self.trail_length = 300
+
 config = Config()
 debug = False
 
@@ -57,14 +59,14 @@ class Plotter(Node):
         ts.registerCallback(self.plotter_callback)
         
         self.get_logger().info("Plotter has been started")
-        
+
     def plotter_callback(self, state1: FullState, state2: FullState):
     
         self.state1_buf = np.vstack((self.state1_buf, [state1.x, state1.y]))
         self.state2_buf = np.vstack((self.state2_buf, [state2.x, state2.y]))
-        if len(self.state1_buf) > 500:
+        if len(self.state1_buf) > config.trail_length:
             self.state1_buf = np.delete(self.state1_buf, 0, 0)
-        if len(self.state2_buf) > 500:
+        if len(self.state2_buf) > config.trail_length:
             self.state2_buf = np.delete(self.state2_buf, 0, 0)
 
         plt.cla()
@@ -73,11 +75,10 @@ class Plotter(Node):
             'key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
         
-        self.plot_robot(state1)
-        self.plot_robot(state2)
-
         plt.scatter(self.state1_buf[:,0], self.state1_buf[:,1], linewidths=0.5)
         plt.scatter(self.state2_buf[:,0], self.state2_buf[:,1], linewidths=0.5)
+        self.plot_robot(state1)
+        self.plot_robot(state2)
         plt.plot(state1.x, state1.y, 'k.')
         plt.plot(state2.x, state2.y, 'b.')
         plt.axis("equal")

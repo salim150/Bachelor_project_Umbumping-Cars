@@ -9,7 +9,7 @@ from functools import partial
 from custom_message.msg import ControlInputs, State
 import message_filters
 
-debug = False
+debug = True
 
 class SensorMeasurement(Node):
 
@@ -25,7 +25,7 @@ class SensorMeasurement(Node):
         state1_subscriber = message_filters.Subscriber(self, State, "/robot1_state")
         state2_subscriber = message_filters.Subscriber(self, State, "/robot2_state")
 
-        ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber], 2, 0.1, allow_headerless=True)
+        ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber], 6, 1, allow_headerless=True)
         ts.registerCallback(self.sensor_callback)
 
         self.get_logger().info("Sensor has been started")
