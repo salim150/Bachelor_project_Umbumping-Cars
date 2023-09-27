@@ -16,8 +16,8 @@ class SensorMeasurement(Node):
     def __init__(self):
         super().__init__("sensor")
 
-        self.measurement1_publisher_ = self.create_publisher(State, "/robot1_measurement", 1)
-        self.measurement2_publisher_ = self.create_publisher(State, "/robot2_measurement", 1)
+        self.measurement1_publisher_ = self.create_publisher(State, "/robot1_measurement", 20)
+        self.measurement2_publisher_ = self.create_publisher(State, "/robot2_measurement", 20)
         """self.pose_subscriber_ = self.create_subscription(State,
                                                          "/" + robot_name + "_state", 
                                                          self.pose_callback, 1) # replace with topic /robot_state"""

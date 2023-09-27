@@ -1,0 +1,42 @@
+[0.016s] Invoking command in '/home/giacomo/thesis_ws/build/sym_bringup': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake /home/giacomo/thesis_ws/src/sym_bringup -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/giacomo/thesis_ws/install/sym_bringup
+[0.090s] -- The C compiler identification is GNU 11.4.0
+[0.166s] -- The CXX compiler identification is GNU 11.4.0
+[0.183s] -- Detecting C compiler ABI info
+[0.272s] -- Detecting C compiler ABI info - done
+[0.285s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.286s] -- Detecting C compile features
+[0.287s] -- Detecting C compile features - done
+[0.293s] -- Detecting CXX compiler ABI info
+[0.398s] -- Detecting CXX compiler ABI info - done
+[0.410s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.410s] -- Detecting CXX compile features
+[0.411s] -- Detecting CXX compile features - done
+[0.416s] -- Found ament_cmake: 1.3.5 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.884s] -- Found Python3: /usr/bin/python3.10 (found version "3.10.12") found components: Interpreter 
+[0.969s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[1.105s] -- Configuring done
+[1.110s] -- Generating done
+[1.112s] -- Build files have been written to: /home/giacomo/thesis_ws/build/sym_bringup
+[1.119s] Invoked command in '/home/giacomo/thesis_ws/build/sym_bringup' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake /home/giacomo/thesis_ws/src/sym_bringup -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/giacomo/thesis_ws/install/sym_bringup
+[1.122s] Invoking command in '/home/giacomo/thesis_ws/build/sym_bringup': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --build /home/giacomo/thesis_ws/build/sym_bringup -- -j8 -l8
+[1.170s] Invoked command in '/home/giacomo/thesis_ws/build/sym_bringup' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --build /home/giacomo/thesis_ws/build/sym_bringup -- -j8 -l8
+[1.200s] Invoking command in '/home/giacomo/thesis_ws/build/sym_bringup': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --install /home/giacomo/thesis_ws/build/sym_bringup
+[1.211s] -- Install configuration: ""
+[1.211s] -- Execute custom install script
+[1.212s] -- Symlinking: /home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/launch/demo.launch.py
+[1.224s] -- Symlinking: /home/giacomo/thesis_ws/install/sym_bringup/share/ament_index/resource_index/package_run_dependencies/sym_bringup
+[1.234s] -- Symlinking: /home/giacomo/thesis_ws/install/sym_bringup/share/ament_index/resource_index/parent_prefix_path/sym_bringup
+[1.246s] -- Symlinking: /home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/environment/ament_prefix_path.sh
+[1.259s] -- Symlinking: /home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/environment/ament_prefix_path.dsv
+[1.270s] -- Symlinking: /home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/environment/path.sh
+[1.281s] -- Symlinking: /home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/environment/path.dsv
+[1.292s] -- Symlinking: /home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/local_setup.bash
+[1.302s] -- Symlinking: /home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/local_setup.sh
+[1.314s] -- Symlinking: /home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/local_setup.zsh
+[1.326s] -- Symlinking: /home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/local_setup.dsv
+[1.336s] -- Symlinking: /home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/package.dsv
+[1.349s] -- Symlinking: /home/giacomo/thesis_ws/install/sym_bringup/share/ament_index/resource_index/packages/sym_bringup
+[1.360s] -- Symlinking: /home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/cmake/sym_bringupConfig.cmake
+[1.370s] -- Symlinking: /home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/cmake/sym_bringupConfig-version.cmake
+[1.380s] -- Symlinking: /home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/package.xml
+[1.394s] Invoked command in '/home/giacomo/thesis_ws/build/sym_bringup' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --install /home/giacomo/thesis_ws/build/sym_bringup

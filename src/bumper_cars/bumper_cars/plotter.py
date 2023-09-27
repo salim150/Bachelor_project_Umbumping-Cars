@@ -46,7 +46,6 @@ class Plotter(Node):
 
     def __init__(self):
         super().__init__("plotter")
-        self.get_logger().info("Plotter has been started")
         
         state1_subscriber = message_filters.Subscriber(self, FullState, "/robot1_fullstate")
         state2_subscriber = message_filters.Subscriber(self, FullState, "/robot2_fullstate")
@@ -56,6 +55,8 @@ class Plotter(Node):
 
         ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber], 10, 1, allow_headerless=True)
         ts.registerCallback(self.plotter_callback)
+        
+        self.get_logger().info("Plotter has been started")
         
     def plotter_callback(self, state1: FullState, state2: FullState):
     

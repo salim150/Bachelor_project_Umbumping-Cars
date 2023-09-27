@@ -35,14 +35,14 @@ class CarModel(Node):
         self.initial_state2 = State(x=0.0, y=0.0, yaw=0.0, v=0.0, omega=0.0)
 
         # Initializing the state publishers/subscribers
-        self.state1_publisher_ = self.create_publisher(State, "/robot1_state", 1)
-        self.state2_publisher_ = self.create_publisher(State, "/robot2_state", 1)
+        self.state1_publisher_ = self.create_publisher(State, "/robot1_state", 20)
+        self.state2_publisher_ = self.create_publisher(State, "/robot2_state", 20)
 
         self.control1_subscriber = message_filters.Subscriber(self, ControlInputs, "/robot1_control")
         self.control2_subscriber = message_filters.Subscriber(self, ControlInputs, "/robot2_control")
 
-        self.fullstate1_publisher_ = self.create_publisher(FullState, "robot1_fullstate", 1)
-        self.fullstate2_publisher_ = self.create_publisher(FullState, "robot2_fullstate", 1)
+        self.fullstate1_publisher_ = self.create_publisher(FullState, "robot1_fullstate", 50)
+        self.fullstate2_publisher_ = self.create_publisher(FullState, "robot2_fullstate", 50)
 
         # Approximate time synchronizer to handle the incoming messages
         ts = message_filters.ApproximateTimeSynchronizer([self.control1_subscriber, self.control2_subscriber], 2, 0.1, allow_headerless=True)
@@ -114,7 +114,6 @@ class CarModel(Node):
         state.v = np.clip(state.v, min_speed, max_speed)
 
         return state, old_time
-
 
     def normalize_angle(self, angle):
         """
