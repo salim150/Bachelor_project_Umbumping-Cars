@@ -2,7 +2,6 @@
 
 import rclpy
 from rclpy.node import Node
-from turtlesim.msg import Pose
 from custom_message.msg import ControlInputs, State, FullState
 import numpy as np
 import time
@@ -52,28 +51,15 @@ class CarModel(Node):
 
         # Initializing the robots
         self.initial_state1 = State(x=self.x0, y=self.y0, yaw=self.yaw, v=self.v, omega=self.omega)
-        #self.initial_state2 = State(x=0.0, y=0.0, yaw=0.0, v=0.0, omega=0.0)
 
         # Initializing the state publishers/subscribers
         self.state1_publisher_ = self.create_publisher(State, "/robot_state", 20)
-        #self.state2_publisher_ = self.create_publisher(State, "/robot2_state", 20)
-
         self.control_sub = self.create_subscription(ControlInputs, '/robot_control', self.general_model_callback, 10)
-        #self.control1_subscriber = message_filters.Subscriber(self, ControlInputs, "/robot_control")
-        #self.control2_subscriber = message_filters.Subscriber(self, ControlInputs, "/robot2_control")
-
         self.fullstate1_publisher_ = self.create_publisher(FullState, "robot_fullstate", 60)
-        #self.fullstate2_publisher_ = self.create_publisher(FullState, "robot2_fullstate", 60)
-
-        # Approximate time synchronizer to handle the incoming messages
-        #ts = message_filters.ApproximateTimeSynchronizer([self.control1_subscriber, self.control2_subscriber], 2, 0.1, allow_headerless=True)
-        #ts.registerCallback(self.general_model_callback)
 
         self.old_time1 = time.time()
-        #self.old_time2 = time.time()
 
         self.state1_publisher_.publish(self.initial_state1)
-        #self.state2_publisher_.publish(self.initial_state2)
         self.get_logger().info("Robots model initialized correctly")
 
         self.timer = self.create_timer(0.1, self.timer_callback)
@@ -85,17 +71,9 @@ class CarModel(Node):
             self.initial_state1, self.old_time1 = self.linear_model_callback(self.initial_state1, control1, self.old_time1)
         elif self.model_type == 'nonlinear':
             self.initial_state1, self.old_time1 = self.nonlinear_model_callback(self.initial_state1, control1, self.old_time1)
-        #self.initial_state2, self.old_time2 = self.nonlinear_model_callback(self.initial_state2, control2, self.old_time2)
-
-        #self.state1_publisher_.publish(self.initial_state1)
-        #self.state2_publisher_.publish(self.initial_state2)
         
         self.fullstate1 = FullState(x=float(self.initial_state1.x), y=float(self.initial_state1.y), yaw=float(self.initial_state1.yaw), v=float(self.initial_state1.v),
                                omega=float(self.initial_state1.omega), delta=float(control1.delta), throttle=float(control1.throttle))
-        #self.fullstate1_publisher_.publish(self.fullstate1)
-        #fullstate2 = FullState(x=float(self.initial_state2.x), y=float(self.initial_state2.y), yaw=float(self.initial_state2.yaw), v=float(self.initial_state2.v),
-        #                       omega=float(self.initial_state2.omega), delta=float(control2.delta), throttle=float(control2.throttle))
-        #self.fullstate2_publisher_.publish(fullstate2)
 
     def linear_model_callback(self, state: State, cmd: ControlInputs, old_time: float):
 

@@ -9,7 +9,7 @@ from functools import partial
 from custom_message.msg import ControlInputs, State
 import message_filters
 
-debug = True
+debug = False
 
 class SensorMeasurement(Node):
 
@@ -18,9 +18,6 @@ class SensorMeasurement(Node):
 
         self.measurement1_publisher_ = self.create_publisher(State, "/robot1_measurement", 20)
         self.measurement2_publisher_ = self.create_publisher(State, "/robot2_measurement", 20)
-        """self.pose_subscriber_ = self.create_subscription(State,
-                                                         "/" + robot_name + "_state", 
-                                                         self.pose_callback, 1) # replace with topic /robot_state"""
         
         state1_subscriber = message_filters.Subscriber(self, State, "/robot1_state")
         state2_subscriber = message_filters.Subscriber(self, State, "/robot2_state")
