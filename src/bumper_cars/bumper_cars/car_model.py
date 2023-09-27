@@ -143,4 +143,5 @@ def main(args=None):
     node = CarModel()
     rclpy.spin(node)
 
+    node.destroy_node()
     rclpy.shutdown()

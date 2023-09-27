@@ -133,6 +133,7 @@ def main(args=None):
     node = Plotter()
     rclpy.spin(node)
 
+    node.destroy_node()
     rclpy.shutdown()
 
 # colcon build --symlink-install to be able to run the node without building it

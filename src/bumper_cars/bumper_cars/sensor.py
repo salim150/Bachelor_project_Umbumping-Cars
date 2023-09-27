@@ -51,4 +51,5 @@ def main(args=None):
     node = SensorMeasurement()
     rclpy.spin(node)
 
+    node.destroy_node()
     rclpy.shutdown()
