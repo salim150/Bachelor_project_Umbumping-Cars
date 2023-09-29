@@ -1,0 +1,1 @@
+/home/giacomo/thesis_ws/src/my_bot/description/install/py_pubsub/share/py_pubsub/hook/pythonpath.ps1
