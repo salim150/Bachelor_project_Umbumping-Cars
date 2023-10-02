@@ -69,6 +69,8 @@ include CMakeFiles/custom_message.dir/progress.make
 CMakeFiles/custom_message: /home/giacomo/thesis_ws/src/custom_message/msg/ControlInputs.msg
 CMakeFiles/custom_message: /home/giacomo/thesis_ws/src/custom_message/msg/State.msg
 CMakeFiles/custom_message: /home/giacomo/thesis_ws/src/custom_message/msg/FullState.msg
+CMakeFiles/custom_message: /home/giacomo/thesis_ws/src/custom_message/msg/Path.msg
+CMakeFiles/custom_message: /home/giacomo/thesis_ws/src/custom_message/msg/Coordinate.msg
 
 custom_message: CMakeFiles/custom_message
 custom_message: CMakeFiles/custom_message.dir/build.make

@@ -1,6 +1,10 @@
 msg/ControlInputs.idl
 msg/ControlInputs.msg
+msg/Coordinate.idl
+msg/Coordinate.msg
 msg/FullState.idl
 msg/FullState.msg
+msg/Path.idl
+msg/Path.msg
 msg/State.idl
 msg/State.msg

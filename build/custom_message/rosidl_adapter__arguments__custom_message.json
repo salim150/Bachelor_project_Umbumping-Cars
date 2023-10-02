@@ -3,6 +3,8 @@
   "non_idl_tuples": [
     "/home/giacomo/thesis_ws/src/custom_message:msg/ControlInputs.msg",
     "/home/giacomo/thesis_ws/src/custom_message:msg/State.msg",
-    "/home/giacomo/thesis_ws/src/custom_message:msg/FullState.msg"
+    "/home/giacomo/thesis_ws/src/custom_message:msg/FullState.msg",
+    "/home/giacomo/thesis_ws/src/custom_message:msg/Path.msg",
+    "/home/giacomo/thesis_ws/src/custom_message:msg/Coordinate.msg"
   ]
 }
