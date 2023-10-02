@@ -16,10 +16,10 @@ class Config:
 
     def __init__(self):
         self.robot_width = 1.45  # [m] for collision check
-        self.robot_length = 1.2  # [m] for collision check
+        self.robot_length = 2.9  # [m] for collision check
         # obstacles [x(m) y(m), ....]
 
-        self.trail_length = 300
+        self.trail_length = 50
 
 config = Config()
 debug = False

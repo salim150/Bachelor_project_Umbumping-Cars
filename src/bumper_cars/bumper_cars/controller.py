@@ -16,7 +16,7 @@ import numpy as np
 debug = True
 WB = 2.9  # [m] Wheel base of vehicle
 Lf = 20  # [m] look-ahead distance
-kpp = 2
+kpp = 5
 
 class Controller(Node):
 
@@ -25,15 +25,16 @@ class Controller(Node):
         self.previous_x = 0
         
         # creating random walk path for car2 to follow
-        self.path = []
         self.safety = 20 # safety border around the map boundaries
         self.width = 100 - self.safety
         self.heigth = 100 -self.safety
-        self.create_path()
-        print(self.path)
-        print(self.path[1])
-        print(type(self.path))
-        self.target = (self.path[0].x, self.path[0].y)
+
+        self.path1 = []
+        self.path1 = self.create_path(self.path1)
+        self.target1 = (self.path1[0].x, self.path1[0].y)
+        self.path2 = []
+        self.path2 = self.create_path(self.path2)
+        self.target2 = (self.path2[0].x, self.path2[0].y)
     
         self.control1_publisher_ = self.create_publisher(ControlInputs, "/robot1_control", 20)
         self.control2_publisher_ = self.create_publisher(ControlInputs, "/robot2_control", 20)
@@ -47,7 +48,7 @@ class Controller(Node):
 
         self.control1_publisher_.publish(ControlInputs(delta=0.0, throttle=0.0))
         self.control2_publisher_.publish(ControlInputs(delta=0.0, throttle=0.0))
-        self.path_pub.publish(Path(path=self.path))
+        self.path_pub.publish(Path(path=self.path2))
 
         self.get_logger().info("Controller has been started")
 
@@ -60,8 +61,7 @@ class Controller(Node):
     def pose1_callback(self, pose: State):
     
         cmd = ControlInputs()
-        cmd.delta =15.0
-        cmd.throttle = 3.0
+        cmd.throttle, cmd.delta, self.path1, self.target1 = self.pure_pursuit_steer_control(self.target1, pose, self.path1)
         self.control1_publisher_.publish(cmd)
         
         if debug:
@@ -70,7 +70,7 @@ class Controller(Node):
     def pose2_callback(self, pose: State):
     
         cmd = ControlInputs()
-        # updating target waypoint
+        """# updating target waypoint
         if self.dist(point1=(pose.x, pose.y), point2=self.target) < Lf:
             self.update_path()
             self.target = (self.path[0].x, self.path[0].y)
@@ -94,44 +94,52 @@ class Controller(Node):
 
         cmd.delta = math.degrees(cmd.delta)
         cmd.throttle = 3 * (desired_speed-pose.v)
-
-        """cmd.delta = 15.0
-        cmd.throttle = 3.0"""
+        """
+        
+        cmd.throttle, cmd.delta, self.path2, self.target2 = self.pure_pursuit_steer_control(self.target2, pose, self.path2)
         self.control2_publisher_.publish(cmd)
-        self.path_pub.publish(Path(path=self.path))
+        self.path_pub.publish(Path(path=self.path2))
         
         if debug:
             self.get_logger().info("Control input robot2, delta:" + str(cmd.delta) + " , throttle: " + str(cmd.throttle))
     
-    def update_path(self):
-        self.path.pop(0)
-        self.path.append(Coordinate(x=random.randint(-self.width/2, self.width/2), y=random.randint(-self.heigth/2, self.heigth/2)))
+    def update_path(self, path: Path):
+        path.pop(0)
+        path.append(Coordinate(x=random.randint(-self.width/2, self.width/2), y=random.randint(-self.heigth/2, self.heigth/2)))
+        return path
 
-    def create_path(self):
-        while len(self.path)<5:
-            self.path.append(Coordinate(x=random.randint(-self.width/2, self.width/2), y=random.randint(-self.heigth/2, self.heigth/2)))
+    def create_path(self, path):
+        while len(path)<5:
+            path.append(Coordinate(x=random.randint(-self.width/2, self.width/2), y=random.randint(-self.heigth/2, self.heigth/2)))
+        return path
     
-    def pure_pursuit_steer_control(self):
-        if self.dist(point1=(self._current_x, self._current_y), point2=self.target) < Lf and self.idx < len(
-                self._waypoints) - 1:
-            self._waypoints.pop(self.idx)
-            self.target = self._waypoints[self.idx]
+    def pure_pursuit_steer_control(self, target, pose: Pose, path: Path):
+        # updating target waypoint
+        if self.dist(point1=(pose.x, pose.y), point2=target) < Lf:
+            path = self.update_path(path)
+            target = (path[0].x, path[0].y)
 
-        if self.idx < len(self._waypoints) and self.dist((self._current_x, self._current_y), self._waypoints[-1]) < 10:
-            self._desired_speed = 0
-            self.steer = 0
+        alpha = self.normalize_angle(math.atan2(target[1] - pose.y, target[0] - pose.x) - pose.yaw)
 
-        alpha = math.atan2(self.target[1] - self._current_y, self.target[0] - self._current_x) - self._current_yaw
-
-        self.steer = math.atan2(2.0 * WB * math.sin(alpha) / Lf, 1.0)
-
-        # decreasing the desired speed when turning
-        if self.steer > math.radians(10) or self.steer < -math.radians(10):
-            self._desired_speed = 5
+        # this if/else condition should fix the buf of the waypoint behind the car
+        if alpha > np.pi/2.0:
+            delta = math.radians(15)
+        elif alpha < -np.pi/2.0: 
+            delta = math.radians(-15)
         else:
-            self._desired_speed = 9
+            # ref: https://www.shuffleai.blog/blog/Three_Methods_of_Vehicle_Lateral_Control.html
+            delta = self.normalize_angle(math.atan2(2.0 * WB *  math.sin(alpha), Lf))
+        
+        # decreasing the desired speed when turning
+        if delta > math.radians(10) or delta < -math.radians(10):
+            desired_speed = 3
+        else:
+            desired_speed = 6
 
-        self.throttle = self.proportional_control()
+        delta = math.degrees(delta)
+        throttle = 3 * (desired_speed-pose.v)
+
+        return throttle, delta, path, target
 
     def proportional_control(self):
         a = 3 * (self._desired_speed-self._current_speed)
