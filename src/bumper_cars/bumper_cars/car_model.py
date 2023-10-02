@@ -29,7 +29,7 @@ class CarModel(Node):
     def __init__(self):
         super().__init__("robot_model")
 
-        # TODO: pass parameters as State type and not single items
+        # TODO: pass parameters as State type and not single items --> USE ARRAYS/DICT   
         self.declare_parameters(
             namespace='',
             parameters=[
@@ -101,8 +101,8 @@ class CarModel(Node):
         Ffy = -Cf * ((vy + Lf * state.omega) / (vx + 0.0001) - cmd.delta)
         Fry = -Cr * (vy - Lr * state.omega) / (vx + 0.0001)
         R_x = c_r1 * abs(vx)
-        F_aero = c_a * vx ** 2
-        F_load = F_aero + R_x
+        F_aero = c_a * vx ** 2 # 
+        F_load = F_aero + R_x #
         state.omega = state.omega + (Ffy * Lf * math.cos(cmd.delta) - Fry * Lr) / Iz * dt
         vx = vx + (cmd.throttle - Ffy * math.sin(cmd.delta) / m - F_load / m + vy * state.omega) * dt
         vy = vy + (Fry / m + Ffy * math.cos(cmd.delta) / m - vx * state.omega) * dt

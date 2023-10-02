@@ -18,6 +18,10 @@
 /home/giacomo/thesis_ws/install/my_bot/share/my_bot/description/build/py_pubsub/py_pubsub.egg-info/top_level.txt
 /home/giacomo/thesis_ws/install/my_bot/share/my_bot/description/build/py_pubsub/py_pubsub.egg-info/zip-safe
 /home/giacomo/thesis_ws/install/my_bot/share/my_bot/description/gazebo_control.xacro
+<<<<<<< HEAD
+=======
+/home/giacomo/thesis_ws/install/my_bot/share/my_bot/description/hello_world.py
+>>>>>>> Decoupling
 /home/giacomo/thesis_ws/install/my_bot/share/my_bot/description/inertial_macros.xacro
 /home/giacomo/thesis_ws/install/my_bot/share/my_bot/description/install/.colcon_install_layout
 /home/giacomo/thesis_ws/install/my_bot/share/my_bot/description/install/COLCON_IGNORE
