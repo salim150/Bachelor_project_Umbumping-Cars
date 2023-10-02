@@ -80,6 +80,8 @@ rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/control_i
 rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/control_inputs__type_support.cpp: rosidl_adapter/custom_message/msg/ControlInputs.idl
 rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/control_inputs__type_support.cpp: rosidl_adapter/custom_message/msg/State.idl
 rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/control_inputs__type_support.cpp: rosidl_adapter/custom_message/msg/FullState.idl
+rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/control_inputs__type_support.cpp: rosidl_adapter/custom_message/msg/Path.idl
+rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/control_inputs__type_support.cpp: rosidl_adapter/custom_message/msg/Coordinate.idl
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/giacomo/thesis_ws/build/custom_message/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating C++ type support for eProsima Fast-RTPS"
 	/usr/bin/python3.10 /opt/ros/humble/lib/rosidl_typesupport_fastrtps_cpp/rosidl_typesupport_fastrtps_cpp --generator-arguments-file /home/giacomo/thesis_ws/build/custom_message/rosidl_typesupport_fastrtps_cpp__arguments.json
 
@@ -97,6 +99,18 @@ rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/full_stat
 
 rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/full_state__rosidl_typesupport_fastrtps_cpp.hpp: rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/control_inputs__type_support.cpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/full_state__rosidl_typesupport_fastrtps_cpp.hpp
+
+rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/path__type_support.cpp: rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/control_inputs__type_support.cpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/path__type_support.cpp
+
+rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/path__rosidl_typesupport_fastrtps_cpp.hpp: rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/control_inputs__type_support.cpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/path__rosidl_typesupport_fastrtps_cpp.hpp
+
+rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/coordinate__type_support.cpp: rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/control_inputs__type_support.cpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/coordinate__type_support.cpp
+
+rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/coordinate__rosidl_typesupport_fastrtps_cpp.hpp: rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/control_inputs__type_support.cpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/coordinate__rosidl_typesupport_fastrtps_cpp.hpp
 
 CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/control_inputs__type_support.cpp.o: CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/flags.make
 CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/control_inputs__type_support.cpp.o: rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/control_inputs__type_support.cpp
@@ -140,11 +154,41 @@ CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesuppor
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/full_state__type_support.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/giacomo/thesis_ws/build/custom_message/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/full_state__type_support.cpp -o CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/full_state__type_support.cpp.s
 
+CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/path__type_support.cpp.o: CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/flags.make
+CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/path__type_support.cpp.o: rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/path__type_support.cpp
+CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/path__type_support.cpp.o: CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/giacomo/thesis_ws/build/custom_message/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/path__type_support.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/path__type_support.cpp.o -MF CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/path__type_support.cpp.o.d -o CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/path__type_support.cpp.o -c /home/giacomo/thesis_ws/build/custom_message/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/path__type_support.cpp
+
+CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/path__type_support.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/path__type_support.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/giacomo/thesis_ws/build/custom_message/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/path__type_support.cpp > CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/path__type_support.cpp.i
+
+CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/path__type_support.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/path__type_support.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/giacomo/thesis_ws/build/custom_message/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/path__type_support.cpp -o CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/path__type_support.cpp.s
+
+CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/coordinate__type_support.cpp.o: CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/flags.make
+CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/coordinate__type_support.cpp.o: rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/coordinate__type_support.cpp
+CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/coordinate__type_support.cpp.o: CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/giacomo/thesis_ws/build/custom_message/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/coordinate__type_support.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/coordinate__type_support.cpp.o -MF CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/coordinate__type_support.cpp.o.d -o CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/coordinate__type_support.cpp.o -c /home/giacomo/thesis_ws/build/custom_message/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/coordinate__type_support.cpp
+
+CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/coordinate__type_support.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/coordinate__type_support.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/giacomo/thesis_ws/build/custom_message/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/coordinate__type_support.cpp > CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/coordinate__type_support.cpp.i
+
+CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/coordinate__type_support.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/coordinate__type_support.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/giacomo/thesis_ws/build/custom_message/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/coordinate__type_support.cpp -o CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/coordinate__type_support.cpp.s
+
 # Object files for target custom_message__rosidl_typesupport_fastrtps_cpp
 custom_message__rosidl_typesupport_fastrtps_cpp_OBJECTS = \
 "CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/control_inputs__type_support.cpp.o" \
 "CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/state__type_support.cpp.o" \
-"CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/full_state__type_support.cpp.o"
+"CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/full_state__type_support.cpp.o" \
+"CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/path__type_support.cpp.o" \
+"CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/coordinate__type_support.cpp.o"
 
 # External object files for target custom_message__rosidl_typesupport_fastrtps_cpp
 custom_message__rosidl_typesupport_fastrtps_cpp_EXTERNAL_OBJECTS =
@@ -152,6 +196,8 @@ custom_message__rosidl_typesupport_fastrtps_cpp_EXTERNAL_OBJECTS =
 libcustom_message__rosidl_typesupport_fastrtps_cpp.so: CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/control_inputs__type_support.cpp.o
 libcustom_message__rosidl_typesupport_fastrtps_cpp.so: CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/state__type_support.cpp.o
 libcustom_message__rosidl_typesupport_fastrtps_cpp.so: CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/full_state__type_support.cpp.o
+libcustom_message__rosidl_typesupport_fastrtps_cpp.so: CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/path__type_support.cpp.o
+libcustom_message__rosidl_typesupport_fastrtps_cpp.so: CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/coordinate__type_support.cpp.o
 libcustom_message__rosidl_typesupport_fastrtps_cpp.so: CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/build.make
 libcustom_message__rosidl_typesupport_fastrtps_cpp.so: /opt/ros/humble/lib/librosidl_typesupport_fastrtps_cpp.so
 libcustom_message__rosidl_typesupport_fastrtps_cpp.so: /opt/ros/humble/lib/libfastcdr.so.1.0.24
@@ -159,7 +205,7 @@ libcustom_message__rosidl_typesupport_fastrtps_cpp.so: /opt/ros/humble/lib/librm
 libcustom_message__rosidl_typesupport_fastrtps_cpp.so: /opt/ros/humble/lib/librosidl_runtime_c.so
 libcustom_message__rosidl_typesupport_fastrtps_cpp.so: /opt/ros/humble/lib/librcutils.so
 libcustom_message__rosidl_typesupport_fastrtps_cpp.so: CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/giacomo/thesis_ws/build/custom_message/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX shared library libcustom_message__rosidl_typesupport_fastrtps_cpp.so"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/giacomo/thesis_ws/build/custom_message/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX shared library libcustom_message__rosidl_typesupport_fastrtps_cpp.so"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -171,10 +217,14 @@ CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/clean:
 .PHONY : CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/clean
 
 CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/depend: rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/control_inputs__rosidl_typesupport_fastrtps_cpp.hpp
+CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/depend: rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/coordinate__rosidl_typesupport_fastrtps_cpp.hpp
 CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/depend: rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/control_inputs__type_support.cpp
+CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/depend: rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/coordinate__type_support.cpp
 CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/depend: rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/full_state__type_support.cpp
+CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/depend: rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/path__type_support.cpp
 CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/depend: rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/state__type_support.cpp
 CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/depend: rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/full_state__rosidl_typesupport_fastrtps_cpp.hpp
+CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/depend: rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/path__rosidl_typesupport_fastrtps_cpp.hpp
 CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/depend: rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/state__rosidl_typesupport_fastrtps_cpp.hpp
 	cd /home/giacomo/thesis_ws/build/custom_message && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/giacomo/thesis_ws/src/custom_message /home/giacomo/thesis_ws/src/custom_message /home/giacomo/thesis_ws/build/custom_message /home/giacomo/thesis_ws/build/custom_message /home/giacomo/thesis_ws/build/custom_message/CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/depend

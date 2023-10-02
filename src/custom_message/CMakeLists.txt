@@ -13,6 +13,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/ControlInputs.msg"
   "msg/State.msg"
   "msg/FullState.msg"
+  "msg/Path.msg"
+  "msg/Coordinate.msg"
 )
 
 ament_export_dependencies(rosidl_default_runtime)

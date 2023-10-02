@@ -78,6 +78,14 @@ CMakeFiles/custom_message__cpp: rosidl_generator_cpp/custom_message/msg/full_sta
 CMakeFiles/custom_message__cpp: rosidl_generator_cpp/custom_message/msg/detail/full_state__builder.hpp
 CMakeFiles/custom_message__cpp: rosidl_generator_cpp/custom_message/msg/detail/full_state__struct.hpp
 CMakeFiles/custom_message__cpp: rosidl_generator_cpp/custom_message/msg/detail/full_state__traits.hpp
+CMakeFiles/custom_message__cpp: rosidl_generator_cpp/custom_message/msg/path.hpp
+CMakeFiles/custom_message__cpp: rosidl_generator_cpp/custom_message/msg/detail/path__builder.hpp
+CMakeFiles/custom_message__cpp: rosidl_generator_cpp/custom_message/msg/detail/path__struct.hpp
+CMakeFiles/custom_message__cpp: rosidl_generator_cpp/custom_message/msg/detail/path__traits.hpp
+CMakeFiles/custom_message__cpp: rosidl_generator_cpp/custom_message/msg/coordinate.hpp
+CMakeFiles/custom_message__cpp: rosidl_generator_cpp/custom_message/msg/detail/coordinate__builder.hpp
+CMakeFiles/custom_message__cpp: rosidl_generator_cpp/custom_message/msg/detail/coordinate__struct.hpp
+CMakeFiles/custom_message__cpp: rosidl_generator_cpp/custom_message/msg/detail/coordinate__traits.hpp
 
 rosidl_generator_cpp/custom_message/msg/control_inputs.hpp: /opt/ros/humble/lib/rosidl_generator_cpp/rosidl_generator_cpp
 rosidl_generator_cpp/custom_message/msg/control_inputs.hpp: /opt/ros/humble/local/lib/python3.10/dist-packages/rosidl_generator_cpp/__init__.py
@@ -97,6 +105,8 @@ rosidl_generator_cpp/custom_message/msg/control_inputs.hpp: /opt/ros/humble/shar
 rosidl_generator_cpp/custom_message/msg/control_inputs.hpp: rosidl_adapter/custom_message/msg/ControlInputs.idl
 rosidl_generator_cpp/custom_message/msg/control_inputs.hpp: rosidl_adapter/custom_message/msg/State.idl
 rosidl_generator_cpp/custom_message/msg/control_inputs.hpp: rosidl_adapter/custom_message/msg/FullState.idl
+rosidl_generator_cpp/custom_message/msg/control_inputs.hpp: rosidl_adapter/custom_message/msg/Path.idl
+rosidl_generator_cpp/custom_message/msg/control_inputs.hpp: rosidl_adapter/custom_message/msg/Coordinate.idl
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/giacomo/thesis_ws/build/custom_message/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating C++ code for ROS interfaces"
 	/usr/bin/python3.10 /opt/ros/humble/share/rosidl_generator_cpp/cmake/../../../lib/rosidl_generator_cpp/rosidl_generator_cpp --generator-arguments-file /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_cpp__arguments.json
 
@@ -133,18 +143,50 @@ rosidl_generator_cpp/custom_message/msg/detail/full_state__struct.hpp: rosidl_ge
 rosidl_generator_cpp/custom_message/msg/detail/full_state__traits.hpp: rosidl_generator_cpp/custom_message/msg/control_inputs.hpp
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/custom_message/msg/detail/full_state__traits.hpp
 
+rosidl_generator_cpp/custom_message/msg/path.hpp: rosidl_generator_cpp/custom_message/msg/control_inputs.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/custom_message/msg/path.hpp
+
+rosidl_generator_cpp/custom_message/msg/detail/path__builder.hpp: rosidl_generator_cpp/custom_message/msg/control_inputs.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/custom_message/msg/detail/path__builder.hpp
+
+rosidl_generator_cpp/custom_message/msg/detail/path__struct.hpp: rosidl_generator_cpp/custom_message/msg/control_inputs.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/custom_message/msg/detail/path__struct.hpp
+
+rosidl_generator_cpp/custom_message/msg/detail/path__traits.hpp: rosidl_generator_cpp/custom_message/msg/control_inputs.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/custom_message/msg/detail/path__traits.hpp
+
+rosidl_generator_cpp/custom_message/msg/coordinate.hpp: rosidl_generator_cpp/custom_message/msg/control_inputs.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/custom_message/msg/coordinate.hpp
+
+rosidl_generator_cpp/custom_message/msg/detail/coordinate__builder.hpp: rosidl_generator_cpp/custom_message/msg/control_inputs.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/custom_message/msg/detail/coordinate__builder.hpp
+
+rosidl_generator_cpp/custom_message/msg/detail/coordinate__struct.hpp: rosidl_generator_cpp/custom_message/msg/control_inputs.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/custom_message/msg/detail/coordinate__struct.hpp
+
+rosidl_generator_cpp/custom_message/msg/detail/coordinate__traits.hpp: rosidl_generator_cpp/custom_message/msg/control_inputs.hpp
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_cpp/custom_message/msg/detail/coordinate__traits.hpp
+
 custom_message__cpp: CMakeFiles/custom_message__cpp
 custom_message__cpp: rosidl_generator_cpp/custom_message/msg/control_inputs.hpp
+custom_message__cpp: rosidl_generator_cpp/custom_message/msg/coordinate.hpp
 custom_message__cpp: rosidl_generator_cpp/custom_message/msg/detail/control_inputs__builder.hpp
 custom_message__cpp: rosidl_generator_cpp/custom_message/msg/detail/control_inputs__struct.hpp
 custom_message__cpp: rosidl_generator_cpp/custom_message/msg/detail/control_inputs__traits.hpp
+custom_message__cpp: rosidl_generator_cpp/custom_message/msg/detail/coordinate__builder.hpp
+custom_message__cpp: rosidl_generator_cpp/custom_message/msg/detail/coordinate__struct.hpp
+custom_message__cpp: rosidl_generator_cpp/custom_message/msg/detail/coordinate__traits.hpp
 custom_message__cpp: rosidl_generator_cpp/custom_message/msg/detail/full_state__builder.hpp
 custom_message__cpp: rosidl_generator_cpp/custom_message/msg/detail/full_state__struct.hpp
 custom_message__cpp: rosidl_generator_cpp/custom_message/msg/detail/full_state__traits.hpp
+custom_message__cpp: rosidl_generator_cpp/custom_message/msg/detail/path__builder.hpp
+custom_message__cpp: rosidl_generator_cpp/custom_message/msg/detail/path__struct.hpp
+custom_message__cpp: rosidl_generator_cpp/custom_message/msg/detail/path__traits.hpp
 custom_message__cpp: rosidl_generator_cpp/custom_message/msg/detail/state__builder.hpp
 custom_message__cpp: rosidl_generator_cpp/custom_message/msg/detail/state__struct.hpp
 custom_message__cpp: rosidl_generator_cpp/custom_message/msg/detail/state__traits.hpp
 custom_message__cpp: rosidl_generator_cpp/custom_message/msg/full_state.hpp
+custom_message__cpp: rosidl_generator_cpp/custom_message/msg/path.hpp
 custom_message__cpp: rosidl_generator_cpp/custom_message/msg/state.hpp
 custom_message__cpp: CMakeFiles/custom_message__cpp.dir/build.make
 .PHONY : custom_message__cpp

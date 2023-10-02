@@ -1,0 +1,450 @@
+[0.907s] DEBUG:colcon:Command line arguments: ['/usr/bin/colcon', 'build', '--symlink-install']
+[0.907s] DEBUG:colcon:Parsed command line arguments: Namespace(log_base=None, log_level=None, verb_name='build', build_base='build', install_base='install', merge_install=False, symlink_install=True, test_result_base=None, continue_on_error=False, executor='parallel', parallel_workers=8, event_handlers=None, ignore_user_meta=False, metas=['./colcon.meta'], base_paths=['.'], packages_ignore=None, packages_ignore_regex=None, paths=None, packages_up_to=None, packages_up_to_regex=None, packages_above=None, packages_above_and_dependencies=None, packages_above_depth=None, packages_select_by_dep=None, packages_skip_by_dep=None, packages_skip_up_to=None, packages_select_build_failed=False, packages_skip_build_finished=False, packages_select_test_failures=False, packages_skip_test_passed=False, packages_select=None, packages_skip=None, packages_select_regex=None, packages_skip_regex=None, packages_start=None, packages_end=None, allow_overriding=[], cmake_args=None, cmake_target=None, cmake_target_skip_unavailable=False, cmake_clean_cache=False, cmake_clean_first=False, cmake_force_configure=False, ament_cmake_args=None, catkin_cmake_args=None, catkin_skip_building_tests=False, verb_parser=<colcon_defaults.argument_parser.defaults.DefaultArgumentsDecorator object at 0x7f0b1f241de0>, verb_extension=<colcon_core.verb.build.BuildVerb object at 0x7f0b1f241900>, main=<bound method BuildVerb.main of <colcon_core.verb.build.BuildVerb object at 0x7f0b1f241900>>)
+[0.958s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) check parameters
+[0.958s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) check parameters
+[0.958s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) check parameters
+[0.958s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) check parameters
+[0.958s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) discover
+[0.958s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) discover
+[0.958s] INFO:colcon.colcon_core.package_discovery:Crawling recursively for packages in '/home/giacomo/thesis_ws'
+[0.958s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ignore', 'ignore_ament_install']
+[0.958s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore'
+[0.958s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore_ament_install'
+[0.958s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_pkg']
+[0.958s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_pkg'
+[0.958s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_meta']
+[0.958s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_meta'
+[0.958s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ros']
+[0.958s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ros'
+[0.971s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['cmake', 'python']
+[0.972s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'cmake'
+[0.972s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python'
+[0.972s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['python_setup_py']
+[0.972s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python_setup_py'
+[0.972s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extensions ['ignore', 'ignore_ament_install']
+[0.972s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extension 'ignore'
+[0.972s] Level 1:colcon.colcon_core.package_identification:_identify(build) ignored
+[0.972s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extensions ['ignore', 'ignore_ament_install']
+[0.972s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extension 'ignore'
+[0.972s] Level 1:colcon.colcon_core.package_identification:_identify(install) ignored
+[0.972s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extensions ['ignore', 'ignore_ament_install']
+[0.973s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extension 'ignore'
+[0.973s] Level 1:colcon.colcon_core.package_identification:_identify(log) ignored
+[0.973s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['ignore', 'ignore_ament_install']
+[0.973s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ignore'
+[0.973s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ignore_ament_install'
+[0.973s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['colcon_pkg']
+[0.973s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'colcon_pkg'
+[0.973s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['colcon_meta']
+[0.973s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'colcon_meta'
+[0.973s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['ros']
+[0.973s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ros'
+[0.973s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['cmake', 'python']
+[0.973s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'cmake'
+[0.973s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'python'
+[0.973s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['python_setup_py']
+[0.973s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'python_setup_py'
+[0.973s] Level 1:colcon.colcon_core.package_identification:_identify(src/build) by extensions ['ignore', 'ignore_ament_install']
+[0.974s] Level 1:colcon.colcon_core.package_identification:_identify(src/build) by extension 'ignore'
+[0.974s] Level 1:colcon.colcon_core.package_identification:_identify(src/build) ignored
+[0.974s] Level 1:colcon.colcon_core.package_identification:_identify(src/bumper_cars) by extensions ['ignore', 'ignore_ament_install']
+[0.974s] Level 1:colcon.colcon_core.package_identification:_identify(src/bumper_cars) by extension 'ignore'
+[0.974s] Level 1:colcon.colcon_core.package_identification:_identify(src/bumper_cars) by extension 'ignore_ament_install'
+[0.974s] Level 1:colcon.colcon_core.package_identification:_identify(src/bumper_cars) by extensions ['colcon_pkg']
+[0.974s] Level 1:colcon.colcon_core.package_identification:_identify(src/bumper_cars) by extension 'colcon_pkg'
+[0.974s] Level 1:colcon.colcon_core.package_identification:_identify(src/bumper_cars) by extensions ['colcon_meta']
+[0.974s] Level 1:colcon.colcon_core.package_identification:_identify(src/bumper_cars) by extension 'colcon_meta'
+[0.974s] Level 1:colcon.colcon_core.package_identification:_identify(src/bumper_cars) by extensions ['ros']
+[0.974s] Level 1:colcon.colcon_core.package_identification:_identify(src/bumper_cars) by extension 'ros'
+[0.977s] DEBUG:colcon.colcon_core.package_identification:Package 'src/bumper_cars' with type 'ros.ament_python' and name 'bumper_cars'
+[0.977s] Level 1:colcon.colcon_core.package_identification:_identify(src/custom_message) by extensions ['ignore', 'ignore_ament_install']
+[0.977s] Level 1:colcon.colcon_core.package_identification:_identify(src/custom_message) by extension 'ignore'
+[0.977s] Level 1:colcon.colcon_core.package_identification:_identify(src/custom_message) by extension 'ignore_ament_install'
+[0.977s] Level 1:colcon.colcon_core.package_identification:_identify(src/custom_message) by extensions ['colcon_pkg']
+[0.977s] Level 1:colcon.colcon_core.package_identification:_identify(src/custom_message) by extension 'colcon_pkg'
+[0.977s] Level 1:colcon.colcon_core.package_identification:_identify(src/custom_message) by extensions ['colcon_meta']
+[0.978s] Level 1:colcon.colcon_core.package_identification:_identify(src/custom_message) by extension 'colcon_meta'
+[0.978s] Level 1:colcon.colcon_core.package_identification:_identify(src/custom_message) by extensions ['ros']
+[0.978s] Level 1:colcon.colcon_core.package_identification:_identify(src/custom_message) by extension 'ros'
+[0.978s] DEBUG:colcon.colcon_core.package_identification:Package 'src/custom_message' with type 'ros.ament_cmake' and name 'custom_message'
+[0.978s] Level 1:colcon.colcon_core.package_identification:_identify(src/install) by extensions ['ignore', 'ignore_ament_install']
+[0.978s] Level 1:colcon.colcon_core.package_identification:_identify(src/install) by extension 'ignore'
+[0.978s] Level 1:colcon.colcon_core.package_identification:_identify(src/install) ignored
+[0.978s] Level 1:colcon.colcon_core.package_identification:_identify(src/log) by extensions ['ignore', 'ignore_ament_install']
+[0.979s] Level 1:colcon.colcon_core.package_identification:_identify(src/log) by extension 'ignore'
+[0.979s] Level 1:colcon.colcon_core.package_identification:_identify(src/log) ignored
+[0.979s] Level 1:colcon.colcon_core.package_identification:_identify(src/my_bot) by extensions ['ignore', 'ignore_ament_install']
+[0.979s] Level 1:colcon.colcon_core.package_identification:_identify(src/my_bot) by extension 'ignore'
+[0.979s] Level 1:colcon.colcon_core.package_identification:_identify(src/my_bot) by extension 'ignore_ament_install'
+[0.979s] Level 1:colcon.colcon_core.package_identification:_identify(src/my_bot) by extensions ['colcon_pkg']
+[0.979s] Level 1:colcon.colcon_core.package_identification:_identify(src/my_bot) by extension 'colcon_pkg'
+[0.979s] Level 1:colcon.colcon_core.package_identification:_identify(src/my_bot) by extensions ['colcon_meta']
+[0.979s] Level 1:colcon.colcon_core.package_identification:_identify(src/my_bot) by extension 'colcon_meta'
+[0.979s] Level 1:colcon.colcon_core.package_identification:_identify(src/my_bot) by extensions ['ros']
+[0.979s] Level 1:colcon.colcon_core.package_identification:_identify(src/my_bot) by extension 'ros'
+[0.979s] DEBUG:colcon.colcon_core.package_identification:Package 'src/my_bot' with type 'ros.ament_cmake' and name 'my_bot'
+[0.979s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner) by extensions ['ignore', 'ignore_ament_install']
+[0.980s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner) by extension 'ignore'
+[0.980s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner) by extension 'ignore_ament_install'
+[0.980s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner) by extensions ['colcon_pkg']
+[0.980s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner) by extension 'colcon_pkg'
+[0.980s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner) by extensions ['colcon_meta']
+[0.980s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner) by extension 'colcon_meta'
+[0.980s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner) by extensions ['ros']
+[0.980s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner) by extension 'ros'
+[0.980s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner) by extensions ['cmake', 'python']
+[0.980s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner) by extension 'cmake'
+[0.980s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner) by extension 'python'
+[0.980s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner) by extensions ['python_setup_py']
+[0.980s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner) by extension 'python_setup_py'
+[0.980s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner/__pycache__) by extensions ['ignore', 'ignore_ament_install']
+[0.980s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner/__pycache__) by extension 'ignore'
+[0.980s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner/__pycache__) by extension 'ignore_ament_install'
+[0.980s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner/__pycache__) by extensions ['colcon_pkg']
+[0.980s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner/__pycache__) by extension 'colcon_pkg'
+[0.980s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner/__pycache__) by extensions ['colcon_meta']
+[0.980s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner/__pycache__) by extension 'colcon_meta'
+[0.981s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner/__pycache__) by extensions ['ros']
+[0.981s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner/__pycache__) by extension 'ros'
+[0.981s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner/__pycache__) by extensions ['cmake', 'python']
+[0.981s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner/__pycache__) by extension 'cmake'
+[0.981s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner/__pycache__) by extension 'python'
+[0.981s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner/__pycache__) by extensions ['python_setup_py']
+[0.981s] Level 1:colcon.colcon_core.package_identification:_identify(src/planner/__pycache__) by extension 'python_setup_py'
+[0.981s] Level 1:colcon.colcon_core.package_identification:_identify(src/sym_bringup) by extensions ['ignore', 'ignore_ament_install']
+[0.981s] Level 1:colcon.colcon_core.package_identification:_identify(src/sym_bringup) by extension 'ignore'
+[0.981s] Level 1:colcon.colcon_core.package_identification:_identify(src/sym_bringup) by extension 'ignore_ament_install'
+[0.981s] Level 1:colcon.colcon_core.package_identification:_identify(src/sym_bringup) by extensions ['colcon_pkg']
+[0.981s] Level 1:colcon.colcon_core.package_identification:_identify(src/sym_bringup) by extension 'colcon_pkg'
+[0.981s] Level 1:colcon.colcon_core.package_identification:_identify(src/sym_bringup) by extensions ['colcon_meta']
+[0.981s] Level 1:colcon.colcon_core.package_identification:_identify(src/sym_bringup) by extension 'colcon_meta'
+[0.981s] Level 1:colcon.colcon_core.package_identification:_identify(src/sym_bringup) by extensions ['ros']
+[0.981s] Level 1:colcon.colcon_core.package_identification:_identify(src/sym_bringup) by extension 'ros'
+[0.982s] DEBUG:colcon.colcon_core.package_identification:Package 'src/sym_bringup' with type 'ros.ament_cmake' and name 'sym_bringup'
+[0.982s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main) by extensions ['ignore', 'ignore_ament_install']
+[0.982s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main) by extension 'ignore'
+[0.982s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main) by extension 'ignore_ament_install'
+[0.982s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main) by extensions ['colcon_pkg']
+[0.982s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main) by extension 'colcon_pkg'
+[0.982s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main) by extensions ['colcon_meta']
+[0.982s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main) by extension 'colcon_meta'
+[0.982s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main) by extensions ['ros']
+[0.982s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main) by extension 'ros'
+[0.982s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main) by extensions ['cmake', 'python']
+[0.982s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main) by extension 'cmake'
+[0.982s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main) by extension 'python'
+[0.983s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main) by extensions ['python_setup_py']
+[0.983s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main) by extension 'python_setup_py'
+[0.983s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main/build) by extensions ['ignore', 'ignore_ament_install']
+[0.983s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main/build) by extension 'ignore'
+[0.983s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main/build) ignored
+[0.983s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main/install) by extensions ['ignore', 'ignore_ament_install']
+[0.983s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main/install) by extension 'ignore'
+[0.983s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main/install) ignored
+[0.983s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main/log) by extensions ['ignore', 'ignore_ament_install']
+[0.983s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main/log) by extension 'ignore'
+[0.984s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main/log) ignored
+[0.984s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main/urdf_example-main) by extensions ['ignore', 'ignore_ament_install']
+[0.984s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main/urdf_example-main) by extension 'ignore'
+[0.984s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main/urdf_example-main) by extension 'ignore_ament_install'
+[0.984s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main/urdf_example-main) by extensions ['colcon_pkg']
+[0.984s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main/urdf_example-main) by extension 'colcon_pkg'
+[0.984s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main/urdf_example-main) by extensions ['colcon_meta']
+[0.984s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main/urdf_example-main) by extension 'colcon_meta'
+[0.984s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main/urdf_example-main) by extensions ['ros']
+[0.984s] Level 1:colcon.colcon_core.package_identification:_identify(src/urdf_example-main/urdf_example-main) by extension 'ros'
+[0.985s] DEBUG:colcon.colcon_core.package_identification:Package 'src/urdf_example-main/urdf_example-main' with type 'ros.ament_cmake' and name 'urdf_example'
+[0.985s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) using defaults
+[0.985s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) discover
+[0.985s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) using defaults
+[0.985s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) discover
+[0.985s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) using defaults
+[1.069s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) check parameters
+[1.069s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) discover
+[1.098s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 6 installed packages in /home/giacomo/thesis_ws/install
+[1.113s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 5 installed packages in /home/giacomo/ros2_ws/install
+[1.127s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 280 installed packages in /opt/ros/humble
+[1.128s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) using defaults
+[1.196s] Level 5:colcon.colcon_core.verb:set package 'custom_message' build argument 'cmake_args' from command line to 'None'
+[1.196s] Level 5:colcon.colcon_core.verb:set package 'custom_message' build argument 'cmake_target' from command line to 'None'
+[1.196s] Level 5:colcon.colcon_core.verb:set package 'custom_message' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[1.196s] Level 5:colcon.colcon_core.verb:set package 'custom_message' build argument 'cmake_clean_cache' from command line to 'False'
+[1.196s] Level 5:colcon.colcon_core.verb:set package 'custom_message' build argument 'cmake_clean_first' from command line to 'False'
+[1.196s] Level 5:colcon.colcon_core.verb:set package 'custom_message' build argument 'cmake_force_configure' from command line to 'False'
+[1.196s] Level 5:colcon.colcon_core.verb:set package 'custom_message' build argument 'ament_cmake_args' from command line to 'None'
+[1.196s] Level 5:colcon.colcon_core.verb:set package 'custom_message' build argument 'catkin_cmake_args' from command line to 'None'
+[1.196s] Level 5:colcon.colcon_core.verb:set package 'custom_message' build argument 'catkin_skip_building_tests' from command line to 'False'
+[1.196s] DEBUG:colcon.colcon_core.verb:Building package 'custom_message' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/giacomo/thesis_ws/build/custom_message', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/giacomo/thesis_ws/install/custom_message', 'merge_install': False, 'path': '/home/giacomo/thesis_ws/src/custom_message', 'symlink_install': True, 'test_result_base': None}
+[1.209s] Level 5:colcon.colcon_core.verb:set package 'my_bot' build argument 'cmake_args' from command line to 'None'
+[1.209s] Level 5:colcon.colcon_core.verb:set package 'my_bot' build argument 'cmake_target' from command line to 'None'
+[1.210s] Level 5:colcon.colcon_core.verb:set package 'my_bot' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[1.210s] Level 5:colcon.colcon_core.verb:set package 'my_bot' build argument 'cmake_clean_cache' from command line to 'False'
+[1.210s] Level 5:colcon.colcon_core.verb:set package 'my_bot' build argument 'cmake_clean_first' from command line to 'False'
+[1.210s] Level 5:colcon.colcon_core.verb:set package 'my_bot' build argument 'cmake_force_configure' from command line to 'False'
+[1.210s] Level 5:colcon.colcon_core.verb:set package 'my_bot' build argument 'ament_cmake_args' from command line to 'None'
+[1.210s] Level 5:colcon.colcon_core.verb:set package 'my_bot' build argument 'catkin_cmake_args' from command line to 'None'
+[1.210s] Level 5:colcon.colcon_core.verb:set package 'my_bot' build argument 'catkin_skip_building_tests' from command line to 'False'
+[1.210s] DEBUG:colcon.colcon_core.verb:Building package 'my_bot' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/giacomo/thesis_ws/build/my_bot', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/giacomo/thesis_ws/install/my_bot', 'merge_install': False, 'path': '/home/giacomo/thesis_ws/src/my_bot', 'symlink_install': True, 'test_result_base': None}
+[1.223s] Level 5:colcon.colcon_core.verb:set package 'urdf_example' build argument 'cmake_args' from command line to 'None'
+[1.223s] Level 5:colcon.colcon_core.verb:set package 'urdf_example' build argument 'cmake_target' from command line to 'None'
+[1.223s] Level 5:colcon.colcon_core.verb:set package 'urdf_example' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[1.223s] Level 5:colcon.colcon_core.verb:set package 'urdf_example' build argument 'cmake_clean_cache' from command line to 'False'
+[1.223s] Level 5:colcon.colcon_core.verb:set package 'urdf_example' build argument 'cmake_clean_first' from command line to 'False'
+[1.223s] Level 5:colcon.colcon_core.verb:set package 'urdf_example' build argument 'cmake_force_configure' from command line to 'False'
+[1.223s] Level 5:colcon.colcon_core.verb:set package 'urdf_example' build argument 'ament_cmake_args' from command line to 'None'
+[1.223s] Level 5:colcon.colcon_core.verb:set package 'urdf_example' build argument 'catkin_cmake_args' from command line to 'None'
+[1.223s] Level 5:colcon.colcon_core.verb:set package 'urdf_example' build argument 'catkin_skip_building_tests' from command line to 'False'
+[1.223s] DEBUG:colcon.colcon_core.verb:Building package 'urdf_example' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/giacomo/thesis_ws/build/urdf_example', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/giacomo/thesis_ws/install/urdf_example', 'merge_install': False, 'path': '/home/giacomo/thesis_ws/src/urdf_example-main/urdf_example-main', 'symlink_install': True, 'test_result_base': None}
+[1.246s] Level 5:colcon.colcon_core.verb:set package 'bumper_cars' build argument 'cmake_args' from command line to 'None'
+[1.246s] Level 5:colcon.colcon_core.verb:set package 'bumper_cars' build argument 'cmake_target' from command line to 'None'
+[1.246s] Level 5:colcon.colcon_core.verb:set package 'bumper_cars' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[1.246s] Level 5:colcon.colcon_core.verb:set package 'bumper_cars' build argument 'cmake_clean_cache' from command line to 'False'
+[1.246s] Level 5:colcon.colcon_core.verb:set package 'bumper_cars' build argument 'cmake_clean_first' from command line to 'False'
+[1.246s] Level 5:colcon.colcon_core.verb:set package 'bumper_cars' build argument 'cmake_force_configure' from command line to 'False'
+[1.246s] Level 5:colcon.colcon_core.verb:set package 'bumper_cars' build argument 'ament_cmake_args' from command line to 'None'
+[1.246s] Level 5:colcon.colcon_core.verb:set package 'bumper_cars' build argument 'catkin_cmake_args' from command line to 'None'
+[1.246s] Level 5:colcon.colcon_core.verb:set package 'bumper_cars' build argument 'catkin_skip_building_tests' from command line to 'False'
+[1.246s] DEBUG:colcon.colcon_core.verb:Building package 'bumper_cars' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/giacomo/thesis_ws/build/bumper_cars', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/giacomo/thesis_ws/install/bumper_cars', 'merge_install': False, 'path': '/home/giacomo/thesis_ws/src/bumper_cars', 'symlink_install': True, 'test_result_base': None}
+[1.260s] Level 5:colcon.colcon_core.verb:set package 'sym_bringup' build argument 'cmake_args' from command line to 'None'
+[1.260s] Level 5:colcon.colcon_core.verb:set package 'sym_bringup' build argument 'cmake_target' from command line to 'None'
+[1.260s] Level 5:colcon.colcon_core.verb:set package 'sym_bringup' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[1.260s] Level 5:colcon.colcon_core.verb:set package 'sym_bringup' build argument 'cmake_clean_cache' from command line to 'False'
+[1.260s] Level 5:colcon.colcon_core.verb:set package 'sym_bringup' build argument 'cmake_clean_first' from command line to 'False'
+[1.260s] Level 5:colcon.colcon_core.verb:set package 'sym_bringup' build argument 'cmake_force_configure' from command line to 'False'
+[1.260s] Level 5:colcon.colcon_core.verb:set package 'sym_bringup' build argument 'ament_cmake_args' from command line to 'None'
+[1.260s] Level 5:colcon.colcon_core.verb:set package 'sym_bringup' build argument 'catkin_cmake_args' from command line to 'None'
+[1.260s] Level 5:colcon.colcon_core.verb:set package 'sym_bringup' build argument 'catkin_skip_building_tests' from command line to 'False'
+[1.260s] DEBUG:colcon.colcon_core.verb:Building package 'sym_bringup' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/giacomo/thesis_ws/build/sym_bringup', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/giacomo/thesis_ws/install/sym_bringup', 'merge_install': False, 'path': '/home/giacomo/thesis_ws/src/sym_bringup', 'symlink_install': True, 'test_result_base': None}
+[1.274s] INFO:colcon.colcon_core.executor:Executing jobs using 'parallel' executor
+[1.289s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete
+[1.289s] INFO:colcon.colcon_ros.task.ament_cmake.build:Building ROS package in '/home/giacomo/thesis_ws/src/custom_message' with build type 'ament_cmake'
+[1.290s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/home/giacomo/thesis_ws/src/custom_message'
+[1.305s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_core.shell.bat': Not used on non-Windows systems
+[1.305s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[1.305s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[1.367s] INFO:colcon.colcon_ros.task.ament_cmake.build:Building ROS package in '/home/giacomo/thesis_ws/src/my_bot' with build type 'ament_cmake'
+[1.367s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/home/giacomo/thesis_ws/src/my_bot'
+[1.382s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[1.382s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[1.442s] INFO:colcon.colcon_ros.task.ament_cmake.build:Building ROS package in '/home/giacomo/thesis_ws/src/urdf_example-main/urdf_example-main' with build type 'ament_cmake'
+[1.442s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/home/giacomo/thesis_ws/src/urdf_example-main/urdf_example-main'
+[1.459s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[1.459s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[1.524s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/giacomo/thesis_ws/build/custom_message': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --build /home/giacomo/thesis_ws/build/custom_message -- -j8 -l8
+[1.530s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/giacomo/thesis_ws/build/my_bot': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --build /home/giacomo/thesis_ws/build/my_bot -- -j8 -l8
+[1.535s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/giacomo/thesis_ws/build/urdf_example': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --build /home/giacomo/thesis_ws/build/urdf_example -- -j8 -l8
+[1.572s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/giacomo/thesis_ws/build/my_bot' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --build /home/giacomo/thesis_ws/build/my_bot -- -j8 -l8
+[1.580s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/giacomo/thesis_ws/build/urdf_example' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --build /home/giacomo/thesis_ws/build/urdf_example -- -j8 -l8
+[1.609s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/giacomo/thesis_ws/build/my_bot': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --install /home/giacomo/thesis_ws/build/my_bot
+[1.613s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/giacomo/thesis_ws/build/urdf_example': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --install /home/giacomo/thesis_ws/build/urdf_example
+[1.648s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(urdf_example)
+[1.650s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/giacomo/thesis_ws/build/urdf_example' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --install /home/giacomo/thesis_ws/build/urdf_example
+[1.672s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/urdf_example' for CMake module files
+[1.673s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/urdf_example' for CMake config files
+[1.673s] Level 1:colcon.colcon_core.shell:create_environment_hook('urdf_example', 'cmake_prefix_path')
+[1.693s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/giacomo/thesis_ws/install/urdf_example/share/urdf_example/hook/cmake_prefix_path.ps1'
+[1.693s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/giacomo/thesis_ws/install/urdf_example/share/urdf_example/hook/cmake_prefix_path.dsv'
+[1.694s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/giacomo/thesis_ws/install/urdf_example/share/urdf_example/hook/cmake_prefix_path.sh'
+[1.695s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/urdf_example/bin'
+[1.695s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/urdf_example/lib/pkgconfig/urdf_example.pc'
+[1.695s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/urdf_example/lib/python3.10/site-packages'
+[1.695s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/urdf_example/bin'
+[1.711s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/urdf_example/share/urdf_example/package.ps1'
+[1.712s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/giacomo/thesis_ws/install/urdf_example/share/urdf_example/package.dsv'
+[1.712s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/urdf_example/share/urdf_example/package.sh'
+[1.713s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/urdf_example/share/urdf_example/package.bash'
+[1.714s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/urdf_example/share/urdf_example/package.zsh'
+[1.715s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/giacomo/thesis_ws/install/urdf_example/share/colcon-core/packages/urdf_example)
+[1.717s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(my_bot)
+[1.718s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/giacomo/thesis_ws/build/my_bot' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --install /home/giacomo/thesis_ws/build/my_bot
+[1.737s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/my_bot' for CMake module files
+[1.738s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/my_bot' for CMake config files
+[1.740s] Level 1:colcon.colcon_core.shell:create_environment_hook('my_bot', 'cmake_prefix_path')
+[1.761s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/giacomo/thesis_ws/install/my_bot/share/my_bot/hook/cmake_prefix_path.ps1'
+[1.762s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/giacomo/thesis_ws/install/my_bot/share/my_bot/hook/cmake_prefix_path.dsv'
+[1.762s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/giacomo/thesis_ws/install/my_bot/share/my_bot/hook/cmake_prefix_path.sh'
+[1.763s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/my_bot/bin'
+[1.763s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/my_bot/lib/pkgconfig/my_bot.pc'
+[1.763s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/my_bot/lib/python3.10/site-packages'
+[1.763s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/my_bot/bin'
+[1.782s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/my_bot/share/my_bot/package.ps1'
+[1.782s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/giacomo/thesis_ws/install/my_bot/share/my_bot/package.dsv'
+[1.783s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/my_bot/share/my_bot/package.sh'
+[1.783s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/my_bot/share/my_bot/package.bash'
+[1.783s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/my_bot/share/my_bot/package.zsh'
+[1.784s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/giacomo/thesis_ws/install/my_bot/share/colcon-core/packages/my_bot)
+[1.811s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(urdf_example)
+[1.827s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/urdf_example' for CMake module files
+[1.828s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/urdf_example' for CMake config files
+[1.828s] Level 1:colcon.colcon_core.shell:create_environment_hook('urdf_example', 'cmake_prefix_path')
+[1.844s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/giacomo/thesis_ws/install/urdf_example/share/urdf_example/hook/cmake_prefix_path.ps1'
+[1.845s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/giacomo/thesis_ws/install/urdf_example/share/urdf_example/hook/cmake_prefix_path.dsv'
+[1.845s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/giacomo/thesis_ws/install/urdf_example/share/urdf_example/hook/cmake_prefix_path.sh'
+[1.846s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/urdf_example/bin'
+[1.846s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/urdf_example/lib/pkgconfig/urdf_example.pc'
+[1.846s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/urdf_example/lib/python3.10/site-packages'
+[1.846s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/urdf_example/bin'
+[1.862s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/urdf_example/share/urdf_example/package.ps1'
+[1.863s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/giacomo/thesis_ws/install/urdf_example/share/urdf_example/package.dsv'
+[1.864s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/urdf_example/share/urdf_example/package.sh'
+[1.864s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/urdf_example/share/urdf_example/package.bash'
+[1.864s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/urdf_example/share/urdf_example/package.zsh'
+[1.865s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/giacomo/thesis_ws/install/urdf_example/share/colcon-core/packages/urdf_example)
+[1.883s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(my_bot)
+[1.900s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/my_bot' for CMake module files
+[1.901s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/my_bot' for CMake config files
+[1.902s] Level 1:colcon.colcon_core.shell:create_environment_hook('my_bot', 'cmake_prefix_path')
+[1.918s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/giacomo/thesis_ws/install/my_bot/share/my_bot/hook/cmake_prefix_path.ps1'
+[1.918s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/giacomo/thesis_ws/install/my_bot/share/my_bot/hook/cmake_prefix_path.dsv'
+[1.919s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/giacomo/thesis_ws/install/my_bot/share/my_bot/hook/cmake_prefix_path.sh'
+[1.919s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/my_bot/bin'
+[1.919s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/my_bot/lib/pkgconfig/my_bot.pc'
+[1.920s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/my_bot/lib/python3.10/site-packages'
+[1.920s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/my_bot/bin'
+[1.936s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/my_bot/share/my_bot/package.ps1'
+[1.937s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/giacomo/thesis_ws/install/my_bot/share/my_bot/package.dsv'
+[1.937s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/my_bot/share/my_bot/package.sh'
+[1.937s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/my_bot/share/my_bot/package.bash'
+[1.938s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/my_bot/share/my_bot/package.zsh'
+[1.938s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/giacomo/thesis_ws/install/my_bot/share/colcon-core/packages/my_bot)
+[8.301s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/giacomo/thesis_ws/build/custom_message' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --build /home/giacomo/thesis_ws/build/custom_message -- -j8 -l8
+[8.467s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/giacomo/thesis_ws/build/custom_message': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --install /home/giacomo/thesis_ws/build/custom_message
+[8.574s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(custom_message)
+[8.575s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/giacomo/thesis_ws/build/custom_message' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --install /home/giacomo/thesis_ws/build/custom_message
+[8.594s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/custom_message' for CMake module files
+[8.594s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/custom_message' for CMake config files
+[8.595s] Level 1:colcon.colcon_core.shell:create_environment_hook('custom_message', 'cmake_prefix_path')
+[8.613s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/giacomo/thesis_ws/install/custom_message/share/custom_message/hook/cmake_prefix_path.ps1'
+[8.613s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/giacomo/thesis_ws/install/custom_message/share/custom_message/hook/cmake_prefix_path.dsv'
+[8.614s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/giacomo/thesis_ws/install/custom_message/share/custom_message/hook/cmake_prefix_path.sh'
+[8.614s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/custom_message/lib'
+[8.615s] Level 1:colcon.colcon_core.shell:create_environment_hook('custom_message', 'ld_library_path_lib')
+[8.629s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/giacomo/thesis_ws/install/custom_message/share/custom_message/hook/ld_library_path_lib.ps1'
+[8.629s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/giacomo/thesis_ws/install/custom_message/share/custom_message/hook/ld_library_path_lib.dsv'
+[8.630s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/giacomo/thesis_ws/install/custom_message/share/custom_message/hook/ld_library_path_lib.sh'
+[8.630s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/custom_message/bin'
+[8.630s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/custom_message/lib/pkgconfig/custom_message.pc'
+[8.631s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/custom_message/lib/python3.10/site-packages'
+[8.631s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/custom_message/bin'
+[8.649s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/custom_message/share/custom_message/package.ps1'
+[8.650s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/giacomo/thesis_ws/install/custom_message/share/custom_message/package.dsv'
+[8.651s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/custom_message/share/custom_message/package.sh'
+[8.651s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/custom_message/share/custom_message/package.bash'
+[8.651s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/custom_message/share/custom_message/package.zsh'
+[8.652s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/giacomo/thesis_ws/install/custom_message/share/colcon-core/packages/custom_message)
+[8.814s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(custom_message)
+[8.831s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/custom_message' for CMake module files
+[8.831s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/custom_message' for CMake config files
+[8.832s] Level 1:colcon.colcon_core.shell:create_environment_hook('custom_message', 'cmake_prefix_path')
+[8.847s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/giacomo/thesis_ws/install/custom_message/share/custom_message/hook/cmake_prefix_path.ps1'
+[8.847s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/giacomo/thesis_ws/install/custom_message/share/custom_message/hook/cmake_prefix_path.dsv'
+[8.847s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/giacomo/thesis_ws/install/custom_message/share/custom_message/hook/cmake_prefix_path.sh'
+[8.848s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/custom_message/lib'
+[8.848s] Level 1:colcon.colcon_core.shell:create_environment_hook('custom_message', 'ld_library_path_lib')
+[8.864s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/giacomo/thesis_ws/install/custom_message/share/custom_message/hook/ld_library_path_lib.ps1'
+[8.864s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/giacomo/thesis_ws/install/custom_message/share/custom_message/hook/ld_library_path_lib.dsv'
+[8.864s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/giacomo/thesis_ws/install/custom_message/share/custom_message/hook/ld_library_path_lib.sh'
+[8.865s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/custom_message/bin'
+[8.865s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/custom_message/lib/pkgconfig/custom_message.pc'
+[8.865s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/custom_message/lib/python3.10/site-packages'
+[8.865s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/custom_message/bin'
+[8.881s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/custom_message/share/custom_message/package.ps1'
+[8.881s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/giacomo/thesis_ws/install/custom_message/share/custom_message/package.dsv'
+[8.882s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/custom_message/share/custom_message/package.sh'
+[8.882s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/custom_message/share/custom_message/package.bash'
+[8.882s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/custom_message/share/custom_message/package.zsh'
+[8.883s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/giacomo/thesis_ws/install/custom_message/share/colcon-core/packages/custom_message)
+[8.883s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/home/giacomo/thesis_ws/src/bumper_cars' with build type 'ament_python'
+[8.883s] Level 1:colcon.colcon_core.shell:create_environment_hook('bumper_cars', 'ament_prefix_path')
+[8.900s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/giacomo/thesis_ws/install/bumper_cars/share/bumper_cars/hook/ament_prefix_path.ps1'
+[8.901s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/giacomo/thesis_ws/install/bumper_cars/share/bumper_cars/hook/ament_prefix_path.dsv'
+[8.901s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/giacomo/thesis_ws/install/bumper_cars/share/bumper_cars/hook/ament_prefix_path.sh'
+[8.918s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[8.918s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[9.178s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/home/giacomo/thesis_ws/src/bumper_cars'
+[9.193s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[9.193s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[9.778s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/giacomo/thesis_ws/build/bumper_cars': CMAKE_PREFIX_PATH=/home/giacomo/thesis_ws/install/custom_message:/home/giacomo/thesis_ws/install/my_bot:/home/giacomo/thesis_ws/install/urdf_example:/home/giacomo/thesis_ws/install/sym_bringup:/home/giacomo/ros2_ws/install/tutorial_interfaces:/home/giacomo/ros2_ws/install/turtlesim PYTHONPATH=/home/giacomo/thesis_ws/build/bumper_cars/prefix_override:/home/giacomo/thesis_ws/install/bumper_cars/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --editable --build-directory /home/giacomo/thesis_ws/build/bumper_cars/build --no-deps install_data
+[10.403s] Level 1:colcon.colcon_core.shell:create_environment_hook('bumper_cars', 'pythonpath_develop')
+[10.403s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/giacomo/thesis_ws/build/bumper_cars' returned '0': CMAKE_PREFIX_PATH=/home/giacomo/thesis_ws/install/custom_message:/home/giacomo/thesis_ws/install/my_bot:/home/giacomo/thesis_ws/install/urdf_example:/home/giacomo/thesis_ws/install/sym_bringup:/home/giacomo/ros2_ws/install/tutorial_interfaces:/home/giacomo/ros2_ws/install/turtlesim PYTHONPATH=/home/giacomo/thesis_ws/build/bumper_cars/prefix_override:/home/giacomo/thesis_ws/install/bumper_cars/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --editable --build-directory /home/giacomo/thesis_ws/build/bumper_cars/build --no-deps install_data
+[10.423s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/giacomo/thesis_ws/build/bumper_cars/share/bumper_cars/hook/pythonpath_develop.ps1'
+[10.423s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/giacomo/thesis_ws/build/bumper_cars/share/bumper_cars/hook/pythonpath_develop.dsv'
+[10.424s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/giacomo/thesis_ws/build/bumper_cars/share/bumper_cars/hook/pythonpath_develop.sh'
+[10.440s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/bumper_cars' for CMake module files
+[10.440s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/bumper_cars' for CMake config files
+[10.441s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/bumper_cars/lib'
+[10.441s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/bumper_cars/bin'
+[10.441s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/bumper_cars/lib/pkgconfig/bumper_cars.pc'
+[10.441s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/bumper_cars/lib/python3.10/site-packages'
+[10.441s] Level 1:colcon.colcon_core.shell:create_environment_hook('bumper_cars', 'pythonpath')
+[10.458s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/giacomo/thesis_ws/install/bumper_cars/share/bumper_cars/hook/pythonpath.ps1'
+[10.458s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/giacomo/thesis_ws/install/bumper_cars/share/bumper_cars/hook/pythonpath.dsv'
+[10.458s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/giacomo/thesis_ws/install/bumper_cars/share/bumper_cars/hook/pythonpath.sh'
+[10.459s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/bumper_cars/bin'
+[10.459s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(bumper_cars)
+[10.475s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/bumper_cars/share/bumper_cars/package.ps1'
+[10.476s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/giacomo/thesis_ws/install/bumper_cars/share/bumper_cars/package.dsv'
+[10.476s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/bumper_cars/share/bumper_cars/package.sh'
+[10.476s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/bumper_cars/share/bumper_cars/package.bash'
+[10.477s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/bumper_cars/share/bumper_cars/package.zsh'
+[10.477s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/giacomo/thesis_ws/install/bumper_cars/share/colcon-core/packages/bumper_cars)
+[10.477s] INFO:colcon.colcon_ros.task.ament_cmake.build:Building ROS package in '/home/giacomo/thesis_ws/src/sym_bringup' with build type 'ament_cmake'
+[10.478s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/home/giacomo/thesis_ws/src/sym_bringup'
+[10.499s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[10.499s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[10.577s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/giacomo/thesis_ws/build/sym_bringup': AMENT_PREFIX_PATH=/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/thesis_ws/install/my_bot:/home/giacomo/thesis_ws/install/urdf_example:/home/giacomo/thesis_ws/install/sym_bringup:/home/giacomo/thesis_ws/install/custom_message:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/tutorial_interfaces:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/turtlesim:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble CMAKE_PREFIX_PATH=/home/giacomo/thesis_ws/install/custom_message:/home/giacomo/thesis_ws/install/my_bot:/home/giacomo/thesis_ws/install/urdf_example:/home/giacomo/thesis_ws/install/sym_bringup:/home/giacomo/ros2_ws/install/tutorial_interfaces:/home/giacomo/ros2_ws/install/turtlesim:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --build /home/giacomo/thesis_ws/build/sym_bringup -- -j8 -l8
+[10.612s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/giacomo/thesis_ws/build/sym_bringup' returned '0': AMENT_PREFIX_PATH=/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/thesis_ws/install/my_bot:/home/giacomo/thesis_ws/install/urdf_example:/home/giacomo/thesis_ws/install/sym_bringup:/home/giacomo/thesis_ws/install/custom_message:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/tutorial_interfaces:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/turtlesim:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble CMAKE_PREFIX_PATH=/home/giacomo/thesis_ws/install/custom_message:/home/giacomo/thesis_ws/install/my_bot:/home/giacomo/thesis_ws/install/urdf_example:/home/giacomo/thesis_ws/install/sym_bringup:/home/giacomo/ros2_ws/install/tutorial_interfaces:/home/giacomo/ros2_ws/install/turtlesim:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --build /home/giacomo/thesis_ws/build/sym_bringup -- -j8 -l8
+[10.635s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/giacomo/thesis_ws/build/sym_bringup': AMENT_PREFIX_PATH=/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/thesis_ws/install/my_bot:/home/giacomo/thesis_ws/install/urdf_example:/home/giacomo/thesis_ws/install/sym_bringup:/home/giacomo/thesis_ws/install/custom_message:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/tutorial_interfaces:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/turtlesim:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble CMAKE_PREFIX_PATH=/home/giacomo/thesis_ws/install/custom_message:/home/giacomo/thesis_ws/install/my_bot:/home/giacomo/thesis_ws/install/urdf_example:/home/giacomo/thesis_ws/install/sym_bringup:/home/giacomo/ros2_ws/install/tutorial_interfaces:/home/giacomo/ros2_ws/install/turtlesim:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --install /home/giacomo/thesis_ws/build/sym_bringup
+[10.663s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(sym_bringup)
+[10.664s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/giacomo/thesis_ws/build/sym_bringup' returned '0': AMENT_PREFIX_PATH=/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/thesis_ws/install/my_bot:/home/giacomo/thesis_ws/install/urdf_example:/home/giacomo/thesis_ws/install/sym_bringup:/home/giacomo/thesis_ws/install/custom_message:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/tutorial_interfaces:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/turtlesim:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble CMAKE_PREFIX_PATH=/home/giacomo/thesis_ws/install/custom_message:/home/giacomo/thesis_ws/install/my_bot:/home/giacomo/thesis_ws/install/urdf_example:/home/giacomo/thesis_ws/install/sym_bringup:/home/giacomo/ros2_ws/install/tutorial_interfaces:/home/giacomo/ros2_ws/install/turtlesim:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --install /home/giacomo/thesis_ws/build/sym_bringup
+[10.682s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/sym_bringup' for CMake module files
+[10.683s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/sym_bringup' for CMake config files
+[10.683s] Level 1:colcon.colcon_core.shell:create_environment_hook('sym_bringup', 'cmake_prefix_path')
+[10.697s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/hook/cmake_prefix_path.ps1'
+[10.698s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/hook/cmake_prefix_path.dsv'
+[10.698s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/hook/cmake_prefix_path.sh'
+[10.698s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/sym_bringup/bin'
+[10.698s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/sym_bringup/lib/pkgconfig/sym_bringup.pc'
+[10.699s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/sym_bringup/lib/python3.10/site-packages'
+[10.699s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/sym_bringup/bin'
+[10.714s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/package.ps1'
+[10.715s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/package.dsv'
+[10.715s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/package.sh'
+[10.716s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/package.bash'
+[10.716s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/package.zsh'
+[10.716s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/giacomo/thesis_ws/install/sym_bringup/share/colcon-core/packages/sym_bringup)
+[10.764s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(sym_bringup)
+[10.780s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/sym_bringup' for CMake module files
+[10.781s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/sym_bringup' for CMake config files
+[10.781s] Level 1:colcon.colcon_core.shell:create_environment_hook('sym_bringup', 'cmake_prefix_path')
+[10.797s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/hook/cmake_prefix_path.ps1'
+[10.797s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/hook/cmake_prefix_path.dsv'
+[10.798s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/hook/cmake_prefix_path.sh'
+[10.798s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/sym_bringup/bin'
+[10.798s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/sym_bringup/lib/pkgconfig/sym_bringup.pc'
+[10.798s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/sym_bringup/lib/python3.10/site-packages'
+[10.799s] Level 1:colcon.colcon_core.environment:checking '/home/giacomo/thesis_ws/install/sym_bringup/bin'
+[10.814s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/package.ps1'
+[10.815s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/package.dsv'
+[10.815s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/package.sh'
+[10.816s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/package.bash'
+[10.816s] INFO:colcon.colcon_core.shell:Creating package script '/home/giacomo/thesis_ws/install/sym_bringup/share/sym_bringup/package.zsh'
+[10.816s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/giacomo/thesis_ws/install/sym_bringup/share/colcon-core/packages/sym_bringup)
+[10.817s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:closing loop
+[10.817s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:loop closed
+[10.817s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete finished with '0'
+[10.817s] DEBUG:colcon.colcon_core.event_reactor:joining thread
+[10.840s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.terminal_notifier': Not used on non-Darwin systems
+[10.840s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.win32': Not used on non-Windows systems
+[10.840s] INFO:colcon.colcon_notification.desktop_notification:Sending desktop notification using 'notify2'
+[10.853s] DEBUG:colcon.colcon_core.event_reactor:joined thread
+[10.876s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/giacomo/thesis_ws/install/local_setup.ps1'
+[10.877s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/giacomo/thesis_ws/install/_local_setup_util_ps1.py'
+[10.878s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/giacomo/thesis_ws/install/setup.ps1'
+[10.901s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/giacomo/thesis_ws/install/local_setup.sh'
+[10.902s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/giacomo/thesis_ws/install/_local_setup_util_sh.py'
+[10.902s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/giacomo/thesis_ws/install/setup.sh'
+[10.920s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/giacomo/thesis_ws/install/local_setup.bash'
+[10.920s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/giacomo/thesis_ws/install/setup.bash'
+[10.938s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/giacomo/thesis_ws/install/local_setup.zsh'
+[10.938s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/giacomo/thesis_ws/install/setup.zsh'
