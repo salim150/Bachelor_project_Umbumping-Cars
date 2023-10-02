@@ -11,10 +11,12 @@ from std_msgs.msg import Float32MultiArray
 import message_filters
 import random
 import math
+import numpy as np
 
 debug = True
 WB = 2.9  # [m] Wheel base of vehicle
 Lf = 20  # [m] look-ahead distance
+kpp = 2
 
 class Controller(Node):
 
@@ -73,9 +75,17 @@ class Controller(Node):
             self.update_path()
             self.target = (self.path[0].x, self.path[0].y)
 
-        alpha = math.atan2(self.target[1] - pose.y, self.target[0] - pose.x) - pose.yaw
+        alpha = self.normalize_angle(math.atan2(self.target[1] - pose.y, self.target[0] - pose.x) - pose.yaw)
 
-        cmd.delta = math.atan2(2.0 * WB * math.sin(alpha) / Lf, 1.0)
+        # this if/else condition should fix the buf of the waypoint behind the car
+        if alpha > np.pi/2.0:
+            cmd.delta = math.radians(15)
+        elif alpha < -np.pi/2.0: 
+            cmd.delta = math.radians(-15)
+        else:
+            # ref: https://www.shuffleai.blog/blog/Three_Methods_of_Vehicle_Lateral_Control.html
+            cmd.delta = self.normalize_angle(math.atan2(2.0 * WB *  math.sin(alpha), Lf))
+        
         # decreasing the desired speed when turning
         if cmd.delta > math.radians(10) or cmd.delta < -math.radians(10):
             desired_speed = 3
@@ -140,6 +150,19 @@ class Controller(Node):
         distance = math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
         return distance
 
+    def normalize_angle(self, angle):
+        """
+        Normalize an angle to [-pi, pi].
+        :param angle: (float)
+        :return: (float) Angle in radian in [-pi, pi]
+        """
+        while angle > np.pi:
+            angle -= 2.0 * np.pi
+
+        while angle < -np.pi:
+            angle += 2.0 * np.pi
+
+        return angle
 
    
 
