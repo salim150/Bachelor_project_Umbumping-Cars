@@ -1,0 +1,287 @@
+[0.265s] Invoking command in '/home/giacomo/thesis_ws/build/custom_message': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/planner:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --build /home/giacomo/thesis_ws/build/custom_message -- -j8 -l8
+[0.580s] -- Found ament_cmake: 1.3.5 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.580s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[0.581s] -- Found rosidl_default_generators: 1.2.0 (/opt/ros/humble/share/rosidl_default_generators/cmake)
+[0.581s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.581s] -- Found rosidl_adapter: 3.1.5 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[0.582s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.879s] -- Found ament_cmake_ros: 0.10.0 (/opt/ros/humble/share/ament_cmake_ros/cmake)
+[1.087s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[1.363s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[1.391s] -- Found python_cmake_module: 0.10.0 (/opt/ros/humble/share/python_cmake_module/cmake)
+[1.416s] -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+[1.416s] -- Using PYTHON_INCLUDE_DIRS: /usr/include/python3.10
+[1.416s] -- Using PYTHON_LIBRARIES: /usr/lib/x86_64-linux-gnu/libpython3.10.so
+[1.443s] -- Configuring done
+[1.481s] -- Generating done
+[1.486s] -- Build files have been written to: /home/giacomo/thesis_ws/build/custom_message
+[1.516s] [  1%] [34m[1mGenerating C code for ROS interfaces[0m
+[1.528s] [  3%] [34m[1mGenerating C++ code for ROS interfaces[0m
+[1.547s] [  3%] Built target ament_cmake_python_symlink_custom_message
+[1.837s] running egg_info
+[1.861s] writing custom_message.egg-info/PKG-INFO
+[1.861s] writing dependency_links to custom_message.egg-info/dependency_links.txt
+[1.862s] writing top-level names to custom_message.egg-info/top_level.txt
+[1.930s] reading manifest file 'custom_message.egg-info/SOURCES.txt'
+[1.931s] writing manifest file 'custom_message.egg-info/SOURCES.txt'
+[1.970s] [  3%] Built target ament_cmake_python_build_custom_message_egg
+[2.184s] [  3%] Built target custom_message__cpp
+[2.200s] [  4%] [34m[1mGenerating C++ type support for eProsima Fast-RTPS[0m
+[2.206s] [  6%] [34m[1mGenerating C++ introspection for ROS interfaces[0m
+[2.207s] [  7%] [34m[1mGenerating C++ type support dispatch for ROS interfaces[0m
+[2.214s] [35m[1mConsolidate compiler generated dependencies of target custom_message__rosidl_generator_c[0m
+[2.240s] [ 11%] [32mBuilding C object CMakeFiles/custom_message__rosidl_generator_c.dir/rosidl_generator_c/custom_message/msg/detail/control_inputs__functions.c.o[0m
+[2.241s] [ 11%] [32mBuilding C object CMakeFiles/custom_message__rosidl_generator_c.dir/rosidl_generator_c/custom_message/msg/detail/state__functions.c.o[0m
+[2.242s] [ 12%] [32mBuilding C object CMakeFiles/custom_message__rosidl_generator_c.dir/rosidl_generator_c/custom_message/msg/detail/path__functions.c.o[0m
+[2.246s] [ 14%] [32mBuilding C object CMakeFiles/custom_message__rosidl_generator_c.dir/rosidl_generator_c/custom_message/msg/detail/full_state__functions.c.o[0m
+[2.255s] [ 15%] [32mBuilding C object CMakeFiles/custom_message__rosidl_generator_c.dir/rosidl_generator_c/custom_message/msg/detail/coordinate__functions.c.o[0m
+[2.375s] [ 17%] [32m[1mLinking C shared library libcustom_message__rosidl_generator_c.so[0m
+[2.430s] [ 17%] Built target custom_message__rosidl_generator_c
+[2.450s] [ 22%] [34m[1mGenerating C type support dispatch for ROS interfaces[0m
+[2.450s] [ 22%] [34m[1mGenerating C type support for eProsima Fast-RTPS[0m
+[2.451s] [ 22%] [34m[1mGenerating C introspection for ROS interfaces[0m
+[2.715s] [35m[1mConsolidate compiler generated dependencies of target custom_message__rosidl_typesupport_cpp[0m
+[2.750s] [ 25%] [32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/custom_message/msg/full_state__type_support.cpp.o[0m
+[2.751s] [ 25%] [32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/custom_message/msg/control_inputs__type_support.cpp.o[0m
+[2.754s] [ 26%] [32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/custom_message/msg/state__type_support.cpp.o[0m
+[3.171s] [35m[1mConsolidate compiler generated dependencies of target custom_message__rosidl_typesupport_introspection_cpp[0m
+[3.207s] [ 28%] [32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/custom_message/msg/detail/control_inputs__type_support.cpp.o[0m
+[3.247s] [35m[1mConsolidate compiler generated dependencies of target custom_message__rosidl_typesupport_fastrtps_cpp[0m
+[3.269s] [35m[1mConsolidate compiler generated dependencies of target custom_message__rosidl_typesupport_c[0m
+[3.287s] [ 30%] [32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/control_inputs__type_support.cpp.o[0m
+[3.292s] [ 31%] [32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_c.dir/rosidl_typesupport_c/custom_message/msg/control_inputs__type_support.cpp.o[0m
+[3.351s] [ 33%] [32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/custom_message/msg/path__type_support.cpp.o[0m
+[3.352s] [ 34%] [32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/state__type_support.cpp.o[0m
+[3.367s] [ 36%] [32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/full_state__type_support.cpp.o[0m
+[3.367s] [ 38%] [32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_c.dir/rosidl_typesupport_c/custom_message/msg/state__type_support.cpp.o[0m
+[3.433s] [ 39%] [32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_c.dir/rosidl_typesupport_c/custom_message/msg/full_state__type_support.cpp.o[0m
+[3.451s] [35m[1mConsolidate compiler generated dependencies of target custom_message__rosidl_typesupport_fastrtps_c[0m
+[3.501s] [ 41%] [32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_c.dir/rosidl_typesupport_c/custom_message/msg/path__type_support.cpp.o[0m
+[3.506s] [ 42%] [32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/custom_message/msg/detail/control_inputs__type_support_c.cpp.o[0m
+[3.565s] [ 44%] [32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_c.dir/rosidl_typesupport_c/custom_message/msg/coordinate__type_support.cpp.o[0m
+[3.565s] [35m[1mConsolidate compiler generated dependencies of target custom_message__rosidl_typesupport_introspection_c[0m
+[3.626s] [ 46%] [32mBuilding C object CMakeFiles/custom_message__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/custom_message/msg/detail/control_inputs__type_support.c.o[0m
+[3.636s] [ 47%] [32m[1mLinking CXX shared library libcustom_message__rosidl_typesupport_c.so[0m
+[3.695s] [ 49%] [32mBuilding C object CMakeFiles/custom_message__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/custom_message/msg/detail/state__type_support.c.o[0m
+[3.727s] [ 49%] Built target custom_message__rosidl_typesupport_c
+[3.747s] [ 50%] [32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/custom_message/msg/detail/state__type_support_c.cpp.o[0m
+[3.766s] [ 52%] [32mBuilding C object CMakeFiles/custom_message__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/custom_message/msg/detail/full_state__type_support.c.o[0m
+[3.836s] [ 53%] [32mBuilding C object CMakeFiles/custom_message__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/custom_message/msg/detail/path__type_support.c.o[0m
+[3.912s] [ 55%] [32mBuilding C object CMakeFiles/custom_message__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/custom_message/msg/detail/coordinate__type_support.c.o[0m
+[3.982s] [ 57%] [32m[1mLinking C shared library libcustom_message__rosidl_typesupport_introspection_c.so[0m
+[3.998s] [ 58%] [32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/custom_message/msg/coordinate__type_support.cpp.o[0m
+[4.048s] [ 58%] Built target custom_message__rosidl_typesupport_introspection_c
+[4.070s] [ 60%] [32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/custom_message/msg/detail/full_state__type_support_c.cpp.o[0m
+[4.082s] [ 61%] [32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/custom_message/msg/detail/state__type_support.cpp.o[0m
+[4.191s] [ 63%] [32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/path__type_support.cpp.o[0m
+[4.238s] [ 65%] [32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/coordinate__type_support.cpp.o[0m
+[4.274s] [ 66%] [32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/custom_message/msg/detail/path__type_support_c.cpp.o[0m
+[4.303s] [ 68%] [32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/custom_message/msg/detail/coordinate__type_support_c.cpp.o[0m
+[4.484s] [ 69%] [32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/custom_message/msg/detail/full_state__type_support.cpp.o[0m
+[4.618s] [ 71%] [32m[1mLinking CXX shared library libcustom_message__rosidl_typesupport_cpp.so[0m
+[4.723s] [ 71%] Built target custom_message__rosidl_typesupport_cpp
+[4.743s] [ 73%] [32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/custom_message/msg/detail/path__type_support.cpp.o[0m
+[4.818s] [ 74%] [32mBuilding CXX object CMakeFiles/custom_message__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/custom_message/msg/detail/coordinate__type_support.cpp.o[0m
+[5.037s] [ 76%] [32m[1mLinking CXX shared library libcustom_message__rosidl_typesupport_fastrtps_c.so[0m
+[5.154s] [ 77%] [32m[1mLinking CXX shared library libcustom_message__rosidl_typesupport_fastrtps_cpp.so[0m
+[5.170s] [ 77%] Built target custom_message__rosidl_typesupport_fastrtps_c
+[5.272s] [ 77%] Built target custom_message__rosidl_typesupport_fastrtps_cpp
+[5.379s] [ 79%] [32m[1mLinking CXX shared library libcustom_message__rosidl_typesupport_introspection_cpp.so[0m
+[5.451s] [ 79%] Built target custom_message__rosidl_typesupport_introspection_cpp
+[5.474s] [ 79%] Built target custom_message
+[5.496s] [ 80%] [34m[1mGenerating Python code for ROS interfaces[0m
+[6.080s] [ 80%] Built target custom_message__py
+[6.092s] [35m[1mConsolidate compiler generated dependencies of target custom_message__rosidl_generator_py[0m
+[6.112s] [ 84%] [32mBuilding C object CMakeFiles/custom_message__rosidl_generator_py.dir/rosidl_generator_py/custom_message/msg/_state_s.c.o[0m
+[6.112s] [ 84%] [32mBuilding C object CMakeFiles/custom_message__rosidl_generator_py.dir/rosidl_generator_py/custom_message/msg/_control_inputs_s.c.o[0m
+[6.112s] [ 85%] [32mBuilding C object CMakeFiles/custom_message__rosidl_generator_py.dir/rosidl_generator_py/custom_message/msg/_path_s.c.o[0m
+[6.116s] [ 87%] [32mBuilding C object CMakeFiles/custom_message__rosidl_generator_py.dir/rosidl_generator_py/custom_message/msg/_full_state_s.c.o[0m
+[6.118s] [ 88%] [32mBuilding C object CMakeFiles/custom_message__rosidl_generator_py.dir/rosidl_generator_py/custom_message/msg/_coordinate_s.c.o[0m
+[6.293s] [ 90%] [32m[1mLinking C shared library rosidl_generator_py/custom_message/libcustom_message__rosidl_generator_py.so[0m
+[6.336s] [ 90%] Built target custom_message__rosidl_generator_py
+[6.349s] [35m[1mConsolidate compiler generated dependencies of target custom_message__rosidl_typesupport_c__pyext[0m
+[6.349s] [35m[1mConsolidate compiler generated dependencies of target custom_message__rosidl_typesupport_introspection_c__pyext[0m
+[6.349s] [35m[1mConsolidate compiler generated dependencies of target custom_message__rosidl_typesupport_fastrtps_c__pyext[0m
+[6.366s] [ 93%] [32mBuilding C object CMakeFiles/custom_message__rosidl_typesupport_fastrtps_c__pyext.dir/rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_fastrtps_c.c.o[0m
+[6.366s] [ 93%] [32mBuilding C object CMakeFiles/custom_message__rosidl_typesupport_c__pyext.dir/rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_c.c.o[0m
+[6.367s] [ 95%] [32mBuilding C object CMakeFiles/custom_message__rosidl_typesupport_introspection_c__pyext.dir/rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_introspection_c.c.o[0m
+[6.501s] [ 96%] [32m[1mLinking C shared library rosidl_generator_py/custom_message/custom_message_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so[0m
+[6.502s] [ 98%] [32m[1mLinking C shared library rosidl_generator_py/custom_message/custom_message_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so[0m
+[6.508s] [100%] [32m[1mLinking C shared library rosidl_generator_py/custom_message/custom_message_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so[0m
+[6.545s] [100%] Built target custom_message__rosidl_typesupport_introspection_c__pyext
+[6.546s] [100%] Built target custom_message__rosidl_typesupport_c__pyext
+[6.552s] [100%] Built target custom_message__rosidl_typesupport_fastrtps_c__pyext
+[6.566s] Invoked command in '/home/giacomo/thesis_ws/build/custom_message' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/planner:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --build /home/giacomo/thesis_ws/build/custom_message -- -j8 -l8
+[6.714s] Invoking command in '/home/giacomo/thesis_ws/build/custom_message': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/planner:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --install /home/giacomo/thesis_ws/build/custom_message
+[6.722s] -- Install configuration: ""
+[6.722s] -- Execute custom install script
+[6.723s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/ament_index/resource_index/rosidl_interfaces/custom_message
+[6.723s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/control_inputs.h
+[6.723s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/coordinate.h
+[6.724s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/control_inputs__functions.h
+[6.724s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/control_inputs__struct.h
+[6.724s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/control_inputs__type_support.h
+[6.724s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/coordinate__functions.h
+[6.724s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/coordinate__struct.h
+[6.725s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/coordinate__type_support.h
+[6.725s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__functions.h
+[6.725s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__struct.h
+[6.725s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__type_support.h
+[6.725s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/path__functions.h
+[6.726s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/path__struct.h
+[6.726s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/path__type_support.h
+[6.726s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/state__functions.h
+[6.726s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/state__struct.h
+[6.726s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/state__type_support.h
+[6.726s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/full_state.h
+[6.726s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/path.h
+[6.727s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/rosidl_generator_c__visibility_control.h
+[6.727s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/state.h
+[6.727s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/environment/library_path.sh
+[6.727s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/environment/library_path.dsv
+[6.727s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/control_inputs__rosidl_typesupport_fastrtps_c.h
+[6.727s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/coordinate__rosidl_typesupport_fastrtps_c.h
+[6.728s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__rosidl_typesupport_fastrtps_c.h
+[6.728s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/path__rosidl_typesupport_fastrtps_c.h
+[6.728s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/state__rosidl_typesupport_fastrtps_c.h
+[6.728s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/rosidl_typesupport_fastrtps_c__visibility_control.h
+[6.728s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/control_inputs__rosidl_typesupport_introspection_c.h
+[6.728s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/coordinate__rosidl_typesupport_introspection_c.h
+[6.728s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__rosidl_typesupport_introspection_c.h
+[6.729s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/path__rosidl_typesupport_introspection_c.h
+[6.729s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/state__rosidl_typesupport_introspection_c.h
+[6.729s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/rosidl_typesupport_introspection_c__visibility_control.h
+[6.730s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/control_inputs.hpp
+[6.730s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/coordinate.hpp
+[6.730s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/control_inputs__builder.hpp
+[6.730s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/control_inputs__struct.hpp
+[6.730s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/control_inputs__traits.hpp
+[6.730s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/coordinate__builder.hpp
+[6.731s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/coordinate__struct.hpp
+[6.731s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/coordinate__traits.hpp
+[6.731s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__builder.hpp
+[6.731s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__struct.hpp
+[6.731s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__traits.hpp
+[6.731s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/path__builder.hpp
+[6.732s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/path__struct.hpp
+[6.732s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/path__traits.hpp
+[6.732s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/state__builder.hpp
+[6.732s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/state__struct.hpp
+[6.732s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/state__traits.hpp
+[6.732s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/full_state.hpp
+[6.732s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/path.hpp
+[6.732s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/state.hpp
+[6.733s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/control_inputs__rosidl_typesupport_fastrtps_cpp.hpp
+[6.733s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/coordinate__rosidl_typesupport_fastrtps_cpp.hpp
+[6.733s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__rosidl_typesupport_fastrtps_cpp.hpp
+[6.733s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/path__rosidl_typesupport_fastrtps_cpp.hpp
+[6.733s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/state__rosidl_typesupport_fastrtps_cpp.hpp
+[6.733s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h
+[6.734s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/control_inputs__rosidl_typesupport_introspection_cpp.hpp
+[6.734s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/coordinate__rosidl_typesupport_introspection_cpp.hpp
+[6.734s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__rosidl_typesupport_introspection_cpp.hpp
+[6.734s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/path__rosidl_typesupport_introspection_cpp.hpp
+[6.734s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/state__rosidl_typesupport_introspection_cpp.hpp
+[6.734s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/environment/pythonpath.sh
+[6.735s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/environment/pythonpath.dsv
+[6.735s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message-0.0.0-py3.10.egg-info/PKG-INFO
+[6.735s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message-0.0.0-py3.10.egg-info/SOURCES.txt
+[6.735s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message-0.0.0-py3.10.egg-info/dependency_links.txt
+[6.735s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message-0.0.0-py3.10.egg-info/top_level.txt
+[6.736s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/__init__.py
+[6.736s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/_custom_message_s.ep.rosidl_typesupport_c.c
+[6.736s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/_custom_message_s.ep.rosidl_typesupport_fastrtps_c.c
+[6.736s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/_custom_message_s.ep.rosidl_typesupport_introspection_c.c
+[6.737s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/custom_message_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so
+[6.737s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/custom_message_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so
+[6.737s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/custom_message_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so
+[6.737s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/libcustom_message__rosidl_generator_py.so
+[6.737s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/__init__.py
+[6.737s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_control_inputs.py
+[6.737s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_control_inputs_s.c
+[6.738s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_coordinate.py
+[6.738s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_coordinate_s.c
+[6.738s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_full_state.py
+[6.738s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_full_state_s.c
+[6.738s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_path.py
+[6.738s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_path_s.c
+[6.738s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_state.py
+[6.739s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_state_s.c
+[6.739s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/custom_message_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so
+[6.739s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/custom_message_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so
+[6.739s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/custom_message_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so
+[6.739s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/ControlInputs.idl
+[6.739s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/State.idl
+[6.739s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/FullState.idl
+[6.740s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/Path.idl
+[6.740s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/Coordinate.idl
+[6.740s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/ControlInputs.msg
+[6.740s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/State.msg
+[6.740s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/FullState.msg
+[6.740s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/Path.msg
+[6.741s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/Coordinate.msg
+[6.741s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/ament_index/resource_index/package_run_dependencies/custom_message
+[6.741s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/ament_index/resource_index/parent_prefix_path/custom_message
+[6.741s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/environment/ament_prefix_path.sh
+[6.741s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/environment/ament_prefix_path.dsv
+[6.741s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/environment/path.sh
+[6.742s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/environment/path.dsv
+[6.742s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/local_setup.bash
+[6.742s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/local_setup.sh
+[6.742s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/local_setup.zsh
+[6.742s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/local_setup.dsv
+[6.742s] -- Symlinking: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/package.dsv
+[6.753s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/ament_index/resource_index/packages/custom_message
+[6.753s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/rosidl_cmake-extras.cmake
+[6.753s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/ament_cmake_export_include_directories-extras.cmake
+[6.753s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/ament_cmake_export_libraries-extras.cmake
+[6.754s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/ament_cmake_export_targets-extras.cmake
+[6.754s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/rosidl_cmake_export_typesupport_targets-extras.cmake
+[6.754s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/ament_cmake_export_dependencies-extras.cmake
+[6.754s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/rosidl_cmake_export_typesupport_libraries-extras.cmake
+[6.754s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/custom_messageConfig.cmake
+[6.754s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/custom_messageConfig-version.cmake
+[6.754s] -- Up-to-date symlink: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/package.xml
+[6.755s] -- Installing: /home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_generator_c.so
+[6.755s] -- Set runtime path of "/home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_generator_c.so" to ""
+[6.755s] -- Installing: /home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_typesupport_fastrtps_c.so
+[6.756s] -- Set runtime path of "/home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_typesupport_fastrtps_c.so" to ""
+[6.756s] -- Installing: /home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_typesupport_introspection_c.so
+[6.757s] -- Set runtime path of "/home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_typesupport_introspection_c.so" to ""
+[6.757s] -- Installing: /home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_typesupport_c.so
+[6.757s] -- Set runtime path of "/home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_typesupport_c.so" to ""
+[6.758s] -- Installing: /home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_typesupport_fastrtps_cpp.so
+[6.759s] -- Set runtime path of "/home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_typesupport_fastrtps_cpp.so" to ""
+[6.759s] -- Installing: /home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_typesupport_introspection_cpp.so
+[6.759s] -- Set runtime path of "/home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_typesupport_introspection_cpp.so" to ""
+[6.759s] -- Installing: /home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_typesupport_cpp.so
+[6.760s] -- Set runtime path of "/home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_typesupport_cpp.so" to ""
+[6.806s] Listing '/home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message'...
+[6.806s] Compiling '/home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/__init__.py'...
+[6.806s] Listing '/home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg'...
+[6.806s] Compiling '/home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/__init__.py'...
+[6.806s] Compiling '/home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_control_inputs.py'...
+[6.806s] Compiling '/home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_coordinate.py'...
+[6.806s] Compiling '/home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_full_state.py'...
+[6.807s] Compiling '/home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_path.py'...
+[6.807s] Compiling '/home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_state.py'...
+[6.811s] -- Installing: /home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_generator_py.so
+[6.811s] -- Set runtime path of "/home/giacomo/thesis_ws/install/custom_message/lib/libcustom_message__rosidl_generator_py.so" to ""
+[6.812s] -- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/export_custom_message__rosidl_generator_cExport.cmake
+[6.812s] -- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/export_custom_message__rosidl_generator_cExport-noconfig.cmake
+[6.812s] -- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/export_custom_message__rosidl_typesupport_fastrtps_cExport.cmake
+[6.812s] -- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/export_custom_message__rosidl_typesupport_fastrtps_cExport-noconfig.cmake
+[6.812s] -- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/custom_message__rosidl_typesupport_introspection_cExport.cmake
+[6.812s] -- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/custom_message__rosidl_typesupport_introspection_cExport-noconfig.cmake
+[6.812s] -- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/custom_message__rosidl_typesupport_cExport.cmake
+[6.812s] -- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/custom_message__rosidl_typesupport_cExport-noconfig.cmake
+[6.813s] -- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/export_custom_message__rosidl_generator_cppExport.cmake
+[6.813s] -- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/export_custom_message__rosidl_typesupport_fastrtps_cppExport.cmake
+[6.813s] -- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/export_custom_message__rosidl_typesupport_fastrtps_cppExport-noconfig.cmake
+[6.813s] -- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/custom_message__rosidl_typesupport_introspection_cppExport.cmake
+[6.813s] -- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/custom_message__rosidl_typesupport_introspection_cppExport-noconfig.cmake
+[6.813s] -- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/custom_message__rosidl_typesupport_cppExport.cmake
+[6.813s] -- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/custom_message__rosidl_typesupport_cppExport-noconfig.cmake
+[6.813s] -- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/export_custom_message__rosidl_generator_pyExport.cmake
+[6.813s] -- Up-to-date: /home/giacomo/thesis_ws/install/custom_message/share/custom_message/cmake/export_custom_message__rosidl_generator_pyExport-noconfig.cmake
+[6.815s] Invoked command in '/home/giacomo/thesis_ws/build/custom_message' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/planner:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --install /home/giacomo/thesis_ws/build/custom_message

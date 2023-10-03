@@ -20,8 +20,8 @@ extern "C"
 /// Struct defined in msg/Coordinate in the package custom_message.
 typedef struct custom_message__msg__Coordinate
 {
-  int32_t x;
-  int32_t y;
+  float x;
+  float y;
 } custom_message__msg__Coordinate;
 
 // Struct for a sequence of custom_message__msg__Coordinate.

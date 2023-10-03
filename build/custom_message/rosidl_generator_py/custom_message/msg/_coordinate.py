@@ -7,6 +7,8 @@
 
 import builtins  # noqa: E402, I100
 
+import math  # noqa: E402, I100
+
 import rosidl_parser.definition  # noqa: E402, I100
 
 
@@ -60,21 +62,21 @@ class Coordinate(metaclass=Metaclass_Coordinate):
     ]
 
     _fields_and_field_types = {
-        'x': 'int32',
-        'y': 'int32',
+        'x': 'float',
+        'y': 'float',
     }
 
     SLOT_TYPES = (
-        rosidl_parser.definition.BasicType('int32'),  # noqa: E501
-        rosidl_parser.definition.BasicType('int32'),  # noqa: E501
+        rosidl_parser.definition.BasicType('float'),  # noqa: E501
+        rosidl_parser.definition.BasicType('float'),  # noqa: E501
     )
 
     def __init__(self, **kwargs):
         assert all('_' + key in self.__slots__ for key in kwargs.keys()), \
             'Invalid arguments passed to constructor: %s' % \
             ', '.join(sorted(k for k in kwargs.keys() if '_' + k not in self.__slots__))
-        self.x = kwargs.get('x', int())
-        self.y = kwargs.get('y', int())
+        self.x = kwargs.get('x', float())
+        self.y = kwargs.get('y', float())
 
     def __repr__(self):
         typename = self.__class__.__module__.split('.')
@@ -125,10 +127,10 @@ class Coordinate(metaclass=Metaclass_Coordinate):
     def x(self, value):
         if __debug__:
             assert \
-                isinstance(value, int), \
-                "The 'x' field must be of type 'int'"
-            assert value >= -2147483648 and value < 2147483648, \
-                "The 'x' field must be an integer in [-2147483648, 2147483647]"
+                isinstance(value, float), \
+                "The 'x' field must be of type 'float'"
+            assert not (value < -3.402823466e+38 or value > 3.402823466e+38) or math.isinf(value), \
+                "The 'x' field must be a float in [-3.402823466e+38, 3.402823466e+38]"
         self._x = value
 
     @builtins.property
@@ -140,8 +142,8 @@ class Coordinate(metaclass=Metaclass_Coordinate):
     def y(self, value):
         if __debug__:
             assert \
-                isinstance(value, int), \
-                "The 'y' field must be of type 'int'"
-            assert value >= -2147483648 and value < 2147483648, \
-                "The 'y' field must be an integer in [-2147483648, 2147483647]"
+                isinstance(value, float), \
+                "The 'y' field must be of type 'float'"
+            assert not (value < -3.402823466e+38 or value > 3.402823466e+38) or math.isinf(value), \
+                "The 'y' field must be a float in [-3.402823466e+38, 3.402823466e+38]"
         self._y = value

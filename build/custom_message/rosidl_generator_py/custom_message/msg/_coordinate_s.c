@@ -55,8 +55,8 @@ bool custom_message__msg__coordinate__convert_from_py(PyObject * _pymsg, void * 
     if (!field) {
       return false;
     }
-    assert(PyLong_Check(field));
-    ros_message->x = (int32_t)PyLong_AsLong(field);
+    assert(PyFloat_Check(field));
+    ros_message->x = (float)PyFloat_AS_DOUBLE(field);
     Py_DECREF(field);
   }
   {  // y
@@ -64,8 +64,8 @@ bool custom_message__msg__coordinate__convert_from_py(PyObject * _pymsg, void * 
     if (!field) {
       return false;
     }
-    assert(PyLong_Check(field));
-    ros_message->y = (int32_t)PyLong_AsLong(field);
+    assert(PyFloat_Check(field));
+    ros_message->y = (float)PyFloat_AS_DOUBLE(field);
     Py_DECREF(field);
   }
 
@@ -92,7 +92,7 @@ PyObject * custom_message__msg__coordinate__convert_to_py(void * raw_ros_message
   custom_message__msg__Coordinate * ros_message = (custom_message__msg__Coordinate *)raw_ros_message;
   {  // x
     PyObject * field = NULL;
-    field = PyLong_FromLong(ros_message->x);
+    field = PyFloat_FromDouble(ros_message->x);
     {
       int rc = PyObject_SetAttrString(_pymessage, "x", field);
       Py_DECREF(field);
@@ -103,7 +103,7 @@ PyObject * custom_message__msg__coordinate__convert_to_py(void * raw_ros_message
   }
   {  // y
     PyObject * field = NULL;
-    field = PyLong_FromLong(ros_message->y);
+    field = PyFloat_FromDouble(ros_message->y);
     {
       int rc = PyObject_SetAttrString(_pymessage, "y", field);
       Py_DECREF(field);

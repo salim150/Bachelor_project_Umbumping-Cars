@@ -6,9 +6,9 @@
 module custom_message {
   module msg {
     struct Coordinate {
-      int32 x;
+      float x;
 
-      int32 y;
+      float y;
     };
   };
 };

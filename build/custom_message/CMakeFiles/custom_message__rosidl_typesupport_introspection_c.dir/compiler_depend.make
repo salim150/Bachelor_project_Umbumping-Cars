@@ -127,9 +127,7 @@ CMakeFiles/custom_message__rosidl_typesupport_introspection_c.dir/rosidl_typesup
   /usr/include/alloca.h \
   /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
   rosidl_generator_c/custom_message/msg/rosidl_generator_c__visibility_control.h \
-  rosidl_generator_c/custom_message/msg/detail/coordinate__struct.h \
-  /opt/ros/humble/include/rosidl_runtime_c/rosidl_runtime_c/primitives_sequence.h \
-  /opt/ros/humble/include/rosidl_runtime_c/rosidl_runtime_c/primitives_sequence_functions.h
+  rosidl_generator_c/custom_message/msg/detail/coordinate__struct.h
 
 CMakeFiles/custom_message__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/custom_message/msg/detail/full_state__type_support.c.o: rosidl_typesupport_introspection_c/custom_message/msg/detail/full_state__type_support.c \
   /usr/include/stdc-predef.h \
@@ -259,7 +257,6 @@ CMakeFiles/custom_message__rosidl_typesupport_introspection_c.dir/rosidl_typesup
   rosidl_generator_c/custom_message/msg/rosidl_generator_c__visibility_control.h \
   rosidl_generator_c/custom_message/msg/detail/path__struct.h \
   rosidl_generator_c/custom_message/msg/detail/coordinate__struct.h \
-  /opt/ros/humble/include/rosidl_runtime_c/rosidl_runtime_c/primitives_sequence.h \
   rosidl_generator_c/custom_message/msg/coordinate.h \
   rosidl_generator_c/custom_message/msg/detail/coordinate__functions.h \
   rosidl_generator_c/custom_message/msg/detail/coordinate__type_support.h \
@@ -380,8 +377,6 @@ rosidl_generator_c/custom_message/msg/detail/full_state__functions.h:
 
 /opt/ros/humble/include/rosidl_runtime_c/rosidl_runtime_c/message_initialization.h:
 
-/opt/ros/humble/include/rosidl_runtime_c/rosidl_runtime_c/primitives_sequence_functions.h:
-
 /usr/include/x86_64-linux-gnu/bits/uintn-identity.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-intn.h:
@@ -483,8 +478,6 @@ rosidl_typesupport_introspection_c/custom_message/msg/detail/full_state__rosidl_
 /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h:
 
 /usr/include/x86_64-linux-gnu/bits/thread-shared-types.h:
-
-/opt/ros/humble/include/rosidl_runtime_c/rosidl_runtime_c/primitives_sequence.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/stddef.h:
 

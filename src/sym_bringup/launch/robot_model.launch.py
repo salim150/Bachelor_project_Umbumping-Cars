@@ -16,8 +16,8 @@ def generate_launch_description():
         ],
         parameters=[
             {'model_type': 'linear'},
-            {'x0': 0.0},
-            {'y0': 0.0},
+            {'x0': 30.0},
+            {'y0': 30.0},
             {'yaw': 0.0},
             {'v': 0.0},
             {'omega': 0.0}

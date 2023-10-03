@@ -34,7 +34,7 @@ void custom_message__msg__Coordinate__rosidl_typesupport_introspection_c__Coordi
 static rosidl_typesupport_introspection_c__MessageMember custom_message__msg__Coordinate__rosidl_typesupport_introspection_c__Coordinate_message_member_array[2] = {
   {
     "x",  // name
-    rosidl_typesupport_introspection_c__ROS_TYPE_INT32,  // type
+    rosidl_typesupport_introspection_c__ROS_TYPE_FLOAT,  // type
     0,  // upper bound of string
     NULL,  // members of sub message
     false,  // is array
@@ -51,7 +51,7 @@ static rosidl_typesupport_introspection_c__MessageMember custom_message__msg__Co
   },
   {
     "y",  // name
-    rosidl_typesupport_introspection_c__ROS_TYPE_INT32,  // type
+    rosidl_typesupport_introspection_c__ROS_TYPE_FLOAT,  // type
     0,  // upper bound of string
     NULL,  // members of sub message
     false,  // is array

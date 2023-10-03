@@ -32,6 +32,7 @@ class Plotter(Node):
         state1_subscriber = message_filters.Subscriber(self, FullState, "/robot1_fullstate")
         state2_subscriber = message_filters.Subscriber(self, FullState, "/robot2_fullstate")
         self.path_sub = message_filters.Subscriber(self, Path, "/robot2_path")
+        self.trajectory_sub = message_filters.Subscriber(self, Path, "/robot2_trajectory")
 
         self.state1_buf = np.array([0,0])
         self.state2_buf = np.array([0,0])
@@ -39,12 +40,12 @@ class Plotter(Node):
         self.width = 100
         self.heigth = 100
 
-        ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber, self.path_sub], 10, 1, allow_headerless=True)
+        ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber, self.path_sub, self.trajectory_sub], 10, 1, allow_headerless=True)
         ts.registerCallback(self.plotter_callback)
         
         self.get_logger().info("Plotter has been started")
 
-    def plotter_callback(self, state1: FullState, state2: FullState, path: Path):
+    def plotter_callback(self, state1: FullState, state2: FullState, path: Path, trajectory: Path):
     
         self.state1_buf = np.vstack((self.state1_buf, [state1.x, state1.y]))
         self.state2_buf = np.vstack((self.state2_buf, [state2.x, state2.y]))
@@ -63,6 +64,7 @@ class Plotter(Node):
             lambda event: [exit(0) if event.key == 'escape' else None])
         self.plot_map()
         self.plot_path(path)
+        self.plot_path(trajectory)
         # plt.plot(random_x, random_y, marker='x')
         plt.scatter(self.state1_buf[:,0], self.state1_buf[:,1], marker='.', s=4)
         plt.scatter(self.state2_buf[:,0], self.state2_buf[:,1], marker='.', s=4)

@@ -38,8 +38,8 @@ struct Coordinate_
     if (rosidl_runtime_cpp::MessageInitialization::ALL == _init ||
       rosidl_runtime_cpp::MessageInitialization::ZERO == _init)
     {
-      this->x = 0l;
-      this->y = 0l;
+      this->x = 0.0f;
+      this->y = 0.0f;
     }
   }
 
@@ -49,28 +49,28 @@ struct Coordinate_
     if (rosidl_runtime_cpp::MessageInitialization::ALL == _init ||
       rosidl_runtime_cpp::MessageInitialization::ZERO == _init)
     {
-      this->x = 0l;
-      this->y = 0l;
+      this->x = 0.0f;
+      this->y = 0.0f;
     }
   }
 
   // field types and members
   using _x_type =
-    int32_t;
+    float;
   _x_type x;
   using _y_type =
-    int32_t;
+    float;
   _y_type y;
 
   // setters for named parameter idiom
   Type & set__x(
-    const int32_t & _arg)
+    const float & _arg)
   {
     this->x = _arg;
     return *this;
   }
   Type & set__y(
-    const int32_t & _arg)
+    const float & _arg)
   {
     this->y = _arg;
     return *this;

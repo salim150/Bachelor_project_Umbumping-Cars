@@ -12,7 +12,6 @@ max_steer = np.radians(30.0)  # [rad] max steering angle
 max_speed = 10 # [m/s]
 min_speed = 0.0 # [m/s]
 L = 2.9  # [m] Wheel base of vehicle
-# dt = 0.1
 Lr = L / 2.0  # [m]
 Lf = L - Lr
 Cf = 160.0 * 2.0  # N/rad

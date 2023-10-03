@@ -454,7 +454,6 @@ CMakeFiles/custom_message__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_
  /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/coordinate__functions.h
  /usr/include/c++/11/stdlib.h
  /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/rosidl_generator_c__visibility_control.h
- /opt/ros/humble/include/rosidl_runtime_c/rosidl_runtime_c/primitives_sequence_functions.h
 
 CMakeFiles/custom_message__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/custom_message/msg/detail/full_state__type_support_c.cpp.o
  /home/giacomo/thesis_ws/build/custom_message/rosidl_typesupport_fastrtps_c/custom_message/msg/detail/full_state__type_support_c.cpp

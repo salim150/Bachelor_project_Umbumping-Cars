@@ -451,8 +451,7 @@ CMakeFiles/custom_message__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_
   rosidl_generator_c/custom_message/msg/detail/coordinate__struct.h \
   rosidl_generator_c/custom_message/msg/detail/coordinate__functions.h \
   /usr/include/c++/11/stdlib.h \
-  rosidl_generator_c/custom_message/msg/rosidl_generator_c__visibility_control.h \
-  /opt/ros/humble/include/rosidl_runtime_c/rosidl_runtime_c/primitives_sequence_functions.h
+  rosidl_generator_c/custom_message/msg/rosidl_generator_c__visibility_control.h
 
 CMakeFiles/custom_message__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/custom_message/msg/detail/full_state__type_support_c.cpp.o: rosidl_typesupport_fastrtps_c/custom_message/msg/detail/full_state__type_support_c.cpp \
   /usr/include/stdc-predef.h \
@@ -1186,8 +1185,6 @@ rosidl_typesupport_fastrtps_c/custom_message/msg/detail/state__rosidl_typesuppor
 /usr/include/c++/11/bits/locale_classes.tcc:
 
 /usr/include/c++/11/bits/locale_classes.h:
-
-/opt/ros/humble/include/rosidl_runtime_c/rosidl_runtime_c/primitives_sequence_functions.h:
 
 /usr/include/c++/11/bits/ios_base.h:
 
