@@ -15,10 +15,10 @@ L = 2.9  # [m] Wheel base of vehicle
 # dt = 0.1
 Lr = L / 2.0  # [m]
 Lf = L - Lr
-Cf = 1600.0 * 2.0  # N/rad
-Cr = 1700.0 * 2.0  # N/rad
-Iz = 2250.0  # kg/m2
-m = 1500.0  # kg
+Cf = 160.0 * 2.0  # N/rad
+Cr = 170.0 * 2.0  # N/rad
+Iz = 225.0  # kg/m2
+m = 150.0  # kg
 # Aerodynamic and friction coefficients
 c_a = 1.36
 c_r1 = 0.01

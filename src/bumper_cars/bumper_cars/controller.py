@@ -69,33 +69,7 @@ class Controller(Node):
 
     def pose2_callback(self, pose: State):
     
-        cmd = ControlInputs()
-        """# updating target waypoint
-        if self.dist(point1=(pose.x, pose.y), point2=self.target) < Lf:
-            self.update_path()
-            self.target = (self.path[0].x, self.path[0].y)
-
-        alpha = self.normalize_angle(math.atan2(self.target[1] - pose.y, self.target[0] - pose.x) - pose.yaw)
-
-        # this if/else condition should fix the buf of the waypoint behind the car
-        if alpha > np.pi/2.0:
-            cmd.delta = math.radians(15)
-        elif alpha < -np.pi/2.0: 
-            cmd.delta = math.radians(-15)
-        else:
-            # ref: https://www.shuffleai.blog/blog/Three_Methods_of_Vehicle_Lateral_Control.html
-            cmd.delta = self.normalize_angle(math.atan2(2.0 * WB *  math.sin(alpha), Lf))
-        
-        # decreasing the desired speed when turning
-        if cmd.delta > math.radians(10) or cmd.delta < -math.radians(10):
-            desired_speed = 3
-        else:
-            desired_speed = 6
-
-        cmd.delta = math.degrees(cmd.delta)
-        cmd.throttle = 3 * (desired_speed-pose.v)
-        """
-        
+        cmd = ControlInputs()       
         cmd.throttle, cmd.delta, self.path2, self.target2 = self.pure_pursuit_steer_control(self.target2, pose, self.path2)
         self.control2_publisher_.publish(cmd)
         self.path_pub.publish(Path(path=self.path2))
