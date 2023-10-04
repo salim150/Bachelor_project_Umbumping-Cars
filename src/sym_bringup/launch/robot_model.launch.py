@@ -34,7 +34,7 @@ def generate_launch_description():
             ("/robot_fullstate", "/robot2_fullstate")
         ],
         parameters=[
-            {'model_type': 'nonlinear'},
+            {'model_type': 'linear'},
             {'x0': 0.0},
             {'y0': 0.0},
             {'yaw': 0.0},

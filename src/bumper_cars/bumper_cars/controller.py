@@ -149,7 +149,7 @@ class Controller(Node):
         else:
             desired_speed = 6
 
-        delta = 3* math.degrees(delta)
+        delta = 3 * math.degrees(delta)
         throttle = 3 * (desired_speed-pose.v)
 
         return throttle, delta, path, target
