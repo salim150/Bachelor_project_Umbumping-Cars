@@ -18,6 +18,7 @@
   <depend>numpy</depend>
   <depend>time</depend>
   <depend>message_filters</depend>
+  <depend>random</depend>
 
 
   <test_depend>ament_copyright</test_depend>

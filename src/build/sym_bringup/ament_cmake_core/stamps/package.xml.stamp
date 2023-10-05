@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+<<<<<<<< HEAD:src/build/sym_bringup/ament_cmake_core/stamps/package.xml.stamp
+  <name>sym_bringup</name>
+========
+  <name>my_bot</name>
+>>>>>>>> Decoupling:build/my_bot/ament_cmake_core/stamps/package.xml.stamp
+  <version>0.0.0</version>
+  <description>TODO: Package description</description>
+  <maintainer email="my_email@email.com">MY NAME</maintainer>
+  <license>TODO: License declaration</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+<<<<<<<< HEAD:src/build/sym_bringup/ament_cmake_core/stamps/package.xml.stamp
+  <depend>bumper_cars</depend>
+========
+>>>>>>>> Decoupling:build/my_bot/ament_cmake_core/stamps/package.xml.stamp
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

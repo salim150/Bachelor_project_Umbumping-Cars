@@ -1,0 +1,46 @@
+[1.223s] Invoking command in '/home/giacomo/thesis_ws/build/bumper_cars': PYTHONPATH=/home/giacomo/thesis_ws/build/bumper_cars/prefix_override:/home/giacomo/thesis_ws/install/bumper_cars/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --editable --build-directory /home/giacomo/thesis_ws/build/bumper_cars/build --no-deps install_data
+[1.637s] running develop
+[1.637s] /home/giacomo/.local/lib/python3.10/site-packages/setuptools/command/develop.py:40: EasyInstallDeprecationWarning: easy_install command is deprecated.
+[1.637s] !!
+[1.637s] 
+[1.637s]         ********************************************************************************
+[1.638s]         Please avoid running ``setup.py`` and ``easy_install``.
+[1.638s]         Instead, use pypa/build, pypa/installer or other
+[1.638s]         standards-based tools.
+[1.638s] 
+[1.638s]         See https://github.com/pypa/setuptools/issues/917 for details.
+[1.638s]         ********************************************************************************
+[1.638s] 
+[1.639s] !!
+[1.639s]   easy_install.initialize_options(self)
+[1.680s] /home/giacomo/.local/lib/python3.10/site-packages/setuptools/_distutils/cmd.py:66: SetuptoolsDeprecationWarning: setup.py install is deprecated.
+[1.680s] !!
+[1.680s] 
+[1.680s]         ********************************************************************************
+[1.680s]         Please avoid running ``setup.py`` directly.
+[1.680s]         Instead, use pypa/build, pypa/installer or other
+[1.681s]         standards-based tools.
+[1.681s] 
+[1.681s]         See https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html for details.
+[1.681s]         ********************************************************************************
+[1.681s] 
+[1.681s] !!
+[1.681s]   self.initialize_options()
+[1.920s] running egg_info
+[1.939s] writing bumper_cars.egg-info/PKG-INFO
+[1.940s] writing dependency_links to bumper_cars.egg-info/dependency_links.txt
+[1.940s] writing entry points to bumper_cars.egg-info/entry_points.txt
+[1.940s] writing requirements to bumper_cars.egg-info/requires.txt
+[1.940s] writing top-level names to bumper_cars.egg-info/top_level.txt
+[1.984s] reading manifest file 'bumper_cars.egg-info/SOURCES.txt'
+[1.985s] writing manifest file 'bumper_cars.egg-info/SOURCES.txt'
+[2.007s] running build_ext
+[2.007s] Creating /home/giacomo/thesis_ws/install/bumper_cars/lib/python3.10/site-packages/bumper-cars.egg-link (link to .)
+[2.008s] Installing controller script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars
+[2.008s] Installing model script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars
+[2.008s] Installing plotter script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars
+[2.008s] Installing sensor script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars
+[2.009s] 
+[2.009s] Installed /home/giacomo/thesis_ws/build/bumper_cars
+[2.009s] running install_data
+[2.045s] Invoked command in '/home/giacomo/thesis_ws/build/bumper_cars' returned '0': PYTHONPATH=/home/giacomo/thesis_ws/build/bumper_cars/prefix_override:/home/giacomo/thesis_ws/install/bumper_cars/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --editable --build-directory /home/giacomo/thesis_ws/build/bumper_cars/build --no-deps install_data

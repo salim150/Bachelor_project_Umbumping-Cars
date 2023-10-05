@@ -251,8 +251,18 @@ CMakeFiles/custom_message__rosidl_typesupport_c__pyext.dir/rosidl_generator_py/c
   rosidl_generator_c/custom_message/msg/detail/state__functions.h \
   rosidl_generator_c/custom_message/msg/detail/full_state__type_support.h \
   rosidl_generator_c/custom_message/msg/detail/full_state__struct.h \
-  rosidl_generator_c/custom_message/msg/detail/full_state__functions.h
+  rosidl_generator_c/custom_message/msg/detail/full_state__functions.h \
+  rosidl_generator_c/custom_message/msg/detail/path__type_support.h \
+  rosidl_generator_c/custom_message/msg/detail/path__struct.h \
+  rosidl_generator_c/custom_message/msg/detail/coordinate__struct.h \
+  rosidl_generator_c/custom_message/msg/detail/path__functions.h \
+  rosidl_generator_c/custom_message/msg/detail/coordinate__type_support.h \
+  rosidl_generator_c/custom_message/msg/detail/coordinate__functions.h
 
+
+rosidl_generator_c/custom_message/msg/detail/coordinate__functions.h:
+
+rosidl_generator_c/custom_message/msg/detail/coordinate__struct.h:
 
 rosidl_generator_c/custom_message/msg/detail/full_state__functions.h:
 
@@ -500,6 +510,8 @@ rosidl_generator_c/custom_message/msg/detail/control_inputs__functions.h:
 
 /usr/include/x86_64-linux-gnu/bits/timex.h:
 
+rosidl_generator_c/custom_message/msg/detail/path__type_support.h:
+
 /usr/lib/gcc/x86_64-linux-gnu/11/include/limits.h:
 
 rosidl_generator_c/custom_message/msg/detail/control_inputs__struct.h:
@@ -532,6 +544,8 @@ rosidl_generator_c/custom_message/msg/detail/control_inputs__struct.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h:
 
+rosidl_generator_c/custom_message/msg/detail/path__functions.h:
+
 /usr/include/python3.10/genobject.h:
 
 /usr/include/x86_64-linux-gnu/bits/long-double.h:
@@ -541,6 +555,8 @@ rosidl_generator_c/custom_message/msg/detail/control_inputs__struct.h:
 /usr/include/x86_64-linux-gnu/bits/byteswap.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
+
+rosidl_generator_c/custom_message/msg/detail/path__struct.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-intn.h:
 
@@ -733,6 +749,8 @@ rosidl_generator_c/custom_message/msg/detail/control_inputs__type_support.h:
 /usr/include/python3.10/longobject.h:
 
 /usr/include/x86_64-linux-gnu/bits/statx.h:
+
+rosidl_generator_c/custom_message/msg/detail/coordinate__type_support.h:
 
 /usr/include/x86_64-linux-gnu/asm/types.h:
 

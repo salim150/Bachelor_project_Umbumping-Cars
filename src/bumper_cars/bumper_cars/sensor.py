@@ -16,16 +16,13 @@ class SensorMeasurement(Node):
     def __init__(self):
         super().__init__("sensor")
 
-        self.measurement1_publisher_ = self.create_publisher(State, "/robot1_measurement", 1)
-        self.measurement2_publisher_ = self.create_publisher(State, "/robot2_measurement", 1)
-        """self.pose_subscriber_ = self.create_subscription(State,
-                                                         "/" + robot_name + "_state", 
-                                                         self.pose_callback, 1) # replace with topic /robot_state"""
+        self.measurement1_publisher_ = self.create_publisher(State, "/robot1_measurement", 20)
+        self.measurement2_publisher_ = self.create_publisher(State, "/robot2_measurement", 20)
         
         state1_subscriber = message_filters.Subscriber(self, State, "/robot1_state")
         state2_subscriber = message_filters.Subscriber(self, State, "/robot2_state")
 
-        ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber], 2, 0.1, allow_headerless=True)
+        ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber], 6, 1, allow_headerless=True)
         ts.registerCallback(self.sensor_callback)
 
         self.get_logger().info("Sensor has been started")
@@ -54,4 +51,5 @@ def main(args=None):
     node = SensorMeasurement()
     rclpy.spin(node)
 
+    node.destroy_node()
     rclpy.shutdown()

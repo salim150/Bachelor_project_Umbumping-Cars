@@ -1,0 +1,1 @@
+/home/giacomo/thesis_ws/src/my_bot/description/install/setup.sh

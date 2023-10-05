@@ -1,0 +1,157 @@
+[0.173s] Invoking command in '/home/giacomo/thesis_ws/src/build/my_bot': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake /home/giacomo/thesis_ws/src/my_bot -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/giacomo/thesis_ws/src/install/my_bot
+[0.289s] -- The C compiler identification is GNU 11.4.0
+[0.384s] -- The CXX compiler identification is GNU 11.4.0
+[0.395s] -- Detecting C compiler ABI info
+[0.481s] -- Detecting C compiler ABI info - done
+[0.499s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.500s] -- Detecting C compile features
+[0.501s] -- Detecting C compile features - done
+[0.507s] -- Detecting CXX compiler ABI info
+[0.609s] -- Detecting CXX compiler ABI info - done
+[0.619s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.620s] -- Detecting CXX compile features
+[0.620s] -- Detecting CXX compile features - done
+[0.624s] -- Found ament_cmake: 1.3.5 (/opt/ros/humble/share/ament_cmake/cmake)
+[1.203s] -- Found Python3: /usr/bin/python3.10 (found version "3.10.12") found components: Interpreter 
+[1.293s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[1.337s] -- Found ament_lint_auto: 0.12.8 (/opt/ros/humble/share/ament_lint_auto/cmake)
+[1.496s] -- Added test 'copyright' to check source files copyright and LICENSE
+[1.532s] -- Added test 'flake8' to check Python code syntax and style conventions
+[1.536s] -- Added test 'lint_cmake' to check CMake code style
+[1.538s] -- Added test 'pep257' to check Python code against some of the docstring style conventions in PEP 257
+[1.551s] -- Added test 'xmllint' to check XML markup files
+[1.554s] -- Configuring done
+[1.559s] -- Generating done
+[1.561s] -- Build files have been written to: /home/giacomo/thesis_ws/src/build/my_bot
+[1.567s] Invoked command in '/home/giacomo/thesis_ws/src/build/my_bot' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake /home/giacomo/thesis_ws/src/my_bot -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/giacomo/thesis_ws/src/install/my_bot
+[1.570s] Invoking command in '/home/giacomo/thesis_ws/src/build/my_bot': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --build /home/giacomo/thesis_ws/src/build/my_bot -- -j8 -l8
+[1.614s] Invoked command in '/home/giacomo/thesis_ws/src/build/my_bot' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --build /home/giacomo/thesis_ws/src/build/my_bot -- -j8 -l8
+[1.643s] Invoking command in '/home/giacomo/thesis_ws/src/build/my_bot': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --install /home/giacomo/thesis_ws/src/build/my_bot
+[1.652s] -- Install configuration: ""
+[1.653s] -- Execute custom install script
+[1.654s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/config/drive_bot.rviz
+[1.665s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/config/empty.yaml
+[1.675s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/config/view_bot.rviz
+[1.688s] [33mCMake Warning (dev) at ament_cmake_symlink_install/ament_cmake_symlink_install.cmake:62 (file):
+[1.688s]   Policy CMP0009 is not set: FILE GLOB_RECURSE calls should not follow
+[1.688s]   symlinks by default.  Run "cmake --help-policy CMP0009" for policy details.
+[1.688s]   Use the cmake_policy command to set the policy and suppress this warning.
+[1.688s] Call Stack (most recent call first):
+[1.688s]   ament_cmake_symlink_install/ament_cmake_symlink_install.cmake:314 (ament_cmake_symlink_install_directory)
+[1.689s]   cmake_install.cmake:46 (include)
+[1.689s] This warning is for project developers.  Use -Wno-dev to suppress it.
+[1.689s] [0m
+[1.689s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/build/.built_by
+[1.698s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/build/COLCON_IGNORE
+[1.709s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/build/py_pubsub/build/lib/py_pubsub/__init__.py
+[1.719s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/build/py_pubsub/build/lib/py_pubsub/hello_world.py
+[1.730s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/build/py_pubsub/colcon_build.rc
+[1.741s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/build/py_pubsub/colcon_command_prefix_setup_py.sh
+[1.752s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/build/py_pubsub/colcon_command_prefix_setup_py.sh.env
+[1.763s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/build/py_pubsub/install.log
+[1.773s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/build/py_pubsub/prefix_override/__pycache__/sitecustomize.cpython-310.pyc
+[1.784s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/build/py_pubsub/prefix_override/sitecustomize.py
+[1.794s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/build/py_pubsub/py_pubsub.egg-info/PKG-INFO
+[1.804s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/build/py_pubsub/py_pubsub.egg-info/SOURCES.txt
+[1.814s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/build/py_pubsub/py_pubsub.egg-info/dependency_links.txt
+[1.825s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/build/py_pubsub/py_pubsub.egg-info/requires.txt
+[1.835s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/build/py_pubsub/py_pubsub.egg-info/top_level.txt
+[1.845s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/build/py_pubsub/py_pubsub.egg-info/zip-safe
+[1.856s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/gazebo_control.xacro
+[1.865s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/inertial_macros.xacro
+[1.876s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/.colcon_install_layout
+[1.885s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/COLCON_IGNORE
+[1.895s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/_local_setup_util_ps1.py
+[1.907s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/_local_setup_util_sh.py
+[1.915s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/local_setup.bash
+[1.926s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/local_setup.ps1
+[1.936s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/local_setup.sh
+[1.946s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/local_setup.zsh
+[1.957s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/py_pubsub/lib/python3.10/site-packages/py_pubsub-0.0.0-py3.10.egg-info/PKG-INFO
+[1.969s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/py_pubsub/lib/python3.10/site-packages/py_pubsub-0.0.0-py3.10.egg-info/SOURCES.txt
+[1.985s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/py_pubsub/lib/python3.10/site-packages/py_pubsub-0.0.0-py3.10.egg-info/dependency_links.txt
+[2.001s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/py_pubsub/lib/python3.10/site-packages/py_pubsub-0.0.0-py3.10.egg-info/requires.txt
+[2.015s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/py_pubsub/lib/python3.10/site-packages/py_pubsub-0.0.0-py3.10.egg-info/top_level.txt
+[2.025s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/py_pubsub/lib/python3.10/site-packages/py_pubsub-0.0.0-py3.10.egg-info/zip-safe
+[2.037s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/py_pubsub/lib/python3.10/site-packages/py_pubsub/__init__.py
+[2.046s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/py_pubsub/lib/python3.10/site-packages/py_pubsub/__pycache__/__init__.cpython-310.pyc
+[2.056s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/py_pubsub/lib/python3.10/site-packages/py_pubsub/__pycache__/hello_world.cpython-310.pyc
+[2.065s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/py_pubsub/lib/python3.10/site-packages/py_pubsub/hello_world.py
+[2.075s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/py_pubsub/share/ament_index/resource_index/packages/py_pubsub
+[2.084s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/py_pubsub/share/colcon-core/packages/py_pubsub
+[2.093s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/py_pubsub/share/py_pubsub/hook/ament_prefix_path.dsv
+[2.103s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/py_pubsub/share/py_pubsub/hook/ament_prefix_path.ps1
+[2.112s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/py_pubsub/share/py_pubsub/hook/ament_prefix_path.sh
+[2.121s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/py_pubsub/share/py_pubsub/hook/pythonpath.dsv
+[2.130s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/py_pubsub/share/py_pubsub/hook/pythonpath.ps1
+[2.139s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/py_pubsub/share/py_pubsub/hook/pythonpath.sh
+[2.150s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/py_pubsub/share/py_pubsub/package.bash
+[2.161s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/py_pubsub/share/py_pubsub/package.dsv
+[2.172s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/py_pubsub/share/py_pubsub/package.ps1
+[2.182s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/py_pubsub/share/py_pubsub/package.sh
+[2.193s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/py_pubsub/share/py_pubsub/package.xml
+[2.204s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/py_pubsub/share/py_pubsub/package.zsh
+[2.214s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/setup.bash
+[2.223s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/setup.ps1
+[2.233s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/setup.sh
+[2.242s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/install/setup.zsh
+[2.252s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/COLCON_IGNORE
+[2.261s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/build_2023-09-01_14-55-19/events.log
+[2.271s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/build_2023-09-01_14-55-19/logger_all.log
+[2.280s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/build_2023-09-01_14-55-19/py_pubsub/command.log
+[2.290s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/build_2023-09-01_14-55-19/py_pubsub/stderr.log
+[2.299s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/build_2023-09-01_14-55-19/py_pubsub/stdout.log
+[2.309s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/build_2023-09-01_14-55-19/py_pubsub/stdout_stderr.log
+[2.318s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/build_2023-09-01_14-55-19/py_pubsub/streams.log
+[2.327s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/build_2023-09-01_14-56-00/events.log
+[2.336s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/build_2023-09-01_14-56-00/logger_all.log
+[2.345s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/build_2023-09-01_14-56-00/py_pubsub/command.log
+[2.354s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/build_2023-09-01_14-56-00/py_pubsub/stderr.log
+[2.363s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/build_2023-09-01_14-56-00/py_pubsub/stdout.log
+[2.373s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/build_2023-09-01_14-56-00/py_pubsub/stdout_stderr.log
+[2.382s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/build_2023-09-01_14-56-00/py_pubsub/streams.log
+[2.391s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/latest/events.log
+[2.400s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/latest/logger_all.log
+[2.409s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/latest/py_pubsub/command.log
+[2.418s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/latest/py_pubsub/stderr.log
+[2.427s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/latest/py_pubsub/stdout.log
+[2.437s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/latest/py_pubsub/stdout_stderr.log
+[2.446s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/latest/py_pubsub/streams.log
+[2.455s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/latest_build/events.log
+[2.465s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/latest_build/logger_all.log
+[2.478s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/latest_build/py_pubsub/command.log
+[2.489s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/latest_build/py_pubsub/stderr.log
+[2.500s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/latest_build/py_pubsub/stdout.log
+[2.511s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/latest_build/py_pubsub/stdout_stderr.log
+[2.522s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/log/latest_build/py_pubsub/streams.log
+[2.531s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/py_pubsub/package.xml
+[2.541s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/py_pubsub/py_pubsub/__init__.py
+[2.551s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/py_pubsub/py_pubsub/hello_world.py
+[2.561s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/py_pubsub/resource/py_pubsub
+[2.571s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/py_pubsub/setup.cfg
+[2.584s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/py_pubsub/setup.py
+[2.594s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/py_pubsub/test/test_copyright.py
+[2.604s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/py_pubsub/test/test_flake8.py
+[2.615s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/py_pubsub/test/test_pep257.py
+[2.624s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/robot.urdf.xacro
+[2.634s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/description/robot_core.xacro
+[2.644s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/launch/launch_sim.launch.py
+[2.654s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/launch/rsp.launch.py
+[2.667s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/worlds/empty.world
+[2.679s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/worlds/obstacle_world.world
+[2.691s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/ament_index/resource_index/package_run_dependencies/my_bot
+[2.703s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/ament_index/resource_index/parent_prefix_path/my_bot
+[2.714s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/environment/ament_prefix_path.sh
+[2.726s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/environment/ament_prefix_path.dsv
+[2.739s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/environment/path.sh
+[2.751s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/environment/path.dsv
+[2.763s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/local_setup.bash
+[2.775s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/local_setup.sh
+[2.787s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/local_setup.zsh
+[2.800s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/local_setup.dsv
+[2.812s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/package.dsv
+[2.824s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/ament_index/resource_index/packages/my_bot
+[2.836s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/cmake/my_botConfig.cmake
+[2.848s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/cmake/my_botConfig-version.cmake
+[2.860s] -- Symlinking: /home/giacomo/thesis_ws/src/install/my_bot/share/my_bot/package.xml
+[2.875s] Invoked command in '/home/giacomo/thesis_ws/src/build/my_bot' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/giacomo/thesis_ws/install/bumper_cars:/home/giacomo/ros2_ws/install/py_pubsub:/home/giacomo/ros2_ws/install/my_robot_controller:/home/giacomo/ros2_ws/install/py_srvcli:/opt/ros/humble /usr/bin/cmake --install /home/giacomo/thesis_ws/src/build/my_bot

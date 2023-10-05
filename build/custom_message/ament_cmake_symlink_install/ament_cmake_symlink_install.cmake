@@ -367,6 +367,12 @@ ament_cmake_symlink_install_files("/home/giacomo/thesis_ws/src/custom_message" F
 # install(FILES "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message/msg/FullState.idl" "DESTINATION" "share/custom_message/msg")
 ament_cmake_symlink_install_files("/home/giacomo/thesis_ws/src/custom_message" FILES "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message/msg/FullState.idl" "DESTINATION" "share/custom_message/msg")
 
+# install(FILES "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message/msg/Path.idl" "DESTINATION" "share/custom_message/msg")
+ament_cmake_symlink_install_files("/home/giacomo/thesis_ws/src/custom_message" FILES "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message/msg/Path.idl" "DESTINATION" "share/custom_message/msg")
+
+# install(FILES "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message/msg/Coordinate.idl" "DESTINATION" "share/custom_message/msg")
+ament_cmake_symlink_install_files("/home/giacomo/thesis_ws/src/custom_message" FILES "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message/msg/Coordinate.idl" "DESTINATION" "share/custom_message/msg")
+
 # install(FILES "/home/giacomo/thesis_ws/src/custom_message/msg/ControlInputs.msg" "DESTINATION" "share/custom_message/msg")
 ament_cmake_symlink_install_files("/home/giacomo/thesis_ws/src/custom_message" FILES "/home/giacomo/thesis_ws/src/custom_message/msg/ControlInputs.msg" "DESTINATION" "share/custom_message/msg")
 
@@ -375,6 +381,12 @@ ament_cmake_symlink_install_files("/home/giacomo/thesis_ws/src/custom_message" F
 
 # install(FILES "/home/giacomo/thesis_ws/src/custom_message/msg/FullState.msg" "DESTINATION" "share/custom_message/msg")
 ament_cmake_symlink_install_files("/home/giacomo/thesis_ws/src/custom_message" FILES "/home/giacomo/thesis_ws/src/custom_message/msg/FullState.msg" "DESTINATION" "share/custom_message/msg")
+
+# install(FILES "/home/giacomo/thesis_ws/src/custom_message/msg/Path.msg" "DESTINATION" "share/custom_message/msg")
+ament_cmake_symlink_install_files("/home/giacomo/thesis_ws/src/custom_message" FILES "/home/giacomo/thesis_ws/src/custom_message/msg/Path.msg" "DESTINATION" "share/custom_message/msg")
+
+# install(FILES "/home/giacomo/thesis_ws/src/custom_message/msg/Coordinate.msg" "DESTINATION" "share/custom_message/msg")
+ament_cmake_symlink_install_files("/home/giacomo/thesis_ws/src/custom_message" FILES "/home/giacomo/thesis_ws/src/custom_message/msg/Coordinate.msg" "DESTINATION" "share/custom_message/msg")
 
 # install(FILES "/home/giacomo/thesis_ws/build/custom_message/ament_cmake_index/share/ament_index/resource_index/package_run_dependencies/custom_message" "DESTINATION" "share/ament_index/resource_index/package_run_dependencies")
 ament_cmake_symlink_install_files("/home/giacomo/thesis_ws/src/custom_message" FILES "/home/giacomo/thesis_ws/build/custom_message/ament_cmake_index/share/ament_index/resource_index/package_run_dependencies/custom_message" "DESTINATION" "share/ament_index/resource_index/package_run_dependencies")
