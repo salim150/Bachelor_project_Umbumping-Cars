@@ -16,7 +16,7 @@ from planner.cubic_spline_planner import *
 from planner.frenet import *
 from planner.predict_traj import *
 
-debug = True
+debug = False
 WB = 2.9  # [m] Wheel base of vehicle
 Lf = 20  # [m] look-ahead distance
 max_steer = np.radians(30.0)  # [rad] max steering angle
@@ -40,7 +40,7 @@ class Controller(Node):
         self.path2 = []
         self.path2 = self.create_path(self.path2)
         self.target2 = (self.path2[0].x, self.path2[0].y)
-        self.trajectory = predict_trajectory(State(x=0.0, y=0.0, yaw=0.0, v=0.0, omega=0.0), self.target2)
+        self.trajectory, self.tx, self.ty = predict_trajectory(State(x=0.0, y=0.0, yaw=0.0, v=0.0, omega=0.0), self.target2)
 
         # Just to try if frenet path works
         # initial state
@@ -90,25 +90,37 @@ class Controller(Node):
 
     def pose2_callback(self, pose: State, other_pose: State):
 
-        """ob = np.array([[other_pose.x, other_pose.y]])
-        wx = [pose.x, self.path2[0].x, self.path2[1].x, self.path2[2].x]
-        wy = [pose.y, self.path2[0].y, self.path2[1].y, self.path2[2].x]
+        ob = np.array([[other_pose.x, other_pose.y]])
         
-        tx, ty, tyaw, tc, csp = generate_target_course(wx, wy)
+        """tx, ty, tyaw, tc, csp = generate_target_course(self.tx, self.ty)
         path_opt = frenet_optimal_planning(csp, self.s0, self.c_speed, self.c_accel, self.c_d, self.c_d_d, self.c_d_dd, ob)
         #self.s0 = path_opt.s[1]
         self.c_d = path_opt.d[1]
         self.c_d_d = path_opt.d_d[1]
         self.c_d_dd = path_opt.d_dd[1]
         self.c_speed = path_opt.s_d[1]
-        self.c_accel = path_opt.s_dd[1]
-        """
+        self.c_accel = path_opt.s_dd[1]"""
+
+        if debug:
+            plt.cla()
+            # for stopping simulation with the esc key.
+            plt.gcf().canvas.mpl_connect(
+                'key_release_event',
+                lambda event: [exit(0) if event.key == 'escape' else None])
+            self.plot_path(self.trajectory)
+            plt.plot(path_opt.x[1:], path_opt.y[1:], "-or")
+            plt.plot(pose.x, pose.y, 'xk')
+            plt.plot(other_pose.x, other_pose.y, 'xb')
+            plt.axis("equal")
+            plt.grid(True)
+            plt.pause(0.000001)
+        
 
         # updating target waypoint and predicting new traj
         if self.dist(point1=(pose.x, pose.y), point2=self.target2) < Lf:
             self.path2 = self.update_path(self.path2)
             self.target2 = (self.path2[0].x, self.path2[0].y)
-            self.trajectory  = predict_trajectory(pose, self.target2)
+            self.trajectory, self.tx, self.ty  = predict_trajectory(pose, self.target2)
 
 
         cmd = ControlInputs()       
@@ -124,6 +136,15 @@ class Controller(Node):
         path.pop(0)
         path.append(Coordinate(x=float(random.randint(-self.width/2, self.width/2)), y=float(random.randint(-self.heigth/2, self.heigth/2))))
         return path
+
+    def plot_path(self, path: Path):
+        x = []
+        y = []
+        for coord in path:
+            x.append(coord.x)
+            y.append(coord.y)
+        plt.scatter(x, y, marker='.', s=10)
+        plt.scatter(x[0], y[0], marker='x', s=20)
 
     def create_path(self, path):
         while len(path)<5:

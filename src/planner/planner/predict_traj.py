@@ -33,12 +33,19 @@ c_r1 = 0.01
 
 def predict_trajectory(initial_state: State, target):
     traj = []
+    tx = []
+    ty = []
+
+    tx.append(initial_state.x)
+    ty.append(initial_state.y)
     traj.append(Coordinate(x=initial_state.x, y=initial_state.y))
     cmd = ControlInputs()
     old_time = time.time()
 
     cmd.throttle, cmd.delta = pure_pursuit_steer_control(target, initial_state)
     new_state, old_time = linear_model_callback(initial_state, cmd, old_time)
+    tx.append(new_state.x)
+    ty.append(new_state.y)
     traj.append(Coordinate(x=new_state.x, y=new_state.y))
 
     while dist(point1=(traj[-1].x, traj[-1].y), point2=target) > 5:
@@ -46,6 +53,8 @@ def predict_trajectory(initial_state: State, target):
         cmd.throttle, cmd.delta = pure_pursuit_steer_control(target, new_state)
         #print(cmd)
         new_state, old_time = linear_model_callback(new_state, cmd, old_time)
+        tx.append(new_state.x)
+        ty.append(new_state.y)
         traj.append(Coordinate(x=new_state.x, y=new_state.y))
 
         if debug:
@@ -61,8 +70,10 @@ def predict_trajectory(initial_state: State, target):
             plt.axis("equal")
             plt.grid(True)
             plt.pause(0.000001)
-
-    return traj
+    
+    tx = tx[0:-1:5]
+    ty = ty[0:-1:5]
+    return traj, tx, ty
 
 def plot_path(path: Path):
         x = []
@@ -173,7 +184,7 @@ def normalize_angle(angle):
 if debug:
     initial_state = State(x=0.0, y=0.0, yaw=0.0, v=0.0, omega=0.0)
     target = [-50, -50]
-    trajectory = predict_trajectory(initial_state, target)
+    trajectory, tx, ty = predict_trajectory(initial_state, target)
 
 
 
