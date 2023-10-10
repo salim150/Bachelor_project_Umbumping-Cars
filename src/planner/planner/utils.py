@@ -12,13 +12,13 @@ def linear_model_callback(initial_state: State, cmd: ControlInputs):
     #dt = time.time() - old_time
     state = State()
     cmd.delta = np.clip(np.radians(cmd.delta), -max_steer, max_steer)
-
-    state.x = initial_state.x + initial_state.v * np.cos(initial_state.yaw) * dt
-    state.y = initial_state.y + initial_state.v * np.sin(initial_state.yaw) * dt
-    state.yaw = initial_state.yaw + initial_state.v / L * np.tan(cmd.delta) * dt
-    state.yaw = normalize_angle(state.yaw)
+    
     state.v = initial_state.v + cmd.throttle * dt
     state.v = np.clip(state.v, min_speed, max_speed)
+    state.yaw = initial_state.yaw + state.v / L * np.tan(cmd.delta) * dt
+    state.yaw = normalize_angle(state.yaw)
+    state.x = initial_state.x + state.v * np.cos(state.yaw) * dt
+    state.y = initial_state.y + state.v * np.sin(state.yaw) * dt
 
     return state
 
@@ -68,9 +68,9 @@ def pure_pursuit_steer_control(target, pose):
 
     # decreasing the desired speed when turning
     if delta > math.radians(10) or delta < -math.radians(10):
-        desired_speed = 1
+        desired_speed = 3
     else:
-        desired_speed = 2
+        desired_speed = 4
 
     delta = math.degrees(delta)
     throttle = 3 * (desired_speed-pose.v) #* dist(point1=(target), point2=(pose.x, pose.y))/10.0
