@@ -9,14 +9,15 @@ from cvxopt import matrix, sparse
 from utils import *
 
 L = 2.9
-max_steer = np.radians(30.0)  # [rad] max steering angle
-max_speed = 7 # [m/s]
+max_steer = np.radians(90.0)  # [rad] max steering angle
+max_speed = 10 # [m/s]
 min_speed = 0.05 # [m/s]
 dt = 0.1
-safety_radius = 10
-barrier_gain = 100
+safety_radius = 3
+barrier_gain = 0.1
+magnitude_limit = max_speed
 
-def create_unicycle_barrier_certificate_with_boundary(barrier_gain=barrier_gain, safety_radius=safety_radius, projection_distance=0.05, magnitude_limit=5, boundary_points = np.array([-50, 50, -50, 50])):
+def create_unicycle_barrier_certificate_with_boundary(barrier_gain=barrier_gain, safety_radius=safety_radius, projection_distance=0.05, magnitude_limit=magnitude_limit, boundary_points = np.array([-50, 50, -50, 50])):
     """ Creates a unicycle barrier cetifcate to avoid collisions. Uses the diffeomorphism mapping
     and single integrator implementation. For optimization purposes, this function returns 
     another function.
@@ -39,7 +40,7 @@ def create_unicycle_barrier_certificate_with_boundary(barrier_gain=barrier_gain,
     assert safety_radius >= 0.12, "In the function create_unicycle_barrier_certificate, the safe distance between robots (safety_radius) must be greater than or equal to the diameter of the robot (0.12m). Recieved %r." % safety_radius
     assert projection_distance > 0, "In the function create_unicycle_barrier_certificate, the projected point distance for the diffeomorphism between sinlge integrator and unicycle (projection_distance) must be positive. Recieved %r." % projection_distance
     assert magnitude_limit > 0, "In the function create_unicycle_barrier_certificate, the maximum linear velocity of the robot (magnitude_limit) must be positive. Recieved %r." % magnitude_limit
-    assert magnitude_limit <= 5, "In the function create_unicycle_barrier_certificate, the maximum linear velocity of the robot (magnitude_limit) must be less than the max speed of the robot (0.2m/s). Recieved %r." % magnitude_limit
+    assert magnitude_limit <= max_speed, "In the function create_unicycle_barrier_certificate, the maximum linear velocity of the robot (magnitude_limit) must be less than the max speed of the robot (0.2m/s). Recieved %r." % magnitude_limit
 
 
     si_barrier_cert = create_single_integrator_barrier_certificate_with_boundary(barrier_gain=barrier_gain, safety_radius=safety_radius+projection_distance, boundary_points=boundary_points)
@@ -63,13 +64,15 @@ def create_unicycle_barrier_certificate_with_boundary(barrier_gain=barrier_gain,
         #Convert unicycle control command to single integrator one
         dxi = bi_to_si_dyn(dxu, x)
         #Apply single integrator barrier certificate
+        print(dxi)
         dxi = si_barrier_cert(dxi, x_si)
+        print(dxi)
         #Return safe unicycle command
         return si_to_bi_dyn(dxi, x)
 
     return f
 
-def create_single_integrator_barrier_certificate_with_boundary(barrier_gain=barrier_gain, safety_radius=safety_radius, magnitude_limit=5, boundary_points = np.array([-50, 50, -50, 50])):
+def create_single_integrator_barrier_certificate_with_boundary(barrier_gain=barrier_gain, safety_radius=safety_radius, magnitude_limit=magnitude_limit, boundary_points = np.array([-50, 50, -50, 50])):
     """Creates a barrier certificate for a single-integrator system with a rectangular boundary included.  This function
     returns another function for optimization reasons.
 
@@ -89,7 +92,7 @@ def create_single_integrator_barrier_certificate_with_boundary(barrier_gain=barr
     assert barrier_gain > 0, "In the function create_single_integrator_barrier_certificate, the barrier gain (barrier_gain) must be positive. Recieved %r." % barrier_gain
     assert safety_radius >= 0.12, "In the function create_single_integrator_barrier_certificate, the safe distance between robots (safety_radius) must be greater than or equal to the diameter of the robot (0.12m) plus the distance to the look ahead point used in the diffeomorphism if that is being used. Recieved %r." % safety_radius
     assert magnitude_limit > 0, "In the function create_single_integrator_barrier_certificate, the maximum linear velocity of the robot (magnitude_limit) must be positive. Recieved %r." % magnitude_limit
-    assert magnitude_limit <= 5, "In the function create_single_integrator_barrier_certificate, the maximum linear velocity of the robot (magnitude_limit) must be less than the max speed of the robot (0.2m/s). Recieved %r." % magnitude_limit
+    assert magnitude_limit <= max_speed, "In the function create_single_integrator_barrier_certificate, the maximum linear velocity of the robot (magnitude_limit) must be less than the max speed of the robot (0.2m/s). Recieved %r." % magnitude_limit
 
 
     def f(dxi, x):
@@ -350,9 +353,9 @@ goal_points = np.array(np.mat('5 5 5 5 5; 5 5 5 5 5; 0 0 0 0 0'))
 uni_barrier_cert = create_unicycle_barrier_certificate_with_boundary()
 
 # define x initially --> state: [x, y, yaw, v]
-x = np.array([[0, 25], [0, 0], [0, np.pi], [0, 0]])
-goal1 = np.array([20,10])
-goal2 = np.array([0, 10])
+x = np.array([[-20, 20], [0, 0], [0, np.pi], [0, 0]])
+goal1 = np.array([20,0])
+goal2 = np.array([-20, 0])
 cmd1 = ControlInputs()
 cmd2 = ControlInputs()
 
@@ -370,15 +373,11 @@ for i in range(iterations):
     dxu[0,0], dxu[1,0] = pure_pursuit_steer_control(goal1, x1)
     dxu[0,1], dxu[1,1] = pure_pursuit_steer_control(goal2, x2)
 
-    print(dxu)
-
     # Create safe control inputs (i.e., no collisions)
     dxu = uni_barrier_cert(dxu, x)
 
     cmd1.throttle, cmd1.delta = dxu[0,0], np.degrees(dxu[1,0])
     cmd2.throttle, cmd2.delta = dxu[0,1], np.degrees(dxu[1,1])
-
-    print(cmd1, cmd2)
 
     # Applying command and current state to the model
     x1 = linear_model_callback(x1, cmd1)
@@ -397,6 +396,7 @@ for i in range(iterations):
     plot_arrow(x2.x, x2.y, x2.yaw + cmd2.delta)
     plt.plot(goal1[0], goal1[1], '.k')
     plt.plot(goal2[0], goal2[1], '.b')
+    # plot_map()
     plt.xlim(-50, 50)
     plt.ylim(-50, 50)
     plt.axis("equal")
