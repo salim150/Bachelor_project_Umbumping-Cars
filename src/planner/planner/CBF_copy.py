@@ -12,7 +12,6 @@ L = 2.9
 max_steer = np.radians(90.0)  # [rad] max steering angle
 max_speed = 10 # [m/s]
 min_speed = 0.05 # [m/s]
-magnitude_limit = max_speed
 dt = 0.1
 safety_radius = 3
 barrier_gain = 0.1
@@ -66,9 +65,7 @@ def create_unicycle_barrier_certificate_with_boundary(barrier_gain=barrier_gain,
         dxi = bi_to_si_dyn(dxu, x)
         #Apply single integrator barrier certificate
         print(dxi)
-        print(dxi)
         dxi = si_barrier_cert(dxi, x_si)
-        print(dxi)
         print(dxi)
         #Return safe unicycle command
         return si_to_bi_dyn(dxi, x)
@@ -95,7 +92,6 @@ def create_single_integrator_barrier_certificate_with_boundary(barrier_gain=barr
     assert barrier_gain > 0, "In the function create_single_integrator_barrier_certificate, the barrier gain (barrier_gain) must be positive. Recieved %r." % barrier_gain
     assert safety_radius >= 0.12, "In the function create_single_integrator_barrier_certificate, the safe distance between robots (safety_radius) must be greater than or equal to the diameter of the robot (0.12m) plus the distance to the look ahead point used in the diffeomorphism if that is being used. Recieved %r." % safety_radius
     assert magnitude_limit > 0, "In the function create_single_integrator_barrier_certificate, the maximum linear velocity of the robot (magnitude_limit) must be positive. Recieved %r." % magnitude_limit
-    assert magnitude_limit <= max_speed, "In the function create_single_integrator_barrier_certificate, the maximum linear velocity of the robot (magnitude_limit) must be less than the max speed of the robot (0.2m/s). Recieved %r." % magnitude_limit
     assert magnitude_limit <= max_speed, "In the function create_single_integrator_barrier_certificate, the maximum linear velocity of the robot (magnitude_limit) must be less than the max speed of the robot (0.2m/s). Recieved %r." % magnitude_limit
 
 
