@@ -6,16 +6,16 @@ from cvxopt import matrix
 from cvxopt.blas import dot
 from cvxopt.solvers import qp, options
 from cvxopt import matrix, sparse
-from utils import *
+from planner.utils import *
 
 L = 2.9
-max_steer = np.radians(90.0)  # [rad] max steering angle
+max_steer = np.radians(45.0)  # [rad] max steering angle
 max_speed = 10 # [m/s]
-min_speed = 0.05 # [m/s]
+min_speed = 0.5 # [m/s]
 magnitude_limit = max_speed
 dt = 0.1
-safety_radius = 3
-barrier_gain = 0.1
+safety_radius = 2
+barrier_gain = 0.005
 magnitude_limit = max_speed
 
 def create_unicycle_barrier_certificate_with_boundary(barrier_gain=barrier_gain, safety_radius=safety_radius, projection_distance=0.05, magnitude_limit=magnitude_limit, boundary_points = np.array([-50, 50, -50, 50])):
@@ -357,9 +357,9 @@ goal_points = np.array(np.mat('5 5 5 5 5; 5 5 5 5 5; 0 0 0 0 0'))
 uni_barrier_cert = create_unicycle_barrier_certificate_with_boundary()
 
 # define x initially --> state: [x, y, yaw, v]
-x = np.array([[-20, 20], [0, 0], [0, np.pi], [0, 0]])
-goal1 = np.array([20,0])
-goal2 = np.array([-20, 0])
+x = np.array([[0, 20], [0, 0], [0, np.pi], [0, 0]])
+goal1 = np.array([20, 10])
+goal2 = np.array([0, 10])
 cmd1 = ControlInputs()
 cmd2 = ControlInputs()
 
@@ -400,6 +400,7 @@ for i in range(iterations):
     plot_arrow(x2.x, x2.y, x2.yaw + cmd2.delta)
     plt.plot(goal1[0], goal1[1], '.k')
     plt.plot(goal2[0], goal2[1], '.b')
+
     # plot_map()
     plt.xlim(-50, 50)
     plt.ylim(-50, 50)

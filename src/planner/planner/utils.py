@@ -6,6 +6,8 @@ from planner.cubic_spline_planner import *
 from planner.frenet import *
 from planner.predict_traj import *
 
+max_steer = np.radians(450)
+
 def linear_model_callback(initial_state: State, cmd: ControlInputs):
 
     dt = 0.1

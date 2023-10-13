@@ -16,10 +16,15 @@ from planner.cubic_spline_planner import *
 from planner.frenet import *
 from planner.predict_traj import *
 
+# for the CBF
+from planner.CBF import *
+
 debug = False
 WB = 2.9  # [m] Wheel base of vehicle
 Lf = 20  # [m] look-ahead distance
 max_steer = np.radians(30.0)  # [rad] max steering angle
+
+
 
 
 class Controller(Node):
@@ -202,6 +207,7 @@ class Controller(Node):
 
         return angle
        
+
 
 def main(args=None):
     rclpy.init(args=args)
