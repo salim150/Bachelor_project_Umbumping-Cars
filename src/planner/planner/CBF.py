@@ -7,15 +7,16 @@ from cvxopt.blas import dot
 from cvxopt.solvers import qp, options
 from cvxopt import matrix, sparse
 from planner.utils import *
+from planner.predict_traj import predict_trajectory
 
 L = 2.9
-max_steer = np.radians(45.0)  # [rad] max steering angle
+max_steer = np.radians(30.0)  # [rad] max steering angle
 max_speed = 10 # [m/s]
-min_speed = 0.5 # [m/s]
-magnitude_limit = max_speed
+min_speed = 0.05 # [m/s]
+magnitude_limit= max_speed
 dt = 0.1
-safety_radius = 2
-barrier_gain = 0.005
+safety_radius = 1
+barrier_gain = 0.1
 magnitude_limit = max_speed
 
 def create_unicycle_barrier_certificate_with_boundary(barrier_gain=barrier_gain, safety_radius=safety_radius, projection_distance=0.05, magnitude_limit=magnitude_limit, boundary_points = np.array([-50, 50, -50, 50])):
@@ -64,12 +65,10 @@ def create_unicycle_barrier_certificate_with_boundary(barrier_gain=barrier_gain,
         x_si = bi_to_si_states(x)
         #Convert unicycle control command to single integrator one
         dxi = bi_to_si_dyn(dxu, x)
+
         #Apply single integrator barrier certificate
-        print(dxi)
-        print(dxi)
-        dxi = si_barrier_cert(dxi, x_si)
-        print(dxi)
-        print(dxi)
+        # dxi = si_barrier_cert(dxi, x_si)
+
         #Return safe unicycle command
         return si_to_bi_dyn(dxi, x)
 
@@ -219,8 +218,8 @@ def create_si_to_bi_mapping(projection_distance=0.05, angular_velocity_limit = n
         uw[0, :] = (1/projection_distance)*(-ss*dxi[0, :] + cs*dxi[1, :])
 
         #Impose angular velocity cap.
-        uw[0,uw[0,:]>angular_velocity_limit] = angular_velocity_limit
-        uw[0,uw[0,:]<-angular_velocity_limit] = -angular_velocity_limit 
+        # uw[0,uw[0,:]>angular_velocity_limit] = angular_velocity_limit
+        # uw[0,uw[0,:]<-angular_velocity_limit] = -angular_velocity_limit 
 
         uv[0, uv[0,:]>max_speed] = max_speed
         uv[0, uv[0,:]<min_speed] = min_speed
@@ -230,6 +229,9 @@ def create_si_to_bi_mapping(projection_distance=0.05, angular_velocity_limit = n
         #Impose steering cap.
         dxu[1,dxu[1,:]>max_steer] = max_steer
         dxu[1,dxu[1,:]<-max_steer] = -max_steer 
+
+        # From radians to degrees
+        dxu[1,:] = np.degrees(dxu[1,:])
 
         """dxu = np.zeros((2, N))
         v = np.zeros((1, N))
@@ -337,78 +339,87 @@ def create_bi_to_si_dynamics(projection_distance=0.05):
         uw[0,:] = us[0,:] * np.tan(dxu[1,:]) / L
 
         dxi = np.zeros((2, N))
-        dxi[0, :] = (cs*us[0,:] - projection_distance*ss*uw[0, :])
+        dxi[0, :] = (cs*us[0, :] - projection_distance*ss*uw[0, :])
         dxi[1, :] = (ss*us[0, :] + projection_distance*cs*uw[0, :])
 
         return dxi
 
     return bi_to_si_dyn
 
-# Instantiate Robotarium object
-N = 2
+def main(args=None):
+    # Instantiate Robotarium object
+    N = 2
 
-# The robots will never reach their goal points so set iteration number
-iterations = 3000
+    # The robots will never reach their goal points so set iteration number
+    iterations = 3000
 
-# Define goal points outside of the arena
-goal_points = np.array(np.mat('5 5 5 5 5; 5 5 5 5 5; 0 0 0 0 0'))
+    # Define goal points outside of the arena
+    goal_points = np.array(np.mat('5 5 5 5 5; 5 5 5 5 5; 0 0 0 0 0'))
 
-# Create barrier certificates to avoid collision
-uni_barrier_cert = create_unicycle_barrier_certificate_with_boundary()
+    # Create barrier certificates to avoid collision
+    uni_barrier_cert = create_unicycle_barrier_certificate_with_boundary()
 
-# define x initially --> state: [x, y, yaw, v]
-x = np.array([[0, 20], [0, 0], [0, np.pi], [0, 0]])
-goal1 = np.array([20, 10])
-goal2 = np.array([0, 10])
-cmd1 = ControlInputs()
-cmd2 = ControlInputs()
+    # define x initially --> state: [x, y, yaw, v]
+    x = np.array([[0, 20], [0, 0], [0, np.pi], [0, 0]])
+    goal1 = np.array([20, 10])
+    goal2 = np.array([0, 10])
+    cmd1 = ControlInputs()
+    cmd2 = ControlInputs()
 
-# While the number of robots at the required poses is less
-# than N...
-for i in range(iterations):
+    trajectory, tx, ty = predict_trajectory(array_to_state(x[:,0]), goal1)
+    trajectory2, tx2, ty2 = predict_trajectory(array_to_state(x[:,1]), goal2)
 
-    # Create single-integrator control inputs
-    x1 = x[:,0]
-    x2 = x[:, 1]
-    x1 = array_to_state(x1)
-    x2 = array_to_state(x2)
-    
-    dxu = np.zeros((2,N))
-    dxu[0,0], dxu[1,0] = pure_pursuit_steer_control(goal1, x1)
-    dxu[0,1], dxu[1,1] = pure_pursuit_steer_control(goal2, x2)
+    # While the number of robots at the required poses is less
+    # than N...
+    for i in range(iterations):
 
-    # Create safe control inputs (i.e., no collisions)
-    dxu = uni_barrier_cert(dxu, x)
+        # Create single-integrator control inputs
+        x1 = x[:,0]
+        x2 = x[:, 1]
+        x1 = array_to_state(x1)
+        x2 = array_to_state(x2)
+        
+        dxu = np.zeros((2,N))
+        dxu[0,0], dxu[1,0] = pure_pursuit_steer_control(goal1, x1)
+        dxu[0,1], dxu[1,1] = pure_pursuit_steer_control(goal2, x2)
 
-    cmd1.throttle, cmd1.delta = dxu[0,0], np.degrees(dxu[1,0])
-    cmd2.throttle, cmd2.delta = dxu[0,1], np.degrees(dxu[1,1])
+        # Create safe control inputs (i.e., no collisions)
+        dxu = uni_barrier_cert(dxu, x)
 
-    # Applying command and current state to the model
-    x1 = linear_model_callback(x1, cmd1)
-    x2 = linear_model_callback(x2, cmd2)
+        cmd1.throttle, cmd1.delta = dxu[0,0], dxu[1,0]
+        cmd2.throttle, cmd2.delta = dxu[0,1], dxu[1,1]
 
-    plt.cla()
-    # for stopping simulation with the esc key.
-    plt.gcf().canvas.mpl_connect(
-        'key_release_event',
-        lambda event: [exit(0) if event.key == 'escape' else None])
-    plt.plot(x1.x, x1.y, 'xk')
-    plt.plot(x2.x, x2.y, 'xb')
-    plot_arrow(x1.x, x1.y, x1.yaw)
-    plot_arrow(x1.x, x1.y, x1.yaw + cmd1.delta)
-    plot_arrow(x2.x, x2.y, x2.yaw)
-    plot_arrow(x2.x, x2.y, x2.yaw + cmd2.delta)
-    plt.plot(goal1[0], goal1[1], '.k')
-    plt.plot(goal2[0], goal2[1], '.b')
+        # Applying command and current state to the model
+        x1 = linear_model_callback(x1, cmd1)
+        x2 = linear_model_callback(x2, cmd2)
 
-    # plot_map()
-    plt.xlim(-50, 50)
-    plt.ylim(-50, 50)
-    plt.axis("equal")
-    plt.grid(True)
-    plt.pause(0.000001)
+        plt.cla()
+        # for stopping simulation with the esc key.
+        plt.gcf().canvas.mpl_connect(
+            'key_release_event',
+            lambda event: [exit(0) if event.key == 'escape' else None])
+        plt.plot(x1.x, x1.y, 'xk')
+        plt.plot(x2.x, x2.y, 'xb')
+        plot_arrow(x1.x, x1.y, x1.yaw)
+        plot_arrow(x1.x, x1.y, x1.yaw + cmd1.delta)
+        plot_arrow(x2.x, x2.y, x2.yaw)
+        plot_arrow(x2.x, x2.y, x2.yaw + cmd2.delta)
+        plot_path(trajectory)
+        plot_path(trajectory2)
+        plt.plot(goal1[0], goal1[1], '.k')
+        plt.plot(goal2[0], goal2[1], '.b')
 
-    x1 = state_to_array(x1)
-    x2 = state_to_array(x2)
-    x = np.concatenate((x1, x2), axis=1)
-    
+        # plot_map()
+        plt.xlim(-50, 50)
+        plt.ylim(-50, 50)
+        plt.axis("equal")
+        plt.grid(True)
+        plt.pause(0.000001)
+
+        x1 = state_to_array(x1)
+        x2 = state_to_array(x2)
+        x = np.concatenate((x1, x2), axis=1)
+
+if __name__=='__main__':
+    main()
+        

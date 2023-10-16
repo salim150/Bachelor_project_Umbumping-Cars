@@ -48,7 +48,7 @@ def predict_trajectory(initial_state: State, target):
     ty.append(new_state.y)
     traj.append(Coordinate(x=new_state.x, y=new_state.y))
 
-    while dist(point1=(traj[-1].x, traj[-1].y), point2=target) > 5:
+    while dist(point1=(traj[-1].x, traj[-1].y), point2=target) > 1:
 
         cmd.throttle, cmd.delta = pure_pursuit_steer_control(target, new_state)
         #print(cmd)

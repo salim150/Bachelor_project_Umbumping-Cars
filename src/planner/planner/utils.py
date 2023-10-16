@@ -6,21 +6,20 @@ from planner.cubic_spline_planner import *
 from planner.frenet import *
 from planner.predict_traj import *
 
-max_steer = np.radians(450)
+max_steer = np.radians(30)
 
 def linear_model_callback(initial_state: State, cmd: ControlInputs):
 
     dt = 0.1
-    #dt = time.time() - old_time
     state = State()
     cmd.delta = np.clip(np.radians(cmd.delta), -max_steer, max_steer)
-    
+
+    state.x = initial_state.x + initial_state.v * np.cos(initial_state.yaw) * dt
+    state.y = initial_state.y + initial_state.v * np.sin(initial_state.yaw) * dt
+    state.yaw = initial_state.yaw + initial_state.v / L * np.tan(cmd.delta) * dt
+    state.yaw = normalize_angle(state.yaw)
     state.v = initial_state.v + cmd.throttle * dt
     state.v = np.clip(state.v, min_speed, max_speed)
-    state.yaw = initial_state.yaw + state.v / L * np.tan(cmd.delta) * dt
-    state.yaw = normalize_angle(state.yaw)
-    state.x = initial_state.x + state.v * np.cos(state.yaw) * dt
-    state.y = initial_state.y + state.v * np.sin(state.yaw) * dt
 
     return state
 
@@ -72,10 +71,10 @@ def pure_pursuit_steer_control(target, pose):
     if delta > math.radians(10) or delta < -math.radians(10):
         desired_speed = 3
     else:
-        desired_speed = 4
+        desired_speed = 6
 
     delta = math.degrees(delta)
-    throttle = 3 * (desired_speed-pose.v) #* dist(point1=(target), point2=(pose.x, pose.y))/10.0
+    throttle = 3 * (desired_speed-pose.v)
     return throttle, delta
 
 @staticmethod
@@ -131,3 +130,12 @@ def plot_map(width=100, heigth=100):
         corner_y = [heigth/2.0, heigth/2.0, -heigth/2.0, -heigth/2.0, heigth/2.0]
 
         plt.plot(corner_x, corner_y)
+
+def plot_path(path: Path):
+        x = []
+        y = []
+        for coord in path:
+            x.append(coord.x)
+            y.append(coord.y)
+        plt.scatter(x, y, marker='.', s=10)
+        plt.scatter(x[0], y[0], marker='x', s=20)

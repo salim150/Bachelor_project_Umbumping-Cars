@@ -72,14 +72,38 @@ class Controller(Node):
         self.control2_publisher_.publish(ControlInputs(delta=0.0, throttle=0.0))
         self.path_pub.publish(Path(path=self.path2))
 
+        # CBF
+        self.uni_barrier_cert = create_unicycle_barrier_certificate_with_boundary()
+
         self.get_logger().info("Controller has been started")
 
     def general_pose_callback(self, state1: State, state2: State):
         
-        self.pose1_callback(state1)
-        self.pose2_callback(state2, state1)
+        cmd1 = self.pose1_callback(state1)
+        cmd2 = self.pose2_callback(state2, state1)
+
+        self.control1_publisher_.publish(cmd1)
         
-        
+
+        self.get_logger().info(f'Commands before: cmd1: {cmd1}, cmd2: {cmd2}')
+        dxu = np.zeros((2,2))
+        dxu[0,0], dxu[1,0] = cmd1.throttle, cmd1.delta
+        dxu[0,1], dxu[1,1] = cmd2.throttle, cmd2.delta
+
+        # Converting positions to arrays for the CBF
+        x1 = state_to_array(state1)
+        x2 = state_to_array(state2)
+        x = np.concatenate((x1, x2), axis=1)
+
+        # Create safe control inputs (i.e., no collisions)
+        dxu = self.uni_barrier_cert(dxu, x)
+
+        cmd1.throttle, cmd1.delta = dxu[0,0], np.degrees(dxu[1,0])
+        cmd2.throttle, cmd2.delta = dxu[0,1], np.degrees(dxu[1,1])
+
+        self.control2_publisher_.publish(cmd2)
+        self.get_logger().info(f'Commands after: cmd1: {cmd1}, cmd2: {cmd2}')
+
     def pose1_callback(self, pose: State):
         # updating target waypoint and predicting new traj
         if self.dist(point1=(pose.x, pose.y), point2=self.target1) < Lf:
@@ -88,11 +112,13 @@ class Controller(Node):
     
         cmd = ControlInputs()
         cmd.throttle, cmd.delta, self.path1, self.target1 = self.pure_pursuit_steer_control(self.target1, pose, self.path1)
-        self.control1_publisher_.publish(cmd)
+        # self.control1_publisher_.publish(cmd)
         
         if debug:
             self.get_logger().info("Control input robot1, delta:" + str(cmd.delta) + " , throttle: " + str(cmd.throttle))
 
+        return cmd
+    
     def pose2_callback(self, pose: State, other_pose: State):
 
         ob = np.array([[other_pose.x, other_pose.y]])
@@ -130,12 +156,13 @@ class Controller(Node):
 
         cmd = ControlInputs()       
         cmd.throttle, cmd.delta, self.path2, self.target2 = self.pure_pursuit_steer_control(self.target2, pose, self.path2)
-        self.control2_publisher_.publish(cmd)
         self.path_pub.publish(Path(path=self.path2))
         self.trajectory_pub.publish(Path(path=self.trajectory))
         
         if debug:
             self.get_logger().info("Control input robot2, delta:" + str(cmd.delta) + " , throttle: " + str(cmd.throttle))
+        
+        return cmd
     
     def update_path(self, path: Path):
         path.pop(0)
