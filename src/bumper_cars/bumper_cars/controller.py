@@ -65,7 +65,7 @@ class Controller(Node):
         state1_subscriber = message_filters.Subscriber(self, State, "/robot1_measurement")
         state2_subscriber = message_filters.Subscriber(self, State, "/robot2_measurement")
 
-        ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber], 2, 0.1, allow_headerless=True)
+        ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber], 4, 0.3, allow_headerless=True)
         ts.registerCallback(self.general_pose_callback)
 
         self.control1_publisher_.publish(ControlInputs(delta=0.0, throttle=0.0))
@@ -82,7 +82,8 @@ class Controller(Node):
         cmd1 = self.pose1_callback(state1)
         cmd2 = self.pose2_callback(state2, state1)
 
-        self.get_logger().info(f'Commands before: cmd1: {cmd1}, cmd2: {cmd2}')
+        if debug:
+           self.get_logger().info(f'Commands before: cmd1: {cmd1}, cmd2: {cmd2}')
         dxu = np.zeros((2,2))
         dxu[0,0], dxu[1,0] = cmd1.throttle, cmd1.delta
         dxu[0,1], dxu[1,1] = cmd2.throttle, cmd2.delta
@@ -98,9 +99,15 @@ class Controller(Node):
         cmd1.throttle, cmd1.delta = dxu[0,0], dxu[1,0]
         cmd2.throttle, cmd2.delta = dxu[0,1], dxu[1,1]
 
+        # Publishing everything in the general callback to avoid deadlocks
         self.control1_publisher_.publish(cmd1)
         self.control2_publisher_.publish(cmd2)
-        self.get_logger().info(f'Commands after: cmd1: {cmd1}, cmd2: {cmd2}')
+        self.trajectory_pub1.publish(Path(path=self.trajectory1))
+        self.path_pub.publish(Path(path=self.path2))
+        self.trajectory_pub2.publish(Path(path=self.trajectory2))
+
+        if debug:
+            self.get_logger().info(f'Commands after: cmd1: {cmd1}, cmd2: {cmd2}')
 
     def pose1_callback(self, pose: State):
         # updating target waypoint and predicting new traj
@@ -111,9 +118,7 @@ class Controller(Node):
     
         cmd = ControlInputs()
         cmd.throttle, cmd.delta, self.path1, self.target1 = self.pure_pursuit_steer_control(self.target1, pose, self.path1)
-        self.trajectory_pub1.publish(Path(path=self.trajectory1))
-        # self.control1_publisher_.publish(cmd)
-        
+
         if debug:
             self.get_logger().info("Control input robot1, delta:" + str(cmd.delta) + " , throttle: " + str(cmd.throttle))
 
@@ -129,8 +134,6 @@ class Controller(Node):
 
         cmd = ControlInputs()       
         cmd.throttle, cmd.delta, self.path2, self.target2 = self.pure_pursuit_steer_control(self.target2, pose, self.path2)
-        self.path_pub.publish(Path(path=self.path2))
-        self.trajectory_pub2.publish(Path(path=self.trajectory2))
         
         if debug:
             self.get_logger().info("Control input robot2, delta:" + str(cmd.delta) + " , throttle: " + str(cmd.throttle))
@@ -209,8 +212,6 @@ class Controller(Node):
 
         return angle
        
-
-
 def main(args=None):
     rclpy.init(args=args)
 
