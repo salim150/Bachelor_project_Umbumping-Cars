@@ -24,9 +24,6 @@ WB = 2.9  # [m] Wheel base of vehicle
 Lf = 20  # [m] look-ahead distance
 max_steer = np.radians(30.0)  # [rad] max steering angle
 
-
-
-
 class Controller(Node):
 
     def __init__(self):
@@ -42,10 +39,12 @@ class Controller(Node):
         self.path1 = []
         self.path1 = self.create_path(self.path1)
         self.target1 = (self.path1[0].x, self.path1[0].y)
+        self.trajectory1, self.tx1, self.ty1 = predict_trajectory(State(x=30.0, y=30.0, yaw=0.0, v=0.0, omega=0.0), self.target1)
+
         self.path2 = []
         self.path2 = self.create_path(self.path2)
         self.target2 = (self.path2[0].x, self.path2[0].y)
-        self.trajectory, self.tx, self.ty = predict_trajectory(State(x=0.0, y=0.0, yaw=0.0, v=0.0, omega=0.0), self.target2)
+        self.trajectory2, self.tx2, self.ty2 = predict_trajectory(State(x=0.0, y=0.0, yaw=0.0, v=0.0, omega=0.0), self.target2)
 
         # Just to try if frenet path works
         # initial state
@@ -60,7 +59,8 @@ class Controller(Node):
         self.control1_publisher_ = self.create_publisher(ControlInputs, "/robot1_control", 20)
         self.control2_publisher_ = self.create_publisher(ControlInputs, "/robot2_control", 20)
         self.path_pub = self.create_publisher(Path, "/robot2_path", 2)
-        self.trajectory_pub = self.create_publisher(Path, "/robot2_trajectory", 2)
+        self.trajectory_pub1 = self.create_publisher(Path, "/robot1_trajectory", 2)
+        self.trajectory_pub2 = self.create_publisher(Path, "/robot2_trajectory", 2)
         
         state1_subscriber = message_filters.Subscriber(self, State, "/robot1_measurement")
         state2_subscriber = message_filters.Subscriber(self, State, "/robot2_measurement")
@@ -107,9 +107,11 @@ class Controller(Node):
         if self.dist(point1=(pose.x, pose.y), point2=self.target1) < Lf:
             self.path1 = self.update_path(self.path1)
             self.target1 = (self.path1[0].x, self.path1[0].y)
+            self.trajectory1, self.tx1, self.ty1  = predict_trajectory(pose, self.target1)
     
         cmd = ControlInputs()
         cmd.throttle, cmd.delta, self.path1, self.target1 = self.pure_pursuit_steer_control(self.target1, pose, self.path1)
+        self.trajectory_pub1.publish(Path(path=self.trajectory1))
         # self.control1_publisher_.publish(cmd)
         
         if debug:
@@ -123,12 +125,12 @@ class Controller(Node):
         if self.dist(point1=(pose.x, pose.y), point2=self.target2) < Lf:
             self.path2 = self.update_path(self.path2)
             self.target2 = (self.path2[0].x, self.path2[0].y)
-            self.trajectory, self.tx, self.ty  = predict_trajectory(pose, self.target2)
+            self.trajectory2, self.tx2, self.ty2  = predict_trajectory(pose, self.target2)
 
         cmd = ControlInputs()       
         cmd.throttle, cmd.delta, self.path2, self.target2 = self.pure_pursuit_steer_control(self.target2, pose, self.path2)
         self.path_pub.publish(Path(path=self.path2))
-        self.trajectory_pub.publish(Path(path=self.trajectory))
+        self.trajectory_pub2.publish(Path(path=self.trajectory2))
         
         if debug:
             self.get_logger().info("Control input robot2, delta:" + str(cmd.delta) + " , throttle: " + str(cmd.throttle))

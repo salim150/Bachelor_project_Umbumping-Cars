@@ -74,16 +74,17 @@ class CarModel(Node):
         self.fullstate1 = FullState(x=float(self.initial_state1.x), y=float(self.initial_state1.y), yaw=float(self.initial_state1.yaw), v=float(self.initial_state1.v),
                                omega=float(self.initial_state1.omega), delta=float(control1.delta), throttle=float(control1.throttle))
 
-    def linear_model_callback(self, state: State, cmd: ControlInputs, old_time: float):
+    def linear_model_callback(self, initial_state: State, cmd: ControlInputs, old_time: float):
 
         dt = time.time() - old_time
+        state = State()
         cmd.delta = np.clip(np.radians(cmd.delta), -max_steer, max_steer)
 
-        state.x += state.v * np.cos(state.yaw) * dt
-        state.y += state.v * np.sin(state.yaw) * dt
-        state.yaw += state.v / L * np.tan(cmd.delta) * dt
+        state.x = initial_state.x + initial_state.v * np.cos(initial_state.yaw) * dt
+        state.y = initial_state.y + initial_state.v * np.sin(initial_state.yaw) * dt
+        state.yaw = initial_state.yaw + initial_state.v / L * np.tan(cmd.delta) * dt
         state.yaw = self.normalize_angle(state.yaw)
-        state.v += cmd.throttle * dt
+        state.v = initial_state.v + cmd.throttle * dt
         state.v = np.clip(state.v, min_speed, max_speed)
 
         return state, time.time()
