@@ -82,9 +82,6 @@ class Controller(Node):
         cmd1 = self.pose1_callback(state1)
         cmd2 = self.pose2_callback(state2, state1)
 
-        self.control1_publisher_.publish(cmd1)
-        
-
         self.get_logger().info(f'Commands before: cmd1: {cmd1}, cmd2: {cmd2}')
         dxu = np.zeros((2,2))
         dxu[0,0], dxu[1,0] = cmd1.throttle, cmd1.delta
@@ -98,9 +95,10 @@ class Controller(Node):
         # Create safe control inputs (i.e., no collisions)
         dxu = self.uni_barrier_cert(dxu, x)
 
-        cmd1.throttle, cmd1.delta = dxu[0,0], np.degrees(dxu[1,0])
-        cmd2.throttle, cmd2.delta = dxu[0,1], np.degrees(dxu[1,1])
+        cmd1.throttle, cmd1.delta = dxu[0,0], dxu[1,0]
+        cmd2.throttle, cmd2.delta = dxu[0,1], dxu[1,1]
 
+        self.control1_publisher_.publish(cmd1)
         self.control2_publisher_.publish(cmd2)
         self.get_logger().info(f'Commands after: cmd1: {cmd1}, cmd2: {cmd2}')
 
@@ -119,40 +117,13 @@ class Controller(Node):
 
         return cmd
     
-    def pose2_callback(self, pose: State, other_pose: State):
+    def pose2_callback(self, pose: State, other_pose: State):       
 
-        ob = np.array([[other_pose.x, other_pose.y]])
-        
-        """tx, ty, tyaw, tc, csp = generate_target_course(self.tx, self.ty)
-        path_opt = frenet_optimal_planning(csp, self.s0, self.c_speed, self.c_accel, self.c_d, self.c_d_d, self.c_d_dd, ob)
-        #self.s0 = path_opt.s[1]
-        self.c_d = path_opt.d[1]
-        self.c_d_d = path_opt.d_d[1]
-        self.c_d_dd = path_opt.d_dd[1]
-        self.c_speed = path_opt.s_d[1]
-        self.c_accel = path_opt.s_dd[1]"""
-
-        if debug:
-            plt.cla()
-            # for stopping simulation with the esc key.
-            plt.gcf().canvas.mpl_connect(
-                'key_release_event',
-                lambda event: [exit(0) if event.key == 'escape' else None])
-            self.plot_path(self.trajectory)
-            plt.plot(path_opt.x[1:], path_opt.y[1:], "-or")
-            plt.plot(pose.x, pose.y, 'xk')
-            plt.plot(other_pose.x, other_pose.y, 'xb')
-            plt.axis("equal")
-            plt.grid(True)
-            plt.pause(0.000001)
-        
-
-        # updating target waypoint and predicting new traj
+    # updating target waypoint and predicting new traj
         if self.dist(point1=(pose.x, pose.y), point2=self.target2) < Lf:
             self.path2 = self.update_path(self.path2)
             self.target2 = (self.path2[0].x, self.path2[0].y)
             self.trajectory, self.tx, self.ty  = predict_trajectory(pose, self.target2)
-
 
         cmd = ControlInputs()       
         cmd.throttle, cmd.delta, self.path2, self.target2 = self.pure_pursuit_steer_control(self.target2, pose, self.path2)
@@ -202,7 +173,9 @@ class Controller(Node):
         else:
             desired_speed = 6
 
-        delta = 3 * math.degrees(delta)
+        delta = 3 * delta
+        delta = np.clip(delta, -max_steer, max_steer)
+        delta = math.degrees(delta)
         throttle = 3 * (desired_speed-pose.v)
 
         return throttle, delta, path, target

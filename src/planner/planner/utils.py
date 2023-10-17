@@ -73,6 +73,7 @@ def pure_pursuit_steer_control(target, pose):
     else:
         desired_speed = 6
 
+    delta = np.clip(delta, -max_steer, max_steer)
     delta = math.degrees(delta)
     throttle = 3 * (desired_speed-pose.v)
     return throttle, delta
@@ -139,3 +140,15 @@ def plot_path(path: Path):
             y.append(coord.y)
         plt.scatter(x, y, marker='.', s=10)
         plt.scatter(x[0], y[0], marker='x', s=20)
+
+def normalize_angle_array(angle):
+    """
+    Normalize an angle to [-pi, pi].
+    :param angle: (float)
+    :return: (float) Angle in radian in [-pi, pi]
+    """
+    angle[angle[:] > np.pi] -= 2.0 * np.pi
+
+    angle[angle[:] < -np.pi] += 2.0 * np.pi
+
+    return angle

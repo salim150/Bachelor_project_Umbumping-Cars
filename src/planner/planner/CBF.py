@@ -11,11 +11,11 @@ from planner.predict_traj import predict_trajectory
 
 L = 2.9
 max_steer = np.radians(30.0)  # [rad] max steering angle
-max_speed = 10 # [m/s]
+max_speed = 6 # [m/s]
 min_speed = 0.05 # [m/s]
 magnitude_limit= max_speed
 dt = 0.1
-safety_radius = 1
+safety_radius = 3
 barrier_gain = 0.1
 magnitude_limit = max_speed
 
@@ -67,7 +67,7 @@ def create_unicycle_barrier_certificate_with_boundary(barrier_gain=barrier_gain,
         dxi = bi_to_si_dyn(dxu, x)
 
         #Apply single integrator barrier certificate
-        # dxi = si_barrier_cert(dxi, x_si)
+        dxi = si_barrier_cert(dxi, x_si)
 
         #Return safe unicycle command
         return si_to_bi_dyn(dxi, x)
@@ -210,7 +210,7 @@ def create_si_to_bi_mapping(projection_distance=0.05, angular_velocity_limit = n
         cs = np.cos(poses[2, :])
         ss = np.sin(poses[2, :])
 
-        dxu = np.zeros((2, N))
+        """dxu = np.zeros((2, N))
         uv = np.zeros((1, N))
         uw = np.zeros((1, N))
 
@@ -231,30 +231,29 @@ def create_si_to_bi_mapping(projection_distance=0.05, angular_velocity_limit = n
         dxu[1,dxu[1,:]<-max_steer] = -max_steer 
 
         # From radians to degrees
-        dxu[1,:] = np.degrees(dxu[1,:])
+        dxu[1,:] = np.degrees(dxu[1,:])"""
 
-        """dxu = np.zeros((2, N))
+        dxu = np.zeros((2, N))
         v = np.zeros((1, N))
         v[0, :] = np.sqrt(dxi[0, :]**2 + dxi[1, :]**2)
         v[0, v[0,:]>max_speed] = max_speed
         v[0, v[0,:]<min_speed] = min_speed
-        dxu[0, :] = 3 * (v[0, :] - poses[3, :])
-        dxu[1, :] = np.arctan2((np.arctan2(dxi[1, :]+0.0001 , dxi[0, :]+0.0001)-poses[2, :])* L, poses[3, :]+0.0001)
+        dxu[0, :] = (v[0, :] - poses[3, :])/dt
+        dxu[1, :] = normalize_angle_array(np.arctan2(normalize_angle_array(normalize_angle_array(np.arctan2(dxi[1, :] , dxi[0, :]))-poses[2, :])* L, (poses[3,:]+0.0001)*dt))
 
-        #Impose angular velocity cap.
+        #Impose steering cap.
         dxu[1,dxu[1,:]>max_steer] = max_steer
         dxu[1,dxu[1,:]<-max_steer] = -max_steer 
 
-        # decreasing the desired speed when turning
+        """# decreasing the desired speed when turning
         desired_speed = np.zeros((1,N))
         desired_speed[0, dxu[1,:]>math.radians(10)] = 3
         desired_speed[0, dxu[1,:]<-math.radians(10)] = 3
-        desired_speed[0, dxu[1,:]<math.radians(10)] = 4
-        desired_speed[0, dxu[1,:]>-math.radians(10)] = 4
+        desired_speed[0, dxu[1,:]<math.radians(10)] = 6
+        desired_speed[0, dxu[1,:]>-math.radians(10)] = 6
 
-        input_des = np.zeros((1,N))
-        input_des[0, :] = 3 * (desired_speed - v[0, :])
-        dxu[0, :] = 3 * (desired_speed - poses[3, :])"""
+        dxu[0, :] = 3 * (desired_speed-v[0,:])"""
+        dxu[1, :] = np.degrees(dxu[1,:])
         return dxu
 
     def bi_to_si_states(poses):
@@ -315,19 +314,23 @@ def create_bi_to_si_dynamics(projection_distance=0.05):
         assert dxu.shape[1] == poses.shape[1], "In the uni_to_si_dyn function created by the create_uni_to_si_dynamics function, the number of unicycle velocity inputs must be equal to the number of current robot poses. Recieved a unicycle velocity input array of size %r x %r and current pose array of size %r x %r." % (dxu.shape[0], dxu.shape[1], poses.shape[0], poses.shape[1])
 
         
-        """M,N = np.shape(dxu)
+        M,N = np.shape(dxu)
         v = np.zeros((1,N))
-        # v[0, :] = dxu[0, :]*dt
-        v[0, :] = dxu[0, :]*dt + poses[3, :]
+        yaw = np.zeros((1,N))
+        dxu[1, :] = np.radians(dxu[1, :])
 
-        cs = np.cos(v[0, :] * np.tan(dxu[1, :]) / L)
-        ss = np.sin(v[0, :] * np.tan(dxu[1, :]) / L)
+        # v[0, :] = dxu[0, :]*dt
+        v[0, :] = poses[3, :] + dxu[0, :]*dt
+        yaw[0,:] = poses[2, :] + poses[3, :] * np.tan(dxu[1, :]) / L * dt
+
+        cs = np.cos(yaw[0, :])
+        ss = np.sin(yaw[0, :])
 
         dxi = np.zeros((2, N))
         dxi[0, :] = v[0, :]*cs
-        dxi[1, :] = v[0, :]*ss"""
+        dxi[1, :] = v[0, :]*ss
 
-        M,N = np.shape(dxu)
+        """M,N = np.shape(dxu)
 
         cs = np.cos(poses[2, :])
         ss = np.sin(poses[2, :])
@@ -340,7 +343,7 @@ def create_bi_to_si_dynamics(projection_distance=0.05):
 
         dxi = np.zeros((2, N))
         dxi[0, :] = (cs*us[0, :] - projection_distance*ss*uw[0, :])
-        dxi[1, :] = (ss*us[0, :] + projection_distance*cs*uw[0, :])
+        dxi[1, :] = (ss*us[0, :] + projection_distance*cs*uw[0, :])"""
 
         return dxi
 
@@ -360,7 +363,7 @@ def main(args=None):
     uni_barrier_cert = create_unicycle_barrier_certificate_with_boundary()
 
     # define x initially --> state: [x, y, yaw, v]
-    x = np.array([[0, 20], [0, 0], [0, np.pi], [0, 0]])
+    x = np.array([[0, 25], [0, 0], [0, np.pi], [0, 0]])
     goal1 = np.array([20, 10])
     goal2 = np.array([0, 10])
     cmd1 = ControlInputs()
@@ -384,7 +387,10 @@ def main(args=None):
         dxu[0,1], dxu[1,1] = pure_pursuit_steer_control(goal2, x2)
 
         # Create safe control inputs (i.e., no collisions)
+        # print(dxu)
         dxu = uni_barrier_cert(dxu, x)
+        # print(dxu)
+        # print('\n')
 
         cmd1.throttle, cmd1.delta = dxu[0,0], dxu[1,0]
         cmd2.throttle, cmd2.delta = dxu[0,1], dxu[1,1]
