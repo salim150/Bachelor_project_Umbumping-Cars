@@ -16,11 +16,13 @@ from planner.cubic_spline_planner import *
 from planner.frenet import *
 from planner.predict_traj import *
 
+# for the CBF
+from planner.CBF import *
+
 debug = False
 WB = 2.9  # [m] Wheel base of vehicle
 Lf = 20  # [m] look-ahead distance
 max_steer = np.radians(30.0)  # [rad] max steering angle
-
 
 class Controller(Node):
 
@@ -37,10 +39,12 @@ class Controller(Node):
         self.path1 = []
         self.path1 = self.create_path(self.path1)
         self.target1 = (self.path1[0].x, self.path1[0].y)
+        self.trajectory1, self.tx1, self.ty1 = predict_trajectory(State(x=30.0, y=30.0, yaw=0.0, v=0.0, omega=0.0), self.target1)
+
         self.path2 = []
         self.path2 = self.create_path(self.path2)
         self.target2 = (self.path2[0].x, self.path2[0].y)
-        self.trajectory, self.tx, self.ty = predict_trajectory(State(x=0.0, y=0.0, yaw=0.0, v=0.0, omega=0.0), self.target2)
+        self.trajectory2, self.tx2, self.ty2 = predict_trajectory(State(x=0.0, y=0.0, yaw=0.0, v=0.0, omega=0.0), self.target2)
 
         # Just to try if frenet path works
         # initial state
@@ -55,82 +59,86 @@ class Controller(Node):
         self.control1_publisher_ = self.create_publisher(ControlInputs, "/robot1_control", 20)
         self.control2_publisher_ = self.create_publisher(ControlInputs, "/robot2_control", 20)
         self.path_pub = self.create_publisher(Path, "/robot2_path", 2)
-        self.trajectory_pub = self.create_publisher(Path, "/robot2_trajectory", 2)
+        self.trajectory_pub1 = self.create_publisher(Path, "/robot1_trajectory", 2)
+        self.trajectory_pub2 = self.create_publisher(Path, "/robot2_trajectory", 2)
         
         state1_subscriber = message_filters.Subscriber(self, State, "/robot1_measurement")
         state2_subscriber = message_filters.Subscriber(self, State, "/robot2_measurement")
 
-        ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber], 2, 0.1, allow_headerless=True)
+        ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber], 4, 0.3, allow_headerless=True)
         ts.registerCallback(self.general_pose_callback)
 
         self.control1_publisher_.publish(ControlInputs(delta=0.0, throttle=0.0))
         self.control2_publisher_.publish(ControlInputs(delta=0.0, throttle=0.0))
         self.path_pub.publish(Path(path=self.path2))
 
+        # CBF
+        self.uni_barrier_cert = create_unicycle_barrier_certificate_with_boundary()
+
         self.get_logger().info("Controller has been started")
 
     def general_pose_callback(self, state1: State, state2: State):
         
-        self.pose1_callback(state1)
-        self.pose2_callback(state2, state1)
-        
-        
+        cmd1 = self.pose1_callback(state1)
+        cmd2 = self.pose2_callback(state2, state1)
+
+        if debug:
+           self.get_logger().info(f'Commands before: cmd1: {cmd1}, cmd2: {cmd2}')
+        dxu = np.zeros((2,2))
+        dxu[0,0], dxu[1,0] = cmd1.throttle, cmd1.delta
+        dxu[0,1], dxu[1,1] = cmd2.throttle, cmd2.delta
+
+        # Converting positions to arrays for the CBF
+        x1 = state_to_array(state1)
+        x2 = state_to_array(state2)
+        x = np.concatenate((x1, x2), axis=1)
+
+        # Create safe control inputs (i.e., no collisions)
+        dxu = self.uni_barrier_cert(dxu, x)
+
+        cmd1.throttle, cmd1.delta = dxu[0,0], dxu[1,0]
+        cmd2.throttle, cmd2.delta = dxu[0,1], dxu[1,1]
+
+        # Publishing everything in the general callback to avoid deadlocks
+        self.control1_publisher_.publish(cmd1)
+        self.control2_publisher_.publish(cmd2)
+        self.trajectory_pub1.publish(Path(path=self.trajectory1))
+        self.path_pub.publish(Path(path=self.path2))
+        self.trajectory_pub2.publish(Path(path=self.trajectory2))
+
+        if debug:
+            self.get_logger().info(f'Commands after: cmd1: {cmd1}, cmd2: {cmd2}')
+
     def pose1_callback(self, pose: State):
         # updating target waypoint and predicting new traj
         if self.dist(point1=(pose.x, pose.y), point2=self.target1) < Lf:
             self.path1 = self.update_path(self.path1)
             self.target1 = (self.path1[0].x, self.path1[0].y)
+            self.trajectory1, self.tx1, self.ty1  = predict_trajectory(pose, self.target1)
     
         cmd = ControlInputs()
         cmd.throttle, cmd.delta, self.path1, self.target1 = self.pure_pursuit_steer_control(self.target1, pose, self.path1)
-        self.control1_publisher_.publish(cmd)
-        
+
         if debug:
             self.get_logger().info("Control input robot1, delta:" + str(cmd.delta) + " , throttle: " + str(cmd.throttle))
 
-    def pose2_callback(self, pose: State, other_pose: State):
+        return cmd
+    
+    def pose2_callback(self, pose: State, other_pose: State):       
 
-        ob = np.array([[other_pose.x, other_pose.y]])
-        
-        """tx, ty, tyaw, tc, csp = generate_target_course(self.tx, self.ty)
-        path_opt = frenet_optimal_planning(csp, self.s0, self.c_speed, self.c_accel, self.c_d, self.c_d_d, self.c_d_dd, ob)
-        #self.s0 = path_opt.s[1]
-        self.c_d = path_opt.d[1]
-        self.c_d_d = path_opt.d_d[1]
-        self.c_d_dd = path_opt.d_dd[1]
-        self.c_speed = path_opt.s_d[1]
-        self.c_accel = path_opt.s_dd[1]"""
-
-        if debug:
-            plt.cla()
-            # for stopping simulation with the esc key.
-            plt.gcf().canvas.mpl_connect(
-                'key_release_event',
-                lambda event: [exit(0) if event.key == 'escape' else None])
-            self.plot_path(self.trajectory)
-            plt.plot(path_opt.x[1:], path_opt.y[1:], "-or")
-            plt.plot(pose.x, pose.y, 'xk')
-            plt.plot(other_pose.x, other_pose.y, 'xb')
-            plt.axis("equal")
-            plt.grid(True)
-            plt.pause(0.000001)
-        
-
-        # updating target waypoint and predicting new traj
+    # updating target waypoint and predicting new traj
         if self.dist(point1=(pose.x, pose.y), point2=self.target2) < Lf:
             self.path2 = self.update_path(self.path2)
             self.target2 = (self.path2[0].x, self.path2[0].y)
-            self.trajectory, self.tx, self.ty  = predict_trajectory(pose, self.target2)
-
+            self.trajectory2, self.tx2, self.ty2  = predict_trajectory(pose, self.target2)
 
         cmd = ControlInputs()       
         cmd.throttle, cmd.delta, self.path2, self.target2 = self.pure_pursuit_steer_control(self.target2, pose, self.path2)
-        self.control2_publisher_.publish(cmd)
-        self.path_pub.publish(Path(path=self.path2))
-        self.trajectory_pub.publish(Path(path=self.trajectory))
         
         if debug:
             self.get_logger().info("Control input robot2, delta:" + str(cmd.delta) + " , throttle: " + str(cmd.throttle))
+        
+        return cmd
     
     def update_path(self, path: Path):
         path.pop(0)
@@ -170,7 +178,9 @@ class Controller(Node):
         else:
             desired_speed = 6
 
-        delta = 3 * math.degrees(delta)
+        delta = 3 * delta
+        delta = np.clip(delta, -max_steer, max_steer)
+        delta = math.degrees(delta)
         throttle = 3 * (desired_speed-pose.v)
 
         return throttle, delta, path, target
@@ -201,9 +211,7 @@ class Controller(Node):
             angle += 2.0 * np.pi
 
         return angle
-
-   
-
+       
 def main(args=None):
     rclpy.init(args=args)
 

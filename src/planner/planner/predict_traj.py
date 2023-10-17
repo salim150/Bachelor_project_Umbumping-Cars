@@ -48,7 +48,7 @@ def predict_trajectory(initial_state: State, target):
     ty.append(new_state.y)
     traj.append(Coordinate(x=new_state.x, y=new_state.y))
 
-    while dist(point1=(traj[-1].x, traj[-1].y), point2=target) > 5:
+    while dist(point1=(traj[-1].x, traj[-1].y), point2=target) > 10:
 
         cmd.throttle, cmd.delta = pure_pursuit_steer_control(target, new_state)
         #print(cmd)
@@ -87,8 +87,8 @@ def plot_path(path: Path):
 def linear_model_callback(initial_state: State, cmd: ControlInputs, old_time: float):
 
         dt = 0.1
-        #dt = time.time() - old_time
         state = State()
+        print(initial_state, cmd)
         cmd.delta = np.clip(np.radians(cmd.delta), -max_steer, max_steer)
 
         state.x = initial_state.x + initial_state.v * np.cos(initial_state.yaw) * dt
