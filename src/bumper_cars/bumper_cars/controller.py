@@ -46,30 +46,32 @@ class Controller(Node):
         self.target2 = (self.path2[0].x, self.path2[0].y)
         self.trajectory2, self.tx2, self.ty2 = predict_trajectory(State(x=0.0, y=0.0, yaw=0.0, v=0.0, omega=0.0), self.target2)
 
-        # Just to try if frenet path works
-        # initial state
-        self.c_speed = 10.0 / 3.6  # current speed [m/s]
-        self.c_accel = 0.0  # current acceleration [m/ss]
-        self.c_d = 2.0  # current lateral position [m]
-        self.c_d_d = 0.0  # current lateral speed [m/s]
-        self.c_d_dd = 0.0  # current lateral acceleration [m/s]
-        self.s0 = 0.0  # current course position
-        self.area = 50.0  # animation area length [m]
+        self.path3 = []
+        self.path3 = self.create_path(self.path3)
+        self.target3 = (self.path3[0].x, self.path3[0].y)
+        self.trajectory3, self.tx3, self.ty3 = predict_trajectory(State(x=-30.0, y=-30.0, yaw=0.0, v=0.0, omega=0.0), self.target3)
     
         self.control1_publisher_ = self.create_publisher(ControlInputs, "/robot1_control", 20)
         self.control2_publisher_ = self.create_publisher(ControlInputs, "/robot2_control", 20)
+        self.control3_publisher_ = self.create_publisher(ControlInputs, "/robot3_control", 20)
+
         self.path_pub = self.create_publisher(Path, "/robot2_path", 2)
+
         self.trajectory_pub1 = self.create_publisher(Path, "/robot1_trajectory", 2)
         self.trajectory_pub2 = self.create_publisher(Path, "/robot2_trajectory", 2)
+        self.trajectory_pub3 = self.create_publisher(Path, "/robot3_trajectory", 2)
         
         state1_subscriber = message_filters.Subscriber(self, State, "/robot1_measurement")
         state2_subscriber = message_filters.Subscriber(self, State, "/robot2_measurement")
+        state3_subscriber = message_filters.Subscriber(self, State, "/robot3_measurement")
 
-        ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber], 4, 0.3, allow_headerless=True)
+        ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber, state3_subscriber], 4, 0.3, allow_headerless=True)
         ts.registerCallback(self.general_pose_callback)
 
         self.control1_publisher_.publish(ControlInputs(delta=0.0, throttle=0.0))
         self.control2_publisher_.publish(ControlInputs(delta=0.0, throttle=0.0))
+        self.control3_publisher_.publish(ControlInputs(delta=0.0, throttle=0.0))
+
         self.path_pub.publish(Path(path=self.path2))
 
         # CBF
@@ -77,35 +79,42 @@ class Controller(Node):
 
         self.get_logger().info("Controller has been started")
 
-    def general_pose_callback(self, state1: State, state2: State):
+    def general_pose_callback(self, state1: State, state2: State, state3: State):
         
         cmd1 = self.pose1_callback(state1)
-        cmd2 = self.pose2_callback(state2, state1)
+        cmd2 = self.pose2_callback(state2)
+        cmd3 = self.pose3_callback(state3)
 
         if debug:
            self.get_logger().info(f'Commands before: cmd1: {cmd1}, cmd2: {cmd2}')
-        dxu = np.zeros((2,2))
+        dxu = np.zeros((2,3))
         dxu[0,0], dxu[1,0] = cmd1.throttle, cmd1.delta
         dxu[0,1], dxu[1,1] = cmd2.throttle, cmd2.delta
+        dxu[0,2], dxu[1,2] = cmd3.throttle, cmd3.delta
 
         # Converting positions to arrays for the CBF
         x1 = state_to_array(state1)
         x2 = state_to_array(state2)
-        x = np.concatenate((x1, x2), axis=1)
+        x3 = state_to_array(state3)
+        x = np.concatenate((x1, x2, x3), axis=1)
 
         # Create safe control inputs (i.e., no collisions)
         dxu = self.uni_barrier_cert(dxu, x)
 
         cmd1.throttle, cmd1.delta = dxu[0,0], dxu[1,0]
         cmd2.throttle, cmd2.delta = dxu[0,1], dxu[1,1]
+        cmd3.throttle, cmd3.delta = dxu[0,2], dxu[1,2]
 
         # Publishing everything in the general callback to avoid deadlocks
         self.control1_publisher_.publish(cmd1)
         self.control2_publisher_.publish(cmd2)
+        self.control3_publisher_.publish(cmd3)
+
         self.trajectory_pub1.publish(Path(path=self.trajectory1))
         self.path_pub.publish(Path(path=self.path2))
         self.trajectory_pub2.publish(Path(path=self.trajectory2))
-
+        self.trajectory_pub3.publish(Path(path=self.trajectory3))
+        
         if debug:
             self.get_logger().info(f'Commands after: cmd1: {cmd1}, cmd2: {cmd2}')
 
@@ -124,9 +133,8 @@ class Controller(Node):
 
         return cmd
     
-    def pose2_callback(self, pose: State, other_pose: State):       
-
-    # updating target waypoint and predicting new traj
+    def pose2_callback(self, pose: State):           
+        # updating target waypoint and predicting new traj
         if self.dist(point1=(pose.x, pose.y), point2=self.target2) < Lf:
             self.path2 = self.update_path(self.path2)
             self.target2 = (self.path2[0].x, self.path2[0].y)
@@ -134,6 +142,21 @@ class Controller(Node):
 
         cmd = ControlInputs()       
         cmd.throttle, cmd.delta, self.path2, self.target2 = self.pure_pursuit_steer_control(self.target2, pose, self.path2)
+        
+        if debug:
+            self.get_logger().info("Control input robot2, delta:" + str(cmd.delta) + " , throttle: " + str(cmd.throttle))
+        
+        return cmd
+    
+    def pose3_callback(self, pose: State):       
+        # updating target waypoint and predicting new traj
+        if self.dist(point1=(pose.x, pose.y), point2=self.target3) < Lf:
+            self.path3 = self.update_path(self.path3)
+            self.target3 = (self.path3[0].x, self.path3[0].y)
+            self.trajectory3, self.tx3, self.ty3  = predict_trajectory(pose, self.target3)
+
+        cmd = ControlInputs()       
+        cmd.throttle, cmd.delta, self.path3, self.target3 = self.pure_pursuit_steer_control(self.target3, pose, self.path3)
         
         if debug:
             self.get_logger().info("Control input robot2, delta:" + str(cmd.delta) + " , throttle: " + str(cmd.throttle))

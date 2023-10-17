@@ -42,8 +42,28 @@ def generate_launch_description():
             {'omega': 0.0}
         ]
     )
+
+    robot3_node = Node(
+        package="bumper_cars",
+        executable="model",
+        name="robot3_model",
+        remappings=[
+            ("/robot_state", "/robot3_state"),
+            ("/robot_control", "/robot3_control"),
+            ("/robot_fullstate", "/robot3_fullstate")
+        ],
+        parameters=[
+            {'model_type': 'linear'},
+            {'x0': -30.0},
+            {'y0': -30.0},
+            {'yaw': 0.0},
+            {'v': 0.0},
+            {'omega': 0.0}
+        ]
+    )
     
     ld.add_action(robot1_node)
-    ld.add_action(robot2_node)    
+    ld.add_action(robot2_node)  
+    ld.add_action(robot3_node)    
 
     return ld

@@ -86,7 +86,7 @@ def plot_path(path: Path):
 
 def linear_model_callback(initial_state: State, cmd: ControlInputs, old_time: float):
 
-        dt = 0.1
+        dt = 0.3
         state = State()
         print(initial_state, cmd)
         cmd.delta = np.clip(np.radians(cmd.delta), -max_steer, max_steer)

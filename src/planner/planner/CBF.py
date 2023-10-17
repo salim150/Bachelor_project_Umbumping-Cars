@@ -9,13 +9,14 @@ from cvxopt import matrix, sparse
 from planner.utils import *
 from planner.predict_traj import predict_trajectory
 
+# TODO: import all this parameters from a config file so that we can easily change them in one place
 L = 2.9
 max_steer = np.radians(30.0)  # [rad] max steering angle
 max_speed = 6 # [m/s]
 min_speed = 0.05 # [m/s]
 magnitude_limit= max_speed
 dt = 0.1
-safety_radius = 4
+safety_radius = 5
 barrier_gain = 0.1
 magnitude_limit = max_speed
 
@@ -210,29 +211,6 @@ def create_si_to_bi_mapping(projection_distance=0.05, angular_velocity_limit = n
         cs = np.cos(poses[2, :])
         ss = np.sin(poses[2, :])
 
-        """dxu = np.zeros((2, N))
-        uv = np.zeros((1, N))
-        uw = np.zeros((1, N))
-
-        uv[0, :] = (cs*dxi[0, :] + ss*dxi[1, :])
-        uw[0, :] = (1/projection_distance)*(-ss*dxi[0, :] + cs*dxi[1, :])
-
-        #Impose angular velocity cap.
-        # uw[0,uw[0,:]>angular_velocity_limit] = angular_velocity_limit
-        # uw[0,uw[0,:]<-angular_velocity_limit] = -angular_velocity_limit 
-
-        uv[0, uv[0,:]>max_speed] = max_speed
-        uv[0, uv[0,:]<min_speed] = min_speed
-
-        dxu[0, :] = 3 * (uv[0, :] - poses[3, :])
-        dxu[1, :] = np.arctan2(uw[0,:]* L, poses[3, :]+0.00001)
-        #Impose steering cap.
-        dxu[1,dxu[1,:]>max_steer] = max_steer
-        dxu[1,dxu[1,:]<-max_steer] = -max_steer 
-
-        # From radians to degrees
-        dxu[1,:] = np.degrees(dxu[1,:])"""
-
         dxu = np.zeros((2, N))
         v = np.zeros((1, N))
         v[0, :] = np.sqrt(dxi[0, :]**2 + dxi[1, :]**2)
@@ -329,21 +307,6 @@ def create_bi_to_si_dynamics(projection_distance=0.05):
         dxi = np.zeros((2, N))
         dxi[0, :] = v[0, :]*cs
         dxi[1, :] = v[0, :]*ss
-
-        """M,N = np.shape(dxu)
-
-        cs = np.cos(poses[2, :])
-        ss = np.sin(poses[2, :])
-
-        us = np.zeros((1,N))
-        uw = np.zeros((1,N))
-
-        us[0,:] = dxu[0, :]*dt
-        uw[0,:] = us[0,:] * np.tan(dxu[1,:]) / L
-
-        dxi = np.zeros((2, N))
-        dxi[0, :] = (cs*us[0, :] - projection_distance*ss*uw[0, :])
-        dxi[1, :] = (ss*us[0, :] + projection_distance*cs*uw[0, :])"""
 
         return dxi
 

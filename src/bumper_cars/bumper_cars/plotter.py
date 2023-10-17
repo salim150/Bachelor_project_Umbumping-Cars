@@ -31,32 +31,36 @@ class Plotter(Node):
         
         state1_subscriber = message_filters.Subscriber(self, FullState, "/robot1_fullstate")
         state2_subscriber = message_filters.Subscriber(self, FullState, "/robot2_fullstate")
+        state3_subscriber = message_filters.Subscriber(self, FullState, "/robot3_fullstate")
         self.path_sub = message_filters.Subscriber(self, Path, "/robot2_path")
         self.trajectory_sub1 = message_filters.Subscriber(self, Path, "/robot1_trajectory")
         self.trajectory_sub2 = message_filters.Subscriber(self, Path, "/robot2_trajectory")
+        self.trajectory_sub3 = message_filters.Subscriber(self, Path, "/robot3_trajectory")
 
         self.state1_buf = np.array([0,0])
         self.state2_buf = np.array([0,0])
+        self.state3_buf = np.array([0,0])
 
         self.width = 100
         self.heigth = 100
 
-        ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber, self.path_sub, self.trajectory_sub1, self.trajectory_sub2], 10, 1, allow_headerless=True)
+        ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber, state3_subscriber, self.path_sub, self.trajectory_sub1, self.trajectory_sub2, self.trajectory_sub3], 10, 1, allow_headerless=True)
         ts.registerCallback(self.plotter_callback)
         
         self.get_logger().info("Plotter has been started")
 
-    def plotter_callback(self, state1: FullState, state2: FullState, path: Path, trajectory1: Path, trajectory2: Path):
+    def plotter_callback(self, state1: FullState, state2: FullState, state3: FullState, path: Path, trajectory1: Path, trajectory2: Path, trajectory3: Path):
     
         self.state1_buf = np.vstack((self.state1_buf, [state1.x, state1.y]))
         self.state2_buf = np.vstack((self.state2_buf, [state2.x, state2.y]))
+        self.state3_buf = np.vstack((self.state3_buf, [state3.x, state3.y]))
+
         if len(self.state1_buf) > config.trail_length:
             self.state1_buf = np.delete(self.state1_buf, 0, 0)
         if len(self.state2_buf) > config.trail_length:
             self.state2_buf = np.delete(self.state2_buf, 0, 0)
-
-        """random_x = random.randint(-self.width/2, self.width/2)
-        random_y = random.randint(-self.heigth/2, self.heigth/2)"""
+        if len(self.state3_buf) > config.trail_length:
+            self.state3_buf = np.delete(self.state3_buf, 0, 0)
         
         plt.cla()
         # for stopping simulation with the esc key.
@@ -65,15 +69,23 @@ class Plotter(Node):
             lambda event: [exit(0) if event.key == 'escape' else None])
         self.plot_map()
         self.plot_path(path)
+
         self.plot_path(trajectory1)
         self.plot_path(trajectory2)
-        # plt.plot(random_x, random_y, marker='x')
+        self.plot_path(trajectory3)
+
         plt.scatter(self.state1_buf[:,0], self.state1_buf[:,1], marker='.', s=4)
         plt.scatter(self.state2_buf[:,0], self.state2_buf[:,1], marker='.', s=4)
+        plt.scatter(self.state3_buf[:,0], self.state3_buf[:,1], marker='.', s=4)
+
         self.plot_robot(state1)
         self.plot_robot(state2)
+        self.plot_robot(state3)
+
         plt.plot(state1.x, state1.y, 'k.')
         plt.plot(state2.x, state2.y, 'b.')
+        plt.plot(state3.x, state3.y, 'b.')
+
         plt.axis("equal")
         plt.grid(True)
         plt.pause(0.000001)
@@ -87,6 +99,10 @@ class Plotter(Node):
                                 "y: " + str(state2.y) + ", " +
                                 "yaw: " + str(state2.yaw) + ", " +
                                 "linear velocity: " + str(state2.v))
+            self.get_logger().info("robot3, x: " + str(state3.x) + ", " +
+                                "y: " + str(state3.y) + ", " +
+                                "yaw: " + str(state3.yaw) + ", " +
+                                "linear velocity: " + str(state3.v))
         
     def plot_robot(self, fullstate: FullState):
         self.plot_rect(fullstate.x, fullstate.y, fullstate.yaw, config)
