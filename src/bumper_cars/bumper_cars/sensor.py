@@ -19,21 +19,24 @@ class SensorMeasurement(Node):
         self.measurement1_publisher_ = self.create_publisher(State, "/robot1_measurement", 20)
         self.measurement2_publisher_ = self.create_publisher(State, "/robot2_measurement", 20)
         self.measurement3_publisher_ = self.create_publisher(State, "/robot3_measurement", 20)
+        self.measurement4_publisher_ = self.create_publisher(State, "/robot4_measurement", 20)
         
         state1_subscriber = message_filters.Subscriber(self, State, "/robot1_state")
         state2_subscriber = message_filters.Subscriber(self, State, "/robot2_state")
         state3_subscriber = message_filters.Subscriber(self, State, "/robot3_state")
+        state4_subscriber = message_filters.Subscriber(self, State, "/robot4_state")
 
-        ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber, state3_subscriber], 6, 1, allow_headerless=True)
+        ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber, state3_subscriber, state4_subscriber], 6, 1, allow_headerless=True)
         ts.registerCallback(self.sensor_callback)
 
         self.get_logger().info("Sensor has been started")
         
-    def sensor_callback(self, state1: State, state2: State, state3: State):
+    def sensor_callback(self, state1: State, state2: State, state3: State, state4: State):
 
         self.measurement1_publisher_.publish(state1)
         self.measurement2_publisher_.publish(state2)
         self.measurement3_publisher_.publish(state3)
+        self.measurement4_publisher_.publish(state4)
 
         if debug:
             self.get_logger().info("Publishing robot1 new state, x: " + str(state1.x) + ", " +
@@ -48,6 +51,10 @@ class SensorMeasurement(Node):
                                 "y: " + str(state3.y) + ", " +
                                 "theta: " + str(state3.yaw) + ", " +
                                 "linear velocity: " + str(state3.v))
+            self.get_logger().info("Publishing robot3 new state, x: " + str(state4.x) + ", " +
+                                "y: " + str(state4.y) + ", " +
+                                "theta: " + str(state4.yaw) + ", " +
+                                "linear velocity: " + str(state4.v))
 
 def main(args=None):
     rclpy.init(args=args)

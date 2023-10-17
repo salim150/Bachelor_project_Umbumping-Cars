@@ -13,7 +13,7 @@ from planner.predict_traj import predict_trajectory
 L = 2.9
 max_steer = np.radians(30.0)  # [rad] max steering angle
 max_speed = 6 # [m/s]
-min_speed = 0.05 # [m/s]
+min_speed = 0.0 # [m/s]
 magnitude_limit= max_speed
 dt = 0.1
 safety_radius = 5
