@@ -17,6 +17,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Coordinate.msg"
   "msg/MultiplePaths.msg"
   "msg/MultiState.msg"
+  "msg/MultiControl.msg"
 )
 
 ament_export_dependencies(rosidl_default_runtime)

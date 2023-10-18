@@ -256,11 +256,11 @@ CMakeFiles/custom_message__rosidl_typesupport_introspection_c.dir/rosidl_typesup
   /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
   rosidl_generator_c/custom_message/msg/rosidl_generator_c__visibility_control.h \
   rosidl_generator_c/custom_message/msg/detail/multi_state__struct.h \
-  rosidl_generator_c/custom_message/msg/detail/state__struct.h \
-  rosidl_generator_c/custom_message/msg/state.h \
-  rosidl_generator_c/custom_message/msg/detail/state__functions.h \
-  rosidl_generator_c/custom_message/msg/detail/state__type_support.h \
-  rosidl_typesupport_introspection_c/custom_message/msg/detail/state__rosidl_typesupport_introspection_c.h
+  rosidl_generator_c/custom_message/msg/detail/full_state__struct.h \
+  rosidl_generator_c/custom_message/msg/full_state.h \
+  rosidl_generator_c/custom_message/msg/detail/full_state__functions.h \
+  rosidl_generator_c/custom_message/msg/detail/full_state__type_support.h \
+  rosidl_typesupport_introspection_c/custom_message/msg/detail/full_state__rosidl_typesupport_introspection_c.h
 
 CMakeFiles/custom_message__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/custom_message/msg/detail/multiple_paths__type_support.c.o: rosidl_typesupport_introspection_c/custom_message/msg/detail/multiple_paths__type_support.c \
   /usr/include/stdc-predef.h \
@@ -466,6 +466,12 @@ CMakeFiles/custom_message__rosidl_typesupport_introspection_c.dir/rosidl_typesup
   rosidl_generator_c/custom_message/msg/detail/state__struct.h
 
 
+rosidl_generator_c/custom_message/msg/detail/state__struct.h:
+
+rosidl_generator_c/custom_message/msg/detail/state__functions.h:
+
+rosidl_typesupport_introspection_c/custom_message/msg/detail/state__rosidl_typesupport_introspection_c.h:
+
 rosidl_typesupport_introspection_c/custom_message/msg/detail/state__type_support.c:
 
 rosidl_generator_c/custom_message/msg/coordinate.h:
@@ -484,13 +490,7 @@ rosidl_generator_c/custom_message/msg/detail/multiple_paths__struct.h:
 
 rosidl_generator_c/custom_message/msg/detail/multiple_paths__functions.h:
 
-rosidl_typesupport_introspection_c/custom_message/msg/detail/state__rosidl_typesupport_introspection_c.h:
-
-rosidl_generator_c/custom_message/msg/detail/state__functions.h:
-
-rosidl_generator_c/custom_message/msg/state.h:
-
-rosidl_generator_c/custom_message/msg/detail/state__struct.h:
+rosidl_generator_c/custom_message/msg/full_state.h:
 
 rosidl_generator_c/custom_message/msg/detail/multi_state__struct.h:
 
@@ -622,8 +622,6 @@ rosidl_typesupport_introspection_c/custom_message/msg/detail/full_state__rosidl_
 
 /usr/include/x86_64-linux-gnu/sys/select.h:
 
-rosidl_generator_c/custom_message/msg/detail/state__type_support.h:
-
 /usr/include/x86_64-linux-gnu/bits/select.h:
 
 /usr/include/x86_64-linux-gnu/bits/long-double.h:
@@ -631,6 +629,8 @@ rosidl_generator_c/custom_message/msg/detail/state__type_support.h:
 /usr/include/x86_64-linux-gnu/bits/byteswap.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
+
+rosidl_generator_c/custom_message/msg/detail/full_state__type_support.h:
 
 /usr/include/x86_64-linux-gnu/sys/cdefs.h:
 

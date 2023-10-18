@@ -10,6 +10,9 @@
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__functions.h
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__struct.h
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__type_support.h
+/home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/multi_control__functions.h
+/home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/multi_control__struct.h
+/home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/multi_control__type_support.h
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/multi_state__functions.h
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/multi_state__struct.h
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/multi_state__type_support.h
@@ -23,6 +26,7 @@
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/state__struct.h
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/state__type_support.h
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/full_state.h
+/home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/multi_control.h
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/multi_state.h
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/multiple_paths.h
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/path.h
@@ -33,6 +37,7 @@
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/control_inputs__rosidl_typesupport_fastrtps_c.h
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/coordinate__rosidl_typesupport_fastrtps_c.h
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__rosidl_typesupport_fastrtps_c.h
+/home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/multi_control__rosidl_typesupport_fastrtps_c.h
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/multi_state__rosidl_typesupport_fastrtps_c.h
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/multiple_paths__rosidl_typesupport_fastrtps_c.h
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/path__rosidl_typesupport_fastrtps_c.h
@@ -41,6 +46,7 @@
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/control_inputs__rosidl_typesupport_introspection_c.h
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/coordinate__rosidl_typesupport_introspection_c.h
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__rosidl_typesupport_introspection_c.h
+/home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/multi_control__rosidl_typesupport_introspection_c.h
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/multi_state__rosidl_typesupport_introspection_c.h
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/multiple_paths__rosidl_typesupport_introspection_c.h
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/path__rosidl_typesupport_introspection_c.h
@@ -57,6 +63,9 @@
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__builder.hpp
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__struct.hpp
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__traits.hpp
+/home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/multi_control__builder.hpp
+/home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/multi_control__struct.hpp
+/home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/multi_control__traits.hpp
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/multi_state__builder.hpp
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/multi_state__struct.hpp
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/multi_state__traits.hpp
@@ -70,6 +79,7 @@
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/state__struct.hpp
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/state__traits.hpp
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/full_state.hpp
+/home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/multi_control.hpp
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/multi_state.hpp
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/multiple_paths.hpp
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/path.hpp
@@ -77,6 +87,7 @@
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/control_inputs__rosidl_typesupport_fastrtps_cpp.hpp
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/coordinate__rosidl_typesupport_fastrtps_cpp.hpp
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__rosidl_typesupport_fastrtps_cpp.hpp
+/home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/multi_control__rosidl_typesupport_fastrtps_cpp.hpp
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/multi_state__rosidl_typesupport_fastrtps_cpp.hpp
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/multiple_paths__rosidl_typesupport_fastrtps_cpp.hpp
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/path__rosidl_typesupport_fastrtps_cpp.hpp
@@ -85,6 +96,7 @@
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/control_inputs__rosidl_typesupport_introspection_cpp.hpp
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/coordinate__rosidl_typesupport_introspection_cpp.hpp
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/full_state__rosidl_typesupport_introspection_cpp.hpp
+/home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/multi_control__rosidl_typesupport_introspection_cpp.hpp
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/multi_state__rosidl_typesupport_introspection_cpp.hpp
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/multiple_paths__rosidl_typesupport_introspection_cpp.hpp
 /home/giacomo/thesis_ws/install/custom_message/include/custom_message/custom_message/msg/detail/path__rosidl_typesupport_introspection_cpp.hpp
@@ -110,6 +122,8 @@
 /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_coordinate_s.c
 /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_full_state.py
 /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_full_state_s.c
+/home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_multi_control.py
+/home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_multi_control_s.c
 /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_multi_state.py
 /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_multi_state_s.c
 /home/giacomo/thesis_ws/install/custom_message/local/lib/python3.10/dist-packages/custom_message/msg/_multiple_paths.py
@@ -128,6 +142,7 @@
 /home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/Coordinate.idl
 /home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/MultiplePaths.idl
 /home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/MultiState.idl
+/home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/MultiControl.idl
 /home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/ControlInputs.msg
 /home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/State.msg
 /home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/FullState.msg
@@ -135,6 +150,7 @@
 /home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/Coordinate.msg
 /home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/MultiplePaths.msg
 /home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/MultiState.msg
+/home/giacomo/thesis_ws/install/custom_message/share/custom_message/msg/MultiControl.msg
 /home/giacomo/thesis_ws/install/custom_message/share/ament_index/resource_index/package_run_dependencies/custom_message
 /home/giacomo/thesis_ws/install/custom_message/share/ament_index/resource_index/parent_prefix_path/custom_message
 /home/giacomo/thesis_ws/install/custom_message/share/custom_message/environment/ament_prefix_path.sh

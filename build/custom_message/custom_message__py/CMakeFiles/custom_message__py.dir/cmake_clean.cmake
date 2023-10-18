@@ -9,6 +9,8 @@ file(REMOVE_RECURSE
   "../rosidl_generator_py/custom_message/msg/_coordinate_s.c"
   "../rosidl_generator_py/custom_message/msg/_full_state.py"
   "../rosidl_generator_py/custom_message/msg/_full_state_s.c"
+  "../rosidl_generator_py/custom_message/msg/_multi_control.py"
+  "../rosidl_generator_py/custom_message/msg/_multi_control_s.c"
   "../rosidl_generator_py/custom_message/msg/_multi_state.py"
   "../rosidl_generator_py/custom_message/msg/_multi_state_s.c"
   "../rosidl_generator_py/custom_message/msg/_multiple_paths.py"

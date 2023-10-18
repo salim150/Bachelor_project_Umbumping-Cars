@@ -222,4 +222,7 @@ CMakeFiles/custom_message__rosidl_typesupport_fastrtps_c__pyext.dir/rosidl_gener
  /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/multiple_paths__functions.h \
  /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/multi_state__type_support.h \
  /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/multi_state__struct.h \
- /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/multi_state__functions.h
+ /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/multi_state__functions.h \
+ /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/multi_control__type_support.h \
+ /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/multi_control__struct.h \
+ /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/multi_control__functions.h

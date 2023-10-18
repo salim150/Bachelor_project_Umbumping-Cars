@@ -795,7 +795,7 @@ CMakeFiles/custom_message__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/cus
   /usr/include/c++/11/stdexcept \
   /opt/ros/humble/include/rosidl_runtime_cpp/rosidl_runtime_cpp/message_initialization.hpp \
   /opt/ros/humble/include/rosidl_runtime_c/rosidl_runtime_c/message_initialization.h \
-  rosidl_generator_cpp/custom_message/msg/detail/state__struct.hpp \
+  rosidl_generator_cpp/custom_message/msg/detail/full_state__struct.hpp \
   /opt/ros/humble/include/rosidl_typesupport_cpp/rosidl_typesupport_cpp/identifier.hpp \
   /opt/ros/humble/include/rosidl_typesupport_cpp/rosidl_typesupport_cpp/visibility_control.h \
   /opt/ros/humble/include/rosidl_runtime_cpp/rosidl_typesupport_cpp/message_type_support.hpp \
@@ -1406,6 +1406,8 @@ CMakeFiles/custom_message__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/cus
   /opt/ros/humble/include/rosidl_typesupport_cpp/rosidl_typesupport_cpp/message_type_support_dispatch.hpp
 
 
+rosidl_generator_cpp/custom_message/msg/detail/state__struct.hpp:
+
 rosidl_typesupport_cpp/custom_message/msg/state__type_support.cpp:
 
 rosidl_typesupport_cpp/custom_message/msg/path__type_support.cpp:
@@ -1415,8 +1417,6 @@ rosidl_generator_cpp/custom_message/msg/detail/path__struct.hpp:
 rosidl_generator_cpp/custom_message/msg/detail/multiple_paths__struct.hpp:
 
 rosidl_typesupport_cpp/custom_message/msg/multiple_paths__type_support.cpp:
-
-rosidl_generator_cpp/custom_message/msg/detail/state__struct.hpp:
 
 rosidl_typesupport_cpp/custom_message/msg/multi_state__type_support.cpp:
 

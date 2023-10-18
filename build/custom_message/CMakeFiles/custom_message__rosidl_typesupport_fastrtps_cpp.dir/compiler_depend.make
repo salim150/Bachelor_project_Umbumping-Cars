@@ -925,7 +925,7 @@ CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesuppor
   /usr/include/c++/11/stdexcept \
   /opt/ros/humble/include/rosidl_runtime_cpp/rosidl_runtime_cpp/message_initialization.hpp \
   /opt/ros/humble/include/rosidl_runtime_c/rosidl_runtime_c/message_initialization.h \
-  rosidl_generator_cpp/custom_message/msg/detail/state__struct.hpp \
+  rosidl_generator_cpp/custom_message/msg/detail/full_state__struct.hpp \
   /opt/ros/humble/include/fastcdr/fastcdr/Cdr.h \
   /opt/ros/humble/include/fastcdr/fastcdr/fastcdr_dll.h \
   /opt/ros/humble/include/fastcdr/fastcdr/config.h \
@@ -1707,9 +1707,9 @@ CMakeFiles/custom_message__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesuppor
   /opt/ros/humble/include/rosidl_typesupport_fastrtps_cpp/rosidl_typesupport_fastrtps_cpp/wstring_conversion.hpp
 
 
-rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/state__rosidl_typesupport_fastrtps_cpp.hpp:
+rosidl_generator_cpp/custom_message/msg/detail/state__struct.hpp:
 
-rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/state__type_support.cpp:
+rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/state__rosidl_typesupport_fastrtps_cpp.hpp:
 
 /usr/include/x86_64-linux-gnu/bits/types/FILE.h:
 
@@ -2211,8 +2211,6 @@ rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/full_state__rosidl_typ
 
 rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/multi_state__type_support.cpp:
 
-rosidl_generator_cpp/custom_message/msg/detail/state__struct.hpp:
-
 rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/multiple_paths__type_support.cpp:
 
 rosidl_generator_cpp/custom_message/msg/detail/multiple_paths__struct.hpp:
@@ -2224,3 +2222,5 @@ rosidl_generator_cpp/custom_message/msg/detail/multiple_paths__struct.hpp:
 rosidl_generator_cpp/custom_message/msg/detail/path__struct.hpp:
 
 rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/path__rosidl_typesupport_fastrtps_cpp.hpp:
+
+rosidl_typesupport_fastrtps_cpp/custom_message/msg/detail/dds_fastrtps/state__type_support.cpp:

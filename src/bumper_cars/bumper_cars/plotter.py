@@ -4,7 +4,7 @@ import rclpy
 from rclpy.node import Node
 import math
 from matplotlib import pyplot as plt
-from custom_message.msg import ControlInputs, State, FullState, Path, MultiplePaths
+from custom_message.msg import ControlInputs, State, FullState, Path, MultiplePaths, MultiState
 import message_filters
 import numpy as np
 import random
@@ -29,10 +29,12 @@ class Plotter(Node):
     def __init__(self):
         super().__init__("plotter")
         
-        state1_subscriber = message_filters.Subscriber(self, FullState, "/robot1_fullstate")
+        """state1_subscriber = message_filters.Subscriber(self, FullState, "/robot1_fullstate")
         state2_subscriber = message_filters.Subscriber(self, FullState, "/robot2_fullstate")
         state3_subscriber = message_filters.Subscriber(self, FullState, "/robot3_fullstate")
-        state4_subscriber = message_filters.Subscriber(self, FullState, "/robot4_fullstate")
+        state4_subscriber = message_filters.Subscriber(self, FullState, "/robot4_fullstate")"""
+
+        multi_state_sub = message_filters.Subscriber(self, MultiState, "/multi_fullstate")
 
         if debug:
             self.path_sub = message_filters.Subscriber(self, Path, "/robot2_path")
@@ -47,12 +49,17 @@ class Plotter(Node):
         self.width = 100
         self.heigth = 100
 
-        ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber, state3_subscriber, state4_subscriber, self.multi_path_sub], 10, 1, allow_headerless=True)
+        ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub, self.multi_path_sub], 10, 1, allow_headerless=True)
         ts.registerCallback(self.plotter_callback)
         
         self.get_logger().info("Plotter has been started")
 
-    def plotter_callback(self, state1: FullState, state2: FullState, state3: FullState, state4: FullState, multi_traj: MultiplePaths, path = None):
+    def plotter_callback(self, multi_state: MultiState, multi_traj: MultiplePaths, path = None):
+
+        state1 = multi_state.multiple_state[0]
+        state2 = multi_state.multiple_state[1]
+        state3 = multi_state.multiple_state[2]
+        state4 = multi_state.multiple_state[3]
     
         self.state1_buf = np.vstack((self.state1_buf, [state1.x, state1.y]))
         self.state2_buf = np.vstack((self.state2_buf, [state2.x, state2.y]))

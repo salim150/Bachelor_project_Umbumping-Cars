@@ -901,11 +901,11 @@ CMakeFiles/custom_message__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_
   /usr/include/c++/11/bits/istream.tcc \
   /usr/include/malloc.h \
   rosidl_generator_c/custom_message/msg/detail/multi_state__struct.h \
-  rosidl_generator_c/custom_message/msg/detail/state__struct.h \
+  rosidl_generator_c/custom_message/msg/detail/full_state__struct.h \
   rosidl_generator_c/custom_message/msg/detail/multi_state__functions.h \
   /usr/include/c++/11/stdlib.h \
   rosidl_generator_c/custom_message/msg/rosidl_generator_c__visibility_control.h \
-  rosidl_generator_c/custom_message/msg/detail/state__functions.h
+  rosidl_generator_c/custom_message/msg/detail/full_state__functions.h
 
 CMakeFiles/custom_message__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/custom_message/msg/detail/multiple_paths__type_support_c.cpp.o: rosidl_typesupport_fastrtps_c/custom_message/msg/detail/multiple_paths__type_support_c.cpp \
   /usr/include/stdc-predef.h \

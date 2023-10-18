@@ -138,7 +138,7 @@ CMakeFiles/custom_message__rosidl_typesupport_c.dir/rosidl_typesupport_c/custom_
   /usr/include/x86_64-linux-gnu/bits/wchar.h \
   /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
   /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
-  rosidl_generator_c/custom_message/msg/detail/state__struct.h \
+  rosidl_generator_c/custom_message/msg/detail/full_state__struct.h \
   rosidl_generator_c/custom_message/msg/detail/multi_state__type_support.h \
   rosidl_generator_c/custom_message/msg/rosidl_generator_c__visibility_control.h \
   /opt/ros/humble/include/rosidl_typesupport_c/rosidl_typesupport_c/identifier.h \
