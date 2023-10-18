@@ -19,7 +19,7 @@ class Config:
         self.robot_length = 2.9  # [m] for collision check
         # obstacles [x(m) y(m), ....]
 
-        self.trail_length = 30
+        self.trail_length = 15
 
 config = Config()
 debug = False
@@ -34,7 +34,8 @@ class Plotter(Node):
         state3_subscriber = message_filters.Subscriber(self, FullState, "/robot3_fullstate")
         state4_subscriber = message_filters.Subscriber(self, FullState, "/robot4_fullstate")
 
-        self.path_sub = message_filters.Subscriber(self, Path, "/robot2_path")
+        if debug:
+            self.path_sub = message_filters.Subscriber(self, Path, "/robot2_path")
 
         self.multi_path_sub = message_filters.Subscriber(self, MultiplePaths, "/robot_multi_traj")
 
@@ -46,12 +47,12 @@ class Plotter(Node):
         self.width = 100
         self.heigth = 100
 
-        ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber, state3_subscriber, state4_subscriber, self.path_sub, self.multi_path_sub], 10, 1, allow_headerless=True)
+        ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber, state3_subscriber, state4_subscriber, self.multi_path_sub], 10, 1, allow_headerless=True)
         ts.registerCallback(self.plotter_callback)
         
         self.get_logger().info("Plotter has been started")
 
-    def plotter_callback(self, state1: FullState, state2: FullState, state3: FullState, state4: FullState, path: Path, multi_traj: MultiplePaths):
+    def plotter_callback(self, state1: FullState, state2: FullState, state3: FullState, state4: FullState, multi_traj: MultiplePaths, path = None):
     
         self.state1_buf = np.vstack((self.state1_buf, [state1.x, state1.y]))
         self.state2_buf = np.vstack((self.state2_buf, [state2.x, state2.y]))
@@ -73,7 +74,8 @@ class Plotter(Node):
             'key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
         self.plot_map()
-        self.plot_path(path)
+        if debug:
+           self.plot_path(path)
 
         self.plot_situation(state1, multi_traj.multiple_path[0], self.state1_buf)
         self.plot_situation(state2, multi_traj.multiple_path[1], self.state2_buf)

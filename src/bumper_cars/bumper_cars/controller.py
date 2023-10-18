@@ -65,7 +65,10 @@ class Controller(Node):
         self.control3_publisher_ = self.create_publisher(ControlInputs, "/robot3_control", 20)
         self.control4_publisher_ = self.create_publisher(ControlInputs, "/robot4_control", 20)
 
-        self.path_pub = self.create_publisher(Path, "/robot2_path", 2)
+        if debug:
+            self.path_pub = self.create_publisher(Path, "/robot2_path", 2)
+            self.path_pub.publish(Path(path=self.path2))
+
         self.multi_path_pub = self.create_publisher(MultiplePaths, "/robot_multi_traj", 2)
         multi_state_sub = message_filters.Subscriber(self, MultiState, "/robot_multi_state")
 
@@ -77,9 +80,7 @@ class Controller(Node):
         self.control2_publisher_.publish(ControlInputs(delta=0.0, throttle=0.0))
         self.control3_publisher_.publish(ControlInputs(delta=0.0, throttle=0.0))
         self.control4_publisher_.publish(ControlInputs(delta=0.0, throttle=0.0))
-
-        self.path_pub.publish(Path(path=self.path2))
-
+     
         # CBF
         self.uni_barrier_cert = create_unicycle_barrier_certificate_with_boundary()
 
@@ -127,12 +128,11 @@ class Controller(Node):
         self.control4_publisher_.publish(cmd4)
 
         multi_path = MultiplePaths(multiple_path=[Path(path=self.trajectory1), Path(path=self.trajectory2), Path(path=self.trajectory3), Path(path=self.trajectory4)])
-        self.multi_path_pub.publish(multi_path)
-
-        self.path_pub.publish(Path(path=self.path2))
+        self.multi_path_pub.publish(multi_path)     
         
         if debug:
             self.get_logger().info(f'Commands after: cmd1: {cmd1}, cmd2: {cmd2}')
+            self.path_pub.publish(Path(path=self.path2))
 
     def control_callback(self, pose: State, target, path, trajectory):
         # updating target waypoint and predicting new traj
