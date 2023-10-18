@@ -52,17 +52,18 @@ class CarModel(Node):
         self.initial_state1 = State(x=self.x0, y=self.y0, yaw=self.yaw, v=self.v, omega=self.omega)
 
         # Initializing the state publishers/subscribers
-        self.state1_publisher_ = self.create_publisher(State, "/robot_state", 20)
+        #self.state1_publisher_ = self.create_publisher(State, "/robot_state", 20)
         self.control_sub = self.create_subscription(ControlInputs, '/robot_control', self.general_model_callback, 10)
         self.fullstate1_publisher_ = self.create_publisher(FullState, "robot_fullstate", 60)
 
         self.old_time1 = time.time()
 
-        self.state1_publisher_.publish(self.initial_state1)
+        #self.state1_publisher_.publish(self.initial_state1)
         self.get_logger().info("Robots model initialized correctly")
 
         self.timer = self.create_timer(0.1, self.timer_callback)
-        self.fullstate1 = FullState(x=0.0, y=0.0, yaw=0.0, v=0.0, omega=0.0, delta=0.0, throttle=0.0)
+        self.fullstate1 = FullState(x=self.initial_state1.x, y=self.initial_state1.y, yaw=self.initial_state1.yaw, v=self.initial_state1.v,
+                                     omega=self.initial_state1.omega, delta=0.0, throttle=0.0)
 
     def general_model_callback(self, control1: ControlInputs):
 
@@ -119,7 +120,7 @@ class CarModel(Node):
         return state, time.time()
     
     def timer_callback(self):
-        self.state1_publisher_.publish(self.initial_state1)
+        #self.state1_publisher_.publish(self.initial_state1)
         self.fullstate1_publisher_.publish(self.fullstate1)
 
     def normalize_angle(self, angle):

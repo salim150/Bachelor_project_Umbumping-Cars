@@ -42,9 +42,9 @@ class Metaclass_MultiState(type):
             cls._TYPE_SUPPORT = module.type_support_msg__msg__multi_state
             cls._DESTROY_ROS_MESSAGE = module.destroy_ros_message_msg__msg__multi_state
 
-            from custom_message.msg import State
-            if State.__class__._TYPE_SUPPORT is None:
-                State.__class__.__import_type_support__()
+            from custom_message.msg import FullState
+            if FullState.__class__._TYPE_SUPPORT is None:
+                FullState.__class__.__import_type_support__()
 
     @classmethod
     def __prepare__(cls, name, bases, **kwargs):
@@ -63,11 +63,11 @@ class MultiState(metaclass=Metaclass_MultiState):
     ]
 
     _fields_and_field_types = {
-        'multiple_state': 'sequence<custom_message/State>',
+        'multiple_state': 'sequence<custom_message/FullState>',
     }
 
     SLOT_TYPES = (
-        rosidl_parser.definition.UnboundedSequence(rosidl_parser.definition.NamespacedType(['custom_message', 'msg'], 'State')),  # noqa: E501
+        rosidl_parser.definition.UnboundedSequence(rosidl_parser.definition.NamespacedType(['custom_message', 'msg'], 'FullState')),  # noqa: E501
     )
 
     def __init__(self, **kwargs):
@@ -122,7 +122,7 @@ class MultiState(metaclass=Metaclass_MultiState):
     @multiple_state.setter
     def multiple_state(self, value):
         if __debug__:
-            from custom_message.msg import State
+            from custom_message.msg import FullState
             from collections.abc import Sequence
             from collections.abc import Set
             from collections import UserList
@@ -133,7 +133,7 @@ class MultiState(metaclass=Metaclass_MultiState):
                   isinstance(value, UserList)) and
                  not isinstance(value, str) and
                  not isinstance(value, UserString) and
-                 all(isinstance(v, State) for v in value) and
+                 all(isinstance(v, FullState) for v in value) and
                  True), \
-                "The 'multiple_state' field must be a set or sequence and each value of type 'State'"
+                "The 'multiple_state' field must be a set or sequence and each value of type 'FullState'"
         self._multiple_state = value

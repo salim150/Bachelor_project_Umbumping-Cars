@@ -1,1 +1,1 @@
-custom_message/State[] multiple_state
+custom_message/FullState[] multiple_state

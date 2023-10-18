@@ -14,9 +14,9 @@
 
 // Include directives for member types
 // Member `multiple_state`
-#include "custom_message/msg/state.h"
+#include "custom_message/msg/full_state.h"
 // Member `multiple_state`
-#include "custom_message/msg/detail/state__rosidl_typesupport_introspection_c.h"
+#include "custom_message/msg/detail/full_state__rosidl_typesupport_introspection_c.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -40,56 +40,56 @@ void custom_message__msg__MultiState__rosidl_typesupport_introspection_c__MultiS
 size_t custom_message__msg__MultiState__rosidl_typesupport_introspection_c__size_function__MultiState__multiple_state(
   const void * untyped_member)
 {
-  const custom_message__msg__State__Sequence * member =
-    (const custom_message__msg__State__Sequence *)(untyped_member);
+  const custom_message__msg__FullState__Sequence * member =
+    (const custom_message__msg__FullState__Sequence *)(untyped_member);
   return member->size;
 }
 
 const void * custom_message__msg__MultiState__rosidl_typesupport_introspection_c__get_const_function__MultiState__multiple_state(
   const void * untyped_member, size_t index)
 {
-  const custom_message__msg__State__Sequence * member =
-    (const custom_message__msg__State__Sequence *)(untyped_member);
+  const custom_message__msg__FullState__Sequence * member =
+    (const custom_message__msg__FullState__Sequence *)(untyped_member);
   return &member->data[index];
 }
 
 void * custom_message__msg__MultiState__rosidl_typesupport_introspection_c__get_function__MultiState__multiple_state(
   void * untyped_member, size_t index)
 {
-  custom_message__msg__State__Sequence * member =
-    (custom_message__msg__State__Sequence *)(untyped_member);
+  custom_message__msg__FullState__Sequence * member =
+    (custom_message__msg__FullState__Sequence *)(untyped_member);
   return &member->data[index];
 }
 
 void custom_message__msg__MultiState__rosidl_typesupport_introspection_c__fetch_function__MultiState__multiple_state(
   const void * untyped_member, size_t index, void * untyped_value)
 {
-  const custom_message__msg__State * item =
-    ((const custom_message__msg__State *)
+  const custom_message__msg__FullState * item =
+    ((const custom_message__msg__FullState *)
     custom_message__msg__MultiState__rosidl_typesupport_introspection_c__get_const_function__MultiState__multiple_state(untyped_member, index));
-  custom_message__msg__State * value =
-    (custom_message__msg__State *)(untyped_value);
+  custom_message__msg__FullState * value =
+    (custom_message__msg__FullState *)(untyped_value);
   *value = *item;
 }
 
 void custom_message__msg__MultiState__rosidl_typesupport_introspection_c__assign_function__MultiState__multiple_state(
   void * untyped_member, size_t index, const void * untyped_value)
 {
-  custom_message__msg__State * item =
-    ((custom_message__msg__State *)
+  custom_message__msg__FullState * item =
+    ((custom_message__msg__FullState *)
     custom_message__msg__MultiState__rosidl_typesupport_introspection_c__get_function__MultiState__multiple_state(untyped_member, index));
-  const custom_message__msg__State * value =
-    (const custom_message__msg__State *)(untyped_value);
+  const custom_message__msg__FullState * value =
+    (const custom_message__msg__FullState *)(untyped_value);
   *item = *value;
 }
 
 bool custom_message__msg__MultiState__rosidl_typesupport_introspection_c__resize_function__MultiState__multiple_state(
   void * untyped_member, size_t size)
 {
-  custom_message__msg__State__Sequence * member =
-    (custom_message__msg__State__Sequence *)(untyped_member);
-  custom_message__msg__State__Sequence__fini(member);
-  return custom_message__msg__State__Sequence__init(member, size);
+  custom_message__msg__FullState__Sequence * member =
+    (custom_message__msg__FullState__Sequence *)(untyped_member);
+  custom_message__msg__FullState__Sequence__fini(member);
+  return custom_message__msg__FullState__Sequence__init(member, size);
 }
 
 static rosidl_typesupport_introspection_c__MessageMember custom_message__msg__MultiState__rosidl_typesupport_introspection_c__MultiState_message_member_array[1] = {
@@ -134,7 +134,7 @@ ROSIDL_TYPESUPPORT_INTROSPECTION_C_EXPORT_custom_message
 const rosidl_message_type_support_t *
 ROSIDL_TYPESUPPORT_INTERFACE__MESSAGE_SYMBOL_NAME(rosidl_typesupport_introspection_c, custom_message, msg, MultiState)() {
   custom_message__msg__MultiState__rosidl_typesupport_introspection_c__MultiState_message_member_array[0].members_ =
-    ROSIDL_TYPESUPPORT_INTERFACE__MESSAGE_SYMBOL_NAME(rosidl_typesupport_introspection_c, custom_message, msg, State)();
+    ROSIDL_TYPESUPPORT_INTERFACE__MESSAGE_SYMBOL_NAME(rosidl_typesupport_introspection_c, custom_message, msg, FullState)();
   if (!custom_message__msg__MultiState__rosidl_typesupport_introspection_c__MultiState_message_type_support_handle.typesupport_identifier) {
     custom_message__msg__MultiState__rosidl_typesupport_introspection_c__MultiState_message_type_support_handle.typesupport_identifier =
       rosidl_typesupport_introspection_c__identifier;

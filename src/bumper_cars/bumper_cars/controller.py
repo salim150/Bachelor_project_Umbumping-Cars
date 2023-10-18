@@ -134,7 +134,7 @@ class Controller(Node):
             self.get_logger().info(f'Commands after: cmd1: {cmd1}, cmd2: {cmd2}')
             self.path_pub.publish(Path(path=self.path2))
 
-    def control_callback(self, pose: State, target, path, trajectory):
+    def control_callback(self, pose: FullState, target, path, trajectory):
         # updating target waypoint and predicting new traj
         if self.dist(point1=(pose.x, pose.y), point2=target) < Lf:
             path = self.update_path(path)

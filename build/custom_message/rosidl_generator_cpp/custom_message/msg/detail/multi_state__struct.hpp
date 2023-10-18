@@ -17,7 +17,7 @@
 
 // Include directives for member types
 // Member 'multiple_state'
-#include "custom_message/msg/detail/state__struct.hpp"
+#include "custom_message/msg/detail/full_state__struct.hpp"
 
 #ifndef _WIN32
 # define DEPRECATED__custom_message__msg__MultiState __attribute__((deprecated))
@@ -50,12 +50,12 @@ struct MultiState_
 
   // field types and members
   using _multiple_state_type =
-    std::vector<custom_message::msg::State_<ContainerAllocator>, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<custom_message::msg::State_<ContainerAllocator>>>;
+    std::vector<custom_message::msg::FullState_<ContainerAllocator>, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<custom_message::msg::FullState_<ContainerAllocator>>>;
   _multiple_state_type multiple_state;
 
   // setters for named parameter idiom
   Type & set__multiple_state(
-    const std::vector<custom_message::msg::State_<ContainerAllocator>, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<custom_message::msg::State_<ContainerAllocator>>> & _arg)
+    const std::vector<custom_message::msg::FullState_<ContainerAllocator>, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<custom_message::msg::FullState_<ContainerAllocator>>> & _arg)
   {
     this->multiple_state = _arg;
     return *this;

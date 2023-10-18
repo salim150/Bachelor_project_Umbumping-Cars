@@ -57,8 +57,8 @@ CMakeFiles/custom_message__rosidl_typesupport_introspection_c.dir/rosidl_typesup
  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
  /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/rosidl_generator_c__visibility_control.h \
  /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/multi_state__struct.h \
- /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/state__struct.h \
- /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/state.h \
- /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/state__functions.h \
- /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/state__type_support.h \
- /home/giacomo/thesis_ws/build/custom_message/rosidl_typesupport_introspection_c/custom_message/msg/detail/state__rosidl_typesupport_introspection_c.h
+ /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/full_state__struct.h \
+ /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/full_state.h \
+ /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/full_state__functions.h \
+ /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/full_state__type_support.h \
+ /home/giacomo/thesis_ws/build/custom_message/rosidl_typesupport_introspection_c/custom_message/msg/detail/full_state__rosidl_typesupport_introspection_c.h

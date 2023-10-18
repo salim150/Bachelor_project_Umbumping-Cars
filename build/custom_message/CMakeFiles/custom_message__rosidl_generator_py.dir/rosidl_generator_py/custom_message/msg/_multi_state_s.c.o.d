@@ -208,9 +208,9 @@ CMakeFiles/custom_message__rosidl_generator_py.dir/rosidl_generator_py/custom_me
  /usr/include/python3.10/numpy/__multiarray_api.h \
  /opt/ros/humble/include/rosidl_runtime_c/rosidl_runtime_c/visibility_control.h \
  /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/multi_state__struct.h \
- /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/state__struct.h \
+ /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/full_state__struct.h \
  /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/multi_state__functions.h \
  /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/rosidl_generator_c__visibility_control.h \
  /opt/ros/humble/include/rosidl_runtime_c/rosidl_runtime_c/primitives_sequence.h \
  /opt/ros/humble/include/rosidl_runtime_c/rosidl_runtime_c/primitives_sequence_functions.h \
- /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/state__functions.h
+ /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/full_state__functions.h

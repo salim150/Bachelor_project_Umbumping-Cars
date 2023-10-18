@@ -8,6 +8,7 @@ custom_message/msg/__init__.py
 custom_message/msg/_control_inputs.py
 custom_message/msg/_coordinate.py
 custom_message/msg/_full_state.py
+custom_message/msg/_multi_state.py
 custom_message/msg/_multiple_paths.py
 custom_message/msg/_path.py
 custom_message/msg/_state.py

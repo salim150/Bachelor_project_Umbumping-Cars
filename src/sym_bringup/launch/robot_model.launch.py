@@ -10,7 +10,6 @@ def generate_launch_description():
         executable="model",
         name="robot1_model",
         remappings=[
-            ("/robot_state", "/robot1_state"),
             ("/robot_control", "/robot1_control"),
             ("/robot_fullstate", "/robot1_fullstate")
         ],
@@ -29,7 +28,6 @@ def generate_launch_description():
         executable="model",
         name="robot2_model",
         remappings=[
-            ("/robot_state", "/robot2_state"),
             ("/robot_control", "/robot2_control"),
             ("/robot_fullstate", "/robot2_fullstate")
         ],
@@ -48,7 +46,6 @@ def generate_launch_description():
         executable="model",
         name="robot3_model",
         remappings=[
-            ("/robot_state", "/robot3_state"),
             ("/robot_control", "/robot3_control"),
             ("/robot_fullstate", "/robot3_fullstate")
         ],
@@ -67,7 +64,6 @@ def generate_launch_description():
         executable="model",
         name="robot4_model",
         remappings=[
-            ("/robot_state", "/robot4_state"),
             ("/robot_control", "/robot4_control"),
             ("/robot_fullstate", "/robot4_fullstate")
         ],

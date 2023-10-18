@@ -2,12 +2,12 @@
 // with input from custom_message/msg/MultiState.msg
 // generated code does not contain a copyright notice
 
-#include "custom_message/msg/State.idl"
+#include "custom_message/msg/FullState.idl"
 
 module custom_message {
   module msg {
     struct MultiState {
-      sequence<custom_message::msg::State> multiple_state;
+      sequence<custom_message::msg::FullState> multiple_state;
     };
   };
 };

@@ -13,7 +13,7 @@
 
 // Include directives for member types
 // Member `multiple_state`
-#include "custom_message/msg/detail/state__functions.h"
+#include "custom_message/msg/detail/full_state__functions.h"
 
 bool
 custom_message__msg__MultiState__init(custom_message__msg__MultiState * msg)
@@ -22,7 +22,7 @@ custom_message__msg__MultiState__init(custom_message__msg__MultiState * msg)
     return false;
   }
   // multiple_state
-  if (!custom_message__msg__State__Sequence__init(&msg->multiple_state, 0)) {
+  if (!custom_message__msg__FullState__Sequence__init(&msg->multiple_state, 0)) {
     custom_message__msg__MultiState__fini(msg);
     return false;
   }
@@ -36,7 +36,7 @@ custom_message__msg__MultiState__fini(custom_message__msg__MultiState * msg)
     return;
   }
   // multiple_state
-  custom_message__msg__State__Sequence__fini(&msg->multiple_state);
+  custom_message__msg__FullState__Sequence__fini(&msg->multiple_state);
 }
 
 bool
@@ -46,7 +46,7 @@ custom_message__msg__MultiState__are_equal(const custom_message__msg__MultiState
     return false;
   }
   // multiple_state
-  if (!custom_message__msg__State__Sequence__are_equal(
+  if (!custom_message__msg__FullState__Sequence__are_equal(
       &(lhs->multiple_state), &(rhs->multiple_state)))
   {
     return false;
@@ -63,7 +63,7 @@ custom_message__msg__MultiState__copy(
     return false;
   }
   // multiple_state
-  if (!custom_message__msg__State__Sequence__copy(
+  if (!custom_message__msg__FullState__Sequence__copy(
       &(input->multiple_state), &(output->multiple_state)))
   {
     return false;
