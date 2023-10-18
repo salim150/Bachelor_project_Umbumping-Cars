@@ -74,12 +74,16 @@ custom_message__py/CMakeFiles/custom_message__py: rosidl_generator_py/custom_mes
 custom_message__py/CMakeFiles/custom_message__py: rosidl_generator_py/custom_message/msg/_full_state.py
 custom_message__py/CMakeFiles/custom_message__py: rosidl_generator_py/custom_message/msg/_path.py
 custom_message__py/CMakeFiles/custom_message__py: rosidl_generator_py/custom_message/msg/_coordinate.py
+custom_message__py/CMakeFiles/custom_message__py: rosidl_generator_py/custom_message/msg/_multiple_paths.py
+custom_message__py/CMakeFiles/custom_message__py: rosidl_generator_py/custom_message/msg/_multi_state.py
 custom_message__py/CMakeFiles/custom_message__py: rosidl_generator_py/custom_message/msg/__init__.py
 custom_message__py/CMakeFiles/custom_message__py: rosidl_generator_py/custom_message/msg/_control_inputs_s.c
 custom_message__py/CMakeFiles/custom_message__py: rosidl_generator_py/custom_message/msg/_state_s.c
 custom_message__py/CMakeFiles/custom_message__py: rosidl_generator_py/custom_message/msg/_full_state_s.c
 custom_message__py/CMakeFiles/custom_message__py: rosidl_generator_py/custom_message/msg/_path_s.c
 custom_message__py/CMakeFiles/custom_message__py: rosidl_generator_py/custom_message/msg/_coordinate_s.c
+custom_message__py/CMakeFiles/custom_message__py: rosidl_generator_py/custom_message/msg/_multiple_paths_s.c
+custom_message__py/CMakeFiles/custom_message__py: rosidl_generator_py/custom_message/msg/_multi_state_s.c
 
 rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_fastrtps_c.c: /opt/ros/humble/lib/rosidl_generator_py/rosidl_generator_py
 rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_fastrtps_c.c: /opt/ros/humble/local/lib/python3.10/dist-packages/rosidl_generator_py/__init__.py
@@ -99,6 +103,8 @@ rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_fastr
 rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_fastrtps_c.c: rosidl_adapter/custom_message/msg/FullState.idl
 rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_fastrtps_c.c: rosidl_adapter/custom_message/msg/Path.idl
 rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_fastrtps_c.c: rosidl_adapter/custom_message/msg/Coordinate.idl
+rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_fastrtps_c.c: rosidl_adapter/custom_message/msg/MultiplePaths.idl
+rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_fastrtps_c.c: rosidl_adapter/custom_message/msg/MultiState.idl
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/giacomo/thesis_ws/build/custom_message/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating Python code for ROS interfaces"
 	cd /home/giacomo/thesis_ws/build/custom_message/custom_message__py && /usr/bin/python3 /opt/ros/humble/share/rosidl_generator_py/cmake/../../../lib/rosidl_generator_py/rosidl_generator_py --generator-arguments-file /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_py__arguments.json --typesupport-impls "rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c;rosidl_typesupport_c"
 
@@ -123,6 +129,12 @@ rosidl_generator_py/custom_message/msg/_path.py: rosidl_generator_py/custom_mess
 rosidl_generator_py/custom_message/msg/_coordinate.py: rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_fastrtps_c.c
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_py/custom_message/msg/_coordinate.py
 
+rosidl_generator_py/custom_message/msg/_multiple_paths.py: rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_fastrtps_c.c
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_py/custom_message/msg/_multiple_paths.py
+
+rosidl_generator_py/custom_message/msg/_multi_state.py: rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_fastrtps_c.c
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_py/custom_message/msg/_multi_state.py
+
 rosidl_generator_py/custom_message/msg/__init__.py: rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_fastrtps_c.c
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_py/custom_message/msg/__init__.py
 
@@ -141,6 +153,12 @@ rosidl_generator_py/custom_message/msg/_path_s.c: rosidl_generator_py/custom_mes
 rosidl_generator_py/custom_message/msg/_coordinate_s.c: rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_fastrtps_c.c
 	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_py/custom_message/msg/_coordinate_s.c
 
+rosidl_generator_py/custom_message/msg/_multiple_paths_s.c: rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_fastrtps_c.c
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_py/custom_message/msg/_multiple_paths_s.c
+
+rosidl_generator_py/custom_message/msg/_multi_state_s.c: rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_fastrtps_c.c
+	@$(CMAKE_COMMAND) -E touch_nocreate rosidl_generator_py/custom_message/msg/_multi_state_s.c
+
 custom_message__py: custom_message__py/CMakeFiles/custom_message__py
 custom_message__py: rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_c.c
 custom_message__py: rosidl_generator_py/custom_message/_custom_message_s.ep.rosidl_typesupport_fastrtps_c.c
@@ -152,6 +170,10 @@ custom_message__py: rosidl_generator_py/custom_message/msg/_coordinate.py
 custom_message__py: rosidl_generator_py/custom_message/msg/_coordinate_s.c
 custom_message__py: rosidl_generator_py/custom_message/msg/_full_state.py
 custom_message__py: rosidl_generator_py/custom_message/msg/_full_state_s.c
+custom_message__py: rosidl_generator_py/custom_message/msg/_multi_state.py
+custom_message__py: rosidl_generator_py/custom_message/msg/_multi_state_s.c
+custom_message__py: rosidl_generator_py/custom_message/msg/_multiple_paths.py
+custom_message__py: rosidl_generator_py/custom_message/msg/_multiple_paths_s.c
 custom_message__py: rosidl_generator_py/custom_message/msg/_path.py
 custom_message__py: rosidl_generator_py/custom_message/msg/_path_s.c
 custom_message__py: rosidl_generator_py/custom_message/msg/_state.py

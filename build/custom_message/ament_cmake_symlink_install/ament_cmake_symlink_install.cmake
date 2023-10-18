@@ -373,6 +373,12 @@ ament_cmake_symlink_install_files("/home/giacomo/thesis_ws/src/custom_message" F
 # install(FILES "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message/msg/Coordinate.idl" "DESTINATION" "share/custom_message/msg")
 ament_cmake_symlink_install_files("/home/giacomo/thesis_ws/src/custom_message" FILES "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message/msg/Coordinate.idl" "DESTINATION" "share/custom_message/msg")
 
+# install(FILES "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message/msg/MultiplePaths.idl" "DESTINATION" "share/custom_message/msg")
+ament_cmake_symlink_install_files("/home/giacomo/thesis_ws/src/custom_message" FILES "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message/msg/MultiplePaths.idl" "DESTINATION" "share/custom_message/msg")
+
+# install(FILES "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message/msg/MultiState.idl" "DESTINATION" "share/custom_message/msg")
+ament_cmake_symlink_install_files("/home/giacomo/thesis_ws/src/custom_message" FILES "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message/msg/MultiState.idl" "DESTINATION" "share/custom_message/msg")
+
 # install(FILES "/home/giacomo/thesis_ws/src/custom_message/msg/ControlInputs.msg" "DESTINATION" "share/custom_message/msg")
 ament_cmake_symlink_install_files("/home/giacomo/thesis_ws/src/custom_message" FILES "/home/giacomo/thesis_ws/src/custom_message/msg/ControlInputs.msg" "DESTINATION" "share/custom_message/msg")
 
@@ -387,6 +393,12 @@ ament_cmake_symlink_install_files("/home/giacomo/thesis_ws/src/custom_message" F
 
 # install(FILES "/home/giacomo/thesis_ws/src/custom_message/msg/Coordinate.msg" "DESTINATION" "share/custom_message/msg")
 ament_cmake_symlink_install_files("/home/giacomo/thesis_ws/src/custom_message" FILES "/home/giacomo/thesis_ws/src/custom_message/msg/Coordinate.msg" "DESTINATION" "share/custom_message/msg")
+
+# install(FILES "/home/giacomo/thesis_ws/src/custom_message/msg/MultiplePaths.msg" "DESTINATION" "share/custom_message/msg")
+ament_cmake_symlink_install_files("/home/giacomo/thesis_ws/src/custom_message" FILES "/home/giacomo/thesis_ws/src/custom_message/msg/MultiplePaths.msg" "DESTINATION" "share/custom_message/msg")
+
+# install(FILES "/home/giacomo/thesis_ws/src/custom_message/msg/MultiState.msg" "DESTINATION" "share/custom_message/msg")
+ament_cmake_symlink_install_files("/home/giacomo/thesis_ws/src/custom_message" FILES "/home/giacomo/thesis_ws/src/custom_message/msg/MultiState.msg" "DESTINATION" "share/custom_message/msg")
 
 # install(FILES "/home/giacomo/thesis_ws/build/custom_message/ament_cmake_index/share/ament_index/resource_index/package_run_dependencies/custom_message" "DESTINATION" "share/ament_index/resource_index/package_run_dependencies")
 ament_cmake_symlink_install_files("/home/giacomo/thesis_ws/src/custom_message" FILES "/home/giacomo/thesis_ws/build/custom_message/ament_cmake_index/share/ament_index/resource_index/package_run_dependencies/custom_message" "DESTINATION" "share/ament_index/resource_index/package_run_dependencies")

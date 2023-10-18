@@ -15,6 +15,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/FullState.msg"
   "msg/Path.msg"
   "msg/Coordinate.msg"
+  "msg/MultiplePaths.msg"
+  "msg/MultiState.msg"
 )
 
 ament_export_dependencies(rosidl_default_runtime)

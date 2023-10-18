@@ -259,4 +259,7 @@ CMakeFiles/custom_message__rosidl_typesupport_fastrtps_c__pyext.dir/rosidl_gener
  /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/path__functions.h
  /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/coordinate__type_support.h
  /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/coordinate__functions.h
+ /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/multiple_paths__type_support.h
+ /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/multiple_paths__struct.h
+ /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/multiple_paths__functions.h
 

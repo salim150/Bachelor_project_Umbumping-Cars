@@ -4,6 +4,10 @@ msg/Coordinate.idl
 msg/Coordinate.msg
 msg/FullState.idl
 msg/FullState.msg
+msg/MultiState.idl
+msg/MultiState.msg
+msg/MultiplePaths.idl
+msg/MultiplePaths.msg
 msg/Path.idl
 msg/Path.msg
 msg/State.idl

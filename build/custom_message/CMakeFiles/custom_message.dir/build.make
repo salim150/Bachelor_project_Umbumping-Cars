@@ -71,6 +71,8 @@ CMakeFiles/custom_message: /home/giacomo/thesis_ws/src/custom_message/msg/State.
 CMakeFiles/custom_message: /home/giacomo/thesis_ws/src/custom_message/msg/FullState.msg
 CMakeFiles/custom_message: /home/giacomo/thesis_ws/src/custom_message/msg/Path.msg
 CMakeFiles/custom_message: /home/giacomo/thesis_ws/src/custom_message/msg/Coordinate.msg
+CMakeFiles/custom_message: /home/giacomo/thesis_ws/src/custom_message/msg/MultiplePaths.msg
+CMakeFiles/custom_message: /home/giacomo/thesis_ws/src/custom_message/msg/MultiState.msg
 
 custom_message: CMakeFiles/custom_message
 custom_message: CMakeFiles/custom_message.dir/build.make

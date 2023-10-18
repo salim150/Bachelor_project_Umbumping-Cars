@@ -4,7 +4,7 @@ import rclpy
 from rclpy.node import Node
 import math
 from matplotlib import pyplot as plt
-from custom_message.msg import ControlInputs, State, FullState, Path
+from custom_message.msg import ControlInputs, State, FullState, Path, MultiplePaths
 import message_filters
 import numpy as np
 import random
@@ -36,10 +36,7 @@ class Plotter(Node):
 
         self.path_sub = message_filters.Subscriber(self, Path, "/robot2_path")
 
-        self.trajectory_sub1 = message_filters.Subscriber(self, Path, "/robot1_trajectory")
-        self.trajectory_sub2 = message_filters.Subscriber(self, Path, "/robot2_trajectory")
-        self.trajectory_sub3 = message_filters.Subscriber(self, Path, "/robot3_trajectory")
-        self.trajectory_sub4 = message_filters.Subscriber(self, Path, "/robot4_trajectory")
+        self.multi_path_sub = message_filters.Subscriber(self, MultiplePaths, "/robot_multi_traj")
 
         self.state1_buf = np.array([0,0])
         self.state2_buf = np.array([0,0])
@@ -49,13 +46,12 @@ class Plotter(Node):
         self.width = 100
         self.heigth = 100
 
-        ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber, state3_subscriber, state4_subscriber, self.path_sub, self.trajectory_sub1,
-                                                          self.trajectory_sub2, self.trajectory_sub3, self.trajectory_sub4], 10, 1, allow_headerless=True)
+        ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber, state3_subscriber, state4_subscriber, self.path_sub, self.multi_path_sub], 10, 1, allow_headerless=True)
         ts.registerCallback(self.plotter_callback)
         
         self.get_logger().info("Plotter has been started")
 
-    def plotter_callback(self, state1: FullState, state2: FullState, state3: FullState, state4: FullState, path: Path, trajectory1: Path, trajectory2: Path, trajectory3: Path, trajectory4: Path):
+    def plotter_callback(self, state1: FullState, state2: FullState, state3: FullState, state4: FullState, path: Path, multi_traj: MultiplePaths):
     
         self.state1_buf = np.vstack((self.state1_buf, [state1.x, state1.y]))
         self.state2_buf = np.vstack((self.state2_buf, [state2.x, state2.y]))
@@ -79,30 +75,10 @@ class Plotter(Node):
         self.plot_map()
         self.plot_path(path)
 
-        self.plot_situation(state1, trajectory1, self.state1_buf)
-        self.plot_situation(state2, trajectory2, self.state2_buf)
-        self.plot_situation(state3, trajectory3, self.state3_buf)
-        self.plot_situation(state4, trajectory4, self.state4_buf)
-
-        """self.plot_path(trajectory1)
-        self.plot_path(trajectory2)
-        self.plot_path(trajectory3)
-        self.plot_path(trajectory4)
-
-        plt.scatter(self.state1_buf[:,0], self.state1_buf[:,1], marker='.', s=4)
-        plt.scatter(self.state2_buf[:,0], self.state2_buf[:,1], marker='.', s=4)
-        plt.scatter(self.state3_buf[:,0], self.state3_buf[:,1], marker='.', s=4)
-        plt.scatter(self.state4_buf[:,0], self.state4_buf[:,1], marker='.', s=4)
-
-        self.plot_robot(state1)
-        self.plot_robot(state2)
-        self.plot_robot(state3)
-        self.plot_robot(state4)
-
-        plt.plot(state1.x, state1.y, 'k.')
-        plt.plot(state2.x, state2.y, 'b.')
-        plt.plot(state3.x, state3.y, 'b.')
-        plt.plot(state4.x, state4.y, 'b.')"""
+        self.plot_situation(state1, multi_traj.multiple_path[0], self.state1_buf)
+        self.plot_situation(state2, multi_traj.multiple_path[1], self.state2_buf)
+        self.plot_situation(state3, multi_traj.multiple_path[2], self.state3_buf)
+        self.plot_situation(state4, multi_traj.multiple_path[3], self.state4_buf)
 
         plt.axis("equal")
         plt.grid(True)
@@ -179,8 +155,6 @@ class Plotter(Node):
         plt.plot(np.array(outline[0, :]).flatten(),
                     np.array(outline[1, :]).flatten(), "-k")
         
-
-
 def main(args=None):
     rclpy.init(args=args)
 

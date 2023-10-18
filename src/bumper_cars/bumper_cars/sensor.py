@@ -6,7 +6,7 @@ from turtlesim.msg import Pose
 from geometry_msgs.msg import Twist
 from turtlesim.srv import SetPen
 from functools import partial
-from custom_message.msg import ControlInputs, State
+from custom_message.msg import ControlInputs, State, MultiState
 import message_filters
 
 debug = False
@@ -16,10 +16,7 @@ class SensorMeasurement(Node):
     def __init__(self):
         super().__init__("sensor")
 
-        self.measurement1_publisher_ = self.create_publisher(State, "/robot1_measurement", 20)
-        self.measurement2_publisher_ = self.create_publisher(State, "/robot2_measurement", 20)
-        self.measurement3_publisher_ = self.create_publisher(State, "/robot3_measurement", 20)
-        self.measurement4_publisher_ = self.create_publisher(State, "/robot4_measurement", 20)
+        self.multi_state_pub = self.create_publisher(MultiState, "/robot_multi_state", 2)
         
         state1_subscriber = message_filters.Subscriber(self, State, "/robot1_state")
         state2_subscriber = message_filters.Subscriber(self, State, "/robot2_state")
@@ -32,11 +29,8 @@ class SensorMeasurement(Node):
         self.get_logger().info("Sensor has been started")
         
     def sensor_callback(self, state1: State, state2: State, state3: State, state4: State):
-
-        self.measurement1_publisher_.publish(state1)
-        self.measurement2_publisher_.publish(state2)
-        self.measurement3_publisher_.publish(state3)
-        self.measurement4_publisher_.publish(state4)
+        multi_state = MultiState(multiple_state=[state1, state2, state3, state4])
+        self.multi_state_pub.publish(multi_state)
 
         if debug:
             self.get_logger().info("Publishing robot1 new state, x: " + str(state1.x) + ", " +

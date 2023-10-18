@@ -6,7 +6,7 @@ from turtlesim.msg import Pose
 from geometry_msgs.msg import Twist
 from turtlesim.srv import SetPen
 from functools import partial
-from custom_message.msg import ControlInputs, State, Path, Coordinate
+from custom_message.msg import ControlInputs, State, Path, Coordinate, MultiplePaths, MultiState
 from std_msgs.msg import Float32MultiArray
 import message_filters
 import random
@@ -66,18 +66,11 @@ class Controller(Node):
         self.control4_publisher_ = self.create_publisher(ControlInputs, "/robot4_control", 20)
 
         self.path_pub = self.create_publisher(Path, "/robot2_path", 2)
+        self.multi_path_pub = self.create_publisher(MultiplePaths, "/robot_multi_traj", 2)
+        multi_state_sub = message_filters.Subscriber(self, MultiState, "/robot_multi_state")
 
-        self.trajectory_pub1 = self.create_publisher(Path, "/robot1_trajectory", 2)
-        self.trajectory_pub2 = self.create_publisher(Path, "/robot2_trajectory", 2)
-        self.trajectory_pub3 = self.create_publisher(Path, "/robot3_trajectory", 2)
-        self.trajectory_pub4 = self.create_publisher(Path, "/robot4_trajectory", 2)
-        
-        state1_subscriber = message_filters.Subscriber(self, State, "/robot1_measurement")
-        state2_subscriber = message_filters.Subscriber(self, State, "/robot2_measurement")
-        state3_subscriber = message_filters.Subscriber(self, State, "/robot3_measurement")
-        state4_subscriber = message_filters.Subscriber(self, State, "/robot4_measurement")
 
-        ts = message_filters.ApproximateTimeSynchronizer([state1_subscriber, state2_subscriber, state3_subscriber, state4_subscriber], 4, 0.3, allow_headerless=True)
+        ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 4, 0.3, allow_headerless=True)
         ts.registerCallback(self.general_pose_callback)
 
         self.control1_publisher_.publish(ControlInputs(delta=0.0, throttle=0.0))
@@ -92,8 +85,13 @@ class Controller(Node):
 
         self.get_logger().info("Controller has been started")
 
-    def general_pose_callback(self, state1: State, state2: State, state3: State, state4: State):
-        
+    def general_pose_callback(self, multi_state):
+
+        state1 = multi_state.multiple_state[0]
+        state2 = multi_state.multiple_state[1]
+        state3 = multi_state.multiple_state[2]
+        state4 = multi_state.multiple_state[3]
+
         cmd1, self.path1, self.target1, self.trajectory1 = self.control_callback(state1, self.target1, self.path1, self.trajectory1)
         cmd2, self.path2, self.target2, self.trajectory2 = self.control_callback(state2, self.target2, self.path2, self.trajectory2)
         cmd3, self.path3, self.target3, self.trajectory3 = self.control_callback(state3, self.target3, self.path3, self.trajectory3)
@@ -128,11 +126,10 @@ class Controller(Node):
         self.control3_publisher_.publish(cmd3)
         self.control4_publisher_.publish(cmd4)
 
-        self.trajectory_pub1.publish(Path(path=self.trajectory1))
+        multi_path = MultiplePaths(multiple_path=[Path(path=self.trajectory1), Path(path=self.trajectory2), Path(path=self.trajectory3), Path(path=self.trajectory4)])
+        self.multi_path_pub.publish(multi_path)
+
         self.path_pub.publish(Path(path=self.path2))
-        self.trajectory_pub2.publish(Path(path=self.trajectory2))
-        self.trajectory_pub3.publish(Path(path=self.trajectory3))
-        self.trajectory_pub4.publish(Path(path=self.trajectory4))
         
         if debug:
             self.get_logger().info(f'Commands after: cmd1: {cmd1}, cmd2: {cmd2}')

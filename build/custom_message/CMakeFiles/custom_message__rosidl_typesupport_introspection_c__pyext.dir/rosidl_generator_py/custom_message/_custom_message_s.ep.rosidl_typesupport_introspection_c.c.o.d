@@ -216,4 +216,10 @@ CMakeFiles/custom_message__rosidl_typesupport_introspection_c__pyext.dir/rosidl_
  /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/coordinate__struct.h \
  /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/path__functions.h \
  /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/coordinate__type_support.h \
- /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/coordinate__functions.h
+ /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/coordinate__functions.h \
+ /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/multiple_paths__type_support.h \
+ /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/multiple_paths__struct.h \
+ /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/multiple_paths__functions.h \
+ /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/multi_state__type_support.h \
+ /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/multi_state__struct.h \
+ /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/multi_state__functions.h
