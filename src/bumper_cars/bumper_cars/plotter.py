@@ -79,7 +79,12 @@ class Plotter(Node):
         self.plot_map()
         self.plot_path(path)
 
-        self.plot_path(trajectory1)
+        self.plot_situation(state1, trajectory1, self.state1_buf)
+        self.plot_situation(state2, trajectory2, self.state2_buf)
+        self.plot_situation(state3, trajectory3, self.state3_buf)
+        self.plot_situation(state4, trajectory4, self.state4_buf)
+
+        """self.plot_path(trajectory1)
         self.plot_path(trajectory2)
         self.plot_path(trajectory3)
         self.plot_path(trajectory4)
@@ -97,7 +102,7 @@ class Plotter(Node):
         plt.plot(state1.x, state1.y, 'k.')
         plt.plot(state2.x, state2.y, 'b.')
         plt.plot(state3.x, state3.y, 'b.')
-        plt.plot(state4.x, state4.y, 'b.')
+        plt.plot(state4.x, state4.y, 'b.')"""
 
         plt.axis("equal")
         plt.grid(True)
@@ -120,7 +125,14 @@ class Plotter(Node):
                                 "y: " + str(state4.y) + ", " +
                                 "yaw: " + str(state4.yaw) + ", " +
                                 "linear velocity: " + str(state4.v))
-            
+
+    def plot_situation(self, state: FullState, trajectory, state_buf):
+        self.plot_path(trajectory)
+        plt.scatter(state_buf[:,0], state_buf[:,1], marker='.', s=4)
+        self.plot_robot(state)
+        plt.plot(state.x, state.y, 'b.')
+
+
     def plot_robot(self, fullstate: FullState):
         self.plot_rect(fullstate.x, fullstate.y, fullstate.yaw, config)
         self.plot_cs_robot(fullstate.x, fullstate.y, fullstate.yaw)

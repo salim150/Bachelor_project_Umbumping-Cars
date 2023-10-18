@@ -94,9 +94,9 @@ class Controller(Node):
 
     def general_pose_callback(self, state1: State, state2: State, state3: State, state4: State):
         
-        cmd1 = self.pose1_callback(state1)
-        cmd2 = self.pose2_callback(state2)
-        cmd3 = self.pose3_callback(state3)
+        cmd1, self.path1, self.target1, self.trajectory1 = self.control_callback(state1, self.target1, self.path1, self.trajectory1)
+        cmd2, self.path2, self.target2, self.trajectory2 = self.control_callback(state2, self.target2, self.path2, self.trajectory2)
+        cmd3, self.path3, self.target3, self.trajectory3 = self.control_callback(state3, self.target3, self.path3, self.trajectory3)
         cmd4, self.path4, self.target4, self.trajectory4 = self.control_callback(state4, self.target4, self.path4, self.trajectory4)
 
         if debug:
@@ -151,51 +151,6 @@ class Controller(Node):
             self.get_logger().info("Control input robot1, delta:" + str(cmd.delta) + " , throttle: " + str(cmd.throttle))
 
         return cmd, path, target, trajectory
-    
-    def pose1_callback(self, pose: State):
-        # updating target waypoint and predicting new traj
-        if self.dist(point1=(pose.x, pose.y), point2=self.target1) < Lf:
-            self.path1 = self.update_path(self.path1)
-            self.target1 = (self.path1[0].x, self.path1[0].y)
-            self.trajectory1, self.tx1, self.ty1  = predict_trajectory(pose, self.target1)
-    
-        cmd = ControlInputs()
-        cmd.throttle, cmd.delta, self.path1, self.target1 = self.pure_pursuit_steer_control(self.target1, pose, self.path1)
-
-        if debug:
-            self.get_logger().info("Control input robot1, delta:" + str(cmd.delta) + " , throttle: " + str(cmd.throttle))
-
-        return cmd
-    
-    def pose2_callback(self, pose: State):           
-        # updating target waypoint and predicting new traj
-        if self.dist(point1=(pose.x, pose.y), point2=self.target2) < Lf:
-            self.path2 = self.update_path(self.path2)
-            self.target2 = (self.path2[0].x, self.path2[0].y)
-            self.trajectory2, self.tx2, self.ty2  = predict_trajectory(pose, self.target2)
-
-        cmd = ControlInputs()       
-        cmd.throttle, cmd.delta, self.path2, self.target2 = self.pure_pursuit_steer_control(self.target2, pose, self.path2)
-        
-        if debug:
-            self.get_logger().info("Control input robot2, delta:" + str(cmd.delta) + " , throttle: " + str(cmd.throttle))
-        
-        return cmd
-    
-    def pose3_callback(self, pose: State):       
-        # updating target waypoint and predicting new traj
-        if self.dist(point1=(pose.x, pose.y), point2=self.target3) < Lf:
-            self.path3 = self.update_path(self.path3)
-            self.target3 = (self.path3[0].x, self.path3[0].y)
-            self.trajectory3, self.tx3, self.ty3  = predict_trajectory(pose, self.target3)
-
-        cmd = ControlInputs()       
-        cmd.throttle, cmd.delta, self.path3, self.target3 = self.pure_pursuit_steer_control(self.target3, pose, self.path3)
-        
-        if debug:
-            self.get_logger().info("Control input robot2, delta:" + str(cmd.delta) + " , throttle: " + str(cmd.throttle))
-        
-        return cmd
     
     def update_path(self, path: Path):
         path.pop(0)

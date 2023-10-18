@@ -16,7 +16,7 @@ max_speed = 6 # [m/s]
 min_speed = 0.0 # [m/s]
 magnitude_limit= max_speed
 dt = 0.1
-safety_radius = 5
+safety_radius = 6
 barrier_gain = 0.1
 magnitude_limit = max_speed
 
