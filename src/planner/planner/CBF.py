@@ -17,7 +17,7 @@ min_speed = -1.0 # [m/s]
 magnitude_limit= max_speed
 dt = 0.1
 safety_radius = 7
-barrier_gain = 0.1
+barrier_gain = 0.05
 magnitude_limit = max_speed
 
 def create_unicycle_barrier_certificate_with_boundary(barrier_gain=barrier_gain, safety_radius=safety_radius, projection_distance=0.05, magnitude_limit=magnitude_limit, boundary_points = np.array([-50, 50, -50, 50])):
