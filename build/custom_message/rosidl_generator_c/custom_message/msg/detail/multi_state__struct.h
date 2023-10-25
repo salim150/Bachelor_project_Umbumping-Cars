@@ -19,12 +19,12 @@ extern "C"
 
 // Include directives for member types
 // Member 'multiple_state'
-#include "custom_message/msg/detail/state__struct.h"
+#include "custom_message/msg/detail/full_state__struct.h"
 
 /// Struct defined in msg/MultiState in the package custom_message.
 typedef struct custom_message__msg__MultiState
 {
-  custom_message__msg__State__Sequence multiple_state;
+  custom_message__msg__FullState__Sequence multiple_state;
 } custom_message__msg__MultiState;
 
 // Struct for a sequence of custom_message__msg__MultiState.

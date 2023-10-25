@@ -6,7 +6,7 @@ from turtlesim.msg import Pose
 from geometry_msgs.msg import Twist
 from turtlesim.srv import SetPen
 from functools import partial
-from custom_message.msg import ControlInputs, State, Path, Coordinate, MultiplePaths, MultiState
+from custom_message.msg import ControlInputs, State, Path, Coordinate, MultiplePaths, MultiState, MultiControl
 from std_msgs.msg import Float32MultiArray
 import message_filters
 import random
@@ -60,10 +60,12 @@ class Controller(Node):
         self.target4 = (self.path4[0].x, self.path4[0].y)
         self.trajectory4, self.tx4, self.ty4 = predict_trajectory(State(x=0.0, y=-20.0, yaw=0.0, v=0.0, omega=0.0), self.target4)
     
-        self.control1_publisher_ = self.create_publisher(ControlInputs, "/robot1_control", 20)
+        """self.control1_publisher_ = self.create_publisher(ControlInputs, "/robot1_control", 20)
         self.control2_publisher_ = self.create_publisher(ControlInputs, "/robot2_control", 20)
         self.control3_publisher_ = self.create_publisher(ControlInputs, "/robot3_control", 20)
-        self.control4_publisher_ = self.create_publisher(ControlInputs, "/robot4_control", 20)
+        self.control4_publisher_ = self.create_publisher(ControlInputs, "/robot4_control", 20)"""
+
+        self.multi_control_pub = self.create_publisher(MultiControl, '/multi_control', 20)
 
         if debug:
             self.path_pub = self.create_publisher(Path, "/robot2_path", 2)
@@ -76,10 +78,12 @@ class Controller(Node):
         ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 4, 0.3, allow_headerless=True)
         ts.registerCallback(self.general_pose_callback)
 
-        self.control1_publisher_.publish(ControlInputs(delta=0.0, throttle=0.0))
+        """self.control1_publisher_.publish(ControlInputs(delta=0.0, throttle=0.0))
         self.control2_publisher_.publish(ControlInputs(delta=0.0, throttle=0.0))
         self.control3_publisher_.publish(ControlInputs(delta=0.0, throttle=0.0))
-        self.control4_publisher_.publish(ControlInputs(delta=0.0, throttle=0.0))
+        self.control4_publisher_.publish(ControlInputs(delta=0.0, throttle=0.0))"""
+        self.multi_control_pub.publish(MultiControl(multi_control=[ControlInputs(delta=0.0, throttle=0.0), ControlInputs(delta=0.0, throttle=0.0), 
+                                                                   ControlInputs(delta=0.0, throttle=0.0), ControlInputs(delta=0.0, throttle=0.0)]))
      
         # CBF
         self.uni_barrier_cert = create_unicycle_barrier_certificate_with_boundary()
@@ -122,10 +126,12 @@ class Controller(Node):
         cmd4.throttle, cmd4.delta = dxu[0,3], dxu[1,3]
 
         # Publishing everything in the general callback to avoid deadlocks
-        self.control1_publisher_.publish(cmd1)
+        """self.control1_publisher_.publish(cmd1)
         self.control2_publisher_.publish(cmd2)
         self.control3_publisher_.publish(cmd3)
-        self.control4_publisher_.publish(cmd4)
+        self.control4_publisher_.publish(cmd4)"""
+        multi_control = MultiControl(multi_control=[cmd1, cmd2, cmd3, cmd4])
+        self.multi_control_pub.publish(multi_control)
 
         multi_path = MultiplePaths(multiple_path=[Path(path=self.trajectory1), Path(path=self.trajectory2), Path(path=self.trajectory3), Path(path=self.trajectory4)])
         self.multi_path_pub.publish(multi_path)     
@@ -134,7 +140,7 @@ class Controller(Node):
             self.get_logger().info(f'Commands after: cmd1: {cmd1}, cmd2: {cmd2}')
             self.path_pub.publish(Path(path=self.path2))
 
-    def control_callback(self, pose: State, target, path, trajectory):
+    def control_callback(self, pose: FullState, target, path, trajectory):
         # updating target waypoint and predicting new traj
         if self.dist(point1=(pose.x, pose.y), point2=target) < Lf:
             path = self.update_path(path)

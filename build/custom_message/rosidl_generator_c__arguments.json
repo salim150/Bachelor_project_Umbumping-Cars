@@ -9,7 +9,8 @@
     "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message:msg/Path.idl",
     "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message:msg/Coordinate.idl",
     "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message:msg/MultiplePaths.idl",
-    "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message:msg/MultiState.idl"
+    "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message:msg/MultiState.idl",
+    "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message:msg/MultiControl.idl"
   ],
   "target_dependencies": [
     "/opt/ros/humble/share/rosidl_generator_c/cmake/../../../lib/rosidl_generator_c/rosidl_generator_c",
@@ -31,6 +32,7 @@
     "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message/msg/Path.idl",
     "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message/msg/Coordinate.idl",
     "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message/msg/MultiplePaths.idl",
-    "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message/msg/MultiState.idl"
+    "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message/msg/MultiState.idl",
+    "/home/giacomo/thesis_ws/build/custom_message/rosidl_adapter/custom_message/msg/MultiControl.idl"
   ]
 }

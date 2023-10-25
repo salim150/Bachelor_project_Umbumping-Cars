@@ -260,8 +260,15 @@ CMakeFiles/custom_message__rosidl_typesupport_fastrtps_c__pyext.dir/rosidl_gener
   rosidl_generator_c/custom_message/msg/detail/coordinate__functions.h \
   rosidl_generator_c/custom_message/msg/detail/multiple_paths__type_support.h \
   rosidl_generator_c/custom_message/msg/detail/multiple_paths__struct.h \
-  rosidl_generator_c/custom_message/msg/detail/multiple_paths__functions.h
+  rosidl_generator_c/custom_message/msg/detail/multiple_paths__functions.h \
+  rosidl_generator_c/custom_message/msg/detail/multi_state__type_support.h \
+  rosidl_generator_c/custom_message/msg/detail/multi_state__struct.h \
+  rosidl_generator_c/custom_message/msg/detail/multi_state__functions.h
 
+
+rosidl_generator_c/custom_message/msg/detail/multi_state__functions.h:
+
+rosidl_generator_c/custom_message/msg/detail/multi_state__type_support.h:
 
 rosidl_generator_c/custom_message/msg/detail/multiple_paths__functions.h:
 
@@ -464,6 +471,8 @@ rosidl_generator_c/custom_message/msg/detail/path__functions.h:
 /usr/include/x86_64-linux-gnu/bits/uio_lim.h:
 
 /usr/include/x86_64-linux-gnu/python3.10/pyconfig.h:
+
+rosidl_generator_c/custom_message/msg/detail/multi_state__struct.h:
 
 /usr/include/python3.10/cpython/traceback.h:
 

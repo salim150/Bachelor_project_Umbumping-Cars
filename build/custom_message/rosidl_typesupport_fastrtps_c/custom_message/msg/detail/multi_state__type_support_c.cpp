@@ -34,20 +34,20 @@ extern "C"
 {
 #endif
 
-#include "custom_message/msg/detail/state__functions.h"  // multiple_state
+#include "custom_message/msg/detail/full_state__functions.h"  // multiple_state
 
 // forward declare type support functions
-size_t get_serialized_size_custom_message__msg__State(
+size_t get_serialized_size_custom_message__msg__FullState(
   const void * untyped_ros_message,
   size_t current_alignment);
 
-size_t max_serialized_size_custom_message__msg__State(
+size_t max_serialized_size_custom_message__msg__FullState(
   bool & full_bounded,
   bool & is_plain,
   size_t current_alignment);
 
 const rosidl_message_type_support_t *
-  ROSIDL_TYPESUPPORT_INTERFACE__MESSAGE_SYMBOL_NAME(rosidl_typesupport_fastrtps_c, custom_message, msg, State)();
+  ROSIDL_TYPESUPPORT_INTERFACE__MESSAGE_SYMBOL_NAME(rosidl_typesupport_fastrtps_c, custom_message, msg, FullState)();
 
 
 using _MultiState__ros_msg_type = custom_message__msg__MultiState;
@@ -66,7 +66,7 @@ static bool _MultiState__cdr_serialize(
     const message_type_support_callbacks_t * callbacks =
       static_cast<const message_type_support_callbacks_t *>(
       ROSIDL_TYPESUPPORT_INTERFACE__MESSAGE_SYMBOL_NAME(
-        rosidl_typesupport_fastrtps_c, custom_message, msg, State
+        rosidl_typesupport_fastrtps_c, custom_message, msg, FullState
       )()->data);
     size_t size = ros_message->multiple_state.size;
     auto array_ptr = ros_message->multiple_state.data;
@@ -97,15 +97,15 @@ static bool _MultiState__cdr_deserialize(
     const message_type_support_callbacks_t * callbacks =
       static_cast<const message_type_support_callbacks_t *>(
       ROSIDL_TYPESUPPORT_INTERFACE__MESSAGE_SYMBOL_NAME(
-        rosidl_typesupport_fastrtps_c, custom_message, msg, State
+        rosidl_typesupport_fastrtps_c, custom_message, msg, FullState
       )()->data);
     uint32_t cdrSize;
     cdr >> cdrSize;
     size_t size = static_cast<size_t>(cdrSize);
     if (ros_message->multiple_state.data) {
-      custom_message__msg__State__Sequence__fini(&ros_message->multiple_state);
+      custom_message__msg__FullState__Sequence__fini(&ros_message->multiple_state);
     }
-    if (!custom_message__msg__State__Sequence__init(&ros_message->multiple_state, size)) {
+    if (!custom_message__msg__FullState__Sequence__init(&ros_message->multiple_state, size)) {
       fprintf(stderr, "failed to create array for field 'multiple_state'");
       return false;
     }
@@ -144,7 +144,7 @@ size_t get_serialized_size_custom_message__msg__MultiState(
       eprosima::fastcdr::Cdr::alignment(current_alignment, padding);
 
     for (size_t index = 0; index < array_size; ++index) {
-      current_alignment += get_serialized_size_custom_message__msg__State(
+      current_alignment += get_serialized_size_custom_message__msg__FullState(
         &array_ptr[index], current_alignment);
     }
   }
@@ -188,7 +188,7 @@ size_t max_serialized_size_custom_message__msg__MultiState(
       bool inner_full_bounded;
       bool inner_is_plain;
       current_alignment +=
-        max_serialized_size_custom_message__msg__State(
+        max_serialized_size_custom_message__msg__FullState(
         inner_full_bounded, inner_is_plain, current_alignment);
       full_bounded &= inner_full_bounded;
       is_plain &= inner_is_plain;

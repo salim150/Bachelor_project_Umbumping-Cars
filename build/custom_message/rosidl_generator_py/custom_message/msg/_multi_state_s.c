@@ -20,10 +20,10 @@
 #include "rosidl_runtime_c/primitives_sequence_functions.h"
 
 // Nested array functions includes
-#include "custom_message/msg/detail/state__functions.h"
+#include "custom_message/msg/detail/full_state__functions.h"
 // end nested array functions include
-bool custom_message__msg__state__convert_from_py(PyObject * _pymsg, void * _ros_message);
-PyObject * custom_message__msg__state__convert_to_py(void * raw_ros_message);
+bool custom_message__msg__full_state__convert_from_py(PyObject * _pymsg, void * _ros_message);
+PyObject * custom_message__msg__full_state__convert_to_py(void * raw_ros_message);
 
 ROSIDL_GENERATOR_C_EXPORT
 bool custom_message__msg__multi_state__convert_from_py(PyObject * _pymsg, void * _ros_message)
@@ -74,15 +74,15 @@ bool custom_message__msg__multi_state__convert_from_py(PyObject * _pymsg, void *
       Py_DECREF(field);
       return false;
     }
-    if (!custom_message__msg__State__Sequence__init(&(ros_message->multiple_state), size)) {
-      PyErr_SetString(PyExc_RuntimeError, "unable to create custom_message__msg__State__Sequence ros_message");
+    if (!custom_message__msg__FullState__Sequence__init(&(ros_message->multiple_state), size)) {
+      PyErr_SetString(PyExc_RuntimeError, "unable to create custom_message__msg__FullState__Sequence ros_message");
       Py_DECREF(seq_field);
       Py_DECREF(field);
       return false;
     }
-    custom_message__msg__State * dest = ros_message->multiple_state.data;
+    custom_message__msg__FullState * dest = ros_message->multiple_state.data;
     for (Py_ssize_t i = 0; i < size; ++i) {
-      if (!custom_message__msg__state__convert_from_py(PySequence_Fast_GET_ITEM(seq_field, i), &dest[i])) {
+      if (!custom_message__msg__full_state__convert_from_py(PySequence_Fast_GET_ITEM(seq_field, i), &dest[i])) {
         Py_DECREF(seq_field);
         Py_DECREF(field);
         return false;
@@ -120,10 +120,10 @@ PyObject * custom_message__msg__multi_state__convert_to_py(void * raw_ros_messag
     if (!field) {
       return NULL;
     }
-    custom_message__msg__State * item;
+    custom_message__msg__FullState * item;
     for (size_t i = 0; i < size; ++i) {
       item = &(ros_message->multiple_state.data[i]);
-      PyObject * pyitem = custom_message__msg__state__convert_to_py(item);
+      PyObject * pyitem = custom_message__msg__full_state__convert_to_py(item);
       if (!pyitem) {
         Py_DECREF(field);
         return NULL;

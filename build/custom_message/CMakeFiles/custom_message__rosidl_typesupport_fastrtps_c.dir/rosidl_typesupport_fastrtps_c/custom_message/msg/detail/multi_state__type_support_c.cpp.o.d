@@ -183,8 +183,8 @@ CMakeFiles/custom_message__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_
  /usr/include/c++/11/bits/ostream.tcc /usr/include/c++/11/istream \
  /usr/include/c++/11/bits/istream.tcc /usr/include/malloc.h \
  /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/multi_state__struct.h \
- /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/state__struct.h \
+ /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/full_state__struct.h \
  /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/multi_state__functions.h \
  /usr/include/c++/11/stdlib.h \
  /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/rosidl_generator_c__visibility_control.h \
- /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/state__functions.h
+ /home/giacomo/thesis_ws/build/custom_message/rosidl_generator_c/custom_message/msg/detail/full_state__functions.h

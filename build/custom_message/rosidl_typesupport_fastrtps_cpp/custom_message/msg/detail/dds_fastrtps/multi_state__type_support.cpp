@@ -23,16 +23,16 @@ namespace msg
 namespace typesupport_fastrtps_cpp
 {
 bool cdr_serialize(
-  const custom_message::msg::State &,
+  const custom_message::msg::FullState &,
   eprosima::fastcdr::Cdr &);
 bool cdr_deserialize(
   eprosima::fastcdr::Cdr &,
-  custom_message::msg::State &);
+  custom_message::msg::FullState &);
 size_t get_serialized_size(
-  const custom_message::msg::State &,
+  const custom_message::msg::FullState &,
   size_t current_alignment);
 size_t
-max_serialized_size_State(
+max_serialized_size_FullState(
   bool & full_bounded,
   bool & is_plain,
   size_t current_alignment);
@@ -151,7 +151,7 @@ max_serialized_size_MultiState(
       bool inner_full_bounded;
       bool inner_is_plain;
       current_alignment +=
-        custom_message::msg::typesupport_fastrtps_cpp::max_serialized_size_State(
+        custom_message::msg::typesupport_fastrtps_cpp::max_serialized_size_FullState(
         inner_full_bounded, inner_is_plain, current_alignment);
       full_bounded &= inner_full_bounded;
       is_plain &= inner_is_plain;

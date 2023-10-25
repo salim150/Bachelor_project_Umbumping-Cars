@@ -5,6 +5,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/custom_message__rosidl_generator_py.dir/rosidl_generator_py/custom_message/msg/_coordinate_s.c.o.d"
   "CMakeFiles/custom_message__rosidl_generator_py.dir/rosidl_generator_py/custom_message/msg/_full_state_s.c.o"
   "CMakeFiles/custom_message__rosidl_generator_py.dir/rosidl_generator_py/custom_message/msg/_full_state_s.c.o.d"
+  "CMakeFiles/custom_message__rosidl_generator_py.dir/rosidl_generator_py/custom_message/msg/_multi_control_s.c.o"
+  "CMakeFiles/custom_message__rosidl_generator_py.dir/rosidl_generator_py/custom_message/msg/_multi_control_s.c.o.d"
   "CMakeFiles/custom_message__rosidl_generator_py.dir/rosidl_generator_py/custom_message/msg/_multi_state_s.c.o"
   "CMakeFiles/custom_message__rosidl_generator_py.dir/rosidl_generator_py/custom_message/msg/_multi_state_s.c.o.d"
   "CMakeFiles/custom_message__rosidl_generator_py.dir/rosidl_generator_py/custom_message/msg/_multiple_paths_s.c.o"

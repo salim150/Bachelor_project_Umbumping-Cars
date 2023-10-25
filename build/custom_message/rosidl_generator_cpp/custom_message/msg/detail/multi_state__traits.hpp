@@ -16,7 +16,7 @@
 
 // Include directives for member types
 // Member 'multiple_state'
-#include "custom_message/msg/detail/state__traits.hpp"
+#include "custom_message/msg/detail/full_state__traits.hpp"
 
 namespace custom_message
 {

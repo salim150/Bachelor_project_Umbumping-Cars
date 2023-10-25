@@ -13,11 +13,11 @@ from planner.predict_traj import predict_trajectory
 L = 2.9
 max_steer = np.radians(30.0)  # [rad] max steering angle
 max_speed = 6 # [m/s]
-min_speed = 0.0 # [m/s]
+min_speed = -1.0 # [m/s]
 magnitude_limit= max_speed
 dt = 0.1
-safety_radius = 6
-barrier_gain = 0.1
+safety_radius = 7
+barrier_gain = 0.05
 magnitude_limit = max_speed
 
 def create_unicycle_barrier_certificate_with_boundary(barrier_gain=barrier_gain, safety_radius=safety_radius, projection_distance=0.05, magnitude_limit=magnitude_limit, boundary_points = np.array([-50, 50, -50, 50])):
