@@ -6,7 +6,22 @@ from planner.cubic_spline_planner import *
 from planner.frenet import *
 from planner.predict_traj import *
 
-max_steer = np.radians(30)
+# TODO: import all this parameters from a config file so that we can easily change them in one place
+L = 2.9
+max_steer = np.radians(30.0)  # [rad] max steering angle
+max_speed = 6 # [m/s]
+min_speed = 0.3 # [m/s]
+magnitude_limit= max_speed
+max_acc = 40
+min_acc = -40
+dt = 0.1
+safety_radius = 3
+barrier_gain = 100
+magnitude_limit = max_speed
+Kv = 1
+L = 2.9  # [m] Wheel base of vehicle
+Lr = L / 2.0  # [m]
+Lf = L - Lr
 
 def linear_model_callback(initial_state: State, cmd: ControlInputs):
 
