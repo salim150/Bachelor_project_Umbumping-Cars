@@ -13,15 +13,15 @@ from planner.predict_traj import predict_trajectory
 L = 2.9
 max_steer = np.radians(30.0)  # [rad] max steering angle
 max_speed = 6 # [m/s]
-min_speed = 0.3 # [m/s]
+min_speed = 0.0 # [m/s]
 magnitude_limit= max_speed
 max_acc = 400
 min_acc = -400
 dt = 0.1
-safety_radius = 3
-barrier_gain = 0.1
+safety_radius = 4
+barrier_gain = 1/1000
 magnitude_limit = max_speed
-Kv = 1 # interval [0.5-1]
+Kv = 0.1 # interval [0.5-1]
 L = 2.9  # [m] Wheel base of vehicle
 Lr = L / 2.0  # [m]
 Lf = L - Lr
@@ -30,39 +30,39 @@ def CBF(x, u_ref):
     N = x.shape[1]
     M = u_ref.shape[0]
     G = np.zeros([N-1,M])
-    H = np.zeros([N-1])
+    H = np.zeros([N-1,1])
     dxu = np.zeros([u_ref.shape[0], u_ref.shape[1]])
     count_dxu = 0
+
+    u_ref[1,:] = delta_to_beta_array(np.radians(u_ref[1,:]))
 
     for i in range(N):
         count = 0
         for j in range(N):
 
             if j == i: continue
-
-            P = np.identity(2)
-            # q = np.array([0, 0]).reshape([1,2])
+            P = np.identity(2)*2
             q = np.array([-2 * u_ref[0, i], - 2 * u_ref[1,i]])
 
             Lf_h = 2 * x[3,i] * (np.cos(x[2,i]) * (x[0,i]-x[0,j]) + np.sin(x[2,i]) * (x[1,i] - x[1,j]))
             Lg_h = 2 * x[3,i] * (np.cos(x[2,i]) * (x[1,i]-x[1,j]) - np.sin(x[2,i]) * (x[0,i] - x[0,j]))
             h = (x[0,i]-x[0,j]) * (x[0,i]-x[0,j]) + (x[1,i] - x[1,j]) * (x[1,i] - x[1,j]) - (safety_radius**2 + Kv * x[3,i])
 
-            H[count] = np.array([barrier_gain*np.power(h, 1) + Lf_h])
+            H[count] = np.array([barrier_gain*np.power(h, 3) + Lf_h])
             G[count,:] = np.array([Kv, -Lg_h])
             count+=1
-            print("Finished 1 loop")
         
         # Add the input constraint
         G = np.vstack([G, [[0, 1], [0, -1]]])
         H = np.vstack([H, delta_to_beta(max_steer), -delta_to_beta(-max_steer)])
-        G = np.vstack([G, [[1, 0], [-1, 0]]])
-        H = np.vstack([H, max_acc, -min_acc])
+        # G = np.vstack([G, [[1, 0], [-1, 0]]])
+        # H = np.vstack([H, max_acc, -min_acc])
         
         """G = np.vstack([G, np.identity(M)])
         G = np.vstack([G, -np.identity(M)])
         H = np.vstack([H, max_acc, delta_to_beta(max_steer), -min_acc, -delta_to_beta(-max_steer)]) """ 
 
+        solvers.options['show_progress'] = False
         sol = solvers.qp(matrix(P), matrix(q), matrix(G), matrix(H))
         dxu[:,count_dxu] = np.reshape(np.array(sol['x']), (M,))
         count_dxu += 1
@@ -72,6 +72,11 @@ def CBF(x, u_ref):
 
 def delta_to_beta(delta):
     beta = normalize_angle(np.arctan2(Lr*np.tan(delta)/L, 1.0))
+
+    return beta
+
+def delta_to_beta_array(delta):
+    beta = normalize_angle_array(np.arctan2(Lr*np.tan(delta)/L, 1.0))
 
     return beta
 
@@ -95,7 +100,7 @@ def main(args=None):
     # uni_barrier_cert = create_unicycle_barrier_certificate_with_boundary()
 
     # define x initially --> state: [x, y, yaw, v]
-    x = np.array([[0, 20], [0, 0], [0, np.pi], [0, 0]])
+    x = np.array([[0, 20], [0.1, 0], [0, np.pi], [0, 0]])
     goal1 = np.array([20, 0])
     goal2 = np.array([0, 0])
     cmd1 = ControlInputs()
@@ -119,11 +124,11 @@ def main(args=None):
         dxu[0,1], dxu[1,1] = pure_pursuit_steer_control(goal2, x2)
 
         # Create safe control inputs (i.e., no collisions)
-        # print(dxu)
+        print(dxu)
         dxu = CBF(x, dxu)
         # dxu = uni_barrier_cert(dxu, x)
-        # print(dxu)
-        # print('\n')
+        print(dxu)
+        print('\n')
 
         cmd1.throttle, cmd1.delta = dxu[0,0], dxu[1,0]
         cmd2.throttle, cmd2.delta = dxu[0,1], dxu[1,1]

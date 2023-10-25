@@ -86,7 +86,7 @@ def pure_pursuit_steer_control(target, pose):
     if delta > math.radians(10) or delta < -math.radians(10):
         desired_speed = 3
     else:
-        desired_speed = 6
+        desired_speed = max_speed
 
     delta = np.clip(delta, -max_steer, max_steer)
     delta = math.degrees(delta)
