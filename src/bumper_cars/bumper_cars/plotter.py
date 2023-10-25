@@ -28,23 +28,13 @@ class Plotter(Node):
 
     def __init__(self):
         super().__init__("plotter")
-        
-        """state1_subscriber = message_filters.Subscriber(self, FullState, "/robot1_fullstate")
-        state2_subscriber = message_filters.Subscriber(self, FullState, "/robot2_fullstate")
-        state3_subscriber = message_filters.Subscriber(self, FullState, "/robot3_fullstate")
-        state4_subscriber = message_filters.Subscriber(self, FullState, "/robot4_fullstate")"""
 
         multi_state_sub = message_filters.Subscriber(self, MultiState, "/multi_fullstate")
-
-        if debug:
-            self.path_sub = message_filters.Subscriber(self, Path, "/robot2_path")
-
         self.multi_path_sub = message_filters.Subscriber(self, MultiplePaths, "/robot_multi_traj")
 
         self.state1_buf = np.array([0,0])
         self.state2_buf = np.array([0,0])
         self.state3_buf = np.array([0,0])
-        self.state4_buf = np.array([0,0])
 
         self.width = 100
         self.heigth = 100
@@ -59,12 +49,10 @@ class Plotter(Node):
         state1 = multi_state.multiple_state[0]
         state2 = multi_state.multiple_state[1]
         state3 = multi_state.multiple_state[2]
-        state4 = multi_state.multiple_state[3]
     
         self.state1_buf = np.vstack((self.state1_buf, [state1.x, state1.y]))
         self.state2_buf = np.vstack((self.state2_buf, [state2.x, state2.y]))
         self.state3_buf = np.vstack((self.state3_buf, [state3.x, state3.y]))
-        self.state4_buf = np.vstack((self.state4_buf, [state4.x, state4.y]))
 
         if len(self.state1_buf) > config.trail_length:
             self.state1_buf = np.delete(self.state1_buf, 0, 0)
@@ -72,8 +60,6 @@ class Plotter(Node):
             self.state2_buf = np.delete(self.state2_buf, 0, 0)
         if len(self.state3_buf) > config.trail_length:
             self.state3_buf = np.delete(self.state3_buf, 0, 0)
-        if len(self.state4_buf) > config.trail_length:
-            self.state4_buf = np.delete(self.state4_buf, 0, 0)
         
         plt.cla()
         # for stopping simulation with the esc key.
@@ -81,13 +67,10 @@ class Plotter(Node):
             'key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
         self.plot_map()
-        if debug:
-           self.plot_path(path)
 
         self.plot_situation(state1, multi_traj.multiple_path[0], self.state1_buf)
         self.plot_situation(state2, multi_traj.multiple_path[1], self.state2_buf)
         self.plot_situation(state3, multi_traj.multiple_path[2], self.state3_buf)
-        self.plot_situation(state4, multi_traj.multiple_path[3], self.state4_buf)
 
         plt.axis("equal")
         plt.grid(True)
@@ -106,10 +89,6 @@ class Plotter(Node):
                                 "y: " + str(state3.y) + ", " +
                                 "yaw: " + str(state3.yaw) + ", " +
                                 "linear velocity: " + str(state3.v))
-            self.get_logger().info("robot3, x: " + str(state4.x) + ", " +
-                                "y: " + str(state4.y) + ", " +
-                                "yaw: " + str(state4.yaw) + ", " +
-                                "linear velocity: " + str(state4.v))
 
     def plot_situation(self, state: FullState, trajectory, state_buf):
         self.plot_path(trajectory)

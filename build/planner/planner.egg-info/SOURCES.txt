@@ -3,6 +3,7 @@ setup.cfg
 setup.py
 planner/CBF.py
 planner/CBF_copy.py
+planner/CBF_mine.py
 planner/__init__.py
 planner/cubic_spline_planner.py
 planner/frenet.py

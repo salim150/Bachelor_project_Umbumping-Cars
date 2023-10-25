@@ -17,11 +17,6 @@ class SensorMeasurement(Node):
         super().__init__("sensor")
 
         self.multi_state_pub = self.create_publisher(MultiState, "/robot_multi_state", 2)
-        
-        """state1_subscriber = message_filters.Subscriber(self, FullState, "/robot1_fullstate")
-        state2_subscriber = message_filters.Subscriber(self, FullState, "/robot2_fullstate")
-        state3_subscriber = message_filters.Subscriber(self, FullState, "/robot3_fullstate")
-        state4_subscriber = message_filters.Subscriber(self, FullState, "/robot4_fullstate")"""
 
         multi_state_subscriber = message_filters.Subscriber(self, MultiState, "/multi_fullstate")
 
@@ -41,11 +36,8 @@ class SensorMeasurement(Node):
         full_state3 = FullState(x=multi_state_in.multiple_state[2].x, y=multi_state_in.multiple_state[2].y, yaw=multi_state_in.multiple_state[2].yaw,
                                 v=multi_state_in.multiple_state[2].v, omega=multi_state_in.multiple_state[2].omega, delta=multi_state_in.multiple_state[2].delta,
                                 throttle=multi_state_in.multiple_state[2].throttle)
-        full_state4 = FullState(x=multi_state_in.multiple_state[3].x, y=multi_state_in.multiple_state[3].y, yaw=multi_state_in.multiple_state[3].yaw,
-                                v=multi_state_in.multiple_state[3].v, omega=multi_state_in.multiple_state[3].omega, delta=multi_state_in.multiple_state[3].delta,
-                                throttle=multi_state_in.multiple_state[3].throttle)
 
-        multi_state = MultiState(multiple_state=[full_state1, full_state2, full_state3, full_state4])
+        multi_state = MultiState(multiple_state=[full_state1, full_state2, full_state3])
         self.multi_state_pub.publish(multi_state)
 
         if debug:
@@ -61,10 +53,6 @@ class SensorMeasurement(Node):
                                 "y: " + str(full_state3.y) + ", " +
                                 "theta: " + str(full_state3.yaw) + ", " +
                                 "linear velocity: " + str(full_state3.v))
-            self.get_logger().info("Publishing robot3 new state, x: " + str(full_state4.x) + ", " +
-                                "y: " + str(full_state4.y) + ", " +
-                                "theta: " + str(full_state4.yaw) + ", " +
-                                "linear velocity: " + str(full_state4.v))
 
 def main(args=None):
     rclpy.init(args=args)

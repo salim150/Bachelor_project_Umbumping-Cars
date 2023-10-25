@@ -52,10 +52,8 @@ class CarModel(Node):
         self.initial_state1 = State(x=self.x0[0], y=self.y0[0], yaw=self.yaw[0], v=self.v[0], omega=self.omega[0])
         self.initial_state2 = State(x=self.x0[1], y=self.y0[1], yaw=self.yaw[1], v=self.v[1], omega=self.omega[1])
         self.initial_state3 = State(x=self.x0[2], y=self.y0[2], yaw=self.yaw[2], v=self.v[2], omega=self.omega[2])
-        self.initial_state4 = State(x=self.x0[3], y=self.y0[3], yaw=self.yaw[3], v=self.v[3], omega=self.omega[3])
 
         # Initializing the state publishers/subscribers
-        #self.state1_publisher_ = self.create_publisher(State, "/robot_state", 20)
         self.control_sub = self.create_subscription(MultiControl, '/robot_control', self.general_model_callback, 10)
         self.fullstate_publisher_ = self.create_publisher(MultiState, "robot_fullstate", 60)
 
@@ -64,7 +62,6 @@ class CarModel(Node):
         self.old_time3 = time.time()
         self.old_time4 = time.time()
 
-        #self.state1_publisher_.publish(self.initial_state1)
         self.get_logger().info("Robots model initialized correctly")
 
         self.timer = self.create_timer(0.1, self.timer_callback)
@@ -75,10 +72,8 @@ class CarModel(Node):
                                      omega=self.initial_state2.omega, delta=0.0, throttle=0.0)
         self.fullstate3 = FullState(x=self.initial_state3.x, y=self.initial_state3.y, yaw=self.initial_state3.yaw, v=self.initial_state3.v,
                                      omega=self.initial_state3.omega, delta=0.0, throttle=0.0)
-        self.fullstate4 = FullState(x=self.initial_state4.x, y=self.initial_state4.y, yaw=self.initial_state4.yaw, v=self.initial_state4.v,
-                                     omega=self.initial_state4.omega, delta=0.0, throttle=0.0)
         
-        self.multi_state = MultiState(multiple_state=[self.fullstate1, self.fullstate2, self.fullstate3, self.fullstate4])
+        self.multi_state = MultiState(multiple_state=[self.fullstate1, self.fullstate2, self.fullstate3])
 
     def general_model_callback(self, control: MultiControl):
 
@@ -98,13 +93,6 @@ class CarModel(Node):
         elif self.model_type[2] == 'nonlinear':
             self.initial_state3, self.old_time3 = self.nonlinear_model_callback(self.initial_state3, control.multi_control[2], self.old_time3)
         
-        if self.model_type[3] == 'linear':
-            self.initial_state4, self.old_time4 = self.linear_model_callback(self.initial_state4, control.multi_control[3], self.old_time4)
-        elif self.model_type[3] == 'nonlinear':
-            self.initial_state4, self.old_time4 = self.nonlinear_model_callback(self.initial_state4, control.multi_control[3], self.old_time4)
-
-
-        
         self.fullstate1 = FullState(x=float(self.initial_state1.x), y=float(self.initial_state1.y), yaw=float(self.initial_state1.yaw), v=float(self.initial_state1.v),
                                omega=float(self.initial_state1.omega), delta=float(control.multi_control[0].delta), throttle=float(control.multi_control[0].throttle))
         
@@ -114,10 +102,7 @@ class CarModel(Node):
         self.fullstate3 = FullState(x=float(self.initial_state3.x), y=float(self.initial_state3.y), yaw=float(self.initial_state3.yaw), v=float(self.initial_state3.v),
                                omega=float(self.initial_state3.omega), delta=float(control.multi_control[2].delta), throttle=float(control.multi_control[2].throttle))
         
-        self.fullstate4 = FullState(x=float(self.initial_state4.x), y=float(self.initial_state4.y), yaw=float(self.initial_state4.yaw), v=float(self.initial_state4.v),
-                               omega=float(self.initial_state4.omega), delta=float(control.multi_control[3].delta), throttle=float(control.multi_control[3].throttle))
-        
-        self.multi_state = MultiState(multiple_state=[self.fullstate1, self.fullstate2, self.fullstate3, self.fullstate4])
+        self.multi_state = MultiState(multiple_state=[self.fullstate1, self.fullstate2, self.fullstate3])
 
     def linear_model_callback(self, initial_state: State, cmd: ControlInputs, old_time: float):
 

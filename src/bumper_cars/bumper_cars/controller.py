@@ -34,7 +34,6 @@ class Controller(Node):
         self.safety = 20 # safety border around the map boundaries
         self.width = 100.0 - self.safety
         self.heigth = 100.0 -self.safety
-        print(type(self.width))
 
         # Robot 1
         self.path1 = []
@@ -54,23 +53,8 @@ class Controller(Node):
         self.target3 = (self.path3[0].x, self.path3[0].y)
         self.trajectory3, self.tx3, self.ty3 = predict_trajectory(State(x=-30.0, y=-30.0, yaw=0.0, v=0.0, omega=0.0), self.target3)
 
-        # Robot 4
-        self.path4 = []
-        self.path4 = self.create_path(self.path4)
-        self.target4 = (self.path4[0].x, self.path4[0].y)
-        self.trajectory4, self.tx4, self.ty4 = predict_trajectory(State(x=0.0, y=-20.0, yaw=0.0, v=0.0, omega=0.0), self.target4)
-    
-        """self.control1_publisher_ = self.create_publisher(ControlInputs, "/robot1_control", 20)
-        self.control2_publisher_ = self.create_publisher(ControlInputs, "/robot2_control", 20)
-        self.control3_publisher_ = self.create_publisher(ControlInputs, "/robot3_control", 20)
-        self.control4_publisher_ = self.create_publisher(ControlInputs, "/robot4_control", 20)"""
 
         self.multi_control_pub = self.create_publisher(MultiControl, '/multi_control', 20)
-
-        if debug:
-            self.path_pub = self.create_publisher(Path, "/robot2_path", 2)
-            self.path_pub.publish(Path(path=self.path2))
-
         self.multi_path_pub = self.create_publisher(MultiplePaths, "/robot_multi_traj", 2)
         multi_state_sub = message_filters.Subscriber(self, MultiState, "/robot_multi_state")
 
@@ -78,12 +62,10 @@ class Controller(Node):
         ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 4, 0.3, allow_headerless=True)
         ts.registerCallback(self.general_pose_callback)
 
-        """self.control1_publisher_.publish(ControlInputs(delta=0.0, throttle=0.0))
-        self.control2_publisher_.publish(ControlInputs(delta=0.0, throttle=0.0))
-        self.control3_publisher_.publish(ControlInputs(delta=0.0, throttle=0.0))
-        self.control4_publisher_.publish(ControlInputs(delta=0.0, throttle=0.0))"""
         self.multi_control_pub.publish(MultiControl(multi_control=[ControlInputs(delta=0.0, throttle=0.0), ControlInputs(delta=0.0, throttle=0.0), 
-                                                                   ControlInputs(delta=0.0, throttle=0.0), ControlInputs(delta=0.0, throttle=0.0)]))
+                                                                   ControlInputs(delta=0.0, throttle=0.0)]))
+        multi_path = MultiplePaths(multiple_path=[Path(path=self.trajectory1), Path(path=self.trajectory2), Path(path=self.trajectory3)])
+        self.multi_path_pub.publish(multi_path)  
      
         # CBF
         self.uni_barrier_cert = create_unicycle_barrier_certificate_with_boundary()
@@ -95,27 +77,24 @@ class Controller(Node):
         state1 = multi_state.multiple_state[0]
         state2 = multi_state.multiple_state[1]
         state3 = multi_state.multiple_state[2]
-        state4 = multi_state.multiple_state[3]
 
         cmd1, self.path1, self.target1, self.trajectory1 = self.control_callback(state1, self.target1, self.path1, self.trajectory1)
         cmd2, self.path2, self.target2, self.trajectory2 = self.control_callback(state2, self.target2, self.path2, self.trajectory2)
         cmd3, self.path3, self.target3, self.trajectory3 = self.control_callback(state3, self.target3, self.path3, self.trajectory3)
-        cmd4, self.path4, self.target4, self.trajectory4 = self.control_callback(state4, self.target4, self.path4, self.trajectory4)
 
         if debug:
            self.get_logger().info(f'Commands before: cmd1: {cmd1}, cmd2: {cmd2}')
-        dxu = np.zeros((2,4))
+        
+        dxu = np.zeros((2,3))
         dxu[0,0], dxu[1,0] = cmd1.throttle, cmd1.delta
         dxu[0,1], dxu[1,1] = cmd2.throttle, cmd2.delta
         dxu[0,2], dxu[1,2] = cmd3.throttle, cmd3.delta
-        dxu[0,3], dxu[1,3] = cmd4.throttle, cmd4.delta
 
         # Converting positions to arrays for the CBF
         x1 = state_to_array(state1)
         x2 = state_to_array(state2)
         x3 = state_to_array(state3)
-        x4 = state_to_array(state4)
-        x = np.concatenate((x1, x2, x3, x4), axis=1)
+        x = np.concatenate((x1, x2, x3), axis=1)
 
         # Create safe control inputs (i.e., no collisions)
         dxu = self.uni_barrier_cert(dxu, x)
@@ -123,22 +102,16 @@ class Controller(Node):
         cmd1.throttle, cmd1.delta = dxu[0,0], dxu[1,0]
         cmd2.throttle, cmd2.delta = dxu[0,1], dxu[1,1]
         cmd3.throttle, cmd3.delta = dxu[0,2], dxu[1,2]
-        cmd4.throttle, cmd4.delta = dxu[0,3], dxu[1,3]
 
         # Publishing everything in the general callback to avoid deadlocks
-        """self.control1_publisher_.publish(cmd1)
-        self.control2_publisher_.publish(cmd2)
-        self.control3_publisher_.publish(cmd3)
-        self.control4_publisher_.publish(cmd4)"""
-        multi_control = MultiControl(multi_control=[cmd1, cmd2, cmd3, cmd4])
+        multi_control = MultiControl(multi_control=[cmd1, cmd2, cmd3])
         self.multi_control_pub.publish(multi_control)
 
-        multi_path = MultiplePaths(multiple_path=[Path(path=self.trajectory1), Path(path=self.trajectory2), Path(path=self.trajectory3), Path(path=self.trajectory4)])
+        multi_path = MultiplePaths(multiple_path=[Path(path=self.trajectory1), Path(path=self.trajectory2), Path(path=self.trajectory3)])
         self.multi_path_pub.publish(multi_path)     
         
         if debug:
             self.get_logger().info(f'Commands after: cmd1: {cmd1}, cmd2: {cmd2}')
-            self.path_pub.publish(Path(path=self.path2))
 
     def control_callback(self, pose: FullState, target, path, trajectory):
         # updating target waypoint and predicting new traj
