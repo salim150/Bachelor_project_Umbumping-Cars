@@ -34,7 +34,7 @@ def CBF(x, u_ref):
     dxu = np.zeros([u_ref.shape[0], u_ref.shape[1]])
     count_dxu = 0
 
-    u_ref[1,:] = delta_to_beta_array(np.radians(u_ref[1,:]))
+    u_ref[1,:] = delta_to_beta_array(u_ref[1,:])
 
     for i in range(N):
         count = 0
@@ -67,7 +67,7 @@ def CBF(x, u_ref):
         dxu[:,count_dxu] = np.reshape(np.array(sol['x']), (M,))
         count_dxu += 1
     
-    dxu[1,:] = np.degrees(beta_to_delta(dxu[1,:]))
+    dxu[1,:] = beta_to_delta(dxu[1,:])
     return dxu
 
 def delta_to_beta(delta):

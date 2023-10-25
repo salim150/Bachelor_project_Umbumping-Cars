@@ -170,7 +170,7 @@ class Controller(Node):
 
         delta = 3 * delta
         delta = np.clip(delta, -max_steer, max_steer)
-        delta = math.degrees(delta)
+        delta = delta
         throttle = 3 * (desired_speed-pose.v)
 
         return throttle, delta, path, target
