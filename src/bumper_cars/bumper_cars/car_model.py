@@ -123,7 +123,7 @@ class CarModel(Node):
 
         dt = time.time() - old_time
         state = State()
-        cmd.delta = np.clip(np.radians(cmd.delta), -max_steer, max_steer)
+        cmd.delta = np.clip(cmd.delta, -max_steer, max_steer)
 
         state.x = initial_state.x + initial_state.v * np.cos(initial_state.yaw) * dt
         state.y = initial_state.y + initial_state.v * np.sin(initial_state.yaw) * dt
@@ -137,7 +137,7 @@ class CarModel(Node):
     def nonlinear_model_callback(self, state: State, cmd: ControlInputs, old_time: float):
 
         dt = time.time() - old_time
-        cmd.delta = np.clip(np.radians(cmd.delta), -max_steer, max_steer)
+        cmd.delta = np.clip(cmd.delta, -max_steer, max_steer)
 
         beta = math.atan2((Lr * math.tan(cmd.delta) / L), 1.0)
         vx = state.v * math.cos(beta)

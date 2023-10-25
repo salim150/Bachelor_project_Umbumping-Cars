@@ -231,7 +231,7 @@ def create_si_to_bi_mapping(projection_distance=0.05, angular_velocity_limit = n
         desired_speed[0, dxu[1,:]>-math.radians(10)] = 6
 
         dxu[0, :] = 3 * (desired_speed-v[0,:])"""
-        dxu[1, :] = np.degrees(dxu[1,:])
+        dxu[1, :] = dxu[1,:]
         return dxu
 
     def bi_to_si_states(poses):
@@ -295,7 +295,6 @@ def create_bi_to_si_dynamics(projection_distance=0.05):
         M,N = np.shape(dxu)
         v = np.zeros((1,N))
         yaw = np.zeros((1,N))
-        dxu[1, :] = np.radians(dxu[1, :])
 
         # v[0, :] = dxu[0, :]*dt
         v[0, :] = poses[3, :] + dxu[0, :]*dt
