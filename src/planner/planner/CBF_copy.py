@@ -9,20 +9,29 @@ from cvxopt import matrix, sparse
 from planner.utils import *
 from planner.predict_traj import predict_trajectory
 
+# For the parameter file
+from pathlib import Path
+import json
+
 # TODO: import all this parameters from a config file so that we can easily change them in one place
-L = 2.9
-max_steer = np.radians(30.0)  # [rad] max steering angle
-max_speed = 6 # [m/s]
-min_speed = 0.0 # [m/s]
-magnitude_limit= max_speed
-max_acc = 400
-min_acc = -400
-dt = 0.1
-safety_radius = 4
-barrier_gain = 1/1000
-magnitude_limit = max_speed
-Kv = 0.1 # interval [0.5-1]
-L = 2.9  # [m] Wheel base of vehicle
+path = Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
+# Opening JSON file
+with open(path, 'r') as openfile:
+
+    # Reading from json file
+    json_object = json.load(openfile)
+
+L = json_object["CBF_simple"]["L"]
+max_steer = json_object["CBF_simple"]["max_steer"]  # [rad] max steering angle
+max_speed = json_object["CBF_simple"]["max_speed"] # [m/s]
+min_speed = json_object["CBF_simple"]["min_speed"] # [m/s]
+magnitude_limit= json_object["CBF_simple"]["max_speed"] 
+max_acc = json_object["CBF_simple"]["max_acc"] 
+min_acc = json_object["CBF_simple"]["min_acc"] 
+dt = json_object["CBF_simple"]["dt"]
+safety_radius = json_object["CBF_simple"]["safety_radius"]
+barrier_gain = json_object["CBF_simple"]["barrier_gain"]
+Kv = json_object["CBF_simple"]["Kv"] # interval [0.5-1]
 Lr = L / 2.0  # [m]
 Lf = L - Lr
 

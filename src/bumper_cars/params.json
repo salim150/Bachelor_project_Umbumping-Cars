@@ -1,0 +1,43 @@
+{
+    "CBF_robotarium": 
+        {
+            "L": 2.9,
+            "max_steer": 0.523599,
+            "max_speed": 6,
+            "min_speed": -1.0,
+            "dt": 0.1,
+            "safety_radius": 7,
+            "barrier_gain": 0.05, 
+            "magnitude_limit": 6
+        },
+    "CBF_simple":
+        {
+            "L": 2.9,
+            "max_steer": 0.523599,
+            "max_speed": 6,
+            "min_speed": 0.0,
+            "max_acc": 400,
+            "min_acc": -400,
+
+            "dt": 0.1,
+            "safety_radius": 4,
+            "barrier_gain": 0.0001, 
+            "Kv": 0.1
+        },
+    "Car_model":
+        {
+            "max_steer": 0.523599,
+            "max_speed": 10,
+            "min_speed": 0.0,
+            "L": 2.9, 
+            "Cf": 320.0,
+            "Cr": 340.0, 
+            "Iz": 225.0,
+            "m": 150.0,
+            "c_a": 1.36,
+            "c_r1": 0.01
+        }
+    
+
+
+}
