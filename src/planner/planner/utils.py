@@ -6,20 +6,22 @@ from planner.cubic_spline_planner import *
 from planner.frenet import *
 from planner.predict_traj import *
 
+# For the parameter file
+import pathlib
+import json
+
 # TODO: import all this parameters from a config file so that we can easily change them in one place
-L = 2.9
-max_steer = np.radians(30.0)  # [rad] max steering angle
-max_speed = 6 # [m/s]
-min_speed = 0.3 # [m/s]
-magnitude_limit= max_speed
-max_acc = 40
-min_acc = -40
-dt = 0.1
-safety_radius = 3
-barrier_gain = 100
-magnitude_limit = max_speed
-Kv = 1
-L = 2.9  # [m] Wheel base of vehicle
+path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
+# Opening JSON file
+with open(path, 'r') as openfile:
+    # Reading from json file
+    json_object = json.load(openfile)
+
+max_steer = json_object["CBF_simple"]["max_steer"]   # [rad] max steering angle
+max_speed = json_object["CBF_simple"]["max_speed"] # [m/s]
+min_speed = json_object["CBF_simple"]["min_speed"]  # [m/s]
+dt = json_object["CBF_simple"]["dt"] 
+L = json_object["CBF_simple"]["L"] # [m] Wheel base of vehicle
 Lr = L / 2.0  # [m]
 Lf = L - Lr
 

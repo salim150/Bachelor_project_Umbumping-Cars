@@ -20,10 +20,21 @@ from planner.predict_traj import *
 from planner.CBF import *
 from planner.CBF_copy import *
 
+# For the parameter file
+import pathlib
+import json
+
+path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
+# Opening JSON file
+with open(path, 'r') as openfile:
+    # Reading from json file
+    json_object = json.load(openfile)
+
+WB = json_object["Controller"]["WB"] # Wheel base
+L_d = json_object["Controller"]["L_d"]  # [m] look-ahead distance
+max_steer = json_object["Controller"]["max_steer"]  # [rad] max steering angle
+
 debug = False
-WB = 2.9  # [m] Wheel base of vehicle
-Lf = 20  # [m] look-ahead distance
-max_steer = np.radians(30.0)  # [rad] max steering angle
 
 class Controller(Node):
 
@@ -117,7 +128,7 @@ class Controller(Node):
 
     def control_callback(self, pose: FullState, target, path, trajectory):
         # updating target waypoint and predicting new traj
-        if self.dist(point1=(pose.x, pose.y), point2=target) < Lf:
+        if self.dist(point1=(pose.x, pose.y), point2=target) < L_d:
             path = self.update_path(path)
             target = (path[0].x, path[0].y)
             trajectory, tx, ty  = predict_trajectory(pose, target)
@@ -160,7 +171,7 @@ class Controller(Node):
             delta = -max_steer
         else:
             # ref: https://www.shuffleai.blog/blog/Three_Methods_of_Vehicle_Lateral_Control.html
-            delta = self.normalize_angle(math.atan2(2.0 * WB *  math.sin(alpha), Lf))
+            delta = self.normalize_angle(math.atan2(2.0 * WB *  math.sin(alpha), L_d))
         
         # decreasing the desired speed when turning
         if delta > math.radians(10) or delta < -math.radians(10):
@@ -168,7 +179,7 @@ class Controller(Node):
         else:
             desired_speed = 6
 
-        delta = 3 * delta
+        # delta = 3 * delta
         delta = np.clip(delta, -max_steer, max_steer)
         delta = delta
         throttle = 3 * (desired_speed-pose.v)

@@ -15,7 +15,7 @@
             "L": 2.9,
             "max_steer": 0.523599,
             "max_speed": 6,
-            "min_speed": 0.0,
+            "min_speed": 0.5,
             "max_acc": 400,
             "min_acc": -400,
 
@@ -28,7 +28,7 @@
         {
             "max_steer": 0.523599,
             "max_speed": 10,
-            "min_speed": 0.0,
+            "min_speed": 0.5,
             "L": 2.9, 
             "Cf": 320.0,
             "Cr": 340.0, 
@@ -36,6 +36,12 @@
             "m": 150.0,
             "c_a": 1.36,
             "c_r1": 0.01
+        },
+    "Controller":
+        {
+            "max_steer": 0.523599,
+            "WB": 10,
+            "L_d": 0.5
         }
     
 

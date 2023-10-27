@@ -9,16 +9,25 @@ from cvxopt import matrix, sparse
 from planner.utils import *
 from planner.predict_traj import predict_trajectory
 
+# For the parameter file
+import pathlib
+import json
+
+path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
+# Opening JSON file
+with open(path, 'r') as openfile:
+    # Reading from json file
+    json_object = json.load(openfile)
+
 # TODO: import all this parameters from a config file so that we can easily change them in one place
-L = 2.9
-max_steer = np.radians(30.0)  # [rad] max steering angle
-max_speed = 6 # [m/s]
-min_speed = -1.0 # [m/s]
+L = json_object["CBF_robotarium"]["L"] 
+max_steer = json_object["CBF_robotarium"]["max_steer"]   # [rad] max steering angle
+max_speed = json_object["CBF_robotarium"]["max_speed"]  # [m/s]
+min_speed = json_object["CBF_robotarium"]["min_speed"]  # [m/s]
 magnitude_limit= max_speed
-dt = 0.1
-safety_radius = 7
-barrier_gain = 0.05
-magnitude_limit = max_speed
+dt = json_object["CBF_robotarium"]["dt"] 
+safety_radius = json_object["CBF_robotarium"]["safety_radius"] 
+barrier_gain = json_object["CBF_robotarium"]["barrier_gain"] 
 
 def create_unicycle_barrier_certificate_with_boundary(barrier_gain=barrier_gain, safety_radius=safety_radius, projection_distance=0.05, magnitude_limit=magnitude_limit, boundary_points = np.array([-50, 50, -50, 50])):
     """ Creates a unicycle barrier cetifcate to avoid collisions. Uses the diffeomorphism mapping

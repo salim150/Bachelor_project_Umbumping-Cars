@@ -10,14 +10,13 @@ from planner.utils import *
 from planner.predict_traj import predict_trajectory
 
 # For the parameter file
-from pathlib import Path
+import pathlib
 import json
 
 # TODO: import all this parameters from a config file so that we can easily change them in one place
-path = Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
+path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
 # Opening JSON file
 with open(path, 'r') as openfile:
-
     # Reading from json file
     json_object = json.load(openfile)
 

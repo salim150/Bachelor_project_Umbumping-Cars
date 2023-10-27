@@ -8,19 +8,29 @@ import time
 import message_filters
 import math
 
-max_steer = np.radians(30.0)  # [rad] max steering angle
-max_speed = 10 # [m/s]
-min_speed = 0.0 # [m/s]
-L = 2.9  # [m] Wheel base of vehicle
+# For the parameter file
+import pathlib
+import json
+
+path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
+# Opening JSON file
+with open(path, 'r') as openfile:
+    # Reading from json file
+    json_object = json.load(openfile)
+
+max_steer = json_object["Car_model"]["max_steer"] # [rad] max steering angle
+max_speed = json_object["Car_model"]["max_speed"] # [m/s]
+min_speed = json_object["Car_model"]["min_speed"] # [m/s]
+L = json_object["Car_model"]["L"]  # [m] Wheel base of vehicle
 Lr = L / 2.0  # [m]
 Lf = L - Lr
-Cf = 160.0 * 2.0  # N/rad
-Cr = 170.0 * 2.0  # N/rad
-Iz = 225.0  # kg/m2
-m = 150.0  # kg
+Cf = json_object["Car_model"]["Cf"]  # N/rad
+Cr = json_object["Car_model"]["Cr"] # N/rad
+Iz = json_object["Car_model"]["Iz"]  # kg/m2
+m = json_object["Car_model"]["m"]  # kg
 # Aerodynamic and friction coefficients
-c_a = 1.36
-c_r1 = 0.01
+c_a = json_object["Car_model"]["c_a"]
+c_r1 = json_object["Car_model"]["c_r1"]
 
 
 class CarModel(Node):
