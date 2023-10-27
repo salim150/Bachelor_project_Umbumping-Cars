@@ -18,9 +18,8 @@
             "min_speed": 0.5,
             "max_acc": 400,
             "min_acc": -400,
-
             "dt": 0.1,
-            "safety_radius": 4,
+            "safety_radius": 6,
             "barrier_gain": 0.0001, 
             "Kv": 0.1
         },
@@ -40,8 +39,8 @@
     "Controller":
         {
             "max_steer": 0.523599,
-            "WB": 10,
-            "L_d": 0.5
+            "WB": 2.9,
+            "L_d": 20
         }
     
 

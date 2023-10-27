@@ -17,8 +17,8 @@ import numpy as np
 from planner.predict_traj import *
 
 # for the CBF
-from planner.CBF import *
-from planner.CBF_copy import *
+from planner.CBF_robotarium import *
+from planner.CBF_simple import *
 
 # For the parameter file
 import pathlib
