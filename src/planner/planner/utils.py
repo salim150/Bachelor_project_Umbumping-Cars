@@ -91,7 +91,7 @@ def pure_pursuit_steer_control(target, pose):
         desired_speed = max_speed
 
     delta = np.clip(delta, -max_steer, max_steer)
-    delta = delta
+    # delta = delta
     throttle = 3 * (desired_speed-pose.v)
     return throttle, delta
 

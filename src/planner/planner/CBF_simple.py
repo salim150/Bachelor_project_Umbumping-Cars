@@ -49,6 +49,7 @@ def CBF(x, u_ref):
         for j in range(N):
 
             if j == i: continue
+
             P = np.identity(2)*2
             q = np.array([-2 * u_ref[0, i], - 2 * u_ref[1,i]])
 

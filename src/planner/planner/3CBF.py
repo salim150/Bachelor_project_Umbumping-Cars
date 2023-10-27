@@ -9,25 +9,40 @@ from cvxopt import matrix, sparse
 from planner.utils import *
 from planner.predict_traj import predict_trajectory
 
-# TODO: import all this parameters from a config file so that we can easily change them in one place
-L = 2.9
-max_steer = np.radians(30.0)  # [rad] max steering angle
-max_speed = 6 # [m/s]
-min_speed = 0.0 # [m/s]
-magnitude_limit= max_speed
-dt = 0.1
-safety_radius = 6
-barrier_gain = 0.1
-magnitude_limit = max_speed
-Kv = 0.1
+# For the parameter file
+import pathlib
+import json
 
-def CBF(x, u_ref):
+# TODO: import all this parameters from a config file so that we can easily change them in one place
+path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
+# Opening JSON file
+with open(path, 'r') as openfile:
+    # Reading from json file
+    json_object = json.load(openfile)
+
+L = json_object["CBF_simple"]["L"]
+max_steer = json_object["CBF_simple"]["max_steer"]  # [rad] max steering angle
+max_speed = json_object["CBF_simple"]["max_speed"] # [m/s]
+min_speed = json_object["CBF_simple"]["min_speed"] # [m/s]
+magnitude_limit= json_object["CBF_simple"]["max_speed"] 
+max_acc = json_object["CBF_simple"]["max_acc"] 
+min_acc = json_object["CBF_simple"]["min_acc"] 
+dt = json_object["CBF_simple"]["dt"]
+safety_radius = 3#json_object["CBF_simple"]["safety_radius"]
+barrier_gain = 1# json_object["CBF_simple"]["barrier_gain"]
+Kv = json_object["CBF_simple"]["Kv"] # interval [0.5-1]
+Lr = L / 2.0  # [m]
+Lf = L - Lr
+
+def C3BF(x, u_ref):
     N = x.shape[1]
     M = u_ref.shape[0]
     G = np.zeros([N-1,M])
-    H = np.zeros([N-1])
+    H = np.zeros([N-1,1])
     dxu = np.zeros([u_ref.shape[0], u_ref.shape[1]])
     count_dxu = 0
+
+    u_ref[1,:] = delta_to_beta_array(u_ref[1,:])
 
     for i in range(N):
         count = 0
@@ -35,25 +50,76 @@ def CBF(x, u_ref):
 
             if j == i: continue
 
-            P = np.identity(2)
-            q = np.array([-2 * u_ref[0, i], -2 * u_ref[1,i]])
+            P = np.identity(2)*2
+            q = np.array([-2 * u_ref[0, i], - 2 * u_ref[1,i]])
 
-            Lf_h = 2 * x[3,i] * (np.cos(x[2,i]) * (x[0,i]-x[0,j]) + np.sin(x[2,i]) * (x[1,i] - x[1,j]))
-            Lg_h = 2 * x[3,i] * (np.cos(x[2,i]) * (x[1,i]-x[1,j]) - np.sin(x[2,i]) * (x[0,i] - x[0,j]))
-            h = (x[0,i]-x[0,j]) * (x[0,i]-x[0,j]) + (x[1,i] - x[1,j]) * (x[1,i] - x[1,j]) - (safety_radius**2 + Kv * x[3,i])
+            f = np.array([x[3,i]*np.cos(x[2,i]),
+                          x[3,i]*np.sin(x[2,i]), 
+                          0, 
+                          0]).reshape(4,1)
+            g = np.array([[0, -x[3,i]*np.sin(x[2,i])], 
+                          [0, x[3,i]*np.cos(x[2,i])], 
+                          [0, x[3,i]/Lr],
+                          [1, 0]]).reshape(4,2)
+            
+            v_xy = np.array([x[3,i]*np.cos(x[2,i]),
+                             x[3,i]*np.sin(x[2,i])])
+            v_rel = np.array([x[3,j]*np.cos(x[2,j]) - x[3,i]*np.cos(x[2,i]), 
+                              x[3,j]*np.sin(x[2,j]) - x[3,i]*np.sin(x[2,i])])
+            p_rel = np.array([x[0,j]-x[0,i],
+                              x[1,j]-x[1,i]])
+            
+            cos_Phi = np.sqrt(np.linalg.norm(p_rel)**2 - safety_radius**2)/np.linalg.norm(p_rel)
+            tan_Phi = safety_radius**2 / (np.linalg.norm(p_rel)**2 - safety_radius**2)
+            
+            h = np.dot(p_rel, v_rel) + np.linalg.norm(v_rel) * np.linalg.norm(p_rel) * cos_Phi
+            
+            gradH_1 = np.array([x[0,i] * -v_rel[0], 
+                                x[1,i] * -v_rel[1],
+                                x[3,i]*np.cos(x[2,i]) * p_rel[0] - x[3,i]*np.sin(x[2,i]) * p_rel[1],
+                                -np.cos(x[2,i]) * p_rel[0] - np.sin(x[2,i]) * p_rel[1]])
+            
+            gradH_21 = -(tan_Phi**2/np.linalg.norm(p_rel)**3 + np.linalg.norm(v_rel)/np.linalg.norm(p_rel)) * p_rel * cos_Phi
+            gradH_22 = np.dot(np.dot(np.array([[0, 1], [-1, 0]]), v_xy), v_rel) * np.linalg.norm(p_rel)/(np.linalg.norm(v_rel) + 0.00001) * cos_Phi
+            gradH_23 = - np.dot(v_xy, v_rel) * np.linalg.norm(p_rel)/(np.linalg.norm(v_rel) + 0.00001) * cos_Phi
 
-            H[count] = np.array([barrier_gain*np.power(h, 3)-Lf_h])
-            G[count,:] = np.array([-Kv, Lg_h])
+            gradH = gradH_1.reshape(4,1) + np.vstack([gradH_21.reshape(2,1), gradH_22, gradH_23])
+
+            Lf_h = np.dot(gradH.T, f)
+            Lg_h = np.dot(gradH.T, g)
+
+            H[count] = np.array([barrier_gain*np.power(h, 1) + Lf_h])
+            G[count,:] = -Lg_h
             count+=1
-            print("Finished 1 loop")
         
+        # Input constraints
+        G = np.vstack([G, [[0, 1], [0, -1]]])
+        H = np.vstack([H, delta_to_beta(max_steer), -delta_to_beta(-max_steer)])
+        G = np.vstack([G, [[1, 0], [-1, 0]]])
+        H = np.vstack([H, max_acc, -min_acc])
+
+        solvers.options['show_progress'] = False
         sol = solvers.qp(matrix(P), matrix(q), matrix(G), matrix(H))
-        dxu[:,count_dxu] = np.reshape(np.array(sol['x']), (2,))
+        dxu[:,count_dxu] = np.reshape(np.array(sol['x']), (M,))
         count_dxu += 1
     
+    dxu[1,:] = beta_to_delta(dxu[1,:])    
     return dxu
             
-            
+def delta_to_beta(delta):
+    beta = normalize_angle(np.arctan2(Lr*np.tan(delta)/L, 1.0))
+
+    return beta
+
+def delta_to_beta_array(delta):
+    beta = normalize_angle_array(np.arctan2(Lr*np.tan(delta)/L, 1.0))
+
+    return beta
+
+def beta_to_delta(beta):
+    delta = normalize_angle_array(np.arctan2(L*np.tan(beta)/Lr, 1.0))
+
+    return delta           
 
 
     # sol = solvers.qp()
@@ -74,8 +140,8 @@ def main(args=None):
 
     # define x initially --> state: [x, y, yaw, v]
     x = np.array([[0, 25], [0, 0], [0, np.pi], [0, 0]])
-    goal1 = np.array([20, 10])
-    goal2 = np.array([0, 10])
+    goal1 = np.array([20, 0])
+    goal2 = np.array([0, 0])
     cmd1 = ControlInputs()
     cmd2 = ControlInputs()
 
@@ -97,11 +163,11 @@ def main(args=None):
         dxu[0,1], dxu[1,1] = pure_pursuit_steer_control(goal2, x2)
 
         # Create safe control inputs (i.e., no collisions)
-        # print(dxu)
-        dxu = CBF(x, dxu)
+        print(dxu)
+        dxu = C3BF(x, dxu)
         # dxu = uni_barrier_cert(dxu, x)
-        # print(dxu)
-        # print('\n')
+        print(dxu)
+        print('\n')
 
         cmd1.throttle, cmd1.delta = dxu[0,0], dxu[1,0]
         cmd2.throttle, cmd2.delta = dxu[0,1], dxu[1,1]
