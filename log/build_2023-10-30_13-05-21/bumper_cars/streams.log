@@ -1,0 +1,46 @@
+[1.007s] Invoking command in '/home/giacomo/thesis_ws/build/bumper_cars': CMAKE_PREFIX_PATH=/home/giacomo/thesis_ws/install/custom_message:/home/giacomo/thesis_ws/install/urdf_example:/home/giacomo/thesis_ws/install/sym_bringup:/home/giacomo/thesis_ws/install/my_bot:/home/giacomo/ros2_ws/install/tutorial_interfaces:/home/giacomo/ros2_ws/install/turtlesim PYTHONPATH=/home/giacomo/thesis_ws/build/bumper_cars/prefix_override:/home/giacomo/thesis_ws/install/bumper_cars/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --editable --build-directory /home/giacomo/thesis_ws/build/bumper_cars/build --no-deps install_data
+[1.355s] running develop
+[1.355s] /home/giacomo/.local/lib/python3.10/site-packages/setuptools/command/develop.py:40: EasyInstallDeprecationWarning: easy_install command is deprecated.
+[1.355s] !!
+[1.355s] 
+[1.355s]         ********************************************************************************
+[1.355s]         Please avoid running ``setup.py`` and ``easy_install``.
+[1.355s]         Instead, use pypa/build, pypa/installer or other
+[1.356s]         standards-based tools.
+[1.356s] 
+[1.356s]         See https://github.com/pypa/setuptools/issues/917 for details.
+[1.356s]         ********************************************************************************
+[1.356s] 
+[1.356s] !!
+[1.356s]   easy_install.initialize_options(self)
+[1.390s] /home/giacomo/.local/lib/python3.10/site-packages/setuptools/_distutils/cmd.py:66: SetuptoolsDeprecationWarning: setup.py install is deprecated.
+[1.390s] !!
+[1.390s] 
+[1.390s]         ********************************************************************************
+[1.390s]         Please avoid running ``setup.py`` directly.
+[1.391s]         Instead, use pypa/build, pypa/installer or other
+[1.391s]         standards-based tools.
+[1.391s] 
+[1.391s]         See https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html for details.
+[1.391s]         ********************************************************************************
+[1.391s] 
+[1.391s] !!
+[1.391s]   self.initialize_options()
+[1.589s] running egg_info
+[1.606s] writing bumper_cars.egg-info/PKG-INFO
+[1.607s] writing dependency_links to bumper_cars.egg-info/dependency_links.txt
+[1.607s] writing entry points to bumper_cars.egg-info/entry_points.txt
+[1.608s] writing requirements to bumper_cars.egg-info/requires.txt
+[1.608s] writing top-level names to bumper_cars.egg-info/top_level.txt
+[1.641s] reading manifest file 'bumper_cars.egg-info/SOURCES.txt'
+[1.642s] writing manifest file 'bumper_cars.egg-info/SOURCES.txt'
+[1.660s] running build_ext
+[1.660s] Creating /home/giacomo/thesis_ws/install/bumper_cars/lib/python3.10/site-packages/bumper-cars.egg-link (link to .)
+[1.661s] Installing controller script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars
+[1.661s] Installing model script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars
+[1.661s] Installing plotter script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars
+[1.661s] Installing sensor script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars
+[1.662s] 
+[1.662s] Installed /home/giacomo/thesis_ws/build/bumper_cars
+[1.662s] running install_data
+[1.689s] Invoked command in '/home/giacomo/thesis_ws/build/bumper_cars' returned '0': CMAKE_PREFIX_PATH=/home/giacomo/thesis_ws/install/custom_message:/home/giacomo/thesis_ws/install/urdf_example:/home/giacomo/thesis_ws/install/sym_bringup:/home/giacomo/thesis_ws/install/my_bot:/home/giacomo/ros2_ws/install/tutorial_interfaces:/home/giacomo/ros2_ws/install/turtlesim PYTHONPATH=/home/giacomo/thesis_ws/build/bumper_cars/prefix_override:/home/giacomo/thesis_ws/install/bumper_cars/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --editable --build-directory /home/giacomo/thesis_ws/build/bumper_cars/build --no-deps install_data

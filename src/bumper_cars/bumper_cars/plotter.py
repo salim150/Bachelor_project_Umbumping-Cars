@@ -4,10 +4,9 @@ import rclpy
 from rclpy.node import Node
 import math
 from matplotlib import pyplot as plt
-from custom_message.msg import ControlInputs, State, FullState, Path, MultiplePaths, MultiState
+from custom_message.msg import FullState, Path, MultiplePaths, MultiState
 import message_filters
 import numpy as np
-import random
 
 class Config:
     """

@@ -2,11 +2,7 @@
 
 import rclpy
 from rclpy.node import Node
-from turtlesim.msg import Pose
-from geometry_msgs.msg import Twist
-from turtlesim.srv import SetPen
-from functools import partial
-from custom_message.msg import ControlInputs, State, MultiState, FullState
+from custom_message.msg import MultiState, FullState
 import message_filters
 
 debug = False

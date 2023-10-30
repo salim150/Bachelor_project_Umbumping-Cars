@@ -2,12 +2,7 @@
 
 import rclpy
 from rclpy.node import Node
-from turtlesim.msg import Pose
-from geometry_msgs.msg import Twist
-from turtlesim.srv import SetPen
-from functools import partial
 from custom_message.msg import ControlInputs, State, Path, Coordinate, MultiplePaths, MultiState, MultiControl
-from std_msgs.msg import Float32MultiArray
 import message_filters
 import random
 import math
@@ -111,8 +106,8 @@ class Controller(Node):
 
         # Create safe control inputs (i.e., no collisions)
         # dxu = self.uni_barrier_cert(dxu, x)
-        # dxu = CBF(x, dxu)
-        dxu = C3BF(x, dxu)
+        dxu = CBF(x, dxu)
+        # dxu = C3BF(x, dxu)
 
         cmd1.throttle, cmd1.delta = dxu[0,0], dxu[1,0]
         cmd2.throttle, cmd2.delta = dxu[0,1], dxu[1,1]
@@ -162,7 +157,7 @@ class Controller(Node):
             path.append(Coordinate(x=float(random.randint(-self.width/2, self.width/2)), y=float(random.randint(-self.heigth/2, self.heigth/2))))
         return path
     
-    def pure_pursuit_steer_control(self, target, pose: Pose, path: Path):
+    def pure_pursuit_steer_control(self, target, pose: FullState, path: Path):
 
         alpha = self.normalize_angle(math.atan2(target[1] - pose.y, target[0] - pose.x) - pose.yaw)
 

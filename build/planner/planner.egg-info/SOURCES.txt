@@ -1,9 +1,9 @@
 package.xml
 setup.cfg
 setup.py
-planner/CBF.py
-planner/CBF_copy.py
-planner/CBF_mine.py
+planner/C3BF.py
+planner/CBF_robotarium.py
+planner/CBF_simple.py
 planner/__init__.py
 planner/cubic_spline_planner.py
 planner/frenet.py
