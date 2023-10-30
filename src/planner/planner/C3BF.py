@@ -99,9 +99,10 @@ def C3BF(x, u_ref):
         # G = np.vstack([G, [[1, 0], [-1, 0]]])
         # H = np.vstack([H, max_acc, -min_acc])
 
-        solvers.options['show_progress], [-1, 0]]])
-        # H = np.vstack([H, max_acc, -min_acc])
-
+        solvers.options['show_progress'] = False
+        sol = solvers.qp(matrix(P), matrix(q), matrix(G), matrix(H))
+        dxu[:,count_dxu] = np.reshape(np.array(sol['x']), (M,))
+        count_dxu += 1
     
     dxu[1,:] = beta_to_delta(dxu[1,:])    
     return dxu
