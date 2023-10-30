@@ -19,6 +19,7 @@ from planner.predict_traj import *
 # for the CBF
 from planner.CBF_robotarium import *
 from planner.CBF_simple import *
+from planner.C3BF import *
 
 # For the parameter file
 import pathlib
@@ -110,7 +111,8 @@ class Controller(Node):
 
         # Create safe control inputs (i.e., no collisions)
         # dxu = self.uni_barrier_cert(dxu, x)
-        dxu = CBF(x, dxu)
+        # dxu = CBF(x, dxu)
+        dxu = C3BF(x, dxu)
 
         cmd1.throttle, cmd1.delta = dxu[0,0], dxu[1,0]
         cmd2.throttle, cmd2.delta = dxu[0,1], dxu[1,1]

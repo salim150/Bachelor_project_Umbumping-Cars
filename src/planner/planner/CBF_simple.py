@@ -64,8 +64,8 @@ def CBF(x, u_ref):
         # Add the input constraint
         G = np.vstack([G, [[0, 1], [0, -1]]])
         H = np.vstack([H, delta_to_beta(max_steer), -delta_to_beta(-max_steer)])
-        # G = np.vstack([G, [[1, 0], [-1, 0]]])
-        # H = np.vstack([H, max_acc, -min_acc])
+        G = np.vstack([G, [[1, 0], [-1, 0]]])
+        H = np.vstack([H, max_acc, -min_acc])
         
         """G = np.vstack([G, np.identity(M)])
         G = np.vstack([G, -np.identity(M)])
@@ -93,6 +93,21 @@ def beta_to_delta(beta):
     delta = normalize_angle_array(np.arctan2(L*np.tan(beta)/Lr, 1.0))
 
     return delta
+
+def plot_rect(x, y, yaw, r):  # pragma: no cover
+        outline = np.array([[-r / 2, r / 2,
+                                (r / 2), -r / 2,
+                                -r / 2],
+                            [r / 2, r/ 2,
+                                - r / 2, -r / 2,
+                                r / 2]])
+        Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
+                            [-math.sin(yaw), math.cos(yaw)]])
+        outline = (outline.T.dot(Rot1)).T
+        outline[0, :] += x
+        outline[1, :] += y
+        plt.plot(np.array(outline[0, :]).flatten(),
+                    np.array(outline[1, :]).flatten(), "-k")
 
 
 def main(args=None):
@@ -155,8 +170,12 @@ def main(args=None):
         plt.plot(x2.x, x2.y, 'xb')
         plot_arrow(x1.x, x1.y, x1.yaw)
         plot_arrow(x1.x, x1.y, x1.yaw + cmd1.delta)
+        plot_rect(x1.x, x1.y, x1.yaw, safety_radius)
+
         plot_arrow(x2.x, x2.y, x2.yaw)
         plot_arrow(x2.x, x2.y, x2.yaw + cmd2.delta)
+        plot_rect(x2.x, x2.y, x2.yaw, safety_radius)
+
         plot_path(trajectory)
         plot_path(trajectory2)
         plt.plot(goal1[0], goal1[1], '.k')

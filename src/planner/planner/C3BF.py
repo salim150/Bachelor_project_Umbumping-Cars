@@ -25,11 +25,11 @@ max_steer = json_object["CBF_simple"]["max_steer"]  # [rad] max steering angle
 max_speed = json_object["CBF_simple"]["max_speed"] # [m/s]
 min_speed = json_object["CBF_simple"]["min_speed"] # [m/s]
 magnitude_limit= json_object["CBF_simple"]["max_speed"] 
-max_acc = json_object["CBF_simple"]["max_acc"] 
-min_acc = json_object["CBF_simple"]["min_acc"] 
+max_acc = 40 #json_object["CBF_simple"]["max_acc"] 
+min_acc = -40 #json_object["CBF_simple"]["min_acc"] 
 dt = json_object["CBF_simple"]["dt"]
 safety_radius = 3#json_object["CBF_simple"]["safety_radius"]
-barrier_gain = 1# json_object["CBF_simple"]["barrier_gain"]
+barrier_gain = 0.00001# json_object["CBF_simple"]["barrier_gain"]
 Kv = json_object["CBF_simple"]["Kv"] # interval [0.5-1]
 Lr = L / 2.0  # [m]
 Lf = L - Lr
@@ -46,21 +46,22 @@ def C3BF(x, u_ref):
 
     for i in range(N):
         count = 0
+
+        f = np.array([x[3,i]*np.cos(x[2,i]),
+                          x[3,i]*np.sin(x[2,i]), 
+                          0, 
+                          0]).reshape(4,1)
+        g = np.array([[0, -x[3,i]*np.sin(x[2,i])], 
+                        [0, x[3,i]*np.cos(x[2,i])], 
+                        [0, x[3,i]/Lr],
+                        [1, 0]]).reshape(4,2)
+        
         for j in range(N):
 
             if j == i: continue
 
             P = np.identity(2)*2
             q = np.array([-2 * u_ref[0, i], - 2 * u_ref[1,i]])
-
-            f = np.array([x[3,i]*np.cos(x[2,i]),
-                          x[3,i]*np.sin(x[2,i]), 
-                          0, 
-                          0]).reshape(4,1)
-            g = np.array([[0, -x[3,i]*np.sin(x[2,i])], 
-                          [0, x[3,i]*np.cos(x[2,i])], 
-                          [0, x[3,i]/Lr],
-                          [1, 0]]).reshape(4,2)
             
             v_xy = np.array([x[3,i]*np.cos(x[2,i]),
                              x[3,i]*np.sin(x[2,i])])
@@ -69,34 +70,41 @@ def C3BF(x, u_ref):
             p_rel = np.array([x[0,j]-x[0,i],
                               x[1,j]-x[1,i]])
             
-            cos_Phi = np.sqrt(np.linalg.norm(p_rel)**2 - safety_radius**2)/np.linalg.norm(p_rel)
-            tan_Phi = safety_radius**2 / (np.linalg.norm(p_rel)**2 - safety_radius**2)
+            cos_Phi = np.sqrt(abs(np.linalg.norm(p_rel)**2 - safety_radius**2))/np.linalg.norm(p_rel)
+            tan_Phi_sq = safety_radius**2 / (np.linalg.norm(p_rel)**2 - safety_radius**2)
             
             h = np.dot(p_rel, v_rel) + np.linalg.norm(v_rel) * np.linalg.norm(p_rel) * cos_Phi
             
-            gradH_1 = np.array([x[0,i] * -v_rel[0], 
-                                x[1,i] * -v_rel[1],
-                                x[3,i]*np.cos(x[2,i]) * p_rel[0] - x[3,i]*np.sin(x[2,i]) * p_rel[1],
+            gradH_1 = np.array([- x[0,i] * (x[3,j]*np.cos(x[2,j]) - x[3,i]*np.cos(x[2,i])), 
+                                - x[1,i] * (x[3,j]*np.sin(x[2,j]) - x[3,i]*np.sin(x[2,i])),
+                                x[3,i] * (np.sin(x[2,i]) * p_rel[0] - np.cos(x[2,i]) * p_rel[1]),
                                 -np.cos(x[2,i]) * p_rel[0] - np.sin(x[2,i]) * p_rel[1]])
             
-            gradH_21 = -(tan_Phi**2/np.linalg.norm(p_rel)**3 + np.linalg.norm(v_rel)/np.linalg.norm(p_rel)) * p_rel * cos_Phi
-            gradH_22 = np.dot(np.dot(np.array([[0, 1], [-1, 0]]), v_xy), v_rel) * np.linalg.norm(p_rel)/(np.linalg.norm(v_rel) + 0.00001) * cos_Phi
-            gradH_23 = - np.dot(v_xy, v_rel) * np.linalg.norm(p_rel)/(np.linalg.norm(v_rel) + 0.00001) * cos_Phi
+            gradH_21 = -(1 + tan_Phi_sq) * np.linalg.norm(v_rel)/np.linalg.norm(p_rel) * cos_Phi * p_rel 
+            gradH_22 = np.dot(np.array([x[3,i]*np.sin(x[2,i]), -x[3,i]*np.cos(x[2,i])]), v_rel) * np.linalg.norm(p_rel)/(np.linalg.norm(v_rel) + 0.00001) * cos_Phi
+            gradH_23 = - np.dot(v_rel, np.array([np.cos(x[2,i]), np.sin(x[2,i])])) * np.linalg.norm(p_rel)/(np.linalg.norm(v_rel) + 0.00001) * cos_Phi
 
             gradH = gradH_1.reshape(4,1) + np.vstack([gradH_21.reshape(2,1), gradH_22, gradH_23])
 
             Lf_h = np.dot(gradH.T, f)
             Lg_h = np.dot(gradH.T, g)
 
+            # print(i,j)
+            # print(gradH)
+            # print(f)
+            # print(Lg_h)
+            # print("\n")
+
+
             H[count] = np.array([barrier_gain*np.power(h, 1) + Lf_h])
             G[count,:] = -Lg_h
             count+=1
         
         # Input constraints
-        G = np.vstack([G, [[0, 1], [0, -1]]])
-        H = np.vstack([H, delta_to_beta(max_steer), -delta_to_beta(-max_steer)])
-        G = np.vstack([G, [[1, 0], [-1, 0]]])
-        H = np.vstack([H, max_acc, -min_acc])
+        # G = np.vstack([G, [[0, 1], [0, -1]]])
+        # H = np.vstack([H, delta_to_beta(max_steer), -delta_to_beta(-max_steer)])
+        # G = np.vstack([G, [[1, 0], [-1, 0]]])
+        # H = np.vstack([H, max_acc, -min_acc])
 
         solvers.options['show_progress'] = False
         sol = solvers.qp(matrix(P), matrix(q), matrix(G), matrix(H))
@@ -121,8 +129,20 @@ def beta_to_delta(beta):
 
     return delta           
 
-
-    # sol = solvers.qp()
+def plot_rect(x, y, yaw, r):  # pragma: no cover
+        outline = np.array([[-r / 2, r / 2,
+                                (r / 2), -r / 2,
+                                -r / 2],
+                            [r / 2, r/ 2,
+                                - r / 2, -r / 2,
+                                r / 2]])
+        Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
+                            [-math.sin(yaw), math.cos(yaw)]])
+        outline = (outline.T.dot(Rot1)).T
+        outline[0, :] += x
+        outline[1, :] += y
+        plt.plot(np.array(outline[0, :]).flatten(),
+                    np.array(outline[1, :]).flatten(), "-k")
 
 
 def main(args=None):
@@ -139,7 +159,7 @@ def main(args=None):
     # uni_barrier_cert = create_unicycle_barrier_certificate_with_boundary()
 
     # define x initially --> state: [x, y, yaw, v]
-    x = np.array([[0, 25], [0, 0], [0, np.pi], [0, 0]])
+    x = np.array([[0, 20], [0.5, 0], [0, np.pi], [0, 0]])
     goal1 = np.array([20, 0])
     goal2 = np.array([0, 0])
     cmd1 = ControlInputs()
@@ -185,8 +205,12 @@ def main(args=None):
         plt.plot(x2.x, x2.y, 'xb')
         plot_arrow(x1.x, x1.y, x1.yaw)
         plot_arrow(x1.x, x1.y, x1.yaw + cmd1.delta)
+        plot_rect(x1.x, x1.y, x1.yaw, safety_radius)
+
         plot_arrow(x2.x, x2.y, x2.yaw)
         plot_arrow(x2.x, x2.y, x2.yaw + cmd2.delta)
+        plot_rect(x2.x, x2.y, x2.yaw, safety_radius)
+
         plot_path(trajectory)
         plot_path(trajectory2)
         plt.plot(goal1[0], goal1[1], '.k')
