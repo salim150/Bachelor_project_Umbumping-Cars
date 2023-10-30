@@ -29,7 +29,7 @@ max_acc = 40 #json_object["CBF_simple"]["max_acc"]
 min_acc = -40 #json_object["CBF_simple"]["min_acc"] 
 dt = json_object["CBF_simple"]["dt"]
 safety_radius = 3#json_object["CBF_simple"]["safety_radius"]
-barrier_gain = 0.00001# json_object["CBF_simple"]["barrier_gain"]
+barrier_gain = 1# json_object["CBF_simple"]["barrier_gain"]
 Kv = json_object["CBF_simple"]["Kv"] # interval [0.5-1]
 Lr = L / 2.0  # [m]
 Lf = L - Lr
@@ -75,8 +75,8 @@ def C3BF(x, u_ref):
             
             h = np.dot(p_rel, v_rel) + np.linalg.norm(v_rel) * np.linalg.norm(p_rel) * cos_Phi
             
-            gradH_1 = np.array([- x[0,i] * (x[3,j]*np.cos(x[2,j]) - x[3,i]*np.cos(x[2,i])), 
-                                - x[1,i] * (x[3,j]*np.sin(x[2,j]) - x[3,i]*np.sin(x[2,i])),
+            gradH_1 = np.array([- (x[3,j]*np.cos(x[2,j]) - x[3,i]*np.cos(x[2,i])), 
+                                - (x[3,j]*np.sin(x[2,j]) - x[3,i]*np.sin(x[2,i])),
                                 x[3,i] * (np.sin(x[2,i]) * p_rel[0] - np.cos(x[2,i]) * p_rel[1]),
                                 -np.cos(x[2,i]) * p_rel[0] - np.sin(x[2,i]) * p_rel[1]])
             
@@ -89,27 +89,19 @@ def C3BF(x, u_ref):
             Lf_h = np.dot(gradH.T, f)
             Lg_h = np.dot(gradH.T, g)
 
-            # print(i,j)
-            # print(gradH)
-            # print(f)
-            # print(Lg_h)
-            # print("\n")
-
-
             H[count] = np.array([barrier_gain*np.power(h, 1) + Lf_h])
             G[count,:] = -Lg_h
             count+=1
         
         # Input constraints
-        # G = np.vstack([G, [[0, 1], [0, -1]]])
-        # H = np.vstack([H, delta_to_beta(max_steer), -delta_to_beta(-max_steer)])
+        G = np.vstack([G, [[0, 1], [0, -1]]])
+        H = np.vstack([H, delta_to_beta(max_steer), -delta_to_beta(-max_steer)])
         # G = np.vstack([G, [[1, 0], [-1, 0]]])
         # H = np.vstack([H, max_acc, -min_acc])
 
-        solvers.options['show_progress'] = False
-        sol = solvers.qp(matrix(P), matrix(q), matrix(G), matrix(H))
-        dxu[:,count_dxu] = np.reshape(np.array(sol['x']), (M,))
-        count_dxu += 1
+        solvers.options['show_progress], [-1, 0]]])
+        # H = np.vstack([H, max_acc, -min_acc])
+
     
     dxu[1,:] = beta_to_delta(dxu[1,:])    
     return dxu
