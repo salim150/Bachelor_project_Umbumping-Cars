@@ -56,15 +56,13 @@ def C3BF(x, u_ref):
                         [0, x[3,i]/Lr],
                         [1, 0]]).reshape(4,2)
         
+        P = np.identity(2)*2
+        q = np.array([-2 * u_ref[0, i], - 2 * u_ref[1,i]])
+        
         for j in range(N):
 
             if j == i: continue
 
-            P = np.identity(2)*2
-            q = np.array([-2 * u_ref[0, i], - 2 * u_ref[1,i]])
-            
-            v_xy = np.array([x[3,i]*np.cos(x[2,i]),
-                             x[3,i]*np.sin(x[2,i])])
             v_rel = np.array([x[3,j]*np.cos(x[2,j]) - x[3,i]*np.cos(x[2,i]), 
                               x[3,j]*np.sin(x[2,j]) - x[3,i]*np.sin(x[2,i])])
             p_rel = np.array([x[0,j]-x[0,i],
@@ -75,8 +73,8 @@ def C3BF(x, u_ref):
             
             h = np.dot(p_rel, v_rel) + np.linalg.norm(v_rel) * np.linalg.norm(p_rel) * cos_Phi
             
-            gradH_1 = np.array([- (x[3,j]*np.cos(x[2,j]) - x[3,i]*np.cos(x[2,i])), 
-                                - (x[3,j]*np.sin(x[2,j]) - x[3,i]*np.sin(x[2,i])),
+            gradH_1 = np.array([- v_rel[0], 
+                                - v_rel[1],
                                 x[3,i] * (np.sin(x[2,i]) * p_rel[0] - np.cos(x[2,i]) * p_rel[1]),
                                 -np.cos(x[2,i]) * p_rel[0] - np.sin(x[2,i]) * p_rel[1]])
             
@@ -152,7 +150,7 @@ def main(args=None):
     # uni_barrier_cert = create_unicycle_barrier_certificate_with_boundary()
 
     # define x initially --> state: [x, y, yaw, v]
-    x = np.array([[0, 20], [0.5, 0], [0, np.pi], [0, 0]])
+    x = np.array([[0, 20], [0, 0], [0, np.pi], [0, 0]])
     goal1 = np.array([20, 0])
     goal2 = np.array([0, 0])
     cmd1 = ControlInputs()

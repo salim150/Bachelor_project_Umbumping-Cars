@@ -124,7 +124,7 @@ def main(args=None):
     # uni_barrier_cert = create_unicycle_barrier_certificate_with_boundary()
 
     # define x initially --> state: [x, y, yaw, v]
-    x = np.array([[0, 20], [0.1, 0], [0, np.pi], [0, 0]])
+    x = np.array([[0, 20], [0.5, 0], [0, np.pi], [0, 0]])
     goal1 = np.array([20, 0])
     goal2 = np.array([0, 0])
     cmd1 = ControlInputs()

@@ -105,9 +105,9 @@ class Controller(Node):
         x = np.concatenate((x1, x2, x3), axis=1)
 
         # Create safe control inputs (i.e., no collisions)
-        # dxu = self.uni_barrier_cert(dxu, x)
+        dxu = self.uni_barrier_cert(dxu, x)
         # dxu = CBF(x, dxu)
-        dxu = C3BF(x, dxu)
+        # dxu = C3BF(x, dxu)
 
         cmd1.throttle, cmd1.delta = dxu[0,0], dxu[1,0]
         cmd2.throttle, cmd2.delta = dxu[0,1], dxu[1,1]
