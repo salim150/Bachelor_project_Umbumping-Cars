@@ -7,6 +7,7 @@ from matplotlib import pyplot as plt
 from custom_message.msg import FullState, Path, MultiplePaths, MultiState
 import message_filters
 import numpy as np
+import time
 
 class Config:
     """
@@ -44,6 +45,7 @@ class Plotter(Node):
         self.get_logger().info("Plotter has been started")
 
     def plotter_callback(self, multi_state: MultiState, multi_traj: MultiplePaths, path = None):
+        debug_time = time.time()
 
         state1 = multi_state.multiple_state[0]
         state2 = multi_state.multiple_state[1]
@@ -88,6 +90,9 @@ class Plotter(Node):
                                 "y: " + str(state3.y) + ", " +
                                 "yaw: " + str(state3.yaw) + ", " +
                                 "linear velocity: " + str(state3.v))
+            
+        print(time.time()-debug_time)
+        debug_time = time.time()
 
     def plot_situation(self, state: FullState, trajectory, state_buf):
         self.plot_path(trajectory)

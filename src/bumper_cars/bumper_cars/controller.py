@@ -81,6 +81,8 @@ class Controller(Node):
         self.get_logger().info("Controller has been started")
 
     def general_pose_callback(self, multi_state):
+        
+        debug_time = time.time()
 
         state1 = multi_state.multiple_state[0]
         state2 = multi_state.multiple_state[1]
@@ -105,8 +107,8 @@ class Controller(Node):
         x = np.concatenate((x1, x2, x3), axis=1)
 
         # Create safe control inputs (i.e., no collisions)
-        dxu = self.uni_barrier_cert(dxu, x)
-        # dxu = CBF(x, dxu)
+        # dxu = self.uni_barrier_cert(dxu, x)
+        dxu = CBF(x, dxu)
         # dxu = C3BF(x, dxu)
 
         cmd1.throttle, cmd1.delta = dxu[0,0], dxu[1,0]
@@ -122,6 +124,9 @@ class Controller(Node):
         
         if debug:
             self.get_logger().info(f'Commands after: cmd1: {cmd1}, cmd2: {cmd2}')
+
+        print(time.time()-debug_time)
+        debug_time = time.time()
 
     def control_callback(self, pose: FullState, target, path, trajectory):
         # updating target waypoint and predicting new traj

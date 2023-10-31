@@ -4,6 +4,7 @@ import rclpy
 from rclpy.node import Node
 from custom_message.msg import MultiState, FullState
 import message_filters
+import time
 
 debug = False
 
@@ -22,6 +23,8 @@ class SensorMeasurement(Node):
         self.get_logger().info("Sensor has been started")
         
     def sensor_callback(self, multi_state_in: MultiState):
+
+        debug_time = time.time()
         
         full_state1 = FullState(x=multi_state_in.multiple_state[0].x, y=multi_state_in.multiple_state[0].y, yaw=multi_state_in.multiple_state[0].yaw,
                                 v=multi_state_in.multiple_state[0].v, omega=multi_state_in.multiple_state[0].omega, delta=multi_state_in.multiple_state[0].delta,
@@ -49,7 +52,10 @@ class SensorMeasurement(Node):
                                 "y: " + str(full_state3.y) + ", " +
                                 "theta: " + str(full_state3.yaw) + ", " +
                                 "linear velocity: " + str(full_state3.v))
-
+        
+        print(time.time()-debug_time)
+        debug_time = time.time()
+        
 def main(args=None):
     rclpy.init(args=args)
 

@@ -33,6 +33,7 @@ barrier_gain = json_object["CBF_simple"]["barrier_gain"]
 Kv = json_object["CBF_simple"]["Kv"] # interval [0.5-1]
 Lr = L / 2.0  # [m]
 Lf = L - Lr
+boundary_points = np.array([-50, 50, -50, 50])
 
 def CBF(x, u_ref):
     N = x.shape[1]
@@ -46,6 +47,16 @@ def CBF(x, u_ref):
 
     for i in range(N):
         count = 0
+
+        f = np.array([x[3,i]*np.cos(x[2,i]),
+                          x[3,i]*np.sin(x[2,i]), 
+                          0, 
+                          0]).reshape(4,1)
+        g = np.array([[0, -x[3,i]*np.sin(x[2,i])], 
+                        [0, x[3,i]*np.cos(x[2,i])], 
+                        [0, x[3,i]/Lr],
+                        [1, 0]]).reshape(4,2)
+
         for j in range(N):
 
             if j == i: continue
@@ -64,8 +75,41 @@ def CBF(x, u_ref):
         # Add the input constraint
         G = np.vstack([G, [[0, 1], [0, -1]]])
         H = np.vstack([H, delta_to_beta(max_steer), -delta_to_beta(-max_steer)])
-        G = np.vstack([G, [[1, 0], [-1, 0]]])
-        H = np.vstack([H, max_acc, -min_acc])
+        # G = np.vstack([G, [[1, 0], [-1, 0]]])
+        # H = np.vstack([H, max_acc, -min_acc])
+
+        # Adding arena boundary constraints
+        # Pos Y
+        h = 0.1*(boundary_points[3] - safety_radius/2 - x[1,i])**3
+        gradH = np.array([0,-1, -x[3,i]*np.cos(x[2,i]), -np.sin(x[2,i])])
+        Lf_h = np.dot(gradH.T, f)
+        Lg_h = np.dot(gradH.T, g)
+        G = np.vstack([G, -Lg_h])
+        H = np.vstack([H, np.array([h + Lf_h])])
+
+        # Neg Y
+        h = 0.1*(-boundary_points[2] - safety_radius/2 + x[1,i])**3
+        gradH = np.array([0,1, x[3,i]*np.cos(x[2,i]), np.sin(x[2,i])])
+        Lf_h = np.dot(gradH.T, f)
+        Lg_h = np.dot(gradH.T, g)
+        G = np.vstack([G, -Lg_h])
+        H = np.vstack([H, np.array([h + Lf_h])])
+
+        # Pos X
+        h = 0.1*(boundary_points[1] - safety_radius/2 - x[0,i])**3
+        gradH = np.array([-1,0, x[3,i]*np.sin(x[2,i]), -np.cos(x[2,i])])
+        Lf_h = np.dot(gradH.T, f)
+        Lg_h = np.dot(gradH.T, g)
+        G = np.vstack([G, -Lg_h])
+        H = np.vstack([H, np.array([h + Lf_h])])
+
+        # Neg X
+        h = 0.1*(-boundary_points[0] - safety_radius/2 + x[0,i])**3
+        gradH = np.array([1,0, -x[3,i]*np.sin(x[2,i]), np.cos(x[2,i])])
+        Lf_h = np.dot(gradH.T, f)
+        Lg_h = np.dot(gradH.T, g)
+        G = np.vstack([G, -Lg_h])
+        H = np.vstack([H, np.array([h + Lf_h])])
         
         """G = np.vstack([G, np.identity(M)])
         G = np.vstack([G, -np.identity(M)])
@@ -125,7 +169,7 @@ def main(args=None):
 
     # define x initially --> state: [x, y, yaw, v]
     x = np.array([[0, 20], [0.5, 0], [0, np.pi], [0, 0]])
-    goal1 = np.array([20, 0])
+    goal1 = np.array([50, 0])
     goal2 = np.array([0, 0])
     cmd1 = ControlInputs()
     cmd2 = ControlInputs()

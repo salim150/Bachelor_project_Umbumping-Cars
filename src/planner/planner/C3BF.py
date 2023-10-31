@@ -73,8 +73,8 @@ def C3BF(x, u_ref):
             
             h = np.dot(p_rel, v_rel) + np.linalg.norm(v_rel) * np.linalg.norm(p_rel) * cos_Phi
             
-            gradH_1 = np.array([- v_rel[0], 
-                                - v_rel[1],
+            gradH_1 = np.array([- (x[3,j]*np.cos(x[2,j]) - x[3,i]*np.cos(x[2,i])), 
+                                - (x[3,j]*np.sin(x[2,j]) - x[3,i]*np.sin(x[2,i])),
                                 x[3,i] * (np.sin(x[2,i]) * p_rel[0] - np.cos(x[2,i]) * p_rel[1]),
                                 -np.cos(x[2,i]) * p_rel[0] - np.sin(x[2,i]) * p_rel[1]])
             
