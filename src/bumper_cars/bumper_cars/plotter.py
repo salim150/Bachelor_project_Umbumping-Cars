@@ -19,7 +19,7 @@ class Config:
         self.robot_length = 2.9  # [m] for collision check
         # obstacles [x(m) y(m), ....]
 
-        self.trail_length = 15
+        self.trail_length = 5
 
 config = Config()
 debug = False

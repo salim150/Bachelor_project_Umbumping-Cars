@@ -38,8 +38,6 @@ boundary_points = np.array([-50, 50, -50, 50])
 def CBF(x, u_ref):
     N = x.shape[1]
     M = u_ref.shape[0]
-    G = np.zeros([N-1,M])
-    H = np.zeros([N-1,1])
     dxu = np.zeros([u_ref.shape[0], u_ref.shape[1]])
     count_dxu = 0
 
@@ -47,6 +45,8 @@ def CBF(x, u_ref):
 
     for i in range(N):
         count = 0
+        G = np.zeros([N-1,M])
+        H = np.zeros([N-1,1])
 
         f = np.array([x[3,i]*np.cos(x[2,i]),
                           x[3,i]*np.sin(x[2,i]), 
@@ -80,7 +80,7 @@ def CBF(x, u_ref):
 
         # Adding arena boundary constraints
         # Pos Y
-        h = 0.1*(boundary_points[3] - safety_radius/2 - x[1,i])**3
+        h = 0.1*(boundary_points[3] - safety_radius - x[1,i])**3
         gradH = np.array([0,-1, -x[3,i]*np.cos(x[2,i]), -np.sin(x[2,i])])
         Lf_h = np.dot(gradH.T, f)
         Lg_h = np.dot(gradH.T, g)
@@ -88,7 +88,7 @@ def CBF(x, u_ref):
         H = np.vstack([H, np.array([h + Lf_h])])
 
         # Neg Y
-        h = 0.1*(-boundary_points[2] - safety_radius/2 + x[1,i])**3
+        h = 0.1*(-boundary_points[2] - safety_radius + x[1,i])**3
         gradH = np.array([0,1, x[3,i]*np.cos(x[2,i]), np.sin(x[2,i])])
         Lf_h = np.dot(gradH.T, f)
         Lg_h = np.dot(gradH.T, g)
@@ -96,7 +96,7 @@ def CBF(x, u_ref):
         H = np.vstack([H, np.array([h + Lf_h])])
 
         # Pos X
-        h = 0.1*(boundary_points[1] - safety_radius/2 - x[0,i])**3
+        h = 0.1*(boundary_points[1] - safety_radius - x[0,i])**3
         gradH = np.array([-1,0, x[3,i]*np.sin(x[2,i]), -np.cos(x[2,i])])
         Lf_h = np.dot(gradH.T, f)
         Lg_h = np.dot(gradH.T, g)
@@ -104,7 +104,7 @@ def CBF(x, u_ref):
         H = np.vstack([H, np.array([h + Lf_h])])
 
         # Neg X
-        h = 0.1*(-boundary_points[0] - safety_radius/2 + x[0,i])**3
+        h = 0.1*(-boundary_points[0] - safety_radius + x[0,i])**3
         gradH = np.array([1,0, -x[3,i]*np.sin(x[2,i]), np.cos(x[2,i])])
         Lf_h = np.dot(gradH.T, f)
         Lg_h = np.dot(gradH.T, g)
@@ -114,13 +114,15 @@ def CBF(x, u_ref):
         """G = np.vstack([G, np.identity(M)])
         G = np.vstack([G, -np.identity(M)])
         H = np.vstack([H, max_acc, delta_to_beta(max_steer), -min_acc, -delta_to_beta(-max_steer)]) """ 
-
+        print(G)
+        print(H)
         solvers.options['show_progress'] = False
         sol = solvers.qp(matrix(P), matrix(q), matrix(G), matrix(H))
         dxu[:,count_dxu] = np.reshape(np.array(sol['x']), (M,))
         count_dxu += 1
     
     dxu[1,:] = beta_to_delta(dxu[1,:])
+    print("\n")
     return dxu
 
 def delta_to_beta(delta):
@@ -169,7 +171,7 @@ def main(args=None):
 
     # define x initially --> state: [x, y, yaw, v]
     x = np.array([[0, 20], [0.5, 0], [0, np.pi], [0, 0]])
-    goal1 = np.array([50, 0])
+    goal1 = np.array([0, 50])
     goal2 = np.array([0, 0])
     cmd1 = ControlInputs()
     cmd2 = ControlInputs()
@@ -192,11 +194,10 @@ def main(args=None):
         dxu[0,1], dxu[1,1] = pure_pursuit_steer_control(goal2, x2)
 
         # Create safe control inputs (i.e., no collisions)
-        print(dxu)
+        # print(dxu)
         dxu = CBF(x, dxu)
-        # dxu = uni_barrier_cert(dxu, x)
-        print(dxu)
-        print('\n')
+        # print(dxu)
+        # print('\n')
 
         cmd1.throttle, cmd1.delta = dxu[0,0], dxu[1,0]
         cmd2.throttle, cmd2.delta = dxu[0,1], dxu[1,1]

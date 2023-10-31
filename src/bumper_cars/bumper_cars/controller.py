@@ -39,7 +39,7 @@ class Controller(Node):
         self.previous_x = 0
         
         # creating random walk path for car2 to follow
-        self.safety = 20 # safety border around the map boundaries
+        self.safety = 0 # safety border around the map boundaries
         self.width = 100.0 - self.safety
         self.heigth = 100.0 -self.safety
 
