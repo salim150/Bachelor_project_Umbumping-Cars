@@ -41,10 +41,10 @@ class Plotter(Node):
 
         ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub, self.multi_path_sub], 10, 1, allow_headerless=True)
         ts.registerCallback(self.plotter_callback)
-        
+
         self.get_logger().info("Plotter has been started")
 
-    def plotter_callback(self, multi_state: MultiState, multi_traj: MultiplePaths, path = None):
+    def plotter_callback(self, multi_state: MultiState, multi_traj: MultiplePaths):
         debug_time = time.time()
 
         state1 = multi_state.multiple_state[0]
@@ -67,14 +67,13 @@ class Plotter(Node):
         plt.gcf().canvas.mpl_connect(
             'key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
-        self.plot_map()
 
         self.plot_situation(state1, multi_traj.multiple_path[0], self.state1_buf)
         self.plot_situation(state2, multi_traj.multiple_path[1], self.state2_buf)
         self.plot_situation(state3, multi_traj.multiple_path[2], self.state3_buf)
 
+        self.plot_map()
         plt.axis("equal")
-        plt.grid(True)
         plt.pause(0.000001)
 
         if debug:
@@ -95,16 +94,18 @@ class Plotter(Node):
         debug_time = time.time()
 
     def plot_situation(self, state: FullState, trajectory, state_buf):
-        self.plot_path(trajectory)
-        plt.scatter(state_buf[:,0], state_buf[:,1], marker='.', s=4)
+        if debug:
+            self.plot_path(trajectory)
+            plt.scatter(state_buf[:,0], state_buf[:,1], marker='.', s=4)
+            plt.plot(state.x, state.y, 'b.')
         self.plot_robot(state)
-        plt.plot(state.x, state.y, 'b.')
+        
 
 
     def plot_robot(self, fullstate: FullState):
         self.plot_rect(fullstate.x, fullstate.y, fullstate.yaw, config)
-        self.plot_cs_robot(fullstate.x, fullstate.y, fullstate.yaw)
-        self.plot_arrow(fullstate.x, fullstate.y, fullstate.yaw + fullstate.delta, length=2)
+        self.plot_cs_robot(fullstate.x, fullstate.y, fullstate.yaw, length=2)
+        self.plot_arrow(fullstate.x, fullstate.y, fullstate.yaw + fullstate.delta, length=4)
 
     def plot_map(self):
         corner_x = [-self.width/2.0, self.width/2.0, self.width/2.0, -self.width/2.0, -self.width/2.0]

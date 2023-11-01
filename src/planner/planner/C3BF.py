@@ -125,38 +125,38 @@ def C3BF(x, u_ref):
         # G = np.vstack([G, -Lg_h])
         # H = np.vstack([H, np.array([h + Lf_h])])
 
-        # Adding arena boundary constraints
-        # Pos Y
-        h = ((x[1,i] - boundary_points[3])**2 - 6**2)
-        gradH = np.array([0, 2*(x[1,i] - boundary_points[3]), 0, -Kv])
-        Lf_h = np.dot(gradH.T, f)
-        Lg_h = np.dot(gradH.T, g)
-        G = np.vstack([G, -Lg_h])
-        H = np.vstack([H, np.array([0.1*h**3 + Lf_h])])
+        # # Adding arena boundary constraints
+        # # Pos Y
+        # h = ((x[1,i] - boundary_points[3])**2 - 6**2)
+        # gradH = np.array([0, 2*(x[1,i] - boundary_points[3]), 0, -Kv])
+        # Lf_h = np.dot(gradH.T, f)
+        # Lg_h = np.dot(gradH.T, g)
+        # G = np.vstack([G, -Lg_h])
+        # H = np.vstack([H, np.array([0.1*h**3 + Lf_h])])
 
-        # Neg Y
-        h = ((x[1,i] - boundary_points[2])**2 - 6**2)
-        gradH = np.array([0, 2*(x[1,i] - boundary_points[2]), 0, -Kv])
-        Lf_h = np.dot(gradH.T, f)
-        Lg_h = np.dot(gradH.T, g)
-        G = np.vstack([G, -Lg_h])
-        H = np.vstack([H, np.array([0.1*h**3 + Lf_h])])
+        # # Neg Y
+        # h = ((x[1,i] - boundary_points[2])**2 - 6**2)
+        # gradH = np.array([0, 2*(x[1,i] - boundary_points[2]), 0, -Kv])
+        # Lf_h = np.dot(gradH.T, f)
+        # Lg_h = np.dot(gradH.T, g)
+        # G = np.vstack([G, -Lg_h])
+        # H = np.vstack([H, np.array([0.1*h**3 + Lf_h])])
 
-        # Pos X
-        h = ((x[0,i] - boundary_points[1])**2 - 6**2)
-        gradH = np.array([2*(x[0,i] - boundary_points[1]), 0, 0, -Kv])
-        Lf_h = np.dot(gradH.T, f)
-        Lg_h = np.dot(gradH.T, g)
-        G = np.vstack([G, -Lg_h])
-        H = np.vstack([H, np.array([0.1*h**3 + Lf_h])])
+        # # Pos X
+        # h = ((x[0,i] - boundary_points[1])**2 - 6**2)
+        # gradH = np.array([2*(x[0,i] - boundary_points[1]), 0, 0, -Kv])
+        # Lf_h = np.dot(gradH.T, f)
+        # Lg_h = np.dot(gradH.T, g)
+        # G = np.vstack([G, -Lg_h])
+        # H = np.vstack([H, np.array([0.1*h**3 + Lf_h])])
 
-        # Neg X
-        h = ((x[0,i] - boundary_points[0])**2 - 6**2)
-        gradH = np.array([2*(x[0,i] - boundary_points[0]), 0, 0, -Kv])
-        Lf_h = np.dot(gradH.T, f)
-        Lg_h = np.dot(gradH.T, g)
-        G = np.vstack([G, -Lg_h])
-        H = np.vstack([H, np.array([0.1*h**3 + Lf_h])])
+        # # Neg X
+        # h = ((x[0,i] - boundary_points[0])**2 - 6**2)
+        # gradH = np.array([2*(x[0,i] - boundary_points[0]), 0, 0, -Kv])
+        # Lf_h = np.dot(gradH.T, f)
+        # Lg_h = np.dot(gradH.T, g)
+        # G = np.vstack([G, -Lg_h])
+        # H = np.vstack([H, np.array([0.1*h**3 + Lf_h])])
         
         # Input constraints
         G = np.vstack([G, [[0, 1], [0, -1]]])
@@ -164,7 +164,7 @@ def C3BF(x, u_ref):
         # G = np.vstack([G, [[1, 0], [-1, 0]]])
         # H = np.vstack([H, max_acc, -min_acc])
 
-        # solvers.options['show_progress'] = False
+        solvers.options['show_progress'] = False
         sol = solvers.qp(matrix(P), matrix(q), matrix(G), matrix(H))
         dxu[:,count_dxu] = np.reshape(np.array(sol['x']), (M,))
         count_dxu += 1

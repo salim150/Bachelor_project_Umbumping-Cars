@@ -114,8 +114,7 @@ def CBF(x, u_ref):
         """G = np.vstack([G, np.identity(M)])
         G = np.vstack([G, -np.identity(M)])
         H = np.vstack([H, max_acc, delta_to_beta(max_steer), -min_acc, -delta_to_beta(-max_steer)]) """ 
-        print(G)
-        print(H)
+        
         solvers.options['show_progress'] = False
         sol = solvers.qp(matrix(P), matrix(q), matrix(G), matrix(H))
         dxu[:,count_dxu] = np.reshape(np.array(sol['x']), (M,))

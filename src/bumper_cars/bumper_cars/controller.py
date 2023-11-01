@@ -39,7 +39,7 @@ class Controller(Node):
         self.previous_x = 0
         
         # creating random walk path for car2 to follow
-        self.safety = 0 # safety border around the map boundaries
+        self.safety = 20 # safety border around the map boundaries
         self.width = 100.0 - self.safety
         self.heigth = 100.0 -self.safety
 
@@ -61,11 +61,9 @@ class Controller(Node):
         self.target3 = (self.path3[0].x, self.path3[0].y)
         self.trajectory3, self.tx3, self.ty3 = predict_trajectory(State(x=-30.0, y=-30.0, yaw=0.0, v=0.0, omega=0.0), self.target3)
 
-
         self.multi_control_pub = self.create_publisher(MultiControl, '/multi_control', 20)
         self.multi_path_pub = self.create_publisher(MultiplePaths, "/robot_multi_traj", 2)
         multi_state_sub = message_filters.Subscriber(self, MultiState, "/robot_multi_state")
-
 
         ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 4, 0.3, allow_headerless=True)
         ts.registerCallback(self.general_pose_callback)
@@ -77,7 +75,6 @@ class Controller(Node):
      
         # CBF
         self.uni_barrier_cert = create_unicycle_barrier_certificate_with_boundary()
-
         self.get_logger().info("Controller has been started")
 
     def general_pose_callback(self, multi_state):
@@ -108,8 +105,8 @@ class Controller(Node):
 
         # Create safe control inputs (i.e., no collisions)
         # dxu = self.uni_barrier_cert(dxu, x)
-        dxu = CBF(x, dxu)
-        # dxu = C3BF(x, dxu)
+        # dxu = CBF(x, dxu)
+        dxu = C3BF(x, dxu)
 
         cmd1.throttle, cmd1.delta = dxu[0,0], dxu[1,0]
         cmd2.throttle, cmd2.delta = dxu[0,1], dxu[1,1]
