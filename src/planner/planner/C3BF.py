@@ -92,38 +92,71 @@ def C3BF(x, u_ref):
             G[count,:] = -Lg_h
             count+=1
 
+        # # Adding arena boundary constraints
+        # # Pos Y
+        # h = 0.01*(boundary_points[3] - safety_radius - x[1,i])**3
+        # gradH = np.array([0,-1, -x[3,i]*np.cos(x[2,i]), -np.sin(x[2,i])])
+        # Lf_h = np.dot(gradH.T, f)
+        # Lg_h = np.dot(gradH.T, g)
+        # G = np.vstack([G, -Lg_h])
+        # H = np.vstack([H, np.array([h + Lf_h])])
+
+        # # Neg Y
+        # h = 0.01*(-boundary_points[2] - safety_radius + x[1,i])**3
+        # gradH = np.array([0,1, x[3,i]*np.cos(x[2,i]), np.sin(x[2,i])])
+        # Lf_h = np.dot(gradH.T, f)
+        # Lg_h = np.dot(gradH.T, g)
+        # G = np.vstack([G, -Lg_h])
+        # H = np.vstack([H, np.array([h + Lf_h])])
+
+        # # Pos X
+        # h = 0.01*(boundary_points[1] - safety_radius - x[0,i])**3
+        # gradH = np.array([-1,0, x[3,i]*np.sin(x[2,i]), -np.cos(x[2,i])])
+        # Lf_h = np.dot(gradH.T, f)
+        # Lg_h = np.dot(gradH.T, g)
+        # G = np.vstack([G, -Lg_h])
+        # H = np.vstack([H, np.array([h + Lf_h])])
+
+        # # Neg X
+        # h = 0.01*(-boundary_points[0] - safety_radius + x[0,i])**3
+        # gradH = np.array([1,0, -x[3,i]*np.sin(x[2,i]), np.cos(x[2,i])])
+        # Lf_h = np.dot(gradH.T, f)
+        # Lg_h = np.dot(gradH.T, g)
+        # G = np.vstack([G, -Lg_h])
+        # H = np.vstack([H, np.array([h + Lf_h])])
+
         # Adding arena boundary constraints
         # Pos Y
-        h = 0.01*(boundary_points[3] - safety_radius - x[1,i])**3
-        gradH = np.array([0,-1, -x[3,i]*np.cos(x[2,i]), -np.sin(x[2,i])])
+        h = ((x[1,i] - boundary_points[3])**2 - 6**2)
+        gradH = np.array([0, 2*(x[1,i] - boundary_points[3]), 0, -Kv])
         Lf_h = np.dot(gradH.T, f)
         Lg_h = np.dot(gradH.T, g)
         G = np.vstack([G, -Lg_h])
-        H = np.vstack([H, np.array([h + Lf_h])])
+        H = np.vstack([H, np.array([0.1*h**3 + Lf_h])])
 
         # Neg Y
-        h = 0.01*(-boundary_points[2] - safety_radius + x[1,i])**3
-        gradH = np.array([0,1, x[3,i]*np.cos(x[2,i]), np.sin(x[2,i])])
+        h = ((x[1,i] - boundary_points[2])**2 - 6**2)
+        gradH = np.array([0, 2*(x[1,i] - boundary_points[2]), 0, -Kv])
         Lf_h = np.dot(gradH.T, f)
         Lg_h = np.dot(gradH.T, g)
         G = np.vstack([G, -Lg_h])
-        H = np.vstack([H, np.array([h + Lf_h])])
+        H = np.vstack([H, np.array([0.1*h**3 + Lf_h])])
 
         # Pos X
-        h = 0.01*(boundary_points[1] - safety_radius - x[0,i])**3
-        gradH = np.array([-1,0, x[3,i]*np.sin(x[2,i]), -np.cos(x[2,i])])
+        h = ((x[0,i] - boundary_points[1])**2 - 6**2)
+        gradH = np.array([2*(x[0,i] - boundary_points[1]), 0, 0, -Kv])
         Lf_h = np.dot(gradH.T, f)
         Lg_h = np.dot(gradH.T, g)
         G = np.vstack([G, -Lg_h])
-        H = np.vstack([H, np.array([h + Lf_h])])
+        H = np.vstack([H, np.array([0.1*h**3 + Lf_h])])
 
         # Neg X
-        h = 0.01*(-boundary_points[0] - safety_radius + x[0,i])**3
-        gradH = np.array([1,0, -x[3,i]*np.sin(x[2,i]), np.cos(x[2,i])])
+        h = ((x[0,i] - boundary_points[0])**2 - 6**2)
+        gradH = np.array([2*(x[0,i] - boundary_points[0]), 0, 0, -Kv])
         Lf_h = np.dot(gradH.T, f)
         Lg_h = np.dot(gradH.T, g)
         G = np.vstack([G, -Lg_h])
-        H = np.vstack([H, np.array([h + Lf_h])])
+        H = np.vstack([H, np.array([0.1*h**3 + Lf_h])])
         
         # Input constraints
         G = np.vstack([G, [[0, 1], [0, -1]]])
@@ -131,7 +164,7 @@ def C3BF(x, u_ref):
         # G = np.vstack([G, [[1, 0], [-1, 0]]])
         # H = np.vstack([H, max_acc, -min_acc])
 
-        solvers.options['show_progress'] = False
+        # solvers.options['show_progress'] = False
         sol = solvers.qp(matrix(P), matrix(q), matrix(G), matrix(H))
         dxu[:,count_dxu] = np.reshape(np.array(sol['x']), (M,))
         count_dxu += 1
