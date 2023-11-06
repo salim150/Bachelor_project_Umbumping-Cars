@@ -74,7 +74,7 @@ class CarModel(Node):
 
         self.get_logger().info("Robots model initialized correctly")
 
-        self.timer = self.create_timer(0.1, self.timer_callback)
+        self.timer = self.create_timer(0.01, self.timer_callback)
 
         self.fullstate1 = FullState(x=self.initial_state1.x, y=self.initial_state1.y, yaw=self.initial_state1.yaw, v=self.initial_state1.v,
                                      omega=self.initial_state1.omega, delta=0.0, throttle=0.0)
@@ -86,7 +86,6 @@ class CarModel(Node):
         self.multi_state = MultiState(multiple_state=[self.fullstate1, self.fullstate2, self.fullstate3])
 
     def general_model_callback(self, control: MultiControl):
-
 
         if self.model_type[0] == 'linear':
             self.initial_state1, self.old_time1 = self.linear_model_callback(self.initial_state1, control.multi_control[0], self.old_time1)

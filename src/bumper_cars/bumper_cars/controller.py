@@ -139,7 +139,7 @@ class Controller(Node):
     
     def general_pose_callback(self, multi_state):
         
-        debug_time = time.time()
+        # debug_time = time.time()
 
         state1 = multi_state.multiple_state[0]
         state2 = multi_state.multiple_state[1]
@@ -170,8 +170,8 @@ class Controller(Node):
         if debug:
             self.get_logger().info(f'Commands after: cmd1: {cmd1}, cmd2: {cmd2}')
 
-        print(time.time()-debug_time)
-        debug_time = time.time()
+        # print(time.time()-debug_time)
+        # debug_time = time.time()
 
     def control_callback(self, pose: FullState, target, path, trajectory):
         # updating target waypoint and predicting new traj

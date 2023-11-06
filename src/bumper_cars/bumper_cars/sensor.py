@@ -20,11 +20,14 @@ class SensorMeasurement(Node):
         ts = message_filters.ApproximateTimeSynchronizer([multi_state_subscriber], 6, 1, allow_headerless=True)
         ts.registerCallback(self.sensor_callback)
 
+        self.multi_state = MultiState()
+        self.timer = self.create_timer(0.1, self.timer_callback)
+
         self.get_logger().info("Sensor has been started")
         
     def sensor_callback(self, multi_state_in: MultiState):
 
-        debug_time = time.time()
+        # debug_time = time.time()
         
         full_state1 = FullState(x=multi_state_in.multiple_state[0].x, y=multi_state_in.multiple_state[0].y, yaw=multi_state_in.multiple_state[0].yaw,
                                 v=multi_state_in.multiple_state[0].v, omega=multi_state_in.multiple_state[0].omega, delta=multi_state_in.multiple_state[0].delta,
@@ -36,8 +39,8 @@ class SensorMeasurement(Node):
                                 v=multi_state_in.multiple_state[2].v, omega=multi_state_in.multiple_state[2].omega, delta=multi_state_in.multiple_state[2].delta,
                                 throttle=multi_state_in.multiple_state[2].throttle)
 
-        multi_state = MultiState(multiple_state=[full_state1, full_state2, full_state3])
-        self.multi_state_pub.publish(multi_state)
+        self.multi_state = MultiState(multiple_state=[full_state1, full_state2, full_state3])
+        # self.multi_state_pub.publish(multi_state)
 
         if debug:
             self.get_logger().info("Publishing robot1 new state, x: " + str(full_state1.x) + ", " +
@@ -53,8 +56,11 @@ class SensorMeasurement(Node):
                                 "theta: " + str(full_state3.yaw) + ", " +
                                 "linear velocity: " + str(full_state3.v))
         
-        print(time.time()-debug_time)
-        debug_time = time.time()
+        # print(time.time()-debug_time)
+        # debug_time = time.time()
+
+    def timer_callback(self):
+        self.multi_state_pub.publish(self.multi_state)
         
 def main(args=None):
     rclpy.init(args=args)

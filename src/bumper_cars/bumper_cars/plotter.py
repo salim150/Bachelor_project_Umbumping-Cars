@@ -98,7 +98,7 @@ class Plotter(Node):
                                 "linear velocity: " + str(state3.v))
 
     def complete_plotter_callback(self, multi_state: MultiState, multi_traj: MultiplePaths):
-        debug_time = time.time()
+        # debug_time = time.time()
 
         state1 = multi_state.multiple_state[0]
         state2 = multi_state.multiple_state[1]
@@ -143,8 +143,8 @@ class Plotter(Node):
                                 "yaw: " + str(state3.yaw) + ", " +
                                 "linear velocity: " + str(state3.v))
             
-        print(time.time()-debug_time)
-        debug_time = time.time()
+        # print(time.time()-debug_time)
+        # debug_time = time.time()
 
     def plot_situation(self, state: FullState, trajectory, state_buf):
         if plot_traj:
