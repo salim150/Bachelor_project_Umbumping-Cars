@@ -203,8 +203,8 @@ class Controller(Node):
 
         # Create safe control inputs (i.e., no collisions)
         # dxu = self.uni_barrier_cert(dxu, x)
-        dxu = CBF(x, dxu)
-        # dxu = C3BF(x, dxu)
+        # dxu = CBF(x, dxu)
+        dxu = C3BF(x, dxu)
 
         return dxu
 

@@ -41,7 +41,7 @@ boundary_points = np.array([-50, 50, -50, 50])
 x = np.array([[0, 20], [0, 0], [0, np.pi], [0, 0]])
 x1 = x[:,0]
 x2 = x[:, 1]
-goal1 = np.array([0, 0])
+goal1 = np.array([20, 0])
 goal2 = np.array([0, 0])
 cmd1 = ControlInputs()
 cmd2 = ControlInputs()
@@ -245,45 +245,14 @@ def update_state(x):
         return x1, x2
 
 def main(args=None):
-    # Instantiate Robotarium object
-    N = 2
-    # The robots will never reach their goal points so set iteration number
-    iterations = 3000
-    # Define goal points outside of the arena
-    goal_points = np.array(np.mat('5 5 5 5 5; 5 5 5 5 5; 0 0 0 0 0'))
-    # Create barrier certificates to avoid collision
-    # uni_barrier_cert = create_unicycle_barrier_certificate_with_boundary()
-    # define x initially --> state: [x, y, yaw, v]
-    x = np.array([[0, 20], [0, 0], [0, np.pi], [0, 0]])
-    goal1 = np.array([20, 0])
-    goal2 = np.array([0, 0])
-    cmd1 = ControlInputs()
-    cmd2 = ControlInputs()
-    trajectory, tx, ty = predict_trajectory(array_to_state(x[:,0]), goal1)
-    trajectory2, tx2, ty2 = predict_trajectory(array_to_state(x[:,1]), goal2)
-    # While the number of robots at the required poses is less
-    # than N...
-    for i in range(iterations):
-        # Create single-integrator control inputs
-        x1 = x[:,0]
-        x2 = x[:, 1]
-        x1 = array_to_state(x1)
-        x2 = array_to_state(x2)
-        
-        dxu = np.zeros((2,N))
-        dxu[0,0], dxu[1,0] = pure_pursuit_steer_control(goal1, x1)
-        dxu[0,1], dxu[1,1] = pure_pursuit_steer_control(goal2, x2)
-        # Create safe control inputs (i.e., no collisions)
-        print(dxu)
-        dxu = C3BF(x, dxu)
-        print(dxu)
-        print('\n')
-        cmd1.throttle, cmd1.delta = dxu[0,0], dxu[1,0]
-        cmd2.throttle, cmd2.delta = dxu[0,1], dxu[1,1]
-        # Applying command and current state to the model
-        x1 = linear_model_callback(x1, cmd1)
-        x2 = linear_model_callback(x2, cmd2)
-        plt.cla()
+    # Initialize the figure and axis
+    fig, ax = plt.subplots()
+
+    def update(frame):
+        global x, debug_time
+        x1, x2 = update_state(x)
+
+        ax.cla()
         # for stopping simulation with the esc key.
         plt.gcf().canvas.mpl_connect(
             'key_release_event',
@@ -293,22 +262,32 @@ def main(args=None):
         plot_arrow(x1.x, x1.y, x1.yaw)
         plot_arrow(x1.x, x1.y, x1.yaw + cmd1.delta)
         plot_rect(x1.x, x1.y, x1.yaw, safety_radius)
+
         plot_arrow(x2.x, x2.y, x2.yaw)
         plot_arrow(x2.x, x2.y, x2.yaw + cmd2.delta)
         plot_rect(x2.x, x2.y, x2.yaw, safety_radius)
+
         plot_path(trajectory)
         plot_path(trajectory2)
-        plt.plot(goal1[0], goal1[1], '.k')
-        plt.plot(goal2[0], goal2[1], '.b')
-        # plot_map()
-        plt.xlim(-50, 50)
-        plt.ylim(-50, 50)
-        plt.axis("equal")
-        plt.grid(True)
-        plt.pause(0.000001)
+        ax.plot(goal1[0], goal1[1], '.k')
+        ax.plot(goal2[0], goal2[1], '.b')
+
+        ax.set_xlim(-50, 50)
+        ax.set_ylim(-50, 50)
+        ax.set_aspect('equal')
+        ax.grid(True)
+
         x1 = state_to_array(x1)
         x2 = state_to_array(x2)
         x = np.concatenate((x1, x2), axis=1)
+
+        print(time.time()-debug_time)
+        debug_time = time.time()
+
+    # Create the animation with a faster frame rate (50 milliseconds per frame)
+    animation = FuncAnimation(fig, update, frames=range(1000), repeat=False, interval=30)
+    # Show the animation
+    plt.show()
 
 
     
