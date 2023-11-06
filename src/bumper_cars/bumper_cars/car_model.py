@@ -38,7 +38,6 @@ class CarModel(Node):
     def __init__(self):
         super().__init__("robot_model")
 
-        # TODO: pass parameters as State type and not single items --> USE ARRAYS/DICT   
         self.declare_parameters(
             namespace='',
             parameters=[
