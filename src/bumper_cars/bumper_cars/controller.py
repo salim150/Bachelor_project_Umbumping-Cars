@@ -40,7 +40,29 @@ class Controller(Node):
 
     def __init__(self):
         super().__init__("robot_controller")
-        self.previous_x = 0
+        self.declare_parameters(
+            namespace='',
+            parameters=[
+                ('model_type', rclpy.Parameter.Type.STRING_ARRAY),
+                ('x0', rclpy.Parameter.Type.DOUBLE_ARRAY),
+                ('y0', rclpy.Parameter.Type.DOUBLE_ARRAY),
+                ('yaw', rclpy.Parameter.Type.DOUBLE_ARRAY),
+                ('v', rclpy.Parameter.Type.DOUBLE_ARRAY),
+                ('omega', rclpy.Parameter.Type.DOUBLE_ARRAY)
+            ]
+        )
+
+        x0 = self.get_parameter('x0').get_parameter_value().double_array_value
+        y0 = self.get_parameter('y0').get_parameter_value().double_array_value
+        yaw = self.get_parameter('yaw').get_parameter_value().double_array_value
+        v = self.get_parameter('v').get_parameter_value().double_array_value
+        omega = self.get_parameter('omega').get_parameter_value().double_array_value
+        model_type = self.get_parameter('model_type').get_parameter_value().string_array_value
+        
+        # Initializing the robots
+        initial_state1 = State(x=x0[0], y=y0[0], yaw=yaw[0], v=v[0], omega=omega[0])
+        initial_state2 = State(x=x0[1], y=y0[1], yaw=yaw[1], v=v[1], omega=omega[1])
+        initial_state3 = State(x=x0[2], y=y0[2], yaw=yaw[2], v=v[2], omega=omega[2])
         
         # creating random walk path for car2 to follow
         self.safety = 20 # safety border around the map boundaries
@@ -51,19 +73,19 @@ class Controller(Node):
         self.path1 = []
         self.path1 = self.create_path(self.path1)
         self.target1 = (self.path1[0].x, self.path1[0].y)
-        self.trajectory1, self.tx1, self.ty1 = predict_trajectory(State(x=30.0, y=30.0, yaw=0.0, v=0.0, omega=0.0), self.target1)
+        self.trajectory1, self.tx1, self.ty1 = predict_trajectory(initial_state1, self.target1)
 
         # Robot 2
         self.path2 = []
         self.path2 = self.create_path(self.path2)
         self.target2 = (self.path2[0].x, self.path2[0].y)
-        self.trajectory2, self.tx2, self.ty2 = predict_trajectory(State(x=0.0, y=0.0, yaw=0.0, v=0.0, omega=0.0), self.target2)
+        self.trajectory2, self.tx2, self.ty2 = predict_trajectory(initial_state2, self.target2)
 
         # Robot 3
         self.path3 = []
         self.path3 = self.create_path(self.path3)
         self.target3 = (self.path3[0].x, self.path3[0].y)
-        self.trajectory3, self.tx3, self.ty3 = predict_trajectory(State(x=-30.0, y=-30.0, yaw=0.0, v=0.0, omega=0.0), self.target3)
+        self.trajectory3, self.tx3, self.ty3 = predict_trajectory(initial_state3, self.target3)
 
         self.multi_control_pub = self.create_publisher(MultiControl, '/multi_control', 20)
         self.multi_path_pub = self.create_publisher(MultiplePaths, "/robot_multi_traj", 2)
