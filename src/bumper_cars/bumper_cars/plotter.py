@@ -9,6 +9,16 @@ import message_filters
 import numpy as np
 import time
 
+# For the parameter file
+import pathlib
+import json
+
+path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
+# Opening JSON file
+with open(path, 'r') as openfile:
+    # Reading from json file
+    json_object = json.load(openfile)
+
 class Config:
     """
     simulation parameter class
@@ -22,7 +32,9 @@ class Config:
         self.trail_length = 5
 
 config = Config()
+controller_type = json_object["Controller"]["controller_type"]
 debug = False
+plot_traj = True
 
 class Plotter(Node):
 
@@ -36,15 +48,56 @@ class Plotter(Node):
         self.state2_buf = np.array([0,0])
         self.state3_buf = np.array([0,0])
 
+        # TODO: Pass it from parameters file
+        self.controller_type = controller_type
+
         self.width = 100
         self.heigth = 100
 
-        ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub, self.multi_path_sub], 10, 1, allow_headerless=True)
-        ts.registerCallback(self.plotter_callback)
+        if self.controller_type == "random_walk":
+            ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 10, 1, allow_headerless=True)
+            ts.registerCallback(self.plotter_callback)
+        else:
+            ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub, self.multi_path_sub], 10, 1, allow_headerless=True)
+            ts.registerCallback(self.complete_plotter_callback)
 
         self.get_logger().info("Plotter has been started")
 
-    def plotter_callback(self, multi_state: MultiState, multi_traj: MultiplePaths):
+    def plotter_callback(self, multi_state: MultiState):
+       
+        state1 = multi_state.multiple_state[0]
+        state2 = multi_state.multiple_state[1]
+        state3 = multi_state.multiple_state[2]
+        
+        plt.cla()
+        # for stopping simulation with the esc key.
+        plt.gcf().canvas.mpl_connect(
+            'key_release_event',
+            lambda event: [exit(0) if event.key == 'escape' else None])
+
+        self.plot_robot(state1)
+        self.plot_robot(state2)
+        self.plot_robot(state3)
+
+        self.plot_map()
+        plt.axis("equal")
+        plt.pause(0.000001)
+
+        if debug:
+            self.get_logger().info("robot1, x: " + str(state1.x) + ", " +
+                                "y: " + str(state1.y) + ", " +
+                                "yaw: " + str(state1.yaw) + ", " +
+                                "linear velocity: " + str(state1.v))
+            self.get_logger().info("robot2, x: " + str(state2.x) + ", " +
+                                "y: " + str(state2.y) + ", " +
+                                "yaw: " + str(state2.yaw) + ", " +
+                                "linear velocity: " + str(state2.v))
+            self.get_logger().info("robot3, x: " + str(state3.x) + ", " +
+                                "y: " + str(state3.y) + ", " +
+                                "yaw: " + str(state3.yaw) + ", " +
+                                "linear velocity: " + str(state3.v))
+
+    def complete_plotter_callback(self, multi_state: MultiState, multi_traj: MultiplePaths):
         debug_time = time.time()
 
         state1 = multi_state.multiple_state[0]
@@ -94,12 +147,11 @@ class Plotter(Node):
         debug_time = time.time()
 
     def plot_situation(self, state: FullState, trajectory, state_buf):
-        if debug:
+        if plot_traj:
             self.plot_path(trajectory)
             plt.scatter(state_buf[:,0], state_buf[:,1], marker='.', s=4)
             plt.plot(state.x, state.y, 'b.')
         self.plot_robot(state)
-        
 
 
     def plot_robot(self, fullstate: FullState):

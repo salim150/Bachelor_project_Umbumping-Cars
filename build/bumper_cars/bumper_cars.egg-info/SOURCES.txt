@@ -13,8 +13,6 @@ bumper_cars/car_model.py
 bumper_cars/controller.py
 bumper_cars/plotter.py
 bumper_cars/sensor.py
-bumper_cars/state_publisher.py
-bumper_cars/state_subscriber.py
 bumper_cars.egg-info/PKG-INFO
 bumper_cars.egg-info/SOURCES.txt
 bumper_cars.egg-info/dependency_links.txt

@@ -29,7 +29,11 @@ with open(path, 'r') as openfile:
 WB = json_object["Controller"]["WB"] # Wheel base
 L_d = json_object["Controller"]["L_d"]  # [m] look-ahead distance
 max_steer = json_object["Controller"]["max_steer"]  # [rad] max steering angle
-
+max_acc = json_object["Controller"]["max_acc"]  # [rad] max acceleration
+min_acc = json_object["Controller"]["min_acc"]  # [rad] min acceleration
+max_speed = json_object["Controller"]["max_speed"]  # [rad] max speed
+min_speed = json_object["Controller"]["min_speed"]  # [rad] min speed
+controller_type = json_object["Controller"]["controller_type"]
 debug = False
 
 class Controller(Node):
@@ -65,8 +69,15 @@ class Controller(Node):
         self.multi_path_pub = self.create_publisher(MultiplePaths, "/robot_multi_traj", 2)
         multi_state_sub = message_filters.Subscriber(self, MultiState, "/robot_multi_state")
 
-        ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 4, 0.3, allow_headerless=True)
-        ts.registerCallback(self.general_pose_callback)
+        # TODO: Pass it from parameters file
+        self.controller_type = controller_type
+
+        if self.controller_type == "random_walk":
+            ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 4, 0.3, allow_headerless=True)
+            ts.registerCallback(self.random_walk_controller)
+        else:
+            ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 4, 0.3, allow_headerless=True)
+            ts.registerCallback(self.general_pose_callback)
 
         self.multi_control_pub.publish(MultiControl(multi_control=[ControlInputs(delta=0.0, throttle=0.0), ControlInputs(delta=0.0, throttle=0.0), 
                                                                    ControlInputs(delta=0.0, throttle=0.0)]))
@@ -77,6 +88,55 @@ class Controller(Node):
         self.uni_barrier_cert = create_unicycle_barrier_certificate_with_boundary()
         self.get_logger().info("Controller has been started")
 
+    def random_walk_controller(self, multi_state):
+
+        cmd1 = ControlInputs()
+        cmd2 = ControlInputs()
+        cmd3 = ControlInputs()
+
+        state1 = multi_state.multiple_state[0]
+        state2 = multi_state.multiple_state[1]
+        state3 = multi_state.multiple_state[2]
+
+        # Commands for robot 1
+        cmd1.delta = random.uniform(-max_steer, max_steer)
+        if state1.v >= max_speed:
+            cmd1.throttle = random.uniform(-max_acc, 0)
+        elif state1.v <= min_speed:
+            cmd1.throttle = random.uniform(0, max_acc)
+        else:
+            cmd1.throttle = random.uniform(-max_acc, max_acc)
+        
+        # Commands for robot 2
+        cmd2.delta = random.uniform(-max_steer, max_steer)
+        if state2.v >= max_speed:
+            cmd2.throttle = random.uniform(-max_acc, 0)
+        elif state2.v <= min_speed:
+            cmd2.throttle = random.uniform(0, max_acc)
+        else:
+            cmd2.throttle = random.uniform(-max_acc, max_acc)
+
+        # Commands for robot 3
+        cmd3.delta = random.uniform(-max_steer, max_steer)
+        if state3.v >= max_speed:
+            cmd3.throttle = random.uniform(-max_acc, 0)
+        elif state3.v <= min_speed:
+            cmd3.throttle = random.uniform(0, max_acc)
+        else:
+            cmd3.throttle = random.uniform(-max_acc, max_acc)
+        
+        # Applying the CBF
+        dxu = self.apply_CBF(cmd1=cmd1, cmd2=cmd2, cmd3=cmd3, 
+                             state1=state1, state2=state2, state3=state3)
+
+        cmd1.throttle, cmd1.delta = dxu[0,0], dxu[1,0]
+        cmd2.throttle, cmd2.delta = dxu[0,1], dxu[1,1]
+        cmd3.throttle, cmd3.delta = dxu[0,2], dxu[1,2]
+
+        # Publishing everything in the general callback to avoid deadlocks
+        multi_control = MultiControl(multi_control=[cmd1, cmd2, cmd3])
+        self.multi_control_pub.publish(multi_control)
+    
     def general_pose_callback(self, multi_state):
         
         debug_time = time.time()
@@ -92,21 +152,9 @@ class Controller(Node):
         if debug:
            self.get_logger().info(f'Commands before: cmd1: {cmd1}, cmd2: {cmd2}')
         
-        dxu = np.zeros((2,3))
-        dxu[0,0], dxu[1,0] = cmd1.throttle, cmd1.delta
-        dxu[0,1], dxu[1,1] = cmd2.throttle, cmd2.delta
-        dxu[0,2], dxu[1,2] = cmd3.throttle, cmd3.delta
-
-        # Converting positions to arrays for the CBF
-        x1 = state_to_array(state1)
-        x2 = state_to_array(state2)
-        x3 = state_to_array(state3)
-        x = np.concatenate((x1, x2, x3), axis=1)
-
-        # Create safe control inputs (i.e., no collisions)
-        # dxu = self.uni_barrier_cert(dxu, x)
-        # dxu = CBF(x, dxu)
-        dxu = C3BF(x, dxu)
+        # Applying the CBF
+        dxu = self.apply_CBF(cmd1=cmd1, cmd2=cmd2, cmd3=cmd3, 
+                             state1=state1, state2=state2, state3=state3)
 
         cmd1.throttle, cmd1.delta = dxu[0,0], dxu[1,0]
         cmd2.throttle, cmd2.delta = dxu[0,1], dxu[1,1]
@@ -140,19 +188,30 @@ class Controller(Node):
 
         return cmd, path, target, trajectory
     
+    def apply_CBF(self, cmd1, cmd2, cmd3, state1, state2, state3):
+        # Remember to change the 3 with the actual number of robots
+        dxu = np.zeros((2,3))
+        dxu[0,0], dxu[1,0] = cmd1.throttle, cmd1.delta
+        dxu[0,1], dxu[1,1] = cmd2.throttle, cmd2.delta
+        dxu[0,2], dxu[1,2] = cmd3.throttle, cmd3.delta
+
+        # Converting positions to arrays for the CBF
+        x1 = state_to_array(state1)
+        x2 = state_to_array(state2)
+        x3 = state_to_array(state3)
+        x = np.concatenate((x1, x2, x3), axis=1)
+
+        # Create safe control inputs (i.e., no collisions)
+        # dxu = self.uni_barrier_cert(dxu, x)
+        dxu = CBF(x, dxu)
+        # dxu = C3BF(x, dxu)
+
+        return dxu
+
     def update_path(self, path: Path):
         path.pop(0)
         path.append(Coordinate(x=float(random.randint(-self.width/2, self.width/2)), y=float(random.randint(-self.heigth/2, self.heigth/2))))
         return path
-
-    def plot_path(self, path: Path):
-        x = []
-        y = []
-        for coord in path:
-            x.append(coord.x)
-            y.append(coord.y)
-        plt.scatter(x, y, marker='.', s=10)
-        plt.scatter(x[0], y[0], marker='x', s=20)
 
     def create_path(self, path):
         while len(path)<5:

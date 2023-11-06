@@ -181,6 +181,7 @@ def main(args=None):
     # While the number of robots at the required poses is less
     # than N...
     for i in range(iterations):
+        debug_time = time.time()
 
         # Create single-integrator control inputs
         x1 = x[:,0]
@@ -235,6 +236,9 @@ def main(args=None):
         x1 = state_to_array(x1)
         x2 = state_to_array(x2)
         x = np.concatenate((x1, x2), axis=1)
+
+        print(time.time()-debug_time)
+        debug_time = time.time()
 
 if __name__=='__main__':
     main()
