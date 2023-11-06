@@ -1,24 +1,22 @@
 """
 
-Unscented kalman filter (UKF) localization sample
+Extended kalman filter (EKF) localization sample
 
 author: Atsushi Sakai (@Atsushi_twi)
 
 """
-
 import sys
 import pathlib
+
 sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 
 import math
-
 import matplotlib.pyplot as plt
 import numpy as np
-import scipy.linalg
 
-from utils import rot_mat_2d
+from utils import plot_covariance_ellipse
 
-# Covariance for UKF simulation
+# Covariance for EKF simulation
 Q = np.diag([
     0.1,  # variance of location on x-axis
     0.1,  # variance of location on y-axis
@@ -34,18 +32,13 @@ GPS_NOISE = np.diag([0.5, 0.5]) ** 2
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
 
-#  UKF Parameter
-ALPHA = 0.001
-BETA = 2
-KAPPA = 0
-
 show_animation = True
 
 
 def calc_input():
     v = 1.0  # [m/s]
-    yawRate = 0.1  # [rad/s]
-    u = np.array([[v, yawRate]]).T
+    yawrate = 0.1  # [rad/s]
+    u = np.array([[v], [yawrate]])
     return u
 
 
@@ -90,135 +83,70 @@ def observation_model(x):
     return z
 
 
-def generate_sigma_points(xEst, PEst, gamma):
-    sigma = xEst
-    Psqrt = scipy.linalg.sqrtm(PEst)
-    n = len(xEst[:, 0])
-    # Positive direction
-    for i in range(n):
-        sigma = np.hstack((sigma, xEst + gamma * Psqrt[:, i:i + 1]))
-
-    # Negative direction
-    for i in range(n):
-        sigma = np.hstack((sigma, xEst - gamma * Psqrt[:, i:i + 1]))
-
-    return sigma
-
-
-def predict_sigma_motion(sigma, u):
+def jacob_f(x, u):
     """
-        Sigma Points prediction with motion model
+    Jacobian of Motion Model
+
+    motion model
+    x_{t+1} = x_t+v*dt*cos(yaw)
+    y_{t+1} = y_t+v*dt*sin(yaw)
+    yaw_{t+1} = yaw_t+omega*dt
+    v_{t+1} = v{t}
+    so
+    dx/dyaw = -v*dt*sin(yaw)
+    dx/dv = dt*cos(yaw)
+    dy/dyaw = v*dt*cos(yaw)
+    dy/dv = dt*sin(yaw)
     """
-    for i in range(sigma.shape[1]):
-        sigma[:, i:i + 1] = motion_model(sigma[:, i:i + 1], u)
+    yaw = x[2, 0]
+    v = u[0, 0]
+    jF = np.array([
+        [1.0, 0.0, -DT * v * math.sin(yaw), DT * math.cos(yaw)],
+        [0.0, 1.0, DT * v * math.cos(yaw), DT * math.sin(yaw)],
+        [0.0, 0.0, 1.0, 0.0],
+        [0.0, 0.0, 0.0, 1.0]])
 
-    return sigma
-
-
-def predict_sigma_observation(sigma):
-    """
-        Sigma Points prediction with observation model
-    """
-    for i in range(sigma.shape[1]):
-        sigma[0:2, i] = observation_model(sigma[:, i])
-
-    sigma = sigma[0:2, :]
-
-    return sigma
+    return jF
 
 
-def calc_sigma_covariance(x, sigma, wc, Pi):
-    nSigma = sigma.shape[1]
-    d = sigma - x[0:sigma.shape[0]]
-    P = Pi
-    for i in range(nSigma):
-        P = P + wc[0, i] * d[:, i:i + 1] @ d[:, i:i + 1].T
-    return P
+def jacob_h():
+    # Jacobian of Observation Model
+    jH = np.array([
+        [1, 0, 0, 0],
+        [0, 1, 0, 0]
+    ])
+
+    return jH
 
 
-def calc_pxz(sigma, x, z_sigma, zb, wc):
-    nSigma = sigma.shape[1]
-    dx = sigma - x
-    dz = z_sigma - zb[0:2]
-    P = np.zeros((dx.shape[0], dz.shape[0]))
-
-    for i in range(nSigma):
-        P = P + wc[0, i] * dx[:, i:i + 1] @ dz[:, i:i + 1].T
-
-    return P
-
-
-def ukf_estimation(xEst, PEst, z, u, wm, wc, gamma):
+def ekf_estimation(xEst, PEst, z, u):
     #  Predict
-    sigma = generate_sigma_points(xEst, PEst, gamma)
-    sigma = predict_sigma_motion(sigma, u)
-    xPred = (wm @ sigma.T).T
-    PPred = calc_sigma_covariance(xPred, sigma, wc, Q)
+    xPred = motion_model(xEst, u)
+    jF = jacob_f(xEst, u)
+    PPred = jF @ PEst @ jF.T + Q
 
     #  Update
+    jH = jacob_h()
     zPred = observation_model(xPred)
     y = z - zPred
-    sigma = generate_sigma_points(xPred, PPred, gamma)
-    zb = (wm @ sigma.T).T
-    z_sigma = predict_sigma_observation(sigma)
-    st = calc_sigma_covariance(zb, z_sigma, wc, R)
-    Pxz = calc_pxz(sigma, xPred, z_sigma, zb, wc)
-    K = Pxz @ np.linalg.inv(st)
+    S = jH @ PPred @ jH.T + R
+    K = PPred @ jH.T @ np.linalg.inv(S)
     xEst = xPred + K @ y
-    PEst = PPred - K @ st @ K.T
-
+    PEst = (np.eye(len(xEst)) - K @ jH) @ PPred
     return xEst, PEst
-
-
-def plot_covariance_ellipse(xEst, PEst):  # pragma: no cover
-    Pxy = PEst[0:2, 0:2]
-    eigval, eigvec = np.linalg.eig(Pxy)
-
-    if eigval[0] >= eigval[1]:
-        bigind = 0
-        smallind = 1
-    else:
-        bigind = 1
-        smallind = 0
-
-    t = np.arange(0, 2 * math.pi + 0.1, 0.1)
-    a = math.sqrt(eigval[bigind])
-    b = math.sqrt(eigval[smallind])
-    x = [a * math.cos(it) for it in t]
-    y = [b * math.sin(it) for it in t]
-    angle = math.atan2(eigvec[1, bigind], eigvec[0, bigind])
-    fx = rot_mat_2d(angle) @ np.array([x, y])
-    px = np.array(fx[0, :] + xEst[0, 0]).flatten()
-    py = np.array(fx[1, :] + xEst[1, 0]).flatten()
-    plt.plot(px, py, "--r")
-
-
-def setup_ukf(nx):
-    lamb = ALPHA ** 2 * (nx + KAPPA) - nx
-    # calculate weights
-    wm = [lamb / (lamb + nx)]
-    wc = [(lamb / (lamb + nx)) + (1 - ALPHA ** 2 + BETA)]
-    for i in range(2 * nx):
-        wm.append(1.0 / (2 * (nx + lamb)))
-        wc.append(1.0 / (2 * (nx + lamb)))
-    gamma = math.sqrt(nx + lamb)
-
-    wm = np.array([wm])
-    wc = np.array([wc])
-
-    return wm, wc, gamma
 
 
 def main():
     print(__file__ + " start!!")
 
-    nx = 4  # State Vector [x y yaw v]'
-    xEst = np.zeros((nx, 1))
-    xTrue = np.zeros((nx, 1))
-    PEst = np.eye(nx)
-    xDR = np.zeros((nx, 1))  # Dead reckoning
+    time = 0.0
 
-    wm, wc, gamma = setup_ukf(nx)
+    # State Vector [x y yaw v]'
+    xEst = np.zeros((4, 1))
+    xTrue = np.zeros((4, 1))
+    PEst = np.eye(4)
+
+    xDR = np.zeros((4, 1))  # Dead reckoning
 
     # history
     hxEst = xEst
@@ -226,15 +154,13 @@ def main():
     hxDR = xTrue
     hz = np.zeros((2, 1))
 
-    time = 0.0
-
     while SIM_TIME >= time:
         time += DT
         u = calc_input()
 
         xTrue, z, xDR, ud = observation(xTrue, xDR, u)
 
-        xEst, PEst = ukf_estimation(xEst, PEst, z, ud, wm, wc, gamma)
+        xEst, PEst = ekf_estimation(xEst, PEst, z, ud)
 
         # store data history
         hxEst = np.hstack((hxEst, xEst))
@@ -248,13 +174,13 @@ def main():
             plt.gcf().canvas.mpl_connect('key_release_event',
                     lambda event: [exit(0) if event.key == 'escape' else None])
             plt.plot(hz[0, :], hz[1, :], ".g")
-            plt.plot(np.array(hxTrue[0, :]).flatten(),
-                     np.array(hxTrue[1, :]).flatten(), "-b")
-            plt.plot(np.array(hxDR[0, :]).flatten(),
-                     np.array(hxDR[1, :]).flatten(), "-k")
-            plt.plot(np.array(hxEst[0, :]).flatten(),
-                     np.array(hxEst[1, :]).flatten(), "-r")
-            plot_covariance_ellipse(xEst, PEst)
+            plt.plot(hxTrue[0, :].flatten(),
+                     hxTrue[1, :].flatten(), "-b")
+            plt.plot(hxDR[0, :].flatten(),
+                     hxDR[1, :].flatten(), "-k")
+            plt.plot(hxEst[0, :].flatten(),
+                     hxEst[1, :].flatten(), "-r")
+            plot_covariance_ellipse(xEst[0, 0], xEst[1, 0], PEst)
             plt.axis("equal")
             plt.grid(True)
             plt.pause(0.001)
