@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+"""
+The intent of this file is to predict the trajectory of a pure pursuit controller given the start, end position and car model
+"""
+
 import math
 import numpy as np
 from custom_message.msg import ControlInputs, State, FullState, Coordinate, Path
@@ -7,29 +11,34 @@ import time
 import matplotlib.pyplot as plt
 from rclpy.node import Node
 
-"""
-The intent of this file is to predict the trajectory of a pure pursuit controller given the start, end position and car model
-"""
+# For the parameter file
+import pathlib
+import json
 
-debug = False
+path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
+# Opening JSON file
+with open(path, 'r') as openfile:
+    # Reading from json file
+    json_object = json.load(openfile)
 
-# Controller Params
-WB = 2.9  # [m] Wheel base of vehicle
-Lf = 20  # [m] look-ahead distance
-
-# Model params
-max_steer = np.radians(30.0)  # [rad] max steering angle
-max_speed = 10 # [m/s]
-min_speed = 0.0 # [m/s]
-L = 2.9  # [m] Wheel base of vehicle
+max_steer = json_object["Car_model"]["max_steer"] # [rad] max steering angle
+max_speed = json_object["Car_model"]["max_speed"] # [m/s]
+min_speed = json_object["Car_model"]["min_speed"] # [m/s]
+L = json_object["Car_model"]["L"]  # [m] Wheel base of vehicle
 Lr = L / 2.0  # [m]
 Lf = L - Lr
-Cf = 160.0 * 2.0  # N/rad
-Cr = 170.0 * 2.0  # N/rad
-Iz = 225.0  # kg/m2
-m = 150.0  # kg
-c_a = 1.36
-c_r1 = 0.01
+Cf = json_object["Car_model"]["Cf"]  # N/rad
+Cr = json_object["Car_model"]["Cr"] # N/rad
+Iz = json_object["Car_model"]["Iz"]  # kg/m2
+m = json_object["Car_model"]["m"]  # kg
+# Aerodynamic and friction coefficients
+c_a = json_object["Car_model"]["c_a"]
+c_r1 = json_object["Car_model"]["c_r1"]
+
+WB = json_object["Controller"]["WB"] 
+L_d = json_object["Controller"]["L_d"] 
+
+debug = False
 
 def predict_trajectory(initial_state: State, target):
     traj = []
@@ -88,8 +97,7 @@ def linear_model_callback(initial_state: State, cmd: ControlInputs, old_time: fl
 
         dt = 0.3
         state = State()
-        print(initial_state, cmd)
-        cmd.delta = np.clip(np.radians(cmd.delta), -max_steer, max_steer)
+        cmd.delta = np.clip(cmd.delta, -max_steer, max_steer)
 
         state.x = initial_state.x + initial_state.v * np.cos(initial_state.yaw) * dt
         state.y = initial_state.y + initial_state.v * np.sin(initial_state.yaw) * dt
@@ -105,7 +113,7 @@ def nonlinear_model_callback(initial_state: State, cmd: ControlInputs, old_time:
         dt = 0.1
         state = State()
         #dt = time.time() - old_time
-        cmd.delta = np.clip(np.radians(cmd.delta), -max_steer, max_steer)
+        cmd.delta = np.clip(cmd.delta, -max_steer, max_steer)
 
         beta = math.atan2((Lr * math.tan(cmd.delta) / L), 1.0)
         vx = initial_state.v * math.cos(beta)
@@ -142,7 +150,7 @@ def pure_pursuit_steer_control(target, pose):
         delta = -max_steer
     else:
         # ref: https://www.shuffleai.blog/blog/Three_Methods_of_Vehicle_Lateral_Control.html
-        delta = normalize_angle(math.atan2(2.0 * WB *  math.sin(alpha), Lf))
+        delta = normalize_angle(math.atan2(2.0 * WB *  math.sin(alpha), L_d))
 
     # decreasing the desired speed when turning
     if delta > math.radians(10) or delta < -math.radians(10):
@@ -150,7 +158,7 @@ def pure_pursuit_steer_control(target, pose):
     else:
         desired_speed = 6
 
-    delta = math.degrees(delta)
+    delta = delta
     throttle = 3 * (desired_speed-pose.v)
     return throttle, delta
 

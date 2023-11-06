@@ -21,6 +21,7 @@
   <depend>random</depend>
   <depend>cvxopt</depend>
   <depend>scipy</depend>
+  <depend>pathlib</depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

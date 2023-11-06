@@ -263,8 +263,13 @@ CMakeFiles/custom_message__rosidl_typesupport_fastrtps_c__pyext.dir/rosidl_gener
   rosidl_generator_c/custom_message/msg/detail/multiple_paths__functions.h \
   rosidl_generator_c/custom_message/msg/detail/multi_state__type_support.h \
   rosidl_generator_c/custom_message/msg/detail/multi_state__struct.h \
-  rosidl_generator_c/custom_message/msg/detail/multi_state__functions.h
+  rosidl_generator_c/custom_message/msg/detail/multi_state__functions.h \
+  rosidl_generator_c/custom_message/msg/detail/multi_control__type_support.h \
+  rosidl_generator_c/custom_message/msg/detail/multi_control__struct.h \
+  rosidl_generator_c/custom_message/msg/detail/multi_control__functions.h
 
+
+rosidl_generator_c/custom_message/msg/detail/multi_control__struct.h:
 
 rosidl_generator_c/custom_message/msg/detail/multi_state__functions.h:
 
@@ -291,6 +296,8 @@ rosidl_generator_c/custom_message/msg/detail/multiple_paths__struct.h:
 /usr/include/x86_64-linux-gnu/asm/types.h:
 
 rosidl_generator_c/custom_message/msg/detail/coordinate__type_support.h:
+
+rosidl_generator_c/custom_message/msg/detail/multi_control__functions.h:
 
 /usr/include/python3.10/longobject.h:
 
@@ -551,6 +558,8 @@ rosidl_generator_c/custom_message/msg/detail/multiple_paths__type_support.h:
 /usr/include/x86_64-linux-gnu/asm/posix_types.h:
 
 /usr/include/python3.10/namespaceobject.h:
+
+rosidl_generator_c/custom_message/msg/detail/multi_control__type_support.h:
 
 /usr/include/stdc-predef.h:
 

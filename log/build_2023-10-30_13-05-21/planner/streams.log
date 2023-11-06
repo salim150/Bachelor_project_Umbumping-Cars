@@ -1,0 +1,41 @@
+[1.251s] Invoking command in '/home/giacomo/thesis_ws/build/planner': PYTHONPATH=/home/giacomo/thesis_ws/build/planner/prefix_override:/home/giacomo/thesis_ws/install/planner/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --editable --build-directory /home/giacomo/thesis_ws/build/planner/build --no-deps install_data
+[1.642s] running develop
+[1.643s] /home/giacomo/.local/lib/python3.10/site-packages/setuptools/command/develop.py:40: EasyInstallDeprecationWarning: easy_install command is deprecated.
+[1.643s] !!
+[1.643s] 
+[1.643s]         ********************************************************************************
+[1.643s]         Please avoid running ``setup.py`` and ``easy_install``.
+[1.643s]         Instead, use pypa/build, pypa/installer or other
+[1.643s]         standards-based tools.
+[1.643s] 
+[1.643s]         See https://github.com/pypa/setuptools/issues/917 for details.
+[1.643s]         ********************************************************************************
+[1.643s] 
+[1.643s] !!
+[1.643s]   easy_install.initialize_options(self)
+[1.685s] /home/giacomo/.local/lib/python3.10/site-packages/setuptools/_distutils/cmd.py:66: SetuptoolsDeprecationWarning: setup.py install is deprecated.
+[1.685s] !!
+[1.685s] 
+[1.685s]         ********************************************************************************
+[1.685s]         Please avoid running ``setup.py`` directly.
+[1.685s]         Instead, use pypa/build, pypa/installer or other
+[1.685s]         standards-based tools.
+[1.685s] 
+[1.685s]         See https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html for details.
+[1.685s]         ********************************************************************************
+[1.685s] 
+[1.685s] !!
+[1.685s]   self.initialize_options()
+[1.919s] running egg_info
+[1.937s] writing planner.egg-info/PKG-INFO
+[1.937s] writing dependency_links to planner.egg-info/dependency_links.txt
+[1.937s] writing requirements to planner.egg-info/requires.txt
+[1.937s] writing top-level names to planner.egg-info/top_level.txt
+[1.976s] reading manifest file 'planner.egg-info/SOURCES.txt'
+[1.977s] writing manifest file 'planner.egg-info/SOURCES.txt'
+[1.996s] running build_ext
+[1.996s] Creating /home/giacomo/thesis_ws/install/planner/lib/python3.10/site-packages/planner.egg-link (link to .)
+[1.997s] 
+[1.997s] Installed /home/giacomo/thesis_ws/build/planner
+[1.997s] running install_data
+[2.029s] Invoked command in '/home/giacomo/thesis_ws/build/planner' returned '0': PYTHONPATH=/home/giacomo/thesis_ws/build/planner/prefix_override:/home/giacomo/thesis_ws/install/planner/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --editable --build-directory /home/giacomo/thesis_ws/build/planner/build --no-deps install_data

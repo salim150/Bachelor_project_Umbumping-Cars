@@ -7,16 +7,40 @@ def generate_launch_description():
     controller_node = Node(
         package="bumper_cars",
         executable="controller",
+        parameters=[
+            {'model_type': ['linear', 'linear', 'linear', 'linear']},
+            {'x0': [30.0, 0.0, -30.0, 0.0]},
+            {'y0': [30.0, 0.0, -30.0, -20.0]},
+            {'yaw': [0.0, 0.0, -3.14, 0.0]},
+            {'v': [0.0, 0.0, 0.0, 0.0]},
+            {'omega': [0.0, 0.0, 0.0, 0.0]}
+            ]
     )
 
     sensor_node = Node(
         package="bumper_cars",
-        executable="sensor"
+        executable="sensor",
+        parameters=[
+            {'model_type': ['linear', 'linear', 'linear', 'linear']},
+            {'x0': [30.0, 0.0, -30.0, 0.0]},
+            {'y0': [30.0, 0.0, -30.0, -20.0]},
+            {'yaw': [0.0, 0.0, -3.14, 0.0]},
+            {'v': [0.0, 0.0, 0.0, 0.0]},
+            {'omega': [0.0, 0.0, 0.0, 0.0]}
+            ]
     )
 
     plotter_node = Node(
         package="bumper_cars",
-        executable="plotter"
+        executable="plotter",
+        parameters=[
+            {'model_type': ['linear', 'linear', 'linear', 'linear']},
+            {'x0': [30.0, 0.0, -30.0, 0.0]},
+            {'y0': [30.0, 0.0, -30.0, -20.0]},
+            {'yaw': [0.0, 0.0, -3.14, 0.0]},
+            {'v': [0.0, 0.0, 0.0, 0.0]},
+            {'omega': [0.0, 0.0, 0.0, 0.0]}
+            ]
     )
     
     ld.add_action(plotter_node)
