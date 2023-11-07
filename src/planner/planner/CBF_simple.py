@@ -121,7 +121,6 @@ def CBF(x, u_ref):
         count_dxu += 1
     
     dxu[1,:] = beta_to_delta(dxu[1,:])
-    print("\n")
     return dxu
 
 def delta_to_beta(delta):
