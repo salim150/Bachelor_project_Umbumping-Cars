@@ -186,10 +186,11 @@ def main():
             plt.plot(hz[0, :], hz[1, :], ".g")
             plt.plot(hxTrue[0, :].flatten(),
                      hxTrue[1, :].flatten(), "-b")
-            # plt.plot(hxDR[0, :].flatten(),
-            #          hxDR[1, :].flatten(), "-k")
+            plt.plot(hxDR[0, :].flatten(),
+                     hxDR[1, :].flatten(), "-k")
             plt.plot(hxEst[0, :].flatten(),
                      hxEst[1, :].flatten(), "-r")
+            plt.plot(xEst[0,0], xEst[1,0], 'xk')
             plot_covariance_ellipse(xEst[0, 0], xEst[1, 0], PEst)
             plt.axis("equal")
             plt.grid(True)
