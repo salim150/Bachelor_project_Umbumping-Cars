@@ -22,34 +22,22 @@ with open(path, 'r') as openfile:
     # Reading from json file
     json_object = json.load(openfile)
 
-L = json_object["CBF_simple"]["L"]
-max_steer = json_object["CBF_simple"]["max_steer"]  # [rad] max steering angle
-max_speed = json_object["CBF_simple"]["max_speed"] # [m/s]
-min_speed = json_object["CBF_simple"]["min_speed"] # [m/s]
-magnitude_limit= json_object["CBF_simple"]["max_speed"] 
-max_acc = 40 #json_object["CBF_simple"]["max_acc"] 
-min_acc = -40 #json_object["CBF_simple"]["min_acc"] 
-dt = json_object["CBF_simple"]["dt"]
-safety_radius = 3#json_object["CBF_simple"]["safety_radius"]
-barrier_gain = 1# json_object["CBF_simple"]["barrier_gain"]
-Kv = json_object["CBF_simple"]["Kv"] # interval [0.5-1]
+L = json_object["C3BF"]["L"]
+max_steer = json_object["C3BF"]["max_steer"]  # [rad] max steering angle
+max_speed = json_object["C3BF"]["max_speed"] # [m/s]
+min_speed = json_object["C3BF"]["min_speed"] # [m/s]
+magnitude_limit= json_object["C3BF"]["max_speed"] 
+max_acc = json_object["C3BF"]["max_acc"] 
+min_acc = json_object["C3BF"]["min_acc"] 
+dt = json_object["C3BF"]["dt"]
+safety_radius = json_object["C3BF"]["safety_radius"]
+barrier_gain = json_object["C3BF"]["barrier_gain"]
+Kv = json_object["C3BF"]["Kv"] # interval [0.5-1]
 Lr = L / 2.0  # [m]
 Lf = L - Lr
 boundary_points = np.array([-50, 50, -50, 50])
 
-# define x initially --> state: [x, y, yaw, v]
-x = np.array([[0, 20], [0, 0], [0, np.pi], [0, 0]])
-x1 = x[:,0]
-x2 = x[:, 1]
-goal1 = np.array([0, 0])
-goal2 = np.array([0, 0])
-cmd1 = ControlInputs()
-cmd2 = ControlInputs()
-trajectory, tx, ty = predict_trajectory(array_to_state(x[:,0]), goal1)
-trajectory2, tx2, ty2 = predict_trajectory(array_to_state(x[:,1]), goal2)
-# Instantiate Robotarium object
-N = 2
-debug_time = time.time()
+# debug_time = time.time()
 
 def C3BF(x, u_ref):
     N = x.shape[1]
@@ -77,8 +65,13 @@ def C3BF(x, u_ref):
         q = np.array([-2 * u_ref[0, i], - 2 * u_ref[1,i]])
         
         for j in range(N):
+            arr = np.array([x[0, j] - x[0, i], x[1, j] - x[1,i]])
+            dist = np.linalg.norm(arr)
+            v = np.array([x[3,i]*np.cos(x[2,i]), x[3,i]*np.sin(x[2,i])])
+            scalar_prod = v @ arr
 
-            if j == i: continue
+            if j == i or dist>25 or scalar_prod<0: 
+                continue
 
             v_rel = np.array([x[3,j]*np.cos(x[2,j]) - x[3,i]*np.cos(x[2,i]), 
                               x[3,j]*np.sin(x[2,j]) - x[3,i]*np.sin(x[2,i])])
@@ -108,17 +101,17 @@ def C3BF(x, u_ref):
             G[count,:] = -Lg_h
             count+=1
 
-        # # Adding arena boundary constraints
-        # # Pos Y
-        # h = 0.01*(boundary_points[3] - safety_radius - x[1,i])**3
-        # gradH = np.array([0,-1, -x[3,i]*np.cos(x[2,i]), -np.sin(x[2,i])])
+        # Adding arena boundary constraints TODO check the calculation/propagation of Kv in the lie derivatives
+        # Pos Y
+        # h = 0.1*(boundary_points[3] - safety_radius - x[1,i] - Kv * x[3,i])**3
+        # gradH = np.array([0,-1, 0, -Kv])
         # Lf_h = np.dot(gradH.T, f)
         # Lg_h = np.dot(gradH.T, g)
         # G = np.vstack([G, -Lg_h])
         # H = np.vstack([H, np.array([h + Lf_h])])
 
         # # Neg Y
-        # h = 0.01*(-boundary_points[2] - safety_radius + x[1,i])**3
+        # h = 0.1*(-boundary_points[2] - safety_radius + x[1,i] - Kv * x[3,i])**3
         # gradH = np.array([0,1, x[3,i]*np.cos(x[2,i]), np.sin(x[2,i])])
         # Lf_h = np.dot(gradH.T, f)
         # Lg_h = np.dot(gradH.T, g)
@@ -126,7 +119,7 @@ def C3BF(x, u_ref):
         # H = np.vstack([H, np.array([h + Lf_h])])
 
         # # Pos X
-        # h = 0.01*(boundary_points[1] - safety_radius - x[0,i])**3
+        # h = 0.1*(boundary_points[1] - safety_radius - x[0,i] - Kv * x[3,i])**3
         # gradH = np.array([-1,0, x[3,i]*np.sin(x[2,i]), -np.cos(x[2,i])])
         # Lf_h = np.dot(gradH.T, f)
         # Lg_h = np.dot(gradH.T, g)
@@ -134,45 +127,45 @@ def C3BF(x, u_ref):
         # H = np.vstack([H, np.array([h + Lf_h])])
 
         # # Neg X
-        # h = 0.01*(-boundary_points[0] - safety_radius + x[0,i])**3
+        # h = 0.1*(-boundary_points[0] - safety_radius + x[0,i] - Kv * x[3,i])**3
         # gradH = np.array([1,0, -x[3,i]*np.sin(x[2,i]), np.cos(x[2,i])])
         # Lf_h = np.dot(gradH.T, f)
         # Lg_h = np.dot(gradH.T, g)
         # G = np.vstack([G, -Lg_h])
         # H = np.vstack([H, np.array([h + Lf_h])])
 
-        # # Adding arena boundary constraints
-        # # Pos Y
-        # h = ((x[1,i] - boundary_points[3])**2 - 6**2)
-        # gradH = np.array([0, 2*(x[1,i] - boundary_points[3]), 0, -Kv])
-        # Lf_h = np.dot(gradH.T, f)
-        # Lg_h = np.dot(gradH.T, g)
-        # G = np.vstack([G, -Lg_h])
-        # H = np.vstack([H, np.array([0.1*h**3 + Lf_h])])
+        # Adding arena boundary constraints
+        # Pos Y
+        h = ((x[1,i] - boundary_points[3])**2 - safety_radius**2 - Kv * x[3,i])
+        gradH = np.array([0, 2*(x[1,i] - boundary_points[3]), 0, -Kv])
+        Lf_h = np.dot(gradH.T, f)
+        Lg_h = np.dot(gradH.T, g)
+        G = np.vstack([G, -Lg_h])
+        H = np.vstack([H, np.array([0.001*h**3 + Lf_h])])
+        
+        # Neg Y
+        h = ((x[1,i] - boundary_points[2])**2 - safety_radius**2 - Kv * x[3,i])
+        gradH = np.array([0, 2*(x[1,i] - boundary_points[2]), 0, -Kv])
+        Lf_h = np.dot(gradH.T, f)
+        Lg_h = np.dot(gradH.T, g)
+        G = np.vstack([G, -Lg_h])
+        H = np.vstack([H, np.array([0.001*h**3 + Lf_h])])
+        
+        # Pos X
+        h = ((x[0,i] - boundary_points[1])**2 - safety_radius**2 - Kv * x[3,i])
+        gradH = np.array([2*(x[0,i] - boundary_points[1]), 0, 0, -Kv])
+        Lf_h = np.dot(gradH.T, f)
+        Lg_h = np.dot(gradH.T, g)
+        G = np.vstack([G, -Lg_h])
+        H = np.vstack([H, np.array([0.001*h**3 + Lf_h])])
 
-        # # Neg Y
-        # h = ((x[1,i] - boundary_points[2])**2 - 6**2)
-        # gradH = np.array([0, 2*(x[1,i] - boundary_points[2]), 0, -Kv])
-        # Lf_h = np.dot(gradH.T, f)
-        # Lg_h = np.dot(gradH.T, g)
-        # G = np.vstack([G, -Lg_h])
-        # H = np.vstack([H, np.array([0.1*h**3 + Lf_h])])
-
-        # # Pos X
-        # h = ((x[0,i] - boundary_points[1])**2 - 6**2)
-        # gradH = np.array([2*(x[0,i] - boundary_points[1]), 0, 0, -Kv])
-        # Lf_h = np.dot(gradH.T, f)
-        # Lg_h = np.dot(gradH.T, g)
-        # G = np.vstack([G, -Lg_h])
-        # H = np.vstack([H, np.array([0.1*h**3 + Lf_h])])
-
-        # # Neg X
-        # h = ((x[0,i] - boundary_points[0])**2 - 6**2)
-        # gradH = np.array([2*(x[0,i] - boundary_points[0]), 0, 0, -Kv])
-        # Lf_h = np.dot(gradH.T, f)
-        # Lg_h = np.dot(gradH.T, g)
-        # G = np.vstack([G, -Lg_h])
-        # H = np.vstack([H, np.array([0.1*h**3 + Lf_h])])
+        # Neg X
+        h = ((x[0,i] - boundary_points[0])**2 - safety_radius**2 - Kv * x[3,i])
+        gradH = np.array([2*(x[0,i] - boundary_points[0]), 0, 0, -Kv])
+        Lf_h = np.dot(gradH.T, f)
+        Lg_h = np.dot(gradH.T, g)
+        G = np.vstack([G, -Lg_h])
+        H = np.vstack([H, np.array([0.001*h**3 + Lf_h])])
         
         # Input constraints
         G = np.vstack([G, [[0, 1], [0, -1]]])
@@ -218,32 +211,6 @@ def plot_rect(x, y, yaw, r):  # pragma: no cover
         plt.plot(np.array(outline[0, :]).flatten(),
                     np.array(outline[1, :]).flatten(), "-k")
 
-def update_state(x):
-        # Create single-integrator control inputs
-        x1 = x[:,0]
-        x2 = x[:, 1]
-        x1 = array_to_state(x1)
-        x2 = array_to_state(x2)
-        
-        dxu = np.zeros((2,N))
-        dxu[0,0], dxu[1,0] = pure_pursuit_steer_control(goal1, x1)
-        dxu[0,1], dxu[1,1] = pure_pursuit_steer_control(goal2, x2)
-
-        # Create safe control inputs (i.e., no collisions)
-        # print(dxu)
-        dxu = C3BF(x, dxu)
-        # print(dxu)
-        # print('\n')
-
-        cmd1.throttle, cmd1.delta = dxu[0,0], dxu[1,0]
-        cmd2.throttle, cmd2.delta = dxu[0,1], dxu[1,1]
-
-        # Applying command and current state to the model
-        x1 = linear_model_callback(x1, cmd1)
-        x2 = linear_model_callback(x2, cmd2)
-
-        return x1, x2
-
 def main(args=None):
     # Instantiate Robotarium object
     N = 2
@@ -255,7 +222,7 @@ def main(args=None):
     # uni_barrier_cert = create_unicycle_barrier_certificate_with_boundary()
     # define x initially --> state: [x, y, yaw, v]
     x = np.array([[0, 20], [0, 0], [0, np.pi], [0, 0]])
-    goal1 = np.array([20, 0])
+    goal1 = np.array([0, 50])
     goal2 = np.array([0, 0])
     cmd1 = ControlInputs()
     cmd2 = ControlInputs()
@@ -274,10 +241,10 @@ def main(args=None):
         dxu[0,0], dxu[1,0] = pure_pursuit_steer_control(goal1, x1)
         dxu[0,1], dxu[1,1] = pure_pursuit_steer_control(goal2, x2)
         # Create safe control inputs (i.e., no collisions)
-        print(dxu)
+        # print(dxu)
         dxu = C3BF(x, dxu)
-        print(dxu)
-        print('\n')
+        # print(dxu)
+        # print('\n')
         cmd1.throttle, cmd1.delta = dxu[0,0], dxu[1,0]
         cmd2.throttle, cmd2.delta = dxu[0,1], dxu[1,1]
         # Applying command and current state to the model

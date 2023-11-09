@@ -65,7 +65,7 @@ class Controller(Node):
         initial_state3 = State(x=x0[2], y=y0[2], yaw=yaw[2], v=v[2], omega=omega[2])
         
         # creating random walk path for car2 to follow
-        self.safety = 20 # safety border around the map boundaries
+        self.safety = 0 # safety border around the map boundaries
         self.width = 100.0 - self.safety
         self.heigth = 100.0 -self.safety
 
@@ -225,8 +225,8 @@ class Controller(Node):
 
         # Create safe control inputs (i.e., no collisions)
         # dxu = self.uni_barrier_cert(dxu, x)
-        dxu = CBF(x, dxu)
-        # dxu = C3BF(x, dxu)
+        # dxu = CBF(x, dxu)
+        dxu = C3BF(x, dxu)
 
         return dxu
 

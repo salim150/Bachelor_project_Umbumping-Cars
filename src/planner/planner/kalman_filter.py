@@ -16,6 +16,8 @@ import numpy as np
 
 from utils import plot_covariance_ellipse
 
+# TODO: implement this and a flag in the ROS simulation
+
 # Covariance for EKF simulation
 Q = np.diag([
     1.0,  # variance of location on x-axis
@@ -26,8 +28,8 @@ Q = np.diag([
 R = np.diag([1.0, 1.0, np.deg2rad(5.0), 0.5]) ** 2  # Observation x,y position covariance
 
 #  Simulation parameter
-INPUT_NOISE = np.diag([1.0, np.deg2rad(2.0)]) ** 2
-GPS_NOISE = np.diag([0.5, 0.5, np.deg2rad(3.0), 0.5]) ** 2
+INPUT_NOISE = np.diag([1.0, np.deg2rad(2.0)])
+GPS_NOISE = np.diag([0.5, 0.5, np.deg2rad(3.0), 0.5])
 
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
