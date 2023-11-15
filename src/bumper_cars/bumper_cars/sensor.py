@@ -7,6 +7,7 @@ import message_filters
 import time
 
 debug = False
+robot_num = 3
 
 class SensorMeasurement(Node):
 
@@ -32,7 +33,6 @@ class SensorMeasurement(Node):
         omega = self.get_parameter('omega').get_parameter_value().double_array_value
         model_type = self.get_parameter('model_type').get_parameter_value().string_array_value
         
-        # Initializing the robots
         initial_state1 = State(x=x0[0], y=y0[0], yaw=yaw[0], v=v[0], omega=omega[0])
         initial_state2 = State(x=x0[1], y=y0[1], yaw=yaw[1], v=v[1], omega=omega[1])
         initial_state3 = State(x=x0[2], y=y0[2], yaw=yaw[2], v=v[2], omega=omega[2])
@@ -46,7 +46,7 @@ class SensorMeasurement(Node):
         
         self.multi_state = MultiState(multiple_state=[fullstate1, fullstate2, fullstate3])
         self.multi_state_pub = self.create_publisher(MultiState, "/robot_multi_state", 2)
-        self.timer = self.create_timer(0.1, self.timer_callback)
+        self.timer = self.create_timer(0.01, self.timer_callback)
 
         multi_state_subscriber = message_filters.Subscriber(self, MultiState, "/multi_fullstate")
 
