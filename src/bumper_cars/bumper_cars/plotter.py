@@ -19,6 +19,9 @@ with open(path, 'r') as openfile:
     # Reading from json file
     json_object = json.load(openfile)
 
+
+robot_num = json_object["robot_num"]
+
 class Config:
     """
     simulation parameter class
@@ -48,6 +51,9 @@ class Plotter(Node):
         self.state2_buf = np.array([0,0])
         self.state3_buf = np.array([0,0])
 
+        self.states_x_buf = np.zeros((robot_num, 1))
+        self.states_y_buf = np.zeros((robot_num, 1))
+
         # TODO: Pass it from parameters file
         self.controller_type = controller_type
 
@@ -64,10 +70,6 @@ class Plotter(Node):
         self.get_logger().info("Plotter has been started")
 
     def plotter_callback(self, multi_state: MultiState):
-       
-        state1 = multi_state.multiple_state[0]
-        state2 = multi_state.multiple_state[1]
-        state3 = multi_state.multiple_state[2]
         
         plt.cla()
         # for stopping simulation with the esc key.
@@ -75,81 +77,59 @@ class Plotter(Node):
             'key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
 
-        self.plot_robot(state1)
-        self.plot_robot(state2)
-        self.plot_robot(state3)
+        for i in range(robot_num):
+            self.plot_robot(multi_state.multiple_state[i])
+            if debug:
+                self.get_logger().info("robot" + str(i) + ", x: " + str(multi_state.multiple_state[i].x) + ", " +
+                                    "y: " + str(multi_state.multiple_state[i].y) + ", " +
+                                    "yaw: " + str(multi_state.multiple_state[i].yaw) + ", " +
+                                    "linear velocity: " + str(multi_state.multiple_state[i].v))
 
         self.plot_map()
         plt.axis("equal")
         plt.pause(0.000001)
-
-        if debug:
-            self.get_logger().info("robot1, x: " + str(state1.x) + ", " +
-                                "y: " + str(state1.y) + ", " +
-                                "yaw: " + str(state1.yaw) + ", " +
-                                "linear velocity: " + str(state1.v))
-            self.get_logger().info("robot2, x: " + str(state2.x) + ", " +
-                                "y: " + str(state2.y) + ", " +
-                                "yaw: " + str(state2.yaw) + ", " +
-                                "linear velocity: " + str(state2.v))
-            self.get_logger().info("robot3, x: " + str(state3.x) + ", " +
-                                "y: " + str(state3.y) + ", " +
-                                "yaw: " + str(state3.yaw) + ", " +
-                                "linear velocity: " + str(state3.v))
 
     def complete_plotter_callback(self, multi_state: MultiState, multi_traj: MultiplePaths):
-        # debug_time = time.time()
 
-        state1 = multi_state.multiple_state[0]
-        state2 = multi_state.multiple_state[1]
-        state3 = multi_state.multiple_state[2]
-    
-        self.state1_buf = np.vstack((self.state1_buf, [state1.x, state1.y]))
-        self.state2_buf = np.vstack((self.state2_buf, [state2.x, state2.y]))
-        self.state3_buf = np.vstack((self.state3_buf, [state3.x, state3.y]))
+        buf = np.zeros((robot_num, 2))
+        for i in range(robot_num):
+            buf[i, 0] = multi_state.multiple_state[i].x
+            buf[i, 1] = multi_state.multiple_state[i].y
 
-        if len(self.state1_buf) > config.trail_length:
-            self.state1_buf = np.delete(self.state1_buf, 0, 0)
-        if len(self.state2_buf) > config.trail_length:
-            self.state2_buf = np.delete(self.state2_buf, 0, 0)
-        if len(self.state3_buf) > config.trail_length:
-            self.state3_buf = np.delete(self.state3_buf, 0, 0)
+        self.states_x_buf = np.concatenate((self.states_x_buf, buf[:,0].reshape(robot_num,1)), axis=1)
+        self.states_y_buf = np.concatenate((self.states_y_buf, buf[:,1].reshape(robot_num,1)), axis=1)
+
+        if len(self.states_x_buf[0, :]) > config.trail_length or len(self.states_y_buf[0, :]) > config.trail_length:
+            self.states_x_buf = np.delete(self.states_x_buf, 0, 1)
+            self.states_y_buf = np.delete(self.states_y_buf, 0, 1)
         
         plt.cla()
         # for stopping simulation with the esc key.
         plt.gcf().canvas.mpl_connect(
             'key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
+        
+        for i in range(robot_num):
 
-        self.plot_situation(state1, multi_traj.multiple_path[0], self.state1_buf)
-        self.plot_situation(state2, multi_traj.multiple_path[1], self.state2_buf)
-        self.plot_situation(state3, multi_traj.multiple_path[2], self.state3_buf)
+            self.plot_situation(multi_state.multiple_state[i], multi_traj.multiple_path[i], 
+                                self.states_x_buf[i, :], self.states_y_buf[i, :])
+            if debug:
+                self.get_logger().info("robot" + str(i) + ", x: " + str(multi_state.multiple_state[i].x) + ", " +
+                                    "y: " + str(multi_state.multiple_state[i].y) + ", " +
+                                    "yaw: " + str(multi_state.multiple_state[i].yaw) + ", " +
+                                    "linear velocity: " + str(multi_state.multiple_state[i].v))
 
         self.plot_map()
         plt.axis("equal")
         plt.pause(0.000001)
-
-        if debug:
-            self.get_logger().info("robot1, x: " + str(state1.x) + ", " +
-                                "y: " + str(state1.y) + ", " +
-                                "yaw: " + str(state1.yaw) + ", " +
-                                "linear velocity: " + str(state1.v))
-            self.get_logger().info("robot2, x: " + str(state2.x) + ", " +
-                                "y: " + str(state2.y) + ", " +
-                                "yaw: " + str(state2.yaw) + ", " +
-                                "linear velocity: " + str(state2.v))
-            self.get_logger().info("robot3, x: " + str(state3.x) + ", " +
-                                "y: " + str(state3.y) + ", " +
-                                "yaw: " + str(state3.yaw) + ", " +
-                                "linear velocity: " + str(state3.v))
             
         # print(time.time()-debug_time)
         # debug_time = time.time()
 
-    def plot_situation(self, state: FullState, trajectory, state_buf):
+    def plot_situation(self, state: FullState, trajectory, state_buf_x, state_buf_y):
         if plot_traj:
             self.plot_path(trajectory)
-            plt.scatter(state_buf[:,0], state_buf[:,1], marker='.', s=4)
+            plt.scatter(state_buf_x[:], state_buf_y[:], marker='.', s=4)
             plt.plot(state.x, state.y, 'b.')
         self.plot_robot(state)
 

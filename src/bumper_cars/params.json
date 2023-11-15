@@ -59,6 +59,7 @@
             "max_speed": 10,
             "min_speed": 0.5,
             "controller_type": "random_goal"
-        }
+        },
+    "robot_num": 4
     
 }

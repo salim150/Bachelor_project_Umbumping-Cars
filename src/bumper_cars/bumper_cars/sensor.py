@@ -6,8 +6,18 @@ from custom_message.msg import MultiState, FullState, State
 import message_filters
 import time
 
+# For the parameter file
+import pathlib
+import json
+
+path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
+# Opening JSON file
+with open(path, 'r') as openfile:
+    # Reading from json file
+    json_object = json.load(openfile)
+
 debug = False
-robot_num = 3
+robot_num = json_object["robot_num"]
 
 class SensorMeasurement(Node):
 
@@ -32,19 +42,14 @@ class SensorMeasurement(Node):
         v = self.get_parameter('v').get_parameter_value().double_array_value
         omega = self.get_parameter('omega').get_parameter_value().double_array_value
         model_type = self.get_parameter('model_type').get_parameter_value().string_array_value
-        
-        initial_state1 = State(x=x0[0], y=y0[0], yaw=yaw[0], v=v[0], omega=omega[0])
-        initial_state2 = State(x=x0[1], y=y0[1], yaw=yaw[1], v=v[1], omega=omega[1])
-        initial_state3 = State(x=x0[2], y=y0[2], yaw=yaw[2], v=v[2], omega=omega[2])
 
-        fullstate1 = FullState(x=initial_state1.x, y=initial_state1.y, yaw=initial_state1.yaw, v=initial_state1.v,
-                                     omega=initial_state1.omega, delta=0.0, throttle=0.0)
-        fullstate2 = FullState(x=initial_state2.x, y=initial_state2.y, yaw=initial_state2.yaw, v=initial_state2.v,
-                                     omega=initial_state2.omega, delta=0.0, throttle=0.0)
-        fullstate3 = FullState(x=initial_state3.x, y=initial_state3.y, yaw=initial_state3.yaw, v=initial_state3.v,
-                                     omega=initial_state3.omega, delta=0.0, throttle=0.0)
-        
-        self.multi_state = MultiState(multiple_state=[fullstate1, fullstate2, fullstate3])
+        self.multi_state = MultiState()
+
+        # Initializing the robots TODO add in the launch file parameters the initial control--> here it's hardcoded
+        for i in range(robot_num):
+            self.multi_state.multiple_state.append(FullState(x=x0[i], y=y0[i], yaw=yaw[i], v=v[i],
+                                                             omega=omega[i], delta=0.0, throttle=0.0))
+
         self.multi_state_pub = self.create_publisher(MultiState, "/robot_multi_state", 2)
         self.timer = self.create_timer(0.01, self.timer_callback)
 
@@ -57,40 +62,19 @@ class SensorMeasurement(Node):
         
     def sensor_callback(self, multi_state_in: MultiState):
 
-        # debug_time = time.time()
-        
-        full_state1 = FullState(x=multi_state_in.multiple_state[0].x, y=multi_state_in.multiple_state[0].y, yaw=multi_state_in.multiple_state[0].yaw,
-                                v=multi_state_in.multiple_state[0].v, omega=multi_state_in.multiple_state[0].omega, delta=multi_state_in.multiple_state[0].delta,
-                                throttle=multi_state_in.multiple_state[0].throttle)
-        full_state2 = FullState(x=multi_state_in.multiple_state[1].x, y=multi_state_in.multiple_state[1].y, yaw=multi_state_in.multiple_state[1].yaw,
-                                v=multi_state_in.multiple_state[1].v, omega=multi_state_in.multiple_state[1].omega, delta=multi_state_in.multiple_state[1].delta,
-                                throttle=multi_state_in.multiple_state[1].throttle)
-        full_state3 = FullState(x=multi_state_in.multiple_state[2].x, y=multi_state_in.multiple_state[2].y, yaw=multi_state_in.multiple_state[2].yaw,
-                                v=multi_state_in.multiple_state[2].v, omega=multi_state_in.multiple_state[2].omega, delta=multi_state_in.multiple_state[2].delta,
-                                throttle=multi_state_in.multiple_state[2].throttle)
-
-        self.multi_state = MultiState(multiple_state=[full_state1, full_state2, full_state3])
-        # self.multi_state_pub.publish(multi_state)
-
-        if debug:
-            self.get_logger().info("Publishing robot1 new state, x: " + str(full_state1.x) + ", " +
-                                "y: " + str(full_state1.y) + ", " +
-                                "theta: " + str(full_state1.yaw) + ", " +
-                                "linear velocity: " + str(full_state1.v))
-            self.get_logger().info("Publishing robot2 new state, x: " + str(full_state2.x) + ", " +
-                                "y: " + str(full_state2.y) + ", " +
-                                "theta: " + str(full_state2.yaw) + ", " +
-                                "linear velocity: " + str(full_state2.v))
-            self.get_logger().info("Publishing robot3 new state, x: " + str(full_state3.x) + ", " +
-                                "y: " + str(full_state3.y) + ", " +
-                                "theta: " + str(full_state3.yaw) + ", " +
-                                "linear velocity: " + str(full_state3.v))
-        
-        # print(time.time()-debug_time)
-        # debug_time = time.time()
+        for i in range(robot_num):
+            self.multi_state.multiple_state[i] = self.apply_noise(multi_state_in.multiple_state[i])
+            if debug:
+                self.get_logger().info("Publishing robot" + str(i) + " new state, x: " + str(multi_state_in.multiple_state[i].x) + ", " +
+                                    "y: " + str(multi_state_in.multiple_state[i].y) + ", " +
+                                    "theta: " + str(multi_state_in.multiple_state[i].yaw) + ", " +
+                                    "linear velocity: " + str(multi_state_in.multiple_state[i].v))
 
     def timer_callback(self):
         self.multi_state_pub.publish(self.multi_state)
+    
+    def apply_noise(self, fullstate: FullState):
+        return fullstate
         
 def main(args=None):
     rclpy.init(args=args)

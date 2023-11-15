@@ -32,7 +32,7 @@ m = json_object["Car_model"]["m"]  # kg
 c_a = json_object["Car_model"]["c_a"]
 c_r1 = json_object["Car_model"]["c_r1"]
 
-robot_num = 3
+robot_num = json_object["robot_num"]
 
 class CarModel(Node):
 

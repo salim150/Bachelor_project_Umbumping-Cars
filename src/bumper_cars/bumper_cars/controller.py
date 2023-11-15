@@ -35,7 +35,7 @@ max_speed = json_object["Controller"]["max_speed"]  # [rad] max speed
 min_speed = json_object["Controller"]["min_speed"]  # [rad] min speed
 controller_type = json_object["Controller"]["controller_type"]
 debug = False
-robot_num = 3
+robot_num = json_object["robot_num"]
 
 class Controller(Node):
 
@@ -69,36 +69,13 @@ class Controller(Node):
         self.paths = []
         self.targets = []
         self.multi_traj = MultiplePaths()
+
         for i in range(robot_num):
             self.paths.append(self.create_path())
             self.targets.append([self.paths[i][0].x, self.paths[i][0].y])
             initial_state = State(x=x0[i], y=y0[i], yaw=yaw[i], v=v[i], omega=omega[i])
             self.multi_traj.multiple_path.append(predict_trajectory(initial_state, self.targets[i]))
-
-        # initial_state1 = State(x=x0[0], y=y0[0], yaw=yaw[0], v=v[0], omega=omega[0])
-        # initial_state2 = State(x=x0[1], y=y0[1], yaw=yaw[1], v=v[1], omega=omega[1])
-        # initial_state3 = State(x=x0[2], y=y0[2], yaw=yaw[2], v=v[2], omega=omega[2])
-
-        # # Robot 1
-        # self.path1 = []
-        # self.path1 = self.create_path(self.path1)
-        # self.target1 = (self.path1[0].x, self.path1[0].y)
-        # self.trajectory1, self.tx1, self.ty1 = predict_trajectory(initial_state1, self.target1)
-
-        # # Robot 2
-        # self.path2 = []
-        # self.path2 = self.create_path(self.path2)
-        # self.target2 = (self.path2[0].x, self.path2[0].y)
-        # self.trajectory2, self.tx2, self.ty2 = predict_trajectory(initial_state2, self.target2)
-
-        # # Robot 3
-        # self.path3 = []
-        # self.path3 = self.create_path(self.path3)
-        # self.target3 = (self.path3[0].x, self.path3[0].y)
-        # self.trajectory3, self.tx3, self.ty3 = predict_trajectory(initial_state3, self.target3)
-
-        # multi_path = MultiplePaths(multiple_path=[Path(path=self.trajectory1), Path(path=self.trajectory2), Path(path=self.trajectory3)])
-
+            
         self.multi_control_pub = self.create_publisher(MultiControl, '/multi_control', 20)
         self.multi_path_pub = self.create_publisher(MultiplePaths, "/robot_multi_traj", 2)
         multi_state_sub = message_filters.Subscriber(self, MultiState, "/robot_multi_state")
@@ -172,45 +149,20 @@ class Controller(Node):
         self.multi_control_pub.publish(multi_control)
     
     def general_pose_callback(self, multi_state):
-        
-        # debug_time = time.time()
+
         multi_control = MultiControl()
         for i in range(robot_num):
             cmd, self.paths[i], self.targets[i], self.multi_traj.multiple_path[i] = self.control_callback(multi_state.multiple_state[i], 
                                                                                                          self.targets[i], self.paths[i], 
                                                                                                          self.multi_traj.multiple_path[i])
             multi_control.multi_control.append(cmd)
-
-        # state1 = multi_state.multiple_state[0]
-        # state2 = multi_state.multiple_state[1]
-        # state3 = multi_state.multiple_state[2]
-
-        # cmd1, self.path1, self.target1, self.trajectory1 = self.control_callback(state1, self.target1, self.path1, self.trajectory1)
-        # cmd2, self.path2, self.target2, self.trajectory2 = self.control_callback(state2, self.target2, self.path2, self.trajectory2)
-        # cmd3, self.path3, self.target3, self.trajectory3 = self.control_callback(state3, self.target3, self.path3, self.trajectory3)
-
-        if debug:
-           self.get_logger().info(f'Commands before: cmd1: {cmd1}, cmd2: {cmd2}')
         
         # Applying the CBF
         multi_control = self.apply_CBF(multi_control=multi_control, multi_state=multi_state)
 
-        # cmd1.throttle, cmd1.delta = dxu[0,0], dxu[1,0]
-        # cmd2.throttle, cmd2.delta = dxu[0,1], dxu[1,1]
-        # cmd3.throttle, cmd3.delta = dxu[0,2], dxu[1,2]
-
         # Publishing everything in the general callback to avoid deadlocks
-        # multi_control = MultiControl(multi_control=[cmd1, cmd2, cmd3])
         self.multi_control_pub.publish(multi_control)
-
-        # multi_path = MultiplePaths(multiple_path=[Path(path=self.trajectory1), Path(path=self.trajectory2), Path(path=self.trajectory3)])
-        self.multi_path_pub.publish(self.multi_traj)     
-        
-        if debug:
-            self.get_logger().info(f'Commands after: cmd1: {cmd1}, cmd2: {cmd2}')
-
-        # print(time.time()-debug_time)
-        # debug_time = time.time()
+        self.multi_path_pub.publish(self.multi_traj)
 
     def control_callback(self, pose: FullState, target, path, trajectory):
         # updating target waypoint and predicting new traj
@@ -236,19 +188,6 @@ class Controller(Node):
             dxu[0,i], dxu[1,i] = multi_control.multi_control[i].throttle, multi_control.multi_control[i].delta
             x[:,i] = state_to_array(multi_state.multiple_state[i]).reshape(4)
 
-        # dxu[0,0], dxu[1,0] = cmd1.throttle, cmd1.delta
-        # dxu[0,1], dxu[1,1] = cmd2.throttle, cmd2.delta
-        # dxu[0,2], dxu[1,2] = cmd3.throttle, cmd3.delta
-
-        # Converting positions to arrays for the CBF
-        # x1 = state_to_array(state1)
-        # x2 = state_to_array(state2)
-        # x3 = state_to_array(state3)
-        # x = np.concatenate((x1, x2, x3), axis=1)
-
-        # Create safe control inputs (i.e., no collisions)
-        # dxu = self.uni_barrier_cert(dxu, x)
-        # dxu = CBF(x, dxu)
         dxu = C3BF(x, dxu)
         multi_control = MultiControl()
         for i in range(robot_num):
