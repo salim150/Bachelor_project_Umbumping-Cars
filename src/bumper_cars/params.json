@@ -60,6 +60,6 @@
             "min_speed": 0.5,
             "controller_type": "random_goal"
         },
-    "robot_num": 4
+    "robot_num": 5
     
 }

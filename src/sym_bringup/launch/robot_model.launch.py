@@ -1,6 +1,23 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from custom_message.msg import ControlInputs, State, FullState
+# For the parameter file
+import pathlib
+import json
+
+path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
+init_path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/init.json')
+# Opening JSON file
+with open(init_path, 'r') as openfile:
+    # Reading from json file
+    json_object = json.load(openfile)
+
+model_type = json_object["model_type"]
+x = json_object["x0"]
+y = json_object["y0"]
+yaw = json_object["yaw"]
+v = json_object["v"]
+omega = json_object["omega"]
 
 def generate_launch_description():
     ld = LaunchDescription()
@@ -14,12 +31,12 @@ def generate_launch_description():
             ("/robot_fullstate", "/multi_fullstate")
         ],
         parameters=[
-            {'model_type': ['linear', 'linear', 'linear', 'linear']},
-            {'x0': [30.0, 0.0, -30.0, 0.0]},
-            {'y0': [30.0, 0.0, -30.0, -20.0]},
-            {'yaw': [0.0, 0.0, -3.14, 0.0]},
-            {'v': [0.0, 0.0, 0.0, 0.0]},
-            {'omega': [0.0, 0.0, 0.0, 0.0]}
+            {'model_type': model_type},
+            {'x0': x},
+            {'y0': y},
+            {'yaw': yaw},
+            {'v': v},
+            {'omega': omega}
             ]
         )
     
