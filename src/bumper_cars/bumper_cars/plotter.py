@@ -21,6 +21,12 @@ with open(path, 'r') as openfile:
 
 
 robot_num = json_object["robot_num"]
+controller_type = json_object["Controller"]["controller_type"]
+safety = json_object["safety"]
+width = json_object["width"]
+height = json_object["height"]
+debug = False
+plot_traj = False
 
 class Config:
     """
@@ -35,9 +41,6 @@ class Config:
         self.trail_length = 5
 
 config = Config()
-controller_type = json_object["Controller"]["controller_type"]
-debug = False
-plot_traj = True
 
 class Plotter(Node):
 
@@ -57,8 +60,8 @@ class Plotter(Node):
         # TODO: Pass it from parameters file
         self.controller_type = controller_type
 
-        self.width = 100
-        self.heigth = 100
+        self.width = width
+        self.heigth = height
 
         if self.controller_type == "random_walk":
             ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 10, 1, allow_headerless=True)

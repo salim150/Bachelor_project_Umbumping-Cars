@@ -35,7 +35,11 @@ barrier_gain = json_object["C3BF"]["barrier_gain"]
 Kv = json_object["C3BF"]["Kv"] # interval [0.5-1]
 Lr = L / 2.0  # [m]
 Lf = L - Lr
-boundary_points = np.array([-50, 50, -50, 50])
+robot_num = json_object["robot_num"]
+safety = json_object["safety"]
+width = json_object["width"]
+height = json_object["height"]
+boundary_points = np.array([-width/2, width/2, -height/2, height/2])
 
 # debug_time = time.time()
 
@@ -70,7 +74,7 @@ def C3BF(x, u_ref):
             v = np.array([x[3,i]*np.cos(x[2,i]), x[3,i]*np.sin(x[2,i])])
             scalar_prod = v @ arr
 
-            if j == i or dist>25 or scalar_prod<0: 
+            if j == i or dist>10 or scalar_prod<0: 
                 continue
 
             v_rel = np.array([x[3,j]*np.cos(x[2,j]) - x[3,i]*np.cos(x[2,i]), 

@@ -36,6 +36,10 @@ min_speed = json_object["Controller"]["min_speed"]  # [rad] min speed
 controller_type = json_object["Controller"]["controller_type"]
 debug = False
 robot_num = json_object["robot_num"]
+safety = json_object["safety"]
+width = json_object["width"]
+height = json_object["height"]
+
 
 class Controller(Node):
 
@@ -61,9 +65,9 @@ class Controller(Node):
         model_type = self.get_parameter('model_type').get_parameter_value().string_array_value
         
         # creating random walk path for car2 to follow
-        self.safety = 0 # safety border around the map boundaries
-        self.width = 100.0 - self.safety
-        self.heigth = 100.0 -self.safety
+        # safety = safety # safety border around the map boundaries
+        self.width = width
+        self.heigth = height
         
         # Initializing the robots
         self.paths = []

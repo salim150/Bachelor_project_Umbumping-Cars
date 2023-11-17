@@ -15,12 +15,15 @@ with open(path, 'r') as openfile:
     json_object = json.load(openfile)
 
 robot_num = json_object["robot_num"]
+safety_init = json_object["safety"]
+width_init = json_object["width"]
+height_init = json_object["height"]
 
 def samplegrid():
     # defining the boundaries
-    safety = 20 # safety border around the map boundaries
-    width = 100.0 - safety
-    height = 100.0 - safety
+    safety = safety_init # safety border around the map boundaries
+    width = width_init - safety
+    height = height_init - safety
     min_dist = 15
     N = int(width/min_dist)
     M = int(height/min_dist)

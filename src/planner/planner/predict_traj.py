@@ -82,6 +82,7 @@ def predict_trajectory(initial_state: State, target):
     
     # tx = tx[0:-1:5]
     # ty = ty[0:-1:5]
+    traj = traj[0:-1:5]
     return Path(path=traj) #, tx, ty
 
 def plot_path(path: Path):

@@ -28,8 +28,13 @@ magnitude_limit= max_speed
 dt = json_object["CBF_robotarium"]["dt"] 
 safety_radius = json_object["CBF_robotarium"]["safety_radius"] 
 barrier_gain = json_object["CBF_robotarium"]["barrier_gain"] 
+robot_num = json_object["robot_num"]
+safety = json_object["safety"]
+width = json_object["width"]
+height = json_object["height"]
+boundary_points = np.array([-width/2, width/2, -height/2, height/2])
 
-def create_unicycle_barrier_certificate_with_boundary(barrier_gain=barrier_gain, safety_radius=safety_radius, projection_distance=0.05, magnitude_limit=magnitude_limit, boundary_points = np.array([-50, 50, -50, 50])):
+def create_unicycle_barrier_certificate_with_boundary(barrier_gain=barrier_gain, safety_radius=safety_radius, projection_distance=0.05, magnitude_limit=magnitude_limit, boundary_points = boundary_points):
     """ Creates a unicycle barrier cetifcate to avoid collisions. Uses the diffeomorphism mapping
     and single integrator implementation. For optimization purposes, this function returns 
     another function.
@@ -84,7 +89,7 @@ def create_unicycle_barrier_certificate_with_boundary(barrier_gain=barrier_gain,
 
     return f
 
-def create_single_integrator_barrier_certificate_with_boundary(barrier_gain=barrier_gain, safety_radius=safety_radius, magnitude_limit=magnitude_limit, boundary_points = np.array([-50, 50, -50, 50])):
+def create_single_integrator_barrier_certificate_with_boundary(barrier_gain=barrier_gain, safety_radius=safety_radius, magnitude_limit=magnitude_limit, boundary_points = boundary_points):
     """Creates a barrier certificate for a single-integrator system with a rectangular boundary included.  This function
     returns another function for optimization reasons.
 

@@ -33,7 +33,11 @@ barrier_gain = json_object["CBF_simple"]["barrier_gain"]
 Kv = json_object["CBF_simple"]["Kv"] # interval [0.5-1]
 Lr = L / 2.0  # [m]
 Lf = L - Lr
-boundary_points = np.array([-50, 50, -50, 50])
+robot_num = json_object["robot_num"]
+safety = json_object["safety"]
+width = json_object["width"]
+height = json_object["height"]
+boundary_points = np.array([-width/2, width/2, -height/2, height/2])
 
 def CBF(x, u_ref):
     N = x.shape[1]
