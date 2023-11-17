@@ -105,51 +105,24 @@ class Controller(Node):
 
     def random_walk_controller(self, multi_state):
 
-        cmd1 = ControlInputs()
-        cmd2 = ControlInputs()
-        cmd3 = ControlInputs()
+        multi_control = MultiControl()
+        for i in range(robot_num):
+            cmd = ControlInputs()
+            
+            cmd.delta = random.uniform(-max_steer, max_steer)
+            if multi_state.multiple_state[i].v >= max_speed:
+                cmd.throttle = random.uniform(-max_acc, 0)
+            elif multi_state.multiple_state[i].v <= min_speed:
+                cmd.throttle = random.uniform(0, max_acc)
+            else:
+                cmd.throttle = random.uniform(-max_acc, max_acc)
+            
+            multi_control.multi_control.append(cmd)
 
-        state1 = multi_state.multiple_state[0]
-        state2 = multi_state.multiple_state[1]
-        state3 = multi_state.multiple_state[2]
-
-        # Commands for robot 1
-        cmd1.delta = random.uniform(-max_steer, max_steer)
-        if state1.v >= max_speed:
-            cmd1.throttle = random.uniform(-max_acc, 0)
-        elif state1.v <= min_speed:
-            cmd1.throttle = random.uniform(0, max_acc)
-        else:
-            cmd1.throttle = random.uniform(-max_acc, max_acc)
-        
-        # Commands for robot 2
-        cmd2.delta = random.uniform(-max_steer, max_steer)
-        if state2.v >= max_speed:
-            cmd2.throttle = random.uniform(-max_acc, 0)
-        elif state2.v <= min_speed:
-            cmd2.throttle = random.uniform(0, max_acc)
-        else:
-            cmd2.throttle = random.uniform(-max_acc, max_acc)
-
-        # Commands for robot 3
-        cmd3.delta = random.uniform(-max_steer, max_steer)
-        if state3.v >= max_speed:
-            cmd3.throttle = random.uniform(-max_acc, 0)
-        elif state3.v <= min_speed:
-            cmd3.throttle = random.uniform(0, max_acc)
-        else:
-            cmd3.throttle = random.uniform(-max_acc, max_acc)
-        
         # Applying the CBF
-        dxu = self.apply_CBF(cmd1=cmd1, cmd2=cmd2, cmd3=cmd3, 
-                             state1=state1, state2=state2, state3=state3)
-
-        cmd1.throttle, cmd1.delta = dxu[0,0], dxu[1,0]
-        cmd2.throttle, cmd2.delta = dxu[0,1], dxu[1,1]
-        cmd3.throttle, cmd3.delta = dxu[0,2], dxu[1,2]
+        multi_control = self.apply_CBF(multi_control=multi_control, multi_state=multi_state)
 
         # Publishing everything in the general callback to avoid deadlocks
-        multi_control = MultiControl(multi_control=[cmd1, cmd2, cmd3])
         self.multi_control_pub.publish(multi_control)
     
     def general_pose_callback(self, multi_state):
