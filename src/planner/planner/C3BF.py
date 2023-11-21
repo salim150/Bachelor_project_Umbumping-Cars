@@ -74,7 +74,7 @@ def C3BF(x, u_ref):
             v = np.array([x[3,i]*np.cos(x[2,i]), x[3,i]*np.sin(x[2,i])])
             scalar_prod = v @ arr
 
-            if j == i or dist>10 or scalar_prod<0: 
+            if j == i or dist > 3 * safety_radius or scalar_prod < 0: 
                 continue
 
             v_rel = np.array([x[3,j]*np.cos(x[2,j]) - x[3,i]*np.cos(x[2,i]), 

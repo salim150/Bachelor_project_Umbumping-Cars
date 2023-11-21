@@ -50,14 +50,9 @@ class Plotter(Node):
         multi_state_sub = message_filters.Subscriber(self, MultiState, "/multi_fullstate")
         self.multi_path_sub = message_filters.Subscriber(self, MultiplePaths, "/robot_multi_traj")
 
-        self.state1_buf = np.array([0,0])
-        self.state2_buf = np.array([0,0])
-        self.state3_buf = np.array([0,0])
-
         self.states_x_buf = np.zeros((robot_num, 1))
         self.states_y_buf = np.zeros((robot_num, 1))
-
-        # TODO: Pass it from parameters file
+        
         self.controller_type = controller_type
 
         self.width = width
@@ -66,6 +61,11 @@ class Plotter(Node):
         if self.controller_type == "random_walk":
             ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 10, 1, allow_headerless=True)
             ts.registerCallback(self.plotter_callback)
+
+        elif self.controller_type == "random_harem":
+            ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 10, 1, allow_headerless=True)
+            ts.registerCallback(self.plotter_callback)
+            
         else:
             ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub, self.multi_path_sub], 10, 1, allow_headerless=True)
             ts.registerCallback(self.complete_plotter_callback)

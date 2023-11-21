@@ -68,17 +68,6 @@ class Controller(Node):
         # safety = safety # safety border around the map boundaries
         self.width = width
         self.heigth = height
-        
-        # Initializing the robots
-        self.paths = []
-        self.targets = []
-        self.multi_traj = MultiplePaths()
-
-        for i in range(robot_num):
-            self.paths.append(self.create_path())
-            self.targets.append([self.paths[i][0].x, self.paths[i][0].y])
-            initial_state = State(x=x0[i], y=y0[i], yaw=yaw[i], v=v[i], omega=omega[i])
-            self.multi_traj.multiple_path.append(predict_trajectory(initial_state, self.targets[i]))
             
         self.multi_control_pub = self.create_publisher(MultiControl, '/multi_control', 20)
         self.multi_path_pub = self.create_publisher(MultiplePaths, "/robot_multi_traj", 2)
@@ -90,15 +79,48 @@ class Controller(Node):
         if self.controller_type == "random_walk":
             ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 4, 0.3, allow_headerless=True)
             ts.registerCallback(self.random_walk_controller)
+            multi_control = MultiControl()
+
+            for i in range(robot_num):
+                multi_control.multi_control.append(ControlInputs(delta=0.0, throttle=0.0))
+        
+        elif self.controller_type == "random_harem":
+            # Initializing the robots
+            self.targets = []
+            multi_control = MultiControl()
+
+            for i in range(robot_num):
+                self.targets.append(random.choice([idx for idx in range(0,robot_num) if idx not in [i]]))
+                initial_state = State(x=x0[i], y=y0[i], yaw=yaw[i], v=v[i], omega=omega[i])
+                multi_control.multi_control.append(ControlInputs(delta=0.0, throttle=0.0))
+
+            self.time_bkp = time.time()
+            ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 4, 0.3, allow_headerless=True)
+            ts.registerCallback(self.random_harem_callback)
+            
+     
         else:
+            # Initializing the robots
+            self.paths = []
+            self.targets = []
+            self.multi_traj = MultiplePaths()
+            multi_control = MultiControl()
+
+            for i in range(robot_num):
+                self.paths.append(self.create_path())
+                self.targets.append([self.paths[i][0].x, self.paths[i][0].y])
+                initial_state = State(x=x0[i], y=y0[i], yaw=yaw[i], v=v[i], omega=omega[i])
+                self.multi_traj.multiple_path.append(predict_trajectory(initial_state, self.targets[i]))
+                # TODO initialize control
+                multi_control.multi_control.append(ControlInputs(delta=0.0, throttle=0.0))
+            
             ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 4, 0.3, allow_headerless=True)
             ts.registerCallback(self.general_pose_callback)
+            self.multi_path_pub.publish(self.multi_traj)  
+     
 
         # TODO initialize the initial control in the launch file
-        self.multi_control_pub.publish(MultiControl(multi_control=[ControlInputs(delta=0.0, throttle=0.0), ControlInputs(delta=0.0, throttle=0.0), 
-                                                                   ControlInputs(delta=0.0, throttle=0.0)]))
-        self.multi_path_pub.publish(self.multi_traj)  
-     
+        self.multi_control_pub.publish(multi_control)
         # CBF
         self.uni_barrier_cert = create_unicycle_barrier_certificate_with_boundary()
         self.get_logger().info("Controller has been started")
@@ -108,7 +130,7 @@ class Controller(Node):
         multi_control = MultiControl()
         for i in range(robot_num):
             cmd = ControlInputs()
-            
+
             cmd.delta = random.uniform(-max_steer, max_steer)
             if multi_state.multiple_state[i].v >= max_speed:
                 cmd.throttle = random.uniform(-max_acc, 0)
@@ -125,6 +147,25 @@ class Controller(Node):
         # Publishing everything in the general callback to avoid deadlocks
         self.multi_control_pub.publish(multi_control)
     
+    def random_harem_callback(self, multi_state):
+        if time.time() - self.time_bkp > 4:
+            self.get_logger().info("Changing the targets")
+            self.time_bkp = time.time()
+            self.update_targets(multi_state=multi_state)
+
+        multi_control = MultiControl()
+        for i in range(robot_num):                                                                                     
+            cmd = ControlInputs()
+            cmd.throttle, cmd.delta= self.pure_pursuit_steer_control([multi_state.multiple_state[self.targets[i]].x, multi_state.multiple_state[self.targets[i]].y],
+                                                                     multi_state.multiple_state[i])
+            multi_control.multi_control.append(cmd)
+        
+        # Applying the CBF
+        multi_control = self.apply_CBF(multi_control=multi_control, multi_state=multi_state)
+
+        # Publishing everything in the general callback to avoid deadlocks
+        self.multi_control_pub.publish(multi_control)
+
     def general_pose_callback(self, multi_state):
 
         multi_control = MultiControl()
@@ -149,7 +190,7 @@ class Controller(Node):
             trajectory = predict_trajectory(pose, target)
     
         cmd = ControlInputs()
-        cmd.throttle, cmd.delta, path, target = self.pure_pursuit_steer_control(target, pose, path)
+        cmd.throttle, cmd.delta= self.pure_pursuit_steer_control(target, pose)
 
         if debug:
             self.get_logger().info("Control input robot1, delta:" + str(cmd.delta) + " , throttle: " + str(cmd.throttle))
@@ -164,13 +205,20 @@ class Controller(Node):
         for i in range(robot_num):
             dxu[0,i], dxu[1,i] = multi_control.multi_control[i].throttle, multi_control.multi_control[i].delta
             x[:,i] = state_to_array(multi_state.multiple_state[i]).reshape(4)
-
+        
+        # dxu = CBF(x, dxu)
         dxu = C3BF(x, dxu)
+
         multi_control = MultiControl()
         for i in range(robot_num):
             multi_control.multi_control.append(ControlInputs(throttle=dxu[0,i], delta=dxu[1,i]))
 
         return multi_control
+    
+    def update_targets(self, multi_state: MultiState):
+        for i in range(len(self.targets)):
+            self.targets[i] = random.choice([idx for idx in range(0,robot_num) if idx not in [i]])
+            self.get_logger().info("New targets: " + str(multi_state.multiple_state[self.targets[i]].x) + " " + str(multi_state.multiple_state[self.targets[i]].y))
 
     def update_path(self, path: Path):
         path.pop(0)
@@ -183,7 +231,7 @@ class Controller(Node):
             path.append(Coordinate(x=float(random.randint(-self.width/2, self.width/2)), y=float(random.randint(-self.heigth/2, self.heigth/2))))
         return path
     
-    def pure_pursuit_steer_control(self, target, pose: FullState, path: Path):
+    def pure_pursuit_steer_control(self, target, pose: FullState):
 
         alpha = self.normalize_angle(math.atan2(target[1] - pose.y, target[0] - pose.x) - pose.yaw)
 
@@ -207,7 +255,7 @@ class Controller(Node):
         delta = delta
         throttle = 3 * (desired_speed-pose.v)
 
-        return throttle, delta, path, target
+        return throttle, delta
 
     @staticmethod
     def dist(point1, point2):
