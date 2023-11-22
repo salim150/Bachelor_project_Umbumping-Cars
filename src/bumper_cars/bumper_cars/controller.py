@@ -64,8 +64,6 @@ class Controller(Node):
         omega = self.get_parameter('omega').get_parameter_value().double_array_value
         model_type = self.get_parameter('model_type').get_parameter_value().string_array_value
         
-        # creating random walk path for car2 to follow
-        # safety = safety # safety border around the map boundaries
         self.width = width
         self.heigth = height
             
@@ -73,7 +71,6 @@ class Controller(Node):
         self.multi_path_pub = self.create_publisher(MultiplePaths, "/robot_multi_traj", 2)
         multi_state_sub = message_filters.Subscriber(self, MultiState, "/robot_multi_state")
 
-        # TODO: Pass it from parameters file
         self.controller_type = controller_type
 
         if self.controller_type == "random_walk":
@@ -96,8 +93,7 @@ class Controller(Node):
 
             self.time_bkp = time.time()
             ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 4, 0.3, allow_headerless=True)
-            ts.registerCallback(self.random_harem_callback)
-            
+            ts.registerCallback(self.random_harem_callback)  
      
         else:
             # Initializing the robots

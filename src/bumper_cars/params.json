@@ -60,7 +60,7 @@
             "min_speed": 0.5,
             "controller_type": "random_goal"
         },
-    "robot_num": 3,
+    "robot_num": 11,
     "safety": 30, 
     "width": 200,
     "height": 200.0

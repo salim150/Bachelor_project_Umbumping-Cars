@@ -5,6 +5,8 @@ from rclpy.node import Node
 import math
 from matplotlib import pyplot as plt
 from custom_message.msg import FullState, Path, MultiplePaths, MultiState, Coordinate
+# import the string type for ROS2 python to publish
+from std_msgs.msg import String
 import message_filters
 import numpy as np
 import time
@@ -25,8 +27,8 @@ controller_type = json_object["Controller"]["controller_type"]
 safety = json_object["safety"]
 width = json_object["width"]
 height = json_object["height"]
-debug = False
-plot_traj = True
+debug = True
+plot_traj = False
 
 class Config:
     """
@@ -78,6 +80,12 @@ class Plotter(Node):
         multi_state_sub = message_filters.Subscriber(self, MultiState, "/multi_fullstate")
         self.multi_path_sub = message_filters.Subscriber(self, MultiplePaths, "/robot_multi_traj")
 
+        # Creating a publisher to publish a string message on the topic "/plotter" only if the debug flag is on
+        if debug:
+            self.publisher_ = self.create_publisher(String, "/plotter", 10)
+            # define a class string message with the message type String with the value "plotter"
+            self.msg = String(data="plotter")
+
         self.states_x_buf = np.zeros((robot_num, 1))
         self.states_y_buf = np.zeros((robot_num, 1))
         
@@ -87,7 +95,6 @@ class Plotter(Node):
         self.heigth = height
 
         if self.controller_type == "random_walk":
-            # self.multi_state = MultiState()
             ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 10, 1, allow_headerless=True)
             ts.registerCallback(self.general_callback)
 
@@ -95,7 +102,6 @@ class Plotter(Node):
             self.timer = self.create_timer(0.01, self.plotter_callback)
 
         elif self.controller_type == "random_harem":
-            # self.multi_state = MultiState()
             ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 10, 1, allow_headerless=True)
             ts.registerCallback(self.general_callback)
 
@@ -103,8 +109,6 @@ class Plotter(Node):
             self.timer = self.create_timer(0.01, self.plotter_callback)
             
         else:
-            # self.multi_state = MultiState()
-            # self.multi_traj = MultiplePaths()
             ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub, self.multi_path_sub], 10, 1, allow_headerless=True)
             ts.registerCallback(self.complete_callback)
 
@@ -129,7 +133,7 @@ class Plotter(Node):
 
         for i in range(robot_num):
             self.plot_robot(self.multi_state.multiple_state[i])
-            if debug:
+            if not debug:
                 self.get_logger().info("robot" + str(i) + ", x: " + str(self.multi_state.multiple_state[i].x) + ", " +
                                     "y: " + str(self.multi_state.multiple_state[i].y) + ", " +
                                     "yaw: " + str(self.multi_state.multiple_state[i].yaw) + ", " +
@@ -138,6 +142,11 @@ class Plotter(Node):
         self.plot_map()
         plt.axis("equal")
         plt.pause(0.000001)
+
+        #publish the self.msg string message on the topic "/plotter"
+        if debug:
+            self.publisher_.publish(self.msg)
+
 
     def complete_plotter_callback(self):
 
@@ -163,7 +172,7 @@ class Plotter(Node):
 
             self.plot_situation(self.multi_state.multiple_state[i], self.multi_traj.multiple_path[i], 
                                 self.states_x_buf[i, :], self.states_y_buf[i, :])
-            if debug:
+            if not debug:
                 self.get_logger().info("robot" + str(i) + ", x: " + str(self.multi_state.multiple_state[i].x) + ", " +
                                     "y: " + str(self.multi_state.multiple_state[i].y) + ", " +
                                     "yaw: " + str(self.multi_state.multiple_state[i].yaw) + ", " +
@@ -173,8 +182,9 @@ class Plotter(Node):
         plt.axis("equal")
         plt.pause(0.000001)
             
-        # print(time.time()-debug_time)
-        # debug_time = time.time()
+        #publish the self.msg string message on the topic "/plotter"
+        if debug:
+            self.publisher_.publish(self.msg)
 
     def plot_situation(self, state: FullState, trajectory, state_buf_x, state_buf_y):
         if plot_traj:
