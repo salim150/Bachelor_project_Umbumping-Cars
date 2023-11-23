@@ -27,7 +27,7 @@ controller_type = json_object["Controller"]["controller_type"]
 safety = json_object["safety"]
 width = json_object["width"]
 height = json_object["height"]
-debug = True
+debug = False
 plot_traj = False
 
 class Config:
@@ -133,7 +133,7 @@ class Plotter(Node):
 
         for i in range(robot_num):
             self.plot_robot(self.multi_state.multiple_state[i])
-            if not debug:
+            if debug:
                 self.get_logger().info("robot" + str(i) + ", x: " + str(self.multi_state.multiple_state[i].x) + ", " +
                                     "y: " + str(self.multi_state.multiple_state[i].y) + ", " +
                                     "yaw: " + str(self.multi_state.multiple_state[i].yaw) + ", " +
@@ -172,7 +172,7 @@ class Plotter(Node):
 
             self.plot_situation(self.multi_state.multiple_state[i], self.multi_traj.multiple_path[i], 
                                 self.states_x_buf[i, :], self.states_y_buf[i, :])
-            if not debug:
+            if debug:
                 self.get_logger().info("robot" + str(i) + ", x: " + str(self.multi_state.multiple_state[i].x) + ", " +
                                     "y: " + str(self.multi_state.multiple_state[i].y) + ", " +
                                     "yaw: " + str(self.multi_state.multiple_state[i].yaw) + ", " +
