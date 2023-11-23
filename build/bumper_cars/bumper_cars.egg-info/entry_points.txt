@@ -1,5 +1,6 @@
 [console_scripts]
 controller = bumper_cars.controller:main
+converter = bumper_cars.converter:main
 model = bumper_cars.car_model:main
 plotter = bumper_cars.plotter:main
 sensor = bumper_cars.sensor:main

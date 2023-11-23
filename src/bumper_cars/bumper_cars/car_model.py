@@ -33,6 +33,7 @@ c_a = json_object["Car_model"]["c_a"]
 c_r1 = json_object["Car_model"]["c_r1"]
 
 robot_num = json_object["robot_num"]
+timer_freq = json_object["timer_freq"]
 
 class CarModel(Node):
 
@@ -74,7 +75,7 @@ class CarModel(Node):
         self.fullstate_publisher_ = self.create_publisher(MultiState, "robot_fullstate", 60)
         self.get_logger().info("Robots model initialized correctly")
 
-        self.timer = self.create_timer(0.01, self.timer_callback)
+        self.timer = self.create_timer(timer_freq, self.timer_callback)
 
     def general_model_callback(self, control: MultiControl):
 

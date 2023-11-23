@@ -24,6 +24,7 @@ setup(
             "sensor = bumper_cars.sensor:main",
             "model = bumper_cars.car_model:main",
             "plotter = bumper_cars.plotter:main",
+            "converter = bumper_cars.converter:main",
         ],
     },
 )

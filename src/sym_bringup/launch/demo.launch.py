@@ -96,11 +96,24 @@ def generate_launch_description():
             {'omega': omega}
             ]
     )
+
+    converter_node = Node(
+        package="bumper_cars",
+        executable="converter",
+        parameters=[
+            {'model_type': model_type},
+            {'x0': x},
+            {'y0': y},
+            {'yaw': yaw},
+            {'v': v},
+            {'omega': omega}
+            ]
+    )
     
     ld.add_action(plotter_node)
     ld.add_action(sensor_node)
     ld.add_action(controller_node)
-    #ld.add_action(robot_node)
+    ld.add_action(converter_node)
     
 
     return ld

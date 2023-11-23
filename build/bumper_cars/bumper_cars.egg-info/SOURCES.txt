@@ -11,6 +11,7 @@ setup.py
 bumper_cars/__init__.py
 bumper_cars/car_model.py
 bumper_cars/controller.py
+bumper_cars/converter.py
 bumper_cars/plotter.py
 bumper_cars/sensor.py
 bumper_cars.egg-info/PKG-INFO
