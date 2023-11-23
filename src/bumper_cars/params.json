@@ -32,7 +32,7 @@
             "max_acc": 40,
             "min_acc": -40,
             "dt": 0.1,
-            "safety_radius": 3,
+            "safety_radius": 5,
             "barrier_gain": 1, 
             "Kv": 20
         },
@@ -59,6 +59,10 @@
             "max_speed": 10,
             "min_speed": 0.5,
             "controller_type": "random_goal"
-        }
+        },
+    "robot_num": 11,
+    "safety": 30, 
+    "width": 200,
+    "height": 200.0
     
 }

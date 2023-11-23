@@ -32,6 +32,7 @@ m = json_object["Car_model"]["m"]  # kg
 c_a = json_object["Car_model"]["c_a"]
 c_r1 = json_object["Car_model"]["c_r1"]
 
+robot_num = json_object["robot_num"]
 
 class CarModel(Node):
 
@@ -57,65 +58,36 @@ class CarModel(Node):
         self.omega = self.get_parameter('omega').get_parameter_value().double_array_value
         self.model_type = self.get_parameter('model_type').get_parameter_value().string_array_value
 
-        # Initializing the robots
-        self.initial_state1 = State(x=self.x0[0], y=self.y0[0], yaw=self.yaw[0], v=self.v[0], omega=self.omega[0])
-        self.initial_state2 = State(x=self.x0[1], y=self.y0[1], yaw=self.yaw[1], v=self.v[1], omega=self.omega[1])
-        self.initial_state3 = State(x=self.x0[2], y=self.y0[2], yaw=self.yaw[2], v=self.v[2], omega=self.omega[2])
+        self.multi_state = MultiState()
+        self.old_time = []
+
+        # Initializing the robots TODO add in the launch file parameters the initial control--> here it's hardcoded
+        for i in range(robot_num):
+            self.multi_state.multiple_state.append(FullState(x=self.x0[i], y=self.y0[i], yaw=self.yaw[i], v=self.v[i], omega=self.omega[i],
+                                                                                                delta=0.0, throttle=0.0))
+            self.old_time.append(time.time())
+            
+        # self.get_logger().info("MultiState: " + str(self.multi_state))
 
         # Initializing the state publishers/subscribers
         self.control_sub = self.create_subscription(MultiControl, '/robot_control', self.general_model_callback, 10)
         self.fullstate_publisher_ = self.create_publisher(MultiState, "robot_fullstate", 60)
-
-        self.old_time1 = time.time()
-        self.old_time2 = time.time()
-        self.old_time3 = time.time()
-        self.old_time4 = time.time()
-
         self.get_logger().info("Robots model initialized correctly")
 
         self.timer = self.create_timer(0.01, self.timer_callback)
 
-        self.fullstate1 = FullState(x=self.initial_state1.x, y=self.initial_state1.y, yaw=self.initial_state1.yaw, v=self.initial_state1.v,
-                                     omega=self.initial_state1.omega, delta=0.0, throttle=0.0)
-        self.fullstate2 = FullState(x=self.initial_state2.x, y=self.initial_state2.y, yaw=self.initial_state2.yaw, v=self.initial_state2.v,
-                                     omega=self.initial_state2.omega, delta=0.0, throttle=0.0)
-        self.fullstate3 = FullState(x=self.initial_state3.x, y=self.initial_state3.y, yaw=self.initial_state3.yaw, v=self.initial_state3.v,
-                                     omega=self.initial_state3.omega, delta=0.0, throttle=0.0)
-        
-        self.multi_state = MultiState(multiple_state=[self.fullstate1, self.fullstate2, self.fullstate3])
-
     def general_model_callback(self, control: MultiControl):
 
-        if self.model_type[0] == 'linear':
-            self.initial_state1, self.old_time1 = self.linear_model_callback(self.initial_state1, control.multi_control[0], self.old_time1)
-        elif self.model_type[0] == 'nonlinear':
-            self.initial_state1, self.old_time1 = self.nonlinear_model_callback(self.initial_state1, control.multi_control[0], self.old_time1)
+        for i in range(robot_num):
+            if self.model_type[0] == 'linear':
+                self.multi_state.multiple_state[i], self.old_time[i] = self.linear_model_callback(self.multi_state.multiple_state[i], control.multi_control[i], self.old_time[i])
+            elif self.model_type[0] == 'nonlinear':
+                self.multi_state.multiple_state[i], self.old_time[i] = self.nonlinear_model_callback(self.multi_state.multiple_state[i], control.multi_control[i], self.old_time[i])
 
-        if self.model_type[1] == 'linear':
-            self.initial_state2, self.old_time2 = self.linear_model_callback(self.initial_state2, control.multi_control[1], self.old_time2)
-        elif self.model_type[1] == 'nonlinear':
-            self.initial_state2, self.old_time2 = self.nonlinear_model_callback(self.initial_state2, control.multi_control[1], self.old_time2)
-        
-        if self.model_type[2] == 'linear':
-            self.initial_state3, self.old_time3 = self.linear_model_callback(self.initial_state3, control.multi_control[2], self.old_time3)
-        elif self.model_type[2] == 'nonlinear':
-            self.initial_state3, self.old_time3 = self.nonlinear_model_callback(self.initial_state3, control.multi_control[2], self.old_time3)
-        
-        self.fullstate1 = FullState(x=float(self.initial_state1.x), y=float(self.initial_state1.y), yaw=float(self.initial_state1.yaw), v=float(self.initial_state1.v),
-                               omega=float(self.initial_state1.omega), delta=float(control.multi_control[0].delta), throttle=float(control.multi_control[0].throttle))
-        
-        self.fullstate2 = FullState(x=float(self.initial_state2.x), y=float(self.initial_state2.y), yaw=float(self.initial_state2.yaw), v=float(self.initial_state2.v),
-                               omega=float(self.initial_state2.omega), delta=float(control.multi_control[1].delta), throttle=float(control.multi_control[1].throttle))
-        
-        self.fullstate3 = FullState(x=float(self.initial_state3.x), y=float(self.initial_state3.y), yaw=float(self.initial_state3.yaw), v=float(self.initial_state3.v),
-                               omega=float(self.initial_state3.omega), delta=float(control.multi_control[2].delta), throttle=float(control.multi_control[2].throttle))
-        
-        self.multi_state = MultiState(multiple_state=[self.fullstate1, self.fullstate2, self.fullstate3])
-
-    def linear_model_callback(self, initial_state: State, cmd: ControlInputs, old_time: float):
+    def linear_model_callback(self, initial_state: FullState, cmd: ControlInputs, old_time: float):
 
         dt = time.time() - old_time
-        state = State()
+        state = FullState()
         cmd.delta = np.clip(cmd.delta, -max_steer, max_steer)
 
         state.x = initial_state.x + initial_state.v * np.cos(initial_state.yaw) * dt
@@ -125,9 +97,12 @@ class CarModel(Node):
         state.v = initial_state.v + cmd.throttle * dt
         state.v = np.clip(state.v, min_speed, max_speed)
 
+        state.delta = cmd.delta
+        state.throttle = cmd.throttle
+
         return state, time.time()
     
-    def nonlinear_model_callback(self, state: State, cmd: ControlInputs, old_time: float):
+    def nonlinear_model_callback(self, state: FullState, cmd: ControlInputs, old_time: float):
 
         dt = time.time() - old_time
         cmd.delta = np.clip(cmd.delta, -max_steer, max_steer)
@@ -154,10 +129,12 @@ class CarModel(Node):
         state.v = math.sqrt(vx ** 2 + vy ** 2)
         state.v = np.clip(state.v, min_speed, max_speed)
 
+        state.delta = cmd.delta
+        state.throttle = cmd.throttle
+
         return state, time.time()
     
     def timer_callback(self):
-        #self.state1_publisher_.publish(self.initial_state1)
         self.fullstate_publisher_.publish(self.multi_state)
 
     def normalize_angle(self, angle):

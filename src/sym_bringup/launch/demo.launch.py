@@ -1,5 +1,59 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
+import random
+import numpy as np
+
+# For the parameter file
+import pathlib
+import json
+
+path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
+init_path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/init.json')
+# Opening JSON file
+with open(path, 'r') as openfile:
+    # Reading from json file
+    json_object = json.load(openfile)
+
+robot_num = json_object["robot_num"]
+safety_init = json_object["safety"]
+width_init = json_object["width"]
+height_init = json_object["height"]
+
+def samplegrid():
+    # defining the boundaries
+    safety = safety_init # safety border around the map boundaries
+    width = width_init - safety
+    height = height_init - safety
+    min_dist = 15
+    N = int(width/min_dist)
+    M = int(height/min_dist)
+    x_mesh = np.linspace(-width/2, width/2, N)
+    y_mesh = np.linspace(-height/2, height/2, M)
+
+    list = [divmod(i, M) for i in random.sample(range(N * M), robot_num)]
+    list = np.array(list)
+    x = x_mesh[list[:, 0]]
+    y = y_mesh[list[:, 1] ]
+    yaw = []
+    while len(yaw)<robot_num:
+        yaw.append(np.radians(random.randint(-180, 180)))
+
+    v = robot_num * [0.0]
+    omega = robot_num * [0.0]
+    model_type = robot_num * ['linear']
+    return x.tolist(), y.tolist(), yaw, v, omega, model_type
+
+x, y, yaw, v, omega, model_type = samplegrid()
+dictionary = {
+    'model_type': model_type,
+    'x0': x,
+    'y0': y,
+    'yaw': yaw,
+    'v': v,
+    'omega': omega
+}
+with open(init_path, 'w') as outfile:
+    json.dump(dictionary, outfile)
 
 def generate_launch_description():
     ld = LaunchDescription()
@@ -8,12 +62,12 @@ def generate_launch_description():
         package="bumper_cars",
         executable="controller",
         parameters=[
-            {'model_type': ['linear', 'linear', 'linear', 'linear']},
-            {'x0': [30.0, 0.0, -30.0, 0.0]},
-            {'y0': [30.0, 0.0, -30.0, -20.0]},
-            {'yaw': [0.0, 0.0, -3.14, 0.0]},
-            {'v': [0.0, 0.0, 0.0, 0.0]},
-            {'omega': [0.0, 0.0, 0.0, 0.0]}
+            {'model_type': model_type},
+            {'x0': x},
+            {'y0': y},
+            {'yaw': yaw},
+            {'v': v},
+            {'omega': omega}
             ]
     )
 
@@ -21,12 +75,12 @@ def generate_launch_description():
         package="bumper_cars",
         executable="sensor",
         parameters=[
-            {'model_type': ['linear', 'linear', 'linear', 'linear']},
-            {'x0': [30.0, 0.0, -30.0, 0.0]},
-            {'y0': [30.0, 0.0, -30.0, -20.0]},
-            {'yaw': [0.0, 0.0, -3.14, 0.0]},
-            {'v': [0.0, 0.0, 0.0, 0.0]},
-            {'omega': [0.0, 0.0, 0.0, 0.0]}
+            {'model_type': model_type},
+            {'x0': x},
+            {'y0': y},
+            {'yaw': yaw},
+            {'v': v},
+            {'omega': omega}
             ]
     )
 
@@ -34,12 +88,12 @@ def generate_launch_description():
         package="bumper_cars",
         executable="plotter",
         parameters=[
-            {'model_type': ['linear', 'linear', 'linear', 'linear']},
-            {'x0': [30.0, 0.0, -30.0, 0.0]},
-            {'y0': [30.0, 0.0, -30.0, -20.0]},
-            {'yaw': [0.0, 0.0, -3.14, 0.0]},
-            {'v': [0.0, 0.0, 0.0, 0.0]},
-            {'omega': [0.0, 0.0, 0.0, 0.0]}
+            {'model_type': model_type},
+            {'x0': x},
+            {'y0': y},
+            {'yaw': yaw},
+            {'v': v},
+            {'omega': omega}
             ]
     )
     

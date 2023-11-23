@@ -35,6 +35,11 @@ max_speed = json_object["Controller"]["max_speed"]  # [rad] max speed
 min_speed = json_object["Controller"]["min_speed"]  # [rad] min speed
 controller_type = json_object["Controller"]["controller_type"]
 debug = False
+robot_num = json_object["robot_num"]
+safety = json_object["safety"]
+width = json_object["width"]
+height = json_object["height"]
+
 
 class Controller(Node):
 
@@ -59,188 +64,170 @@ class Controller(Node):
         omega = self.get_parameter('omega').get_parameter_value().double_array_value
         model_type = self.get_parameter('model_type').get_parameter_value().string_array_value
         
-        # Initializing the robots
-        initial_state1 = State(x=x0[0], y=y0[0], yaw=yaw[0], v=v[0], omega=omega[0])
-        initial_state2 = State(x=x0[1], y=y0[1], yaw=yaw[1], v=v[1], omega=omega[1])
-        initial_state3 = State(x=x0[2], y=y0[2], yaw=yaw[2], v=v[2], omega=omega[2])
-        
-        # creating random walk path for car2 to follow
-        self.safety = 0 # safety border around the map boundaries
-        self.width = 100.0 - self.safety
-        self.heigth = 100.0 -self.safety
-
-        # Robot 1
-        self.path1 = []
-        self.path1 = self.create_path(self.path1)
-        self.target1 = (self.path1[0].x, self.path1[0].y)
-        self.trajectory1, self.tx1, self.ty1 = predict_trajectory(initial_state1, self.target1)
-
-        # Robot 2
-        self.path2 = []
-        self.path2 = self.create_path(self.path2)
-        self.target2 = (self.path2[0].x, self.path2[0].y)
-        self.trajectory2, self.tx2, self.ty2 = predict_trajectory(initial_state2, self.target2)
-
-        # Robot 3
-        self.path3 = []
-        self.path3 = self.create_path(self.path3)
-        self.target3 = (self.path3[0].x, self.path3[0].y)
-        self.trajectory3, self.tx3, self.ty3 = predict_trajectory(initial_state3, self.target3)
-
+        self.width = width
+        self.heigth = height
+            
         self.multi_control_pub = self.create_publisher(MultiControl, '/multi_control', 20)
         self.multi_path_pub = self.create_publisher(MultiplePaths, "/robot_multi_traj", 2)
         multi_state_sub = message_filters.Subscriber(self, MultiState, "/robot_multi_state")
 
-        # TODO: Pass it from parameters file
         self.controller_type = controller_type
 
         if self.controller_type == "random_walk":
             ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 4, 0.3, allow_headerless=True)
             ts.registerCallback(self.random_walk_controller)
+            multi_control = MultiControl()
+
+            for i in range(robot_num):
+                multi_control.multi_control.append(ControlInputs(delta=0.0, throttle=0.0))
+        
+        elif self.controller_type == "random_harem":
+            # Initializing the robots
+            self.targets = []
+            multi_control = MultiControl()
+
+            for i in range(robot_num):
+                self.targets.append(random.choice([idx for idx in range(0,robot_num) if idx not in [i]]))
+                initial_state = State(x=x0[i], y=y0[i], yaw=yaw[i], v=v[i], omega=omega[i])
+                multi_control.multi_control.append(ControlInputs(delta=0.0, throttle=0.0))
+
+            self.time_bkp = time.time()
+            ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 4, 0.3, allow_headerless=True)
+            ts.registerCallback(self.random_harem_callback)  
+     
         else:
+            # Initializing the robots
+            self.paths = []
+            self.targets = []
+            self.multi_traj = MultiplePaths()
+            multi_control = MultiControl()
+
+            for i in range(robot_num):
+                self.paths.append(self.create_path())
+                self.targets.append([self.paths[i][0].x, self.paths[i][0].y])
+                initial_state = State(x=x0[i], y=y0[i], yaw=yaw[i], v=v[i], omega=omega[i])
+                self.multi_traj.multiple_path.append(predict_trajectory(initial_state, self.targets[i]))
+                # TODO initialize control
+                multi_control.multi_control.append(ControlInputs(delta=0.0, throttle=0.0))
+            
             ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 4, 0.3, allow_headerless=True)
             ts.registerCallback(self.general_pose_callback)
-
-        self.multi_control_pub.publish(MultiControl(multi_control=[ControlInputs(delta=0.0, throttle=0.0), ControlInputs(delta=0.0, throttle=0.0), 
-                                                                   ControlInputs(delta=0.0, throttle=0.0)]))
-        multi_path = MultiplePaths(multiple_path=[Path(path=self.trajectory1), Path(path=self.trajectory2), Path(path=self.trajectory3)])
-        self.multi_path_pub.publish(multi_path)  
+            self.multi_path_pub.publish(self.multi_traj)  
      
+
+        # TODO initialize the initial control in the launch file
+        self.multi_control_pub.publish(multi_control)
         # CBF
         self.uni_barrier_cert = create_unicycle_barrier_certificate_with_boundary()
         self.get_logger().info("Controller has been started")
 
     def random_walk_controller(self, multi_state):
 
-        cmd1 = ControlInputs()
-        cmd2 = ControlInputs()
-        cmd3 = ControlInputs()
+        multi_control = MultiControl()
+        for i in range(robot_num):
+            cmd = ControlInputs()
 
-        state1 = multi_state.multiple_state[0]
-        state2 = multi_state.multiple_state[1]
-        state3 = multi_state.multiple_state[2]
+            cmd.delta = random.uniform(-max_steer, max_steer)
+            if multi_state.multiple_state[i].v >= max_speed:
+                cmd.throttle = random.uniform(-max_acc, 0)
+            elif multi_state.multiple_state[i].v <= min_speed:
+                cmd.throttle = random.uniform(0, max_acc)
+            else:
+                cmd.throttle = random.uniform(-max_acc, max_acc)
+            
+            multi_control.multi_control.append(cmd)
 
-        # Commands for robot 1
-        cmd1.delta = random.uniform(-max_steer, max_steer)
-        if state1.v >= max_speed:
-            cmd1.throttle = random.uniform(-max_acc, 0)
-        elif state1.v <= min_speed:
-            cmd1.throttle = random.uniform(0, max_acc)
-        else:
-            cmd1.throttle = random.uniform(-max_acc, max_acc)
-        
-        # Commands for robot 2
-        cmd2.delta = random.uniform(-max_steer, max_steer)
-        if state2.v >= max_speed:
-            cmd2.throttle = random.uniform(-max_acc, 0)
-        elif state2.v <= min_speed:
-            cmd2.throttle = random.uniform(0, max_acc)
-        else:
-            cmd2.throttle = random.uniform(-max_acc, max_acc)
-
-        # Commands for robot 3
-        cmd3.delta = random.uniform(-max_steer, max_steer)
-        if state3.v >= max_speed:
-            cmd3.throttle = random.uniform(-max_acc, 0)
-        elif state3.v <= min_speed:
-            cmd3.throttle = random.uniform(0, max_acc)
-        else:
-            cmd3.throttle = random.uniform(-max_acc, max_acc)
-        
         # Applying the CBF
-        dxu = self.apply_CBF(cmd1=cmd1, cmd2=cmd2, cmd3=cmd3, 
-                             state1=state1, state2=state2, state3=state3)
-
-        cmd1.throttle, cmd1.delta = dxu[0,0], dxu[1,0]
-        cmd2.throttle, cmd2.delta = dxu[0,1], dxu[1,1]
-        cmd3.throttle, cmd3.delta = dxu[0,2], dxu[1,2]
+        multi_control = self.apply_CBF(multi_control=multi_control, multi_state=multi_state)
 
         # Publishing everything in the general callback to avoid deadlocks
-        multi_control = MultiControl(multi_control=[cmd1, cmd2, cmd3])
         self.multi_control_pub.publish(multi_control)
     
-    def general_pose_callback(self, multi_state):
-        
-        # debug_time = time.time()
+    def random_harem_callback(self, multi_state):
+        if time.time() - self.time_bkp > 4:
+            self.get_logger().info("Changing the targets")
+            self.time_bkp = time.time()
+            self.update_targets(multi_state=multi_state)
 
-        state1 = multi_state.multiple_state[0]
-        state2 = multi_state.multiple_state[1]
-        state3 = multi_state.multiple_state[2]
-
-        cmd1, self.path1, self.target1, self.trajectory1 = self.control_callback(state1, self.target1, self.path1, self.trajectory1)
-        cmd2, self.path2, self.target2, self.trajectory2 = self.control_callback(state2, self.target2, self.path2, self.trajectory2)
-        cmd3, self.path3, self.target3, self.trajectory3 = self.control_callback(state3, self.target3, self.path3, self.trajectory3)
-
-        if debug:
-           self.get_logger().info(f'Commands before: cmd1: {cmd1}, cmd2: {cmd2}')
+        multi_control = MultiControl()
+        for i in range(robot_num):                                                                                     
+            cmd = ControlInputs()
+            cmd.throttle, cmd.delta= self.pure_pursuit_steer_control([multi_state.multiple_state[self.targets[i]].x, multi_state.multiple_state[self.targets[i]].y],
+                                                                     multi_state.multiple_state[i])
+            multi_control.multi_control.append(cmd)
         
         # Applying the CBF
-        dxu = self.apply_CBF(cmd1=cmd1, cmd2=cmd2, cmd3=cmd3, 
-                             state1=state1, state2=state2, state3=state3)
-
-        cmd1.throttle, cmd1.delta = dxu[0,0], dxu[1,0]
-        cmd2.throttle, cmd2.delta = dxu[0,1], dxu[1,1]
-        cmd3.throttle, cmd3.delta = dxu[0,2], dxu[1,2]
+        multi_control = self.apply_CBF(multi_control=multi_control, multi_state=multi_state)
 
         # Publishing everything in the general callback to avoid deadlocks
-        multi_control = MultiControl(multi_control=[cmd1, cmd2, cmd3])
         self.multi_control_pub.publish(multi_control)
 
-        multi_path = MultiplePaths(multiple_path=[Path(path=self.trajectory1), Path(path=self.trajectory2), Path(path=self.trajectory3)])
-        self.multi_path_pub.publish(multi_path)     
-        
-        if debug:
-            self.get_logger().info(f'Commands after: cmd1: {cmd1}, cmd2: {cmd2}')
+    def general_pose_callback(self, multi_state):
 
-        # print(time.time()-debug_time)
-        # debug_time = time.time()
+        multi_control = MultiControl()
+        for i in range(robot_num):
+            cmd, self.paths[i], self.targets[i], self.multi_traj.multiple_path[i] = self.control_callback(multi_state.multiple_state[i], 
+                                                                                                         self.targets[i], self.paths[i], 
+                                                                                                         self.multi_traj.multiple_path[i])
+            multi_control.multi_control.append(cmd)
+        
+        # Applying the CBF
+        multi_control = self.apply_CBF(multi_control=multi_control, multi_state=multi_state)
+
+        # Publishing everything in the general callback to avoid deadlocks
+        self.multi_control_pub.publish(multi_control)
+        self.multi_path_pub.publish(self.multi_traj)
 
     def control_callback(self, pose: FullState, target, path, trajectory):
         # updating target waypoint and predicting new traj
         if self.dist(point1=(pose.x, pose.y), point2=target) < L_d:
             path = self.update_path(path)
             target = (path[0].x, path[0].y)
-            trajectory, tx, ty  = predict_trajectory(pose, target)
+            trajectory = predict_trajectory(pose, target)
     
         cmd = ControlInputs()
-        cmd.throttle, cmd.delta, path, target = self.pure_pursuit_steer_control(target, pose, path)
+        cmd.throttle, cmd.delta= self.pure_pursuit_steer_control(target, pose)
 
         if debug:
             self.get_logger().info("Control input robot1, delta:" + str(cmd.delta) + " , throttle: " + str(cmd.throttle))
 
         return cmd, path, target, trajectory
     
-    def apply_CBF(self, cmd1, cmd2, cmd3, state1, state2, state3):
-        # Remember to change the 3 with the actual number of robots
-        dxu = np.zeros((2,3))
-        dxu[0,0], dxu[1,0] = cmd1.throttle, cmd1.delta
-        dxu[0,1], dxu[1,1] = cmd2.throttle, cmd2.delta
-        dxu[0,2], dxu[1,2] = cmd3.throttle, cmd3.delta
+    def apply_CBF(self, multi_control: MultiControl, multi_state: MultiState):
+        # TODO Remember to change the 3 with the actual number of robots and the two with the input dim not hardcoding
+        dxu = np.zeros((2,robot_num))
+        x = np.zeros((4,robot_num))
 
-        # Converting positions to arrays for the CBF
-        x1 = state_to_array(state1)
-        x2 = state_to_array(state2)
-        x3 = state_to_array(state3)
-        x = np.concatenate((x1, x2, x3), axis=1)
-
-        # Create safe control inputs (i.e., no collisions)
-        # dxu = self.uni_barrier_cert(dxu, x)
+        for i in range(robot_num):
+            dxu[0,i], dxu[1,i] = multi_control.multi_control[i].throttle, multi_control.multi_control[i].delta
+            x[:,i] = state_to_array(multi_state.multiple_state[i]).reshape(4)
+        
         # dxu = CBF(x, dxu)
         dxu = C3BF(x, dxu)
 
-        return dxu
+        multi_control = MultiControl()
+        for i in range(robot_num):
+            multi_control.multi_control.append(ControlInputs(throttle=dxu[0,i], delta=dxu[1,i]))
+
+        return multi_control
+    
+    def update_targets(self, multi_state: MultiState):
+        for i in range(len(self.targets)):
+            self.targets[i] = random.choice([idx for idx in range(0,robot_num) if idx not in [i]])
+            self.get_logger().info("New targets: " + str(multi_state.multiple_state[self.targets[i]].x) + " " + str(multi_state.multiple_state[self.targets[i]].y))
 
     def update_path(self, path: Path):
         path.pop(0)
         path.append(Coordinate(x=float(random.randint(-self.width/2, self.width/2)), y=float(random.randint(-self.heigth/2, self.heigth/2))))
         return path
 
-    def create_path(self, path):
+    def create_path(self):
+        path = []
         while len(path)<5:
             path.append(Coordinate(x=float(random.randint(-self.width/2, self.width/2)), y=float(random.randint(-self.heigth/2, self.heigth/2))))
         return path
     
-    def pure_pursuit_steer_control(self, target, pose: FullState, path: Path):
+    def pure_pursuit_steer_control(self, target, pose: FullState):
 
         alpha = self.normalize_angle(math.atan2(target[1] - pose.y, target[0] - pose.x) - pose.yaw)
 
@@ -264,7 +251,7 @@ class Controller(Node):
         delta = delta
         throttle = 3 * (desired_speed-pose.v)
 
-        return throttle, delta, path, target
+        return throttle, delta
 
     @staticmethod
     def dist(point1, point2):
