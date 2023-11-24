@@ -7,6 +7,7 @@ import message_filters
 import time
 from geometry_msgs.msg import Pose, PoseArray
 import math
+import numpy as np
 
 # For the parameter file
 import pathlib
@@ -47,43 +48,48 @@ class Converter(Node):
         omega = self.get_parameter('omega').get_parameter_value().double_array_value
         # model_type = self.get_parameter('model_type').get_parameter_value().string_array_value
 
-        self.pose_array = PoseArray()
+        self.pose_array_state = PoseArray()
+        self.pose_array_state.header.frame_id = "base_link"
+        self.pose_array_steering = PoseArray()
+        self.pose_array_steering.header.frame_id = "base_link"
 
         # Initializing the robots TODO add in the launch file parameters the initial control--> here it's hardcoded
         for i in range(robot_num):
             pose = self.convert_to_pose(FullState(x=x0[i], y=y0[i], yaw=yaw[i], v=v[i],
                                                              omega=omega[i], delta=0.0, throttle=0.0))
-            self.pose_array.poses.append(pose)
+            steering = self.convert_to_steering_pose(FullState(x=x0[i], y=y0[i], yaw=yaw[i], v=v[i], omega=omega[i],
+                                                             delta=0.0, throttle=0.0))
+            self.pose_array_state.poses.append(pose)
+            self.pose_array_steering.poses.append(steering)
         
         self.pose_array_pub = self.create_publisher(PoseArray, "/pose_array", 2)
+        self.pose_array_steering_pub = self.create_publisher(PoseArray, "/pose_array_steering", 2)
         self.timer = self.create_timer(timer_freq, self.timer_callback)
 
         multi_state_subscriber = message_filters.Subscriber(self, MultiState, "/multi_fullstate")
         ts = message_filters.ApproximateTimeSynchronizer([multi_state_subscriber], 6, 1, allow_headerless=True)
-        ts.registerCallback(self.converter_callback)
+        ts.registerCallback(self.state_converter_callback)
 
         self.get_logger().info("Converter has been started")
 
-    def quaternion_from_euler(self, roll, pitch, yaw):
+    def get_quaternion_from_euler(self, roll, pitch, yaw):
         """
-        Converts euler roll, pitch, yaw to quaternion (w in last place)
-        quat = [x, y, z, w]
-        Bellow should be replaced when porting for ROS 2 Python tf_conversions is done.
+        Convert an Euler angle to a quaternion.
+        
+        Input
+            :param roll: The roll (rotation around x-axis) angle in radians.
+            :param pitch: The pitch (rotation around y-axis) angle in radians.
+            :param yaw: The yaw (rotation around z-axis) angle in radians.
+        
+        Output
+            :return qx, qy, qz, qw: The orientation in quaternion [x,y,z,w] format
         """
-        cy = math.cos(yaw * 0.5)
-        sy = math.sin(yaw * 0.5)
-        cp = math.cos(pitch * 0.5)
-        sp = math.sin(pitch * 0.5)
-        cr = math.cos(roll * 0.5)
-        sr = math.sin(roll * 0.5)
-
-        q = [0] * 4
-        q[0] = cy * cp * cr + sy * sp * sr
-        q[1] = cy * cp * sr - sy * sp * cr
-        q[2] = sy * cp * sr + cy * sp * cr
-        q[3] = sy * cp * cr - cy * sp * sr
-
-        return q
+        qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+        qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
+        qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
+        qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+        
+        return [qx, qy, qz, qw]
         
     def convert_to_pose(self, state: FullState):
         pose = Pose()
@@ -91,21 +97,43 @@ class Converter(Node):
         pose.position.y = state.y
         pose.position.z = 0.0
 
-        q = self.quaternion_from_euler(0, 0, state.yaw)
+        q = self.get_quaternion_from_euler(0, 0, state.yaw)
+        pose.orientation.x = q[0]
+        pose.orientation.y = q[1]
+        pose.orientation.z = q[2]
+        pose.orientation.w = q[3]
+        return pose
+    
+    def convert_to_steering_pose(self, state: FullState):
+        pose = Pose()
+        pose.position.x = state.x
+        pose.position.y = state.y
+        pose.position.z = 0.0
+
+        q = self.get_quaternion_from_euler(0, 0, state.yaw+state.delta)
+        # q = self.quaternion_from_euler(0, 0, state.yaw)
         pose.orientation.x = q[0]
         pose.orientation.y = q[1]
         pose.orientation.z = q[2]
         pose.orientation.w = q[3]
         return pose
 
-    def converter_callback(self, multi_state_in: MultiState):
-        self.pose_array = PoseArray()
+    def state_converter_callback(self, multi_state_in: MultiState):
+        self.pose_array_state = PoseArray()
+        self.pose_array_state.header.frame_id = "base_link"
+
+        self.pose_array_steering = PoseArray()
+        self.pose_array_steering.header.frame_id = "base_link"
+
         for state in multi_state_in.multiple_state:
             pose = self.convert_to_pose(state)
-            self.pose_array.poses.append(pose)
+            steering = self.convert_to_steering_pose(state)
+            self.pose_array_steering.poses.append(steering)
+            self.pose_array_state.poses.append(pose)
         
     def timer_callback(self):
-        self.pose_array_pub.publish(self.pose_array)
+        self.pose_array_pub.publish(self.pose_array_state)
+        self.pose_array_steering_pub.publish(self.pose_array_steering)
 
 
 def main(args=None):

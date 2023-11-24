@@ -33,7 +33,7 @@ def samplegrid():
     list = [divmod(i, M) for i in random.sample(range(N * M), robot_num)]
     list = np.array(list)
     x = x_mesh[list[:, 0]]
-    y = y_mesh[list[:, 1] ]
+    y = y_mesh[list[:, 1]]
     yaw = []
     while len(yaw)<robot_num:
         yaw.append(np.radians(random.randint(-180, 180)))
