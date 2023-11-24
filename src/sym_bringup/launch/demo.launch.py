@@ -84,18 +84,18 @@ def generate_launch_description():
             ]
     )
 
-    plotter_node = Node(
-        package="bumper_cars",
-        executable="plotter",
-        parameters=[
-            {'model_type': model_type},
-            {'x0': x},
-            {'y0': y},
-            {'yaw': yaw},
-            {'v': v},
-            {'omega': omega}
-            ]
-    )
+    # plotter_node = Node(
+    #     package="bumper_cars",
+    #     executable="plotter",
+    #     parameters=[
+    #         {'model_type': model_type},
+    #         {'x0': x},
+    #         {'y0': y},
+    #         {'yaw': yaw},
+    #         {'v': v},
+    #         {'omega': omega}
+    #         ]
+    # )
 
     converter_node = Node(
         package="bumper_cars",
@@ -109,6 +109,12 @@ def generate_launch_description():
             {'omega': omega}
             ]
     )
+    # launch node to start rviz2 
+    rviz2_node = Node(
+        package="rviz2",
+        executable="rviz2",
+        arguments=["-d", "/home/giacomo/thesis_ws/src/bumper_cars/rviz2_config.rviz"]
+    )
 
     # launch node for static broadcaster following this example ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 1 map base_link
     static_tf_pub = Node(
@@ -118,11 +124,12 @@ def generate_launch_description():
     )
 
     
-    ld.add_action(plotter_node)
+    # ld.add_action(plotter_node)
     ld.add_action(sensor_node)
     ld.add_action(controller_node)
     ld.add_action(converter_node)
-    ld.add_action(static_tf_pub)   
+    ld.add_action(static_tf_pub)  
+    ld.add_action(rviz2_node) 
     
     
 
