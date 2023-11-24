@@ -109,11 +109,21 @@ def generate_launch_description():
             {'omega': omega}
             ]
     )
+
+    # launch node for static broadcaster following this example ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 1 map base_link
+    static_tf_pub = Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        arguments=["0", "0", "0", "0", "0", "0", "1", "map", "base_link"]
+    )
+
     
     ld.add_action(plotter_node)
     ld.add_action(sensor_node)
     ld.add_action(controller_node)
     ld.add_action(converter_node)
+    ld.add_action(static_tf_pub)   
+    
     
 
     return ld

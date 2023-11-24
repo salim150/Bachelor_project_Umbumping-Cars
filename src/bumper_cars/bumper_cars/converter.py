@@ -6,6 +6,7 @@ from custom_message.msg import MultiState, FullState, State
 import message_filters
 import time
 from geometry_msgs.msg import Pose, PoseArray
+from visualization_msgs.msg import Marker, MarkerArray
 import math
 import numpy as np
 
@@ -52,6 +53,7 @@ class Converter(Node):
         self.pose_array_state.header.frame_id = "base_link"
         self.pose_array_steering = PoseArray()
         self.pose_array_steering.header.frame_id = "base_link"
+        self.marker_array = MarkerArray()
 
         # Initializing the robots TODO add in the launch file parameters the initial control--> here it's hardcoded
         for i in range(robot_num):
@@ -59,11 +61,15 @@ class Converter(Node):
                                                              omega=omega[i], delta=0.0, throttle=0.0))
             steering = self.convert_to_steering_pose(FullState(x=x0[i], y=y0[i], yaw=yaw[i], v=v[i], omega=omega[i],
                                                              delta=0.0, throttle=0.0))
+            marker = self.convert_to_marker(FullState(x=x0[i], y=y0[i], yaw=yaw[i], v=v[i], omega=omega[i],
+                                                             delta=0.0, throttle=0.0), i)
             self.pose_array_state.poses.append(pose)
             self.pose_array_steering.poses.append(steering)
+            self.marker_array.markers.append(marker)
         
         self.pose_array_pub = self.create_publisher(PoseArray, "/pose_array", 2)
         self.pose_array_steering_pub = self.create_publisher(PoseArray, "/pose_array_steering", 2)
+        self.marker_array_pub = self.create_publisher(MarkerArray, "/marker_array", 2)
         self.timer = self.create_timer(timer_freq, self.timer_callback)
 
         multi_state_subscriber = message_filters.Subscriber(self, MultiState, "/multi_fullstate")
@@ -105,7 +111,7 @@ class Converter(Node):
         return pose
     
     def convert_to_steering_pose(self, state: FullState):
-        pose = Pose()
+        pose = Pose()        
         pose.position.x = state.x
         pose.position.y = state.y
         pose.position.z = 0.0
@@ -117,23 +123,54 @@ class Converter(Node):
         pose.orientation.z = q[2]
         pose.orientation.w = q[3]
         return pose
+    
+    def convert_to_marker(self, state: FullState, idx):
+        marker = Marker()
+        marker.header.frame_id = "base_link"
+        marker.header.stamp = self.get_clock().now().to_msg()
+        # marker.ns = "my_namespace"
+        marker.id = idx
+        marker.type = Marker.CUBE
+        marker.action = Marker.ADD
+        marker.pose = self.convert_to_pose(state)
+        marker.scale.x = 2.9
+        marker.scale.y = 1.45
+        marker.scale.z = 1.0
+        if state.v > 0.0:
+            marker.color.r = 1.0
+            marker.color.g = 0.0
+            marker.color.b = 0.0
+        else:
+            marker.color.r = 0.0
+            marker.color.g = 1.0
+            marker.color.b = 0.0
+        marker.color.a = 1.0
+        # marker.lifetime = self.get_clock().now().to_msg()
+        return marker
 
     def state_converter_callback(self, multi_state_in: MultiState):
         self.pose_array_state = PoseArray()
         self.pose_array_state.header.frame_id = "base_link"
+        self.pose_array_state.header.stamp = self.get_clock().now().to_msg()
 
         self.pose_array_steering = PoseArray()
         self.pose_array_steering.header.frame_id = "base_link"
+        self.pose_array_steering.header.stamp = self.get_clock().now().to_msg()
 
-        for state in multi_state_in.multiple_state:
+        self.marker_array = MarkerArray()
+
+        for idx, state in enumerate(multi_state_in.multiple_state):
             pose = self.convert_to_pose(state)
             steering = self.convert_to_steering_pose(state)
+            marker = self.convert_to_marker(state, idx)
             self.pose_array_steering.poses.append(steering)
             self.pose_array_state.poses.append(pose)
+            self.marker_array.markers.append(marker)
         
     def timer_callback(self):
         self.pose_array_pub.publish(self.pose_array_state)
         self.pose_array_steering_pub.publish(self.pose_array_steering)
+        self.marker_array_pub.publish(self.marker_array)
 
 
 def main(args=None):
