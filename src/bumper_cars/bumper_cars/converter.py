@@ -23,7 +23,7 @@ with open(path, 'r') as openfile:
     # Reading from json file
     json_object = json.load(openfile)
 
-debug = False
+plot_traj = json_object["plot_traj"]
 robot_num = json_object["robot_num"]
 timer_freq = json_object["timer_freq"]
 
@@ -59,7 +59,8 @@ class Converter(Node):
         self.pose_array_steering = PoseArray()
         self.pose_array_steering.header.frame_id = "base_link"
         self.marker_array = MarkerArray()
-        self.point_cloud = PointCloud()
+        if plot_traj:
+            self.point_cloud = PointCloud()
 
         # Initializing the robots TODO add in the launch file parameters the initial control--> here it's hardcoded
         for i in range(robot_num):
@@ -81,7 +82,10 @@ class Converter(Node):
 
         multi_state_subscriber = message_filters.Subscriber(self, MultiState, "/multi_fullstate")
         multi_trajectory_subscriber = message_filters.Subscriber(self, MultiplePaths, "/robot_multi_traj")
-        ts = message_filters.ApproximateTimeSynchronizer([multi_state_subscriber, multi_trajectory_subscriber], 6, 1, allow_headerless=True)
+        if plot_traj:
+            ts = message_filters.ApproximateTimeSynchronizer([multi_state_subscriber, multi_trajectory_subscriber], 6, 1, allow_headerless=True)
+        else:
+            ts = message_filters.ApproximateTimeSynchronizer([multi_state_subscriber], 6, 1, allow_headerless=True)
         ts.registerCallback(self.state_converter_callback)
 
         self.get_logger().info("Converter has been started")
@@ -181,7 +185,7 @@ class Converter(Node):
         marker.color.a = 1.0
         return marker
 
-    def state_converter_callback(self, multi_state_in: MultiState, multi_trajectory_in: MultiplePaths):
+    def state_converter_callback(self, multi_state_in: MultiState, multi_trajectory_in: MultiplePaths = None):
         """
         Callback function for processing robot states.
 
@@ -196,9 +200,10 @@ class Converter(Node):
         self.pose_array_steering.header.frame_id = "base_link"
         self.pose_array_steering.header.stamp = self.get_clock().now().to_msg()
 
-        self.point_cloud = PointCloud()
-        self.point_cloud.header.frame_id = "base_link"
-        self.point_cloud.header.stamp = self.get_clock().now().to_msg()
+        if plot_traj:
+            self.point_cloud = PointCloud()
+            self.point_cloud.header.frame_id = "base_link"
+            self.point_cloud.header.stamp = self.get_clock().now().to_msg()
 
         self.marker_array = MarkerArray()
 
@@ -209,7 +214,9 @@ class Converter(Node):
             self.pose_array_steering.poses.append(steering)
             self.pose_array_state.poses.append(pose)
             self.marker_array.markers.append(marker)
-            self.path_to_pointcloud(multi_trajectory_in.multiple_path[idx].path)
+
+            if plot_traj:
+                self.path_to_pointcloud(multi_trajectory_in.multiple_path[idx].path)
 
         
     def path_to_pointcloud(self, path):
@@ -236,7 +243,8 @@ class Converter(Node):
         self.pose_array_pub.publish(self.pose_array_state)
         self.pose_array_steering_pub.publish(self.pose_array_steering)
         self.marker_array_pub.publish(self.marker_array)
-        self.point_cloud_pub.publish(self.point_cloud)
+        if plot_traj:
+            self.point_cloud_pub.publish(self.point_cloud)
 
 
 def main(args=None):

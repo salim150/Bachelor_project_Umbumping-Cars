@@ -235,12 +235,12 @@ def main(args=None):
     # uni_barrier_cert = create_unicycle_barrier_certificate_with_boundary()
     # define x initially --> state: [x, y, yaw, v]
     x = np.array([[0, 20], [0, 0], [0, np.pi], [0, 0]])
-    goal1 = np.array([0, 50])
+    goal1 = np.array([10, 0])
     goal2 = np.array([0, 0])
     cmd1 = ControlInputs()
     cmd2 = ControlInputs()
-    trajectory, tx, ty = predict_trajectory(array_to_state(x[:,0]), goal1)
-    trajectory2, tx2, ty2 = predict_trajectory(array_to_state(x[:,1]), goal2)
+    trajectory = predict_trajectory(array_to_state(x[:,0]), goal1)
+    trajectory2 = predict_trajectory(array_to_state(x[:,1]), goal2)
     # While the number of robots at the required poses is less
     # than N...
     for i in range(iterations):
@@ -289,6 +289,8 @@ def main(args=None):
         x1 = state_to_array(x1)
         x2 = state_to_array(x2)
         x = np.concatenate((x1, x2), axis=1)
+
+        print(dxu)
 
 
     

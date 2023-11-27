@@ -215,7 +215,7 @@ def plot_map(width=100, heigth=100):
 def plot_path(path: Path):
         x = []
         y = []
-        for coord in path:
+        for coord in path.path:
             x.append(coord.x)
             y.append(coord.y)
         plt.scatter(x, y, marker='.', s=10)
