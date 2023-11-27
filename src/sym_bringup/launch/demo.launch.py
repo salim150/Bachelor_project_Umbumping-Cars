@@ -33,7 +33,7 @@ def samplegrid():
     list = [divmod(i, M) for i in random.sample(range(N * M), robot_num)]
     list = np.array(list)
     x = x_mesh[list[:, 0]]
-    y = y_mesh[list[:, 1] ]
+    y = y_mesh[list[:, 1]]
     yaw = []
     while len(yaw)<robot_num:
         yaw.append(np.radians(random.randint(-180, 180)))
@@ -84,9 +84,22 @@ def generate_launch_description():
             ]
     )
 
-    plotter_node = Node(
+    # plotter_node = Node(
+    #     package="bumper_cars",
+    #     executable="plotter",
+    #     parameters=[
+    #         {'model_type': model_type},
+    #         {'x0': x},
+    #         {'y0': y},
+    #         {'yaw': yaw},
+    #         {'v': v},
+    #         {'omega': omega}
+    #         ]
+    # )
+
+    converter_node = Node(
         package="bumper_cars",
-        executable="plotter",
+        executable="converter",
         parameters=[
             {'model_type': model_type},
             {'x0': x},
@@ -96,11 +109,28 @@ def generate_launch_description():
             {'omega': omega}
             ]
     )
+    # launch node to start rviz2 
+    rviz2_node = Node(
+        package="rviz2",
+        executable="rviz2",
+        arguments=["-d", "/home/giacomo/thesis_ws/src/bumper_cars/rviz2_config.rviz"]
+    )
+
+    # launch node for static broadcaster following this example ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 1 map base_link
+    static_tf_pub = Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        arguments=["0", "0", "0", "0", "0", "0", "1", "map", "base_link"]
+    )
+
     
-    ld.add_action(plotter_node)
+    # ld.add_action(plotter_node)
     ld.add_action(sensor_node)
     ld.add_action(controller_node)
-    #ld.add_action(robot_node)
+    ld.add_action(converter_node)
+    ld.add_action(static_tf_pub)  
+    ld.add_action(rviz2_node) 
+    
     
 
     return ld

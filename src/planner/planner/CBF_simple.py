@@ -40,6 +40,17 @@ height = json_object["height"]
 boundary_points = np.array([-width/2, width/2, -height/2, height/2])
 
 def CBF(x, u_ref):
+    """
+    Computes the circular Control Barrier Function (CBF) for a given state and reference input.
+
+    Args:
+        x (numpy.ndarray): State vector.
+        u_ref (numpy.ndarray): Reference input vector.
+
+    Returns:
+        numpy.ndarray: Computed control input.
+
+    """
     N = x.shape[1]
     M = u_ref.shape[0]
     dxu = np.zeros([u_ref.shape[0], u_ref.shape[1]])

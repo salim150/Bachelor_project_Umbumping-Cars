@@ -41,9 +41,18 @@ width = json_object["width"]
 height = json_object["height"]
 boundary_points = np.array([-width/2, width/2, -height/2, height/2])
 
-# debug_time = time.time()
-
 def C3BF(x, u_ref):
+    """
+    Computes the control input for the C3BF (Collision Cone Control Barrier Function) algorithm.
+
+    Args:
+        x (numpy.ndarray): State vector of shape (4, N), where N is the number of time steps.
+        u_ref (numpy.ndarray): Reference control input of shape (2, N).
+
+    Returns:
+        numpy.ndarray: Filtered Control input dxu of shape (2, N).
+
+    """
     N = x.shape[1]
     M = u_ref.shape[0]
     dxu = np.zeros([u_ref.shape[0], u_ref.shape[1]])

@@ -18,10 +18,38 @@ with open(path, 'r') as openfile:
 
 debug = False
 robot_num = json_object["robot_num"]
+timer_freq = json_object["timer_freq"]
 
 class SensorMeasurement(Node):
+    """
+    Class representing a sensor measurement node.
+
+    This class is responsible for initializing the sensor node, receiving sensor measurements,
+    applying noise to the measurements, and publishing the multi-state information.
+
+    Args:
+        Node: The base class for creating a ROS node.
+
+    Attributes:
+        multi_state (MultiState): The multi-state information.
+        multi_state_pub (Publisher): The publisher for multi-state information.
+        timer (Timer): The timer for publishing multi-state information.
+    """
 
     def __init__(self):
+        """
+        Initializes the Sensor class.
+
+        This method sets up the necessary parameters and initializes the multi_state object.
+        It also creates a publisher for multi-state messages and a timer for the timer_callback method.
+        Finally, it sets up a subscriber for multi-state messages and registers the sensor_callback method.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         super().__init__("sensor")
 
         self.declare_parameters(
@@ -51,7 +79,7 @@ class SensorMeasurement(Node):
                                                              omega=omega[i], delta=0.0, throttle=0.0))
 
         self.multi_state_pub = self.create_publisher(MultiState, "/robot_multi_state", 2)
-        self.timer = self.create_timer(0.01, self.timer_callback)
+        self.timer = self.create_timer(timer_freq, self.timer_callback)
 
         multi_state_subscriber = message_filters.Subscriber(self, MultiState, "/multi_fullstate")
 
@@ -61,6 +89,12 @@ class SensorMeasurement(Node):
         self.get_logger().info("Sensor has been started")
         
     def sensor_callback(self, multi_state_in: MultiState):
+        """
+        Callback function for receiving sensor measurements.
+
+        Args:
+            multi_state_in (MultiState): The received multi-state information.
+        """
 
         for i in range(robot_num):
             self.multi_state.multiple_state[i] = self.apply_noise(multi_state_in.multiple_state[i])
@@ -71,9 +105,21 @@ class SensorMeasurement(Node):
                                     "linear velocity: " + str(multi_state_in.multiple_state[i].v))
 
     def timer_callback(self):
+        """
+        Callback function for the timer to publish multi-state information.
+        """
         self.multi_state_pub.publish(self.multi_state)
     
     def apply_noise(self, fullstate: FullState):
+        """
+        Apply noise to the given full state.
+
+        Args:
+            fullstate (FullState): The full state to apply noise to.
+
+        Returns:
+            FullState: The full state with applied noise.
+        """
         return fullstate
         
 def main(args=None):

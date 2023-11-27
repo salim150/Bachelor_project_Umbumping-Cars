@@ -27,6 +27,16 @@ Lr = L / 2.0  # [m]
 Lf = L - Lr
 
 def linear_model_callback(initial_state: State, cmd: ControlInputs):
+    """
+    Computes the next state using a non-linear kinematic model.
+
+    Args:
+        initial_state (State): The initial state.
+        cmd (ControlInputs): The control inputs.
+
+    Returns:
+        State: The next state.
+    """
 
     dt = 0.1
     state = State()
@@ -43,6 +53,17 @@ def linear_model_callback(initial_state: State, cmd: ControlInputs):
     return state
 
 def nonlinear_model_callback(initial_state: State, cmd: ControlInputs, old_time: float):
+    """
+    Calculates the state of the system using a nonlinear dynamic model.
+
+    Args:
+        initial_state (State): The initial state of the system.
+        cmd (ControlInputs): The control inputs for the system.
+        old_time (float): The previous time at which the model was updated.
+
+    Returns:
+        tuple: A tuple containing the updated state of the system and the current time.
+    """
 
     dt = 0.1
     state = State()
@@ -75,6 +96,17 @@ def nonlinear_model_callback(initial_state: State, cmd: ControlInputs, old_time:
     return state, time.time()
 
 def pure_pursuit_steer_control(target, pose):
+    """
+    Calculates the throttle and steering angle for a pure pursuit steering control algorithm.
+
+    Args:
+        target (tuple): The coordinates of the target point.
+        pose (Pose): The current pose of the vehicle.
+
+    Returns:
+        tuple: A tuple containing the throttle and steering angle.
+
+    """
         
     alpha = normalize_angle(math.atan2(target[1] - pose.y, target[0] - pose.x) - pose.yaw)
 
@@ -100,6 +132,16 @@ def pure_pursuit_steer_control(target, pose):
 
 @staticmethod
 def dist(point1, point2):
+    """
+    Calculate the Euclidean distance between two points.
+
+    Args:
+        point1 (tuple): The coordinates of the first point in the form (x1, y1).
+        point2 (tuple): The coordinates of the second point in the form (x2, y2).
+
+    Returns:
+        float: The Euclidean distance between the two points.
+    """
     x1, y1 = point1
     x2, y2 = point2
 
@@ -126,6 +168,15 @@ def normalize_angle(angle):
     return angle
 
 def array_to_state(array):
+    """
+    Convert an array to a State object.
+
+    Args:
+        array (list): The array containing the state values.
+
+    Returns:
+        State: The State object with the values from the array.
+    """
     state = State()
     state.x = array[0]
     state.y = array[1]
@@ -134,6 +185,15 @@ def array_to_state(array):
     return state
 
 def state_to_array(state: State):
+    """
+    Convert a State object to a numpy array.
+
+    Args:
+        state (State): The State object to be converted.
+
+    Returns:
+        numpy.ndarray: The converted numpy array.
+    """
     array = np.zeros((4,1))
     array[0,0] = state.x
     array[1,0] = state.y
@@ -178,15 +238,22 @@ def plot_covariance_ellipse(x, y, cov, chi2=3.0, color="-r", ax=None):
     This function plots an ellipse that represents a covariance matrix. The ellipse is centered at (x, y) and its shape, size and rotation are determined by the covariance matrix.
 
     Parameters:
-    x : (float) The x-coordinate of the center of the ellipse.
-    y : (float) The y-coordinate of the center of the ellipse.
-    cov : (numpy.ndarray) A 2x2 covariance matrix that determines the shape, size, and rotation of the ellipse.
-    chi2 : (float, optional) A scalar value that scales the ellipse size. This value is typically set based on chi-squared distribution quantiles to achieve certain confidence levels (e.g., 3.0 corresponds to ~95% confidence for a 2D Gaussian). Defaults to 3.0.
-    color : (str, optional) The color and line style of the ellipse plot, following matplotlib conventions. Defaults to "-r" (a red solid line).
-    ax : (matplotlib.axes.Axes, optional) The Axes object to draw the ellipse on. If None (default), a new figure and axes are created.
+    x : float
+        The x-coordinate of the center of the ellipse.
+    y : float
+        The y-coordinate of the center of the ellipse.
+    cov : numpy.ndarray
+        A 2x2 covariance matrix that determines the shape, size, and rotation of the ellipse.
+    chi2 : float, optional
+        A scalar value that scales the ellipse size. This value is typically set based on chi-squared distribution quantiles to achieve certain confidence levels (e.g., 3.0 corresponds to ~95% confidence for a 2D Gaussian). Defaults to 3.0.
+    color : str, optional
+        The color and line style of the ellipse plot, following matplotlib conventions. Defaults to "-r" (a red solid line).
+    ax : matplotlib.axes.Axes, optional
+        The Axes object to draw the ellipse on. If None (default), a new figure and axes are created.
 
     Returns:
-    None. This function plots the covariance ellipse on the specified axes.
+    None
+        This function plots the covariance ellipse on the specified axes.
     """
     eig_val, eig_vec = np.linalg.eig(cov)
 

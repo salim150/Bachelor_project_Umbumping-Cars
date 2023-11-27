@@ -41,34 +41,44 @@ L_d = json_object["Controller"]["L_d"]
 debug = False
 
 def predict_trajectory(initial_state: State, target):
-    traj = []
-    # tx = []
-    # ty = []
+    """
+    Predicts the trajectory of a vehicle from an initial state to a target point.
 
-    # tx.append(initial_state.x)
-    # ty.append(initial_state.y)
+    Args:
+        initial_state (State): The initial state of the vehicle.
+        target (tuple): The target point (x, y) to reach.
+
+    Returns:
+        Path: The predicted trajectory as a Path object.
+    """
+    traj = []  # List to store the trajectory points
+
+    # Append the initial state coordinates to the trajectory
     traj.append(Coordinate(x=initial_state.x, y=initial_state.y))
-    cmd = ControlInputs()
-    old_time = time.time()
 
+    cmd = ControlInputs()  # Create a ControlInputs object
+    old_time = time.time()  # Get the current time
+
+    # Calculate the control inputs for the initial state
     cmd.throttle, cmd.delta = pure_pursuit_steer_control(target, initial_state)
+
+    # Update the state using the linear model and append the new state coordinates to the trajectory
     new_state, old_time = linear_model_callback(initial_state, cmd, old_time)
-    # tx.append(new_state.x)
-    # ty.append(new_state.y)
     traj.append(Coordinate(x=new_state.x, y=new_state.y))
 
+    # Continue predicting the trajectory until the distance between the last point and the target is less than 10
     while dist(point1=(traj[-1].x, traj[-1].y), point2=target) > 10:
 
+        # Calculate the control inputs for the new state
         cmd.throttle, cmd.delta = pure_pursuit_steer_control(target, new_state)
-        #print(cmd)
+
+        # Update the state using the linear model and append the new state coordinates to the trajectory
         new_state, old_time = linear_model_callback(new_state, cmd, old_time)
-        # tx.append(new_state.x)
-        # ty.append(new_state.y)
         traj.append(Coordinate(x=new_state.x, y=new_state.y))
 
         if debug:
+            # Plot the trajectory and other elements for debugging
             plt.cla()
-            # for stopping simulation with the esc key.
             plt.gcf().canvas.mpl_connect(
                 'key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
@@ -80,10 +90,10 @@ def predict_trajectory(initial_state: State, target):
             plt.grid(True)
             plt.pause(0.000001)
     
-    # tx = tx[0:-1:5]
-    # ty = ty[0:-1:5]
+    # Reduce the number of points in the trajectory for efficiency
     traj = traj[0:-1:5]
-    return Path(path=traj) #, tx, ty
+
+    return Path(path=traj)
 
 def plot_path(path: Path):
         x = []
@@ -95,52 +105,84 @@ def plot_path(path: Path):
         plt.scatter(x[0], y[0], marker='x', s=20)
 
 def linear_model_callback(initial_state: State, cmd: ControlInputs, old_time: float):
+    """
+    Calculates the next state based on the linear model.
 
-        dt = 0.3
-        state = State()
-        cmd.delta = np.clip(cmd.delta, -max_steer, max_steer)
+    Args:
+        initial_state (State): The initial state of the vehicle.
+        cmd (ControlInputs): The control inputs for the vehicle.
+        old_time (float): The previous time.
 
-        state.x = initial_state.x + initial_state.v * np.cos(initial_state.yaw) * dt
-        state.y = initial_state.y + initial_state.v * np.sin(initial_state.yaw) * dt
-        state.yaw = initial_state.yaw + initial_state.v / L * np.tan(cmd.delta) * dt
-        state.yaw = normalize_angle(state.yaw)
-        state.v = initial_state.v + cmd.throttle * dt
-        state.v = np.clip(state.v, min_speed, max_speed)
+    Returns:
+        Tuple[State, float]: The next state and the current time.
+    """
+    dt = 0.3
+    state = State()
+    cmd.delta = np.clip(cmd.delta, -max_steer, max_steer)
 
-        return state, time.time()
+    state.x = initial_state.x + initial_state.v * np.cos(initial_state.yaw) * dt
+    state.y = initial_state.y + initial_state.v * np.sin(initial_state.yaw) * dt
+    state.yaw = initial_state.yaw + initial_state.v / L * np.tan(cmd.delta) * dt
+    state.yaw = normalize_angle(state.yaw)
+    state.v = initial_state.v + cmd.throttle * dt
+    state.v = np.clip(state.v, min_speed, max_speed)
+
+    return state, time.time()
 
 def nonlinear_model_callback(initial_state: State, cmd: ControlInputs, old_time: float):
+    """
+    Nonlinear model callback function.
 
-        dt = 0.1
-        state = State()
-        #dt = time.time() - old_time
-        cmd.delta = np.clip(cmd.delta, -max_steer, max_steer)
+    Args:
+        initial_state (State): The initial state of the system.
+        cmd (ControlInputs): The control inputs.
+        old_time (float): The previous time.
 
-        beta = math.atan2((Lr * math.tan(cmd.delta) / L), 1.0)
-        vx = initial_state.v * math.cos(beta)
-        vy = initial_state.v * math.sin(beta)
+    Returns:
+        Tuple[State, float]: The updated state and the current time.
+    """
 
-        Ffy = -Cf * ((vy + Lf * initial_state.omega) / (vx + 0.0001) - cmd.delta)
-        Fry = -Cr * (vy - Lr * initial_state.omega) / (vx + 0.0001)
-        R_x = c_r1 * abs(vx)
-        F_aero = c_a * vx ** 2 # 
-        F_load = F_aero + R_x #
-        state.omega = initial_state.omega + (Ffy * Lf * math.cos(cmd.delta) - Fry * Lr) / Iz * dt
-        vx = vx + (cmd.throttle - Ffy * math.sin(cmd.delta) / m - F_load / m + vy * state.omega) * dt
-        vy = vy + (Fry / m + Ffy * math.cos(cmd.delta) / m - vx * state.omega) * dt
+    dt = 0.1
+    state = State()
 
-        state.yaw = initial_state.yaw + state.omega * dt
-        state.yaw = normalize_angle(state.yaw)
+    cmd.delta = np.clip(cmd.delta, -max_steer, max_steer)
 
-        state.x = initial_state.x + vx * math.cos(state.yaw) * dt - vy * math.sin(state.yaw) * dt
-        state.y = initial_state.y + vx * math.sin(state.yaw) * dt + vy * math.cos(state.yaw) * dt
+    beta = math.atan2((Lr * math.tan(cmd.delta) / L), 1.0)
+    vx = initial_state.v * math.cos(beta)
+    vy = initial_state.v * math.sin(beta)
 
-        state.v = math.sqrt(vx ** 2 + vy ** 2)
-        state.v = np.clip(state.v, min_speed, max_speed)
+    Ffy = -Cf * ((vy + Lf * initial_state.omega) / (vx + 0.0001) - cmd.delta)
+    Fry = -Cr * (vy - Lr * initial_state.omega) / (vx + 0.0001)
+    R_x = c_r1 * abs(vx)
+    F_aero = c_a * vx ** 2
+    F_load = F_aero + R_x
 
-        return state, time.time()
+    state.omega = initial_state.omega + (Ffy * Lf * math.cos(cmd.delta) - Fry * Lr) / Iz * dt
+    vx = vx + (cmd.throttle - Ffy * math.sin(cmd.delta) / m - F_load / m + vy * state.omega) * dt
+    vy = vy + (Fry / m + Ffy * math.cos(cmd.delta) / m - vx * state.omega) * dt
+
+    state.yaw = initial_state.yaw + state.omega * dt
+    state.yaw = normalize_angle(state.yaw)
+
+    state.x = initial_state.x + vx * math.cos(state.yaw) * dt - vy * math.sin(state.yaw) * dt
+    state.y = initial_state.y + vx * math.sin(state.yaw) * dt + vy * math.cos(state.yaw) * dt
+
+    state.v = math.sqrt(vx ** 2 + vy ** 2)
+    state.v = np.clip(state.v, min_speed, max_speed)
+
+    return state, time.time()
 
 def pure_pursuit_steer_control(target, pose):
+    """
+    Calculates the throttle and steering angle for the pure pursuit steering control algorithm.
+
+    Args:
+        target (tuple): The target coordinates (x, y) to track.
+        pose (Pose): The current pose of the vehicle.
+
+    Returns:
+        tuple: A tuple containing the throttle and steering angle (throttle, delta).
+    """
         
     alpha = normalize_angle(math.atan2(target[1] - pose.y, target[0] - pose.x) - pose.yaw)
 
@@ -165,6 +207,16 @@ def pure_pursuit_steer_control(target, pose):
 
 @staticmethod
 def dist(point1, point2):
+    """
+    Calculate the Euclidean distance between two points.
+
+    Args:
+        point1 (tuple): The coordinates of the first point in the form (x1, y1).
+        point2 (tuple): The coordinates of the second point in the form (x2, y2).
+
+    Returns:
+        float: The Euclidean distance between the two points.
+    """
     x1, y1 = point1
     x2, y2 = point2
 

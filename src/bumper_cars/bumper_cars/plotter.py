@@ -27,6 +27,7 @@ controller_type = json_object["Controller"]["controller_type"]
 safety = json_object["safety"]
 width = json_object["width"]
 height = json_object["height"]
+timer_freq = json_object["timer_freq"]
 debug = False
 plot_traj = False
 
@@ -99,21 +100,21 @@ class Plotter(Node):
             ts.registerCallback(self.general_callback)
 
             # timer
-            self.timer = self.create_timer(0.01, self.plotter_callback)
+            self.timer = self.create_timer(timer_freq, self.plotter_callback)
 
         elif self.controller_type == "random_harem":
             ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 10, 1, allow_headerless=True)
             ts.registerCallback(self.general_callback)
 
             # timer
-            self.timer = self.create_timer(0.01, self.plotter_callback)
+            self.timer = self.create_timer(timer_freq, self.plotter_callback)
             
         else:
             ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub, self.multi_path_sub], 10, 1, allow_headerless=True)
             ts.registerCallback(self.complete_callback)
 
             # timer
-            self.timer = self.create_timer(0.01, self.complete_plotter_callback)
+            self.timer = self.create_timer(timer_freq, self.complete_plotter_callback)
 
         self.get_logger().info("Plotter has been started")
 

@@ -42,6 +42,13 @@ height = json_object["height"]
 
 
 class Controller(Node):
+    """
+    This class represents the controller for the robot.
+
+    It initializes the controller parameters, subscribes to robot state topics,
+    and publishes control commands to the robot. It also implements different
+    controller algorithms based on the specified controller type.
+    """
 
     def __init__(self):
         super().__init__("robot_controller")
@@ -57,6 +64,7 @@ class Controller(Node):
             ]
         )
 
+        # Get controller parameters from the parameter server
         x0 = self.get_parameter('x0').get_parameter_value().double_array_value
         y0 = self.get_parameter('y0').get_parameter_value().double_array_value
         yaw = self.get_parameter('yaw').get_parameter_value().double_array_value
@@ -122,7 +130,12 @@ class Controller(Node):
         self.get_logger().info("Controller has been started")
 
     def random_walk_controller(self, multi_state):
+        """
+        Random walk controller algorithm.
 
+        Generates random control inputs (throttle and delta) for each robot
+        and applies control barrier function (CBF) to ensure safety.
+        """
         multi_control = MultiControl()
         for i in range(robot_num):
             cmd = ControlInputs()
@@ -144,6 +157,12 @@ class Controller(Node):
         self.multi_control_pub.publish(multi_control)
     
     def random_harem_callback(self, multi_state):
+        """
+        Random harem controller algorithm.
+
+        Selects random targets for each robot and applies pure pursuit steering control
+        to navigate towards the target. Applies control barrier function (CBF) to ensure safety.
+        """
         if time.time() - self.time_bkp > 4:
             self.get_logger().info("Changing the targets")
             self.time_bkp = time.time()
@@ -163,7 +182,12 @@ class Controller(Node):
         self.multi_control_pub.publish(multi_control)
 
     def general_pose_callback(self, multi_state):
+        """
+        General pose callback function.
 
+        Implements the control algorithm based on the specified controller type.
+        Applies control barrier function (CBF) to ensure safety.
+        """
         multi_control = MultiControl()
         for i in range(robot_num):
             cmd, self.paths[i], self.targets[i], self.multi_traj.multiple_path[i] = self.control_callback(multi_state.multiple_state[i], 
@@ -179,7 +203,12 @@ class Controller(Node):
         self.multi_path_pub.publish(self.multi_traj)
 
     def control_callback(self, pose: FullState, target, path, trajectory):
-        # updating target waypoint and predicting new traj
+        """
+        Control callback function.
+
+        Updates the target waypoint and predicts a new trajectory if the current target is reached.
+        Applies pure pursuit steering control to navigate towards the target.
+        """
         if self.dist(point1=(pose.x, pose.y), point2=target) < L_d:
             path = self.update_path(path)
             target = (path[0].x, path[0].y)
@@ -194,7 +223,12 @@ class Controller(Node):
         return cmd, path, target, trajectory
     
     def apply_CBF(self, multi_control: MultiControl, multi_state: MultiState):
-        # TODO Remember to change the 3 with the actual number of robots and the two with the input dim not hardcoding
+        """
+        Applies control barrier function (CBF) to the control inputs.
+
+        Uses the current robot states and control inputs to calculate the modified control inputs
+        that satisfy the control barrier function constraints.
+        """
         dxu = np.zeros((2,robot_num))
         x = np.zeros((4,robot_num))
 
@@ -212,23 +246,42 @@ class Controller(Node):
         return multi_control
     
     def update_targets(self, multi_state: MultiState):
+        """
+        Updates the target waypoints for each robot.
+
+        Selects random targets for each robot, excluding itself.
+        """
         for i in range(len(self.targets)):
             self.targets[i] = random.choice([idx for idx in range(0,robot_num) if idx not in [i]])
             self.get_logger().info("New targets: " + str(multi_state.multiple_state[self.targets[i]].x) + " " + str(multi_state.multiple_state[self.targets[i]].y))
 
     def update_path(self, path: Path):
+        """
+        Updates the path by removing the first waypoint and adding a new random waypoint.
+
+        Removes the first waypoint from the path and adds a new random waypoint within the specified boundaries.
+        """
         path.pop(0)
         path.append(Coordinate(x=float(random.randint(-self.width/2, self.width/2)), y=float(random.randint(-self.heigth/2, self.heigth/2))))
         return path
 
     def create_path(self):
+        """
+        Creates a random path.
+
+        Generates a random path by creating a list of waypoints within the specified boundaries.
+        """
         path = []
         while len(path)<5:
             path.append(Coordinate(x=float(random.randint(-self.width/2, self.width/2)), y=float(random.randint(-self.heigth/2, self.heigth/2))))
         return path
     
     def pure_pursuit_steer_control(self, target, pose: FullState):
+        """
+        Pure pursuit steering control algorithm.
 
+        Calculates the throttle and delta (steering angle) based on the current pose and target waypoint.
+        """
         alpha = self.normalize_angle(math.atan2(target[1] - pose.y, target[0] - pose.x) - pose.yaw)
 
         # this if/else condition should fix the buf of the waypoint behind the car
@@ -255,6 +308,13 @@ class Controller(Node):
 
     @staticmethod
     def dist(point1, point2):
+        """
+        Calculates the Euclidean distance between two points.
+
+        :param point1: (tuple) x, y coordinates of the first point
+        :param point2: (tuple) x, y coordinates of the second point
+        :return: (float) Euclidean distance between the two points
+        """
         x1, y1 = point1
         x2, y2 = point2
 
@@ -269,8 +329,9 @@ class Controller(Node):
     def normalize_angle(self, angle):
         """
         Normalize an angle to [-pi, pi].
-        :param angle: (float)
-        :return: (float) Angle in radian in [-pi, pi]
+
+        :param angle: (float) Angle in radians
+        :return: (float) Angle in radians in the range [-pi, pi]
         """
         while angle > np.pi:
             angle -= 2.0 * np.pi
