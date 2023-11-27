@@ -123,6 +123,19 @@ def generate_launch_description():
         arguments=["0", "0", "0", "0", "0", "0", "1", "map", "base_link"]
     )
 
+    broadcaster_node = Node(
+        package="bumper_cars",
+        executable="broadcaster",
+        parameters=[
+            {'model_type': model_type},
+            {'x0': x},
+            {'y0': y},
+            {'yaw': yaw},
+            {'v': v},
+            {'omega': omega}
+            ]
+    )
+
     
     # ld.add_action(plotter_node)
     ld.add_action(sensor_node)
@@ -130,6 +143,7 @@ def generate_launch_description():
     ld.add_action(converter_node)
     ld.add_action(static_tf_pub)  
     ld.add_action(rviz2_node) 
+    # ld.add_action(broadcaster_node)
     
     
 
