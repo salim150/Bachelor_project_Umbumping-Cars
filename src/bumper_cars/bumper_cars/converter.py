@@ -26,6 +26,10 @@ robot_num = json_object["robot_num"]
 timer_freq = json_object["timer_freq"]
 
 class Converter(Node):
+    """
+    This class represents a converter node that converts robot states to poses, steering poses, and markers.
+    It subscribes to the "/multi_fullstate" topic to receive robot states and publishes the converted poses and markers.
+    """
 
     def __init__(self):
         super().__init__("converter")
@@ -47,7 +51,6 @@ class Converter(Node):
         yaw = self.get_parameter('yaw').get_parameter_value().double_array_value
         v = self.get_parameter('v').get_parameter_value().double_array_value
         omega = self.get_parameter('omega').get_parameter_value().double_array_value
-        # model_type = self.get_parameter('model_type').get_parameter_value().string_array_value
 
         self.pose_array_state = PoseArray()
         self.pose_array_state.header.frame_id = "base_link"
@@ -98,6 +101,15 @@ class Converter(Node):
         return [qx, qy, qz, qw]
         
     def convert_to_pose(self, state: FullState):
+        """
+        Convert a robot state to a pose.
+
+        Input
+            :param state: The robot state.
+
+        Output
+            :return pose: The converted pose.
+        """
         pose = Pose()
         pose.position.x = state.x
         pose.position.y = state.y
@@ -111,13 +123,21 @@ class Converter(Node):
         return pose
     
     def convert_to_steering_pose(self, state: FullState):
+        """
+        Convert a robot state to a steering pose.
+
+        Input
+            :param state: The robot state.
+
+        Output
+            :return pose: The converted steering pose.
+        """
         pose = Pose()        
         pose.position.x = state.x
         pose.position.y = state.y
         pose.position.z = 0.0
 
         q = self.get_quaternion_from_euler(0, 0, state.yaw+state.delta)
-        # q = self.quaternion_from_euler(0, 0, state.yaw)
         pose.orientation.x = q[0]
         pose.orientation.y = q[1]
         pose.orientation.z = q[2]
@@ -125,10 +145,19 @@ class Converter(Node):
         return pose
     
     def convert_to_marker(self, state: FullState, idx):
+        """
+        Convert a robot state to a marker.
+
+        Input
+            :param state: The robot state.
+            :param idx: The index of the marker.
+
+        Output
+            :return marker: The converted marker.
+        """
         marker = Marker()
         marker.header.frame_id = "base_link"
         marker.header.stamp = self.get_clock().now().to_msg()
-        # marker.ns = "my_namespace"
         marker.id = idx
         marker.type = Marker.CUBE
         marker.action = Marker.ADD
@@ -145,10 +174,15 @@ class Converter(Node):
             marker.color.g = 1.0
             marker.color.b = 0.0
         marker.color.a = 1.0
-        # marker.lifetime = self.get_clock().now().to_msg()
         return marker
 
     def state_converter_callback(self, multi_state_in: MultiState):
+        """
+        Callback function for processing robot states.
+
+        Input
+            :param multi_state_in: The received multi-state message.
+        """
         self.pose_array_state = PoseArray()
         self.pose_array_state.header.frame_id = "base_link"
         self.pose_array_state.header.stamp = self.get_clock().now().to_msg()
@@ -168,6 +202,9 @@ class Converter(Node):
             self.marker_array.markers.append(marker)
         
     def timer_callback(self):
+        """
+        Timer callback function for publishing the converted poses and markers.
+        """
         self.pose_array_pub.publish(self.pose_array_state)
         self.pose_array_steering_pub.publish(self.pose_array_steering)
         self.marker_array_pub.publish(self.marker_array)

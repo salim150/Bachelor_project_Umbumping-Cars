@@ -36,6 +36,12 @@ robot_num = json_object["robot_num"]
 timer_freq = json_object["timer_freq"]
 
 class CarModel(Node):
+    """
+    Represents the car model and its behavior.
+
+    This class initializes the car model with the given parameters and provides methods for updating the car state based on control inputs.
+    It also publishes the car's full state and handles the timer callback for publishing the state periodically.
+    """
 
     def __init__(self):
         super().__init__("robot_model")
@@ -78,6 +84,12 @@ class CarModel(Node):
         self.timer = self.create_timer(timer_freq, self.timer_callback)
 
     def general_model_callback(self, control: MultiControl):
+        """
+        Callback function for handling general model control inputs.
+
+        This function is called when new control inputs are received.
+        It updates the car state based on the model type and the control inputs for each robot.
+        """
 
         for i in range(robot_num):
             if self.model_type[0] == 'linear':
@@ -86,6 +98,21 @@ class CarModel(Node):
                 self.multi_state.multiple_state[i], self.old_time[i] = self.nonlinear_model_callback(self.multi_state.multiple_state[i], control.multi_control[i], self.old_time[i])
 
     def linear_model_callback(self, initial_state: FullState, cmd: ControlInputs, old_time: float):
+        """
+        Update the car state using a non-linear kinematic model.
+
+        This function calculates the new state of the car based on the initial state, control inputs, and the time elapsed since the last update.
+        It returns the updated state and the current time.
+
+        Args:
+            initial_state (FullState): The initial state of the car.
+            cmd (ControlInputs): The control inputs for the car.
+            old_time (float): The time of the last update.
+
+        Returns:
+            FullState: The updated state of the car.
+            float: The current time.
+        """
 
         dt = time.time() - old_time
         state = FullState()
@@ -104,6 +131,21 @@ class CarModel(Node):
         return state, time.time()
     
     def nonlinear_model_callback(self, state: FullState, cmd: ControlInputs, old_time: float):
+        """
+        Update the car state using a nonlinear dynamic model.
+
+        This function calculates the new state of the car based on the current state, control inputs, and the time elapsed since the last update.
+        It returns the updated state and the current time.
+
+        Args:
+            state (FullState): The current state of the car.
+            cmd (ControlInputs): The control inputs for the car.
+            old_time (float): The time of the last update.
+
+        Returns:
+            FullState: The updated state of the car.
+            float: The current time.
+        """
 
         dt = time.time() - old_time
         cmd.delta = np.clip(cmd.delta, -max_steer, max_steer)
@@ -136,13 +178,24 @@ class CarModel(Node):
         return state, time.time()
     
     def timer_callback(self):
+        """
+        Timer callback function for publishing the car's full state.
+
+        This function is called periodically based on the timer frequency.
+        It publishes the car's full state.
+        """
+
         self.fullstate_publisher_.publish(self.multi_state)
 
     def normalize_angle(self, angle):
         """
         Normalize an angle to [-pi, pi].
-        :param angle: (float)
-        :return: (float) Angle in radian in [-pi, pi]
+
+        Args:
+            angle (float): The angle to normalize.
+
+        Returns:
+            float: The normalized angle in the range [-pi, pi].
         """
         while angle > np.pi:
             angle -= 2.0 * np.pi
