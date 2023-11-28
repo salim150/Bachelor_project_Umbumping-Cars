@@ -39,7 +39,7 @@ robot_num = json_object["robot_num"]
 safety = json_object["safety"]
 width = json_object["width"]
 height = json_object["height"]
-
+plot_traj = json_object["plot_traj"]    
 
 class Controller(Node):
     """
@@ -107,20 +107,24 @@ class Controller(Node):
             # Initializing the robots
             self.paths = []
             self.targets = []
-            self.multi_traj = MultiplePaths()
+            if plot_traj:
+                self.multi_traj = MultiplePaths()
             multi_control = MultiControl()
 
             for i in range(robot_num):
                 self.paths.append(self.create_path())
                 self.targets.append([self.paths[i][0].x, self.paths[i][0].y])
                 initial_state = State(x=x0[i], y=y0[i], yaw=yaw[i], v=v[i], omega=omega[i])
-                self.multi_traj.multiple_path.append(predict_trajectory(initial_state, self.targets[i]))
+                if plot_traj:
+                    self.multi_traj.multiple_path.append(predict_trajectory(initial_state, self.targets[i]))
                 # TODO initialize control
                 multi_control.multi_control.append(ControlInputs(delta=0.0, throttle=0.0))
             
             ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 4, 0.3, allow_headerless=True)
             ts.registerCallback(self.general_pose_callback)
-            self.multi_path_pub.publish(self.multi_traj)  
+    
+            if plot_traj:
+                self.multi_path_pub.publish(self.multi_traj)  
      
 
         # TODO initialize the initial control in the launch file
@@ -190,9 +194,12 @@ class Controller(Node):
         """
         multi_control = MultiControl()
         for i in range(robot_num):
-            cmd, self.paths[i], self.targets[i], self.multi_traj.multiple_path[i] = self.control_callback(multi_state.multiple_state[i], 
-                                                                                                         self.targets[i], self.paths[i], 
-                                                                                                         self.multi_traj.multiple_path[i])
+            if plot_traj:
+                cmd, self.paths[i], self.targets[i], self.multi_traj.multiple_path[i] = self.control_callback(multi_state.multiple_state[i], 
+                                                                                                            self.targets[i], self.paths[i], 
+                                                                                                            self.multi_traj.multiple_path[i])
+            else:
+                cmd, self.paths[i], self.targets[i] = self.control_callback(multi_state.multiple_state[i], self.targets[i], self.paths[i], None)
             multi_control.multi_control.append(cmd)
         
         # Applying the CBF
@@ -200,7 +207,9 @@ class Controller(Node):
 
         # Publishing everything in the general callback to avoid deadlocks
         self.multi_control_pub.publish(multi_control)
-        self.multi_path_pub.publish(self.multi_traj)
+
+        if plot_traj:
+            self.multi_path_pub.publish(self.multi_traj)
 
     def control_callback(self, pose: FullState, target, path, trajectory):
         """
@@ -212,7 +221,8 @@ class Controller(Node):
         if self.dist(point1=(pose.x, pose.y), point2=target) < L_d:
             path = self.update_path(path)
             target = (path[0].x, path[0].y)
-            trajectory = predict_trajectory(pose, target)
+            if plot_traj:
+                trajectory = predict_trajectory(pose, target)
     
         cmd = ControlInputs()
         cmd.throttle, cmd.delta= self.pure_pursuit_steer_control(target, pose)
@@ -220,7 +230,10 @@ class Controller(Node):
         if debug:
             self.get_logger().info("Control input robot1, delta:" + str(cmd.delta) + " , throttle: " + str(cmd.throttle))
 
-        return cmd, path, target, trajectory
+        if plot_traj:
+            return cmd, path, target, trajectory
+        else:
+            return cmd, path, target
     
     def apply_CBF(self, multi_control: MultiControl, multi_state: MultiState):
         """

@@ -9,6 +9,7 @@ setup.py
 ../../build/bumper_cars/bumper_cars.egg-info/top_level.txt
 ../../build/bumper_cars/bumper_cars.egg-info/zip-safe
 bumper_cars/__init__.py
+bumper_cars/broadcaster.py
 bumper_cars/car_model.py
 bumper_cars/controller.py
 bumper_cars/converter.py

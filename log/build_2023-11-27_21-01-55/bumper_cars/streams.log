@@ -1,0 +1,49 @@
+[5.063s] Invoking command in '/home/giacomo/thesis_ws/build/bumper_cars': CMAKE_PREFIX_PATH=/home/giacomo/thesis_ws/install/custom_message:/home/giacomo/thesis_ws/install/urdf_example:/home/giacomo/thesis_ws/install/sym_bringup:/home/giacomo/thesis_ws/install/my_bot:/home/giacomo/ros2_ws/install/tutorial_interfaces:/home/giacomo/ros2_ws/install/turtlesim PYTHONPATH=/home/giacomo/thesis_ws/build/bumper_cars/prefix_override:/home/giacomo/thesis_ws/install/bumper_cars/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --editable --build-directory /home/giacomo/thesis_ws/build/bumper_cars/build --no-deps install_data
+[6.763s] running develop
+[6.765s] /home/giacomo/.local/lib/python3.10/site-packages/setuptools/command/develop.py:40: EasyInstallDeprecationWarning: easy_install command is deprecated.
+[6.772s] !!
+[6.774s] 
+[6.777s]         ********************************************************************************
+[6.783s]         Please avoid running ``setup.py`` and ``easy_install``.
+[6.785s]         Instead, use pypa/build, pypa/installer or other
+[6.788s]         standards-based tools.
+[6.792s] 
+[6.800s]         See https://github.com/pypa/setuptools/issues/917 for details.
+[6.804s]         ********************************************************************************
+[6.808s] 
+[6.810s] !!
+[6.813s]   easy_install.initialize_options(self)
+[6.881s] /home/giacomo/.local/lib/python3.10/site-packages/setuptools/_distutils/cmd.py:66: SetuptoolsDeprecationWarning: setup.py install is deprecated.
+[6.884s] !!
+[6.886s] 
+[6.892s]         ********************************************************************************
+[6.897s]         Please avoid running ``setup.py`` directly.
+[6.900s]         Instead, use pypa/build, pypa/installer or other
+[6.906s]         standards-based tools.
+[6.908s] 
+[6.911s]         See https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html for details.
+[6.914s]         ********************************************************************************
+[6.919s] 
+[6.922s] !!
+[6.924s]   self.initialize_options()
+[7.628s] running egg_info
+[7.713s] writing bumper_cars.egg-info/PKG-INFO
+[7.715s] writing dependency_links to bumper_cars.egg-info/dependency_links.txt
+[7.718s] writing entry points to bumper_cars.egg-info/entry_points.txt
+[7.720s] writing requirements to bumper_cars.egg-info/requires.txt
+[7.722s] writing top-level names to bumper_cars.egg-info/top_level.txt
+[7.878s] reading manifest file 'bumper_cars.egg-info/SOURCES.txt'
+[7.887s] writing manifest file 'bumper_cars.egg-info/SOURCES.txt'
+[7.977s] running build_ext
+[7.978s] Creating /home/giacomo/thesis_ws/install/bumper_cars/lib/python3.10/site-packages/bumper-cars.egg-link (link to .)
+[7.984s] Installing broadcaster script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars
+[7.988s] Installing controller script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars
+[7.992s] Installing converter script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars
+[7.996s] Installing model script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars
+[8.014s] Installing plotter script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars
+[8.014s] Installing sensor script to /home/giacomo/thesis_ws/install/bumper_cars/lib/bumper_cars
+[8.015s] 
+[8.015s] Installed /home/giacomo/thesis_ws/build/bumper_cars
+[8.015s] running install_data
+[8.016s] copying package.xml -> /home/giacomo/thesis_ws/install/bumper_cars/share/bumper_cars
+[8.119s] Invoked command in '/home/giacomo/thesis_ws/build/bumper_cars' returned '0': CMAKE_PREFIX_PATH=/home/giacomo/thesis_ws/install/custom_message:/home/giacomo/thesis_ws/install/urdf_example:/home/giacomo/thesis_ws/install/sym_bringup:/home/giacomo/thesis_ws/install/my_bot:/home/giacomo/ros2_ws/install/tutorial_interfaces:/home/giacomo/ros2_ws/install/turtlesim PYTHONPATH=/home/giacomo/thesis_ws/build/bumper_cars/prefix_override:/home/giacomo/thesis_ws/install/bumper_cars/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --editable --build-directory /home/giacomo/thesis_ws/build/bumper_cars/build --no-deps install_data
