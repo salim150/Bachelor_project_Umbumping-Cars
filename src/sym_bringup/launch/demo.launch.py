@@ -140,7 +140,7 @@ def generate_launch_description():
     ld.add_action(sensor_node)
     ld.add_action(controller_node)
     ld.add_action(converter_node)
-    ld.add_action(static_tf_pub)  
+    # ld.add_action(static_tf_pub)  
     ld.add_action(rviz2_node) 
     ld.add_action(broadcaster_node)
 

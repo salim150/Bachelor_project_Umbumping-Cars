@@ -55,9 +55,9 @@ class Converter(Node):
         omega = self.get_parameter('omega').get_parameter_value().double_array_value
 
         self.pose_array_state = PoseArray()
-        self.pose_array_state.header.frame_id = "base_link"
+        self.pose_array_state.header.frame_id = "map"
         self.pose_array_steering = PoseArray()
-        self.pose_array_steering.header.frame_id = "base_link"
+        self.pose_array_steering.header.frame_id = "map"
         self.marker_array = MarkerArray()
         if plot_traj:
             self.point_cloud = PointCloud()
@@ -165,12 +165,14 @@ class Converter(Node):
             :return marker: The converted marker.
         """
         marker = Marker()
-        marker.header.frame_id = "base_link"
+        marker.header.frame_id = "map"
         marker.header.stamp = self.get_clock().now().to_msg()
         marker.id = idx
         marker.type = Marker.CUBE
         marker.action = Marker.ADD
         marker.pose = self.convert_to_pose(state)
+        # so that the marker is on the ground
+        marker.pose.position.z = 0.5
         marker.scale.x = 2.9
         marker.scale.y = 1.45
         marker.scale.z = 1.0
@@ -193,16 +195,16 @@ class Converter(Node):
             :param multi_state_in: The received multi-state message.
         """
         self.pose_array_state = PoseArray()
-        self.pose_array_state.header.frame_id = "base_link"
+        self.pose_array_state.header.frame_id = "map"
         self.pose_array_state.header.stamp = self.get_clock().now().to_msg()
 
         self.pose_array_steering = PoseArray()
-        self.pose_array_steering.header.frame_id = "base_link"
+        self.pose_array_steering.header.frame_id = "map"
         self.pose_array_steering.header.stamp = self.get_clock().now().to_msg()
 
         if plot_traj:
             self.point_cloud = PointCloud()
-            self.point_cloud.header.frame_id = "base_link"
+            self.point_cloud.header.frame_id = "map"
             self.point_cloud.header.stamp = self.get_clock().now().to_msg()
 
         self.marker_array = MarkerArray()

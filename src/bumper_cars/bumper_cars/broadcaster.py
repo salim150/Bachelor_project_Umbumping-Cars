@@ -73,7 +73,7 @@ class FramePublisher(Node):
             # Read message content and assign it to
             # corresponding tf variables
             t.header.stamp = self.get_clock().now().to_msg()
-            t.header.frame_id = 'base_link'
+            t.header.frame_id = 'map'
             t.child_frame_id = f'robot_frame_{i}'
 
             # Turtle only exists in 2D, thus we get x and y translation
