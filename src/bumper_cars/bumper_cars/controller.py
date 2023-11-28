@@ -10,6 +10,7 @@ import numpy as np
 # from planner.cubic_spline_planner import *
 # from planner.frenet import *
 from planner.predict_traj import *
+from planner.DWA import *
 
 # for the CBF
 from planner.CBF_robotarium import *
@@ -90,6 +91,19 @@ class Controller(Node):
                 multi_control.multi_control.append(ControlInputs(delta=0.0, throttle=0.0))
         
         elif self.controller_type == "random_harem":
+            # Initializing the robots
+            self.targets = []
+            multi_control = MultiControl()
+
+            for i in range(robot_num):
+                self.targets.append(random.choice([idx for idx in range(0,robot_num) if idx not in [i]]))
+                initial_state = State(x=x0[i], y=y0[i], yaw=yaw[i], v=v[i], omega=omega[i])
+                multi_control.multi_control.append(ControlInputs(delta=0.0, throttle=0.0))
+
+            ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 4, 0.3, allow_headerless=True)
+            ts.registerCallback(self.DWA_callback) 
+
+        elif self.controller_type == "DWA":
             # Initializing the robots
             self.targets = []
             multi_control = MultiControl()
@@ -185,7 +199,7 @@ class Controller(Node):
         # Publishing everything in the general callback to avoid deadlocks
         self.multi_control_pub.publish(multi_control)
 
-    def general_pose_callback(self, multi_state):
+    def general_pose_callback(self, multi_state: MultiState):
         """
         General pose callback function.
 
@@ -210,6 +224,22 @@ class Controller(Node):
 
         if plot_traj:
             self.multi_path_pub.publish(self.multi_traj)
+
+    def DWA_callback(self, multi_state: MultiState):
+        """
+        DWA callback function, that uses the dynamic window approach algorithm. 
+        """
+        
+        # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
+        x = np.array([0.0, 0.0, math.pi / 8.0, 1.0, 0.0])
+        # goal position [x(m), y(m)]
+        goal = np.array([gx, gy])
+        # input [throttle, steer (delta)]
+        trajectory = np.array(x)
+        ob = config.ob
+        u, predicted_trajectory = dwa_control(x, config, goal, ob)
+        x = motion(x, u, config.dt)  # simulate robot
+        
 
     def control_callback(self, pose: FullState, target, path, trajectory):
         """
