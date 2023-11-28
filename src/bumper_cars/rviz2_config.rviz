@@ -8,6 +8,7 @@ Panels:
         - /Status1
         - /Grid1
         - /TF1
+        - /TF1/Frames1
         - /PoseArray1
         - /PoseArray2
         - /MarkerArray1
@@ -31,7 +32,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: PointCloud
+    SyncSource: ""
 Visualization Manager:
   Class: ""
   Displays:
@@ -62,7 +63,17 @@ Visualization Manager:
           Value: true
         map:
           Value: true
-      Marker Scale: 1
+        robot_frame_0:
+          Value: true
+        robot_frame_1:
+          Value: true
+        robot_frame_2:
+          Value: true
+        robot_frame_3:
+          Value: true
+        robot_frame_4:
+          Value: true
+      Marker Scale: 10
       Name: TF
       Show Arrows: true
       Show Axes: true
@@ -70,6 +81,16 @@ Visualization Manager:
       Tree:
         map:
           base_link:
+            {}
+          robot_frame_0:
+            {}
+          robot_frame_1:
+            {}
+          robot_frame_2:
+            {}
+          robot_frame_3:
+            {}
+          robot_frame_4:
             {}
       Update Interval: 0
       Value: true
@@ -207,25 +228,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 265.49078369140625
+      Distance: 100.90939331054688
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.3434625566005707
-        Y: -0.6302047967910767
-        Z: 0.22437746822834015
+        X: -2.9011502265930176
+        Y: 15.127238273620605
+        Z: -1.5448600053787231
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.4597960710525513
+      Pitch: 0.5897969007492065
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.6103904247283936
+      Yaw: 1.9003901481628418
     Saved: ~
 Window Geometry:
   Displays:

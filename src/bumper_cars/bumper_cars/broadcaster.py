@@ -1,13 +1,11 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import TransformStamped
-from sensor_msgs.msg import JointState
-from custom_message.msg import MultiState, FullState, State, MultiplePaths
-
+from custom_message.msg import MultiState
+from tf2_ros import TransformBroadcaster
 # For the parameter file
 import pathlib
 import json
-from geometry_msgs.msg import Pose
 import numpy as np
 
 path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
@@ -20,20 +18,22 @@ plot_traj = json_object["plot_traj"]
 robot_num = json_object["robot_num"]
 timer_freq = json_object["timer_freq"]
 
-class TransformBroadcasterNode(Node):
+class FramePublisher(Node):
+
     def __init__(self):
-        super().__init__('transform_broadcaster_node')
+        super().__init__('turtle_tf2_frame_publisher')
+
+        # Initialize the transform broadcaster
+        self.tf_broadcaster = TransformBroadcaster(self)
+
+        # Subscribe to a turtle{1}{2}/pose topic and call handle_turtle_pose
+        # callback function on each message
         self.subscription = self.create_subscription(
             MultiState,
-            '/multi_fullstate',
-            self.state_callback,
-            10
-        )
-        self.transform_broadcaster = self.create_publisher(
-            TransformStamped,
-            '/tf',
-            10
-        )
+            f'/multi_fullstate',
+            self.handle_turtle_pose,
+            1)
+        self.subscription  # prevent unused variable warning
     
     def get_quaternion_from_euler(self, roll, pitch, yaw):
         """
@@ -53,52 +53,45 @@ class TransformBroadcasterNode(Node):
         qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
         
         return [qx, qy, qz, qw]
-        
-    def convert_to_pose(self, state: FullState):
-        """
-        Convert a robot state to a pose.
 
-        Input
-            :param state: The robot state.
+    def handle_turtle_pose(self, msg: MultiState):
 
-        Output
-            :return pose: The converted pose.
-        """
-        pose = Pose()
-        pose.position.x = state.x
-        pose.position.y = state.y
-        pose.position.z = 0.0
-
-        q = self.get_quaternion_from_euler(0, 0, state.yaw)
-        pose.orientation.x = q[0]
-        pose.orientation.y = q[1]
-        pose.orientation.z = q[2]
-        pose.orientation.w = q[3]
-        return pose
-
-    def state_callback(self, msg: MultiState):
         for i in range(robot_num):
-            pose = self.convert_to_pose(msg.multiple_state[i])
-            # Convert state message to transform
-            transform = TransformStamped()
-            transform.header.stamp = self.get_clock().now().to_msg()
-            transform.header.frame_id = 'map'
-            transform.child_frame_id = f'robot_frame_{i}'
-            transform.transform.translation.x = pose.position.x
-            transform.transform.translation.y = pose.position.y
-            transform.transform.translation.z = 0.0
-            transform.transform.rotation.x = pose.orientation.x
-            transform.transform.rotation.y = pose.orientation.y
-            transform.transform.rotation.z = pose.orientation.z
-            transform.transform.rotation.w = pose.orientation.w
+            t = TransformStamped()
 
-            # Publish the transform
-            self.transform_broadcaster.publish(transform)
+            # Read message content and assign it to
+            # corresponding tf variables
+            t.header.stamp = self.get_clock().now().to_msg()
+            t.header.frame_id = 'base_link'
+            t.child_frame_id = f'robot_frame_{i}'
 
-def main(args=None):
-    rclpy.init(args=args)
-    node = TransformBroadcasterNode()
-    rclpy.spin(node)
+            # Turtle only exists in 2D, thus we get x and y translation
+            # coordinates from the message and set the z coordinate to 0
+            t.transform.translation.x = msg.multiple_state[i].x
+            t.transform.translation.y = msg.multiple_state[i].y
+            t.transform.translation.z = 0.0
+
+            # For the same reason, turtle can only rotate around one axis
+            # and this why we set rotation in x and y to 0 and obtain
+            # rotation in z axis from the message
+            q = self.get_quaternion_from_euler(0, 0, msg.multiple_state[i].yaw)
+            t.transform.rotation.x = q[0]
+            t.transform.rotation.y = q[1]
+            t.transform.rotation.z = q[2]
+            t.transform.rotation.w = q[3]
+
+            # Send the transformation
+            self.tf_broadcaster.sendTransform(t)
+
+
+def main():
+    rclpy.init()
+    node = FramePublisher()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+
     rclpy.shutdown()
 
 if __name__ == '__main__':
