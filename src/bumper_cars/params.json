@@ -52,7 +52,7 @@
     "Controller":
         {
             "max_steer": 0.785398,
-            "WB": 2.9,
+            "WB": 1.45,
             "L_d": 20,
             "max_acc": 5,
             "min_acc": -5,
@@ -60,7 +60,7 @@
             "min_speed": -1,
             "controller_type": "random_goal"
         },
-    "robot_num": 5,
+    "robot_num": 10,
     "safety": 30, 
     "width": 200,
     "height": 200.0,

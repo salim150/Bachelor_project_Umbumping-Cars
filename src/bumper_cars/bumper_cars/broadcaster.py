@@ -21,7 +21,18 @@ timer_freq = json_object["timer_freq"]
 class FramePublisher(Node):
 
     def __init__(self):
-        super().__init__('turtle_tf2_frame_publisher')
+        """
+        A class that publishes transformation frames for multiple turtle robots.
+
+        This class subscribes to a topic containing the pose information of multiple turtle robots,
+        converts the pose information into transformation frames, and broadcasts the frames using tf2.
+
+        Attributes:
+            tf_broadcaster (TransformBroadcaster): The transform broadcaster object.
+            subscription (Subscription): The subscription object for receiving turtle pose messages.
+
+        """
+        super().__init__('tf2_frame_publisher')
 
         # Initialize the transform broadcaster
         self.tf_broadcaster = TransformBroadcaster(self)
