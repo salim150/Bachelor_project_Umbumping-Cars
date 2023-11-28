@@ -54,8 +54,8 @@ class Converter(Node):
         v = self.get_parameter('v').get_parameter_value().double_array_value
         omega = self.get_parameter('omega').get_parameter_value().double_array_value
 
-        self.pose_array_state = PoseArray()
-        self.pose_array_state.header.frame_id = "map"
+        # self.pose_array_state = PoseArray()
+        # self.pose_array_state.header.frame_id = "map"
         self.pose_array_steering = PoseArray()
         self.pose_array_steering.header.frame_id = "map"
         self.marker_array = MarkerArray()
@@ -64,17 +64,17 @@ class Converter(Node):
 
         # Initializing the robots TODO add in the launch file parameters the initial control--> here it's hardcoded
         for i in range(robot_num):
-            pose = self.convert_to_pose(FullState(x=x0[i], y=y0[i], yaw=yaw[i], v=v[i],
-                                                             omega=omega[i], delta=0.0, throttle=0.0))
+            # pose = self.convert_to_pose(FullState(x=x0[i], y=y0[i], yaw=yaw[i], v=v[i],
+            #                                                  omega=omega[i], delta=0.0, throttle=0.0))
             steering = self.convert_to_steering_pose(FullState(x=x0[i], y=y0[i], yaw=yaw[i], v=v[i], omega=omega[i],
                                                              delta=0.0, throttle=0.0))
             marker = self.convert_to_marker(FullState(x=x0[i], y=y0[i], yaw=yaw[i], v=v[i], omega=omega[i],
                                                              delta=0.0, throttle=0.0), i)
-            self.pose_array_state.poses.append(pose)
+            # self.pose_array_state.poses.append(pose)
             self.pose_array_steering.poses.append(steering)
             self.marker_array.markers.append(marker)
         
-        self.pose_array_pub = self.create_publisher(PoseArray, "/pose_array", 2)
+        # self.pose_array_pub = self.create_publisher(PoseArray, "/pose_array", 2)
         self.pose_array_steering_pub = self.create_publisher(PoseArray, "/pose_array_steering", 2)
         self.marker_array_pub = self.create_publisher(MarkerArray, "/marker_array", 2)
         self.point_cloud_pub = self.create_publisher(PointCloud, "/point_cloud", 2)
@@ -194,9 +194,9 @@ class Converter(Node):
         Input
             :param multi_state_in: The received multi-state message.
         """
-        self.pose_array_state = PoseArray()
-        self.pose_array_state.header.frame_id = "map"
-        self.pose_array_state.header.stamp = self.get_clock().now().to_msg()
+        # self.pose_array_state = PoseArray()
+        # self.pose_array_state.header.frame_id = "map"
+        # self.pose_array_state.header.stamp = self.get_clock().now().to_msg()
 
         self.pose_array_steering = PoseArray()
         self.pose_array_steering.header.frame_id = "map"
@@ -210,11 +210,11 @@ class Converter(Node):
         self.marker_array = MarkerArray()
 
         for idx, state in enumerate(multi_state_in.multiple_state):
-            pose = self.convert_to_pose(state)
+            # pose = self.convert_to_pose(state)
             steering = self.convert_to_steering_pose(state)
             marker = self.convert_to_marker(state, idx)
+            # self.pose_array_state.poses.append(pose)
             self.pose_array_steering.poses.append(steering)
-            self.pose_array_state.poses.append(pose)
             self.marker_array.markers.append(marker)
 
             if plot_traj:
@@ -242,7 +242,7 @@ class Converter(Node):
         """
         Timer callback function for publishing the converted poses and markers.
         """
-        self.pose_array_pub.publish(self.pose_array_state)
+        # self.pose_array_pub.publish(self.pose_array_state)
         self.pose_array_steering_pub.publish(self.pose_array_steering)
         self.marker_array_pub.publish(self.marker_array)
         if plot_traj:
