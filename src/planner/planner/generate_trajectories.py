@@ -50,7 +50,7 @@ class Config:
         self.max_acc = 40 # [m/s]
         self.min_acc = -40# [m/s]
         self.max_speed = 10 # [m/s]
-        self.min_speed = -1# [m/s]
+        self.min_speed = -10# [m/s]
         self.max_delta = np.radians(45)  # [rad]
         self.max_accel = 0.2  # [m/ss]
         # self.max_delta_yaw_rate = 40.0 * math.pi / 180.0  # [rad/ss]
@@ -113,7 +113,7 @@ def motion(x, u, dt):
     x[2] = x[2] + x[3] / L * math.tan(delta) * dt
     x[3] = x[3] + throttle * dt
     x[2] = normalize_angle(x[2])
-    x[3] = np.clip(x[3], min_speed, max_speed)
+    x[3] = np.clip(x[3], config.min_speed, config.max_speed)
 
     return x
 
@@ -207,14 +207,16 @@ def main():
     plt.show()
 
     traj = np.array(traj)
-    print(traj.shape)
-    line = LineString(zip(traj[0, 0], traj[0,1]))
-    dilated = line.buffer(0.5)
 
     fig = plt.figure(1, dpi=90)
     ax = fig.add_subplot(121)
-    plot_line(line, ax=ax, add_points=False, linewidth=3)
-    plot_polygon(dilated, ax=ax, add_points=False, alpha=0.5)
+
+    for i in range(len(traj)):
+        line = LineString(zip(traj[i, :, 0], traj[i, :, 1]))
+        dilated = line.buffer(0.5, cap_style=3, join_style=3)
+        plot_line(line, ax=ax, add_points=False, linewidth=3)
+        plot_polygon(dilated, ax=ax, add_points=False, alpha=0.5)
+
     plt.show()
         
         

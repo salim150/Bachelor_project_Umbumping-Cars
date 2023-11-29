@@ -6,6 +6,8 @@ from enum import Enum
 import pathlib
 import json
 from custom_message.msg import ControlInputs
+from shapely.geometry import Point, Polygon, LineString
+from shapely.plotting import plot_polygon, plot_line
 
 path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
 # Opening JSON file
@@ -293,6 +295,8 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.circle):
     # input [throttle, steer (delta)]
     config.robot_type = robot_type
     # ob = config.ob
+    fig = plt.figure(1, dpi=90)
+    ax = fig.add_subplot(111)
     for i in range(iterations):
         ob = x[:2,:]
         x1 = x[:, 0]
@@ -306,6 +310,9 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.circle):
         trajectory1 = np.vstack((trajectory1, x1))
         trajectory2 = np.vstack((trajectory2, x2))
 
+        line = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1]))
+        dilated = line.buffer(0.5, cap_style=3)
+
         if show_animation:
             plt.cla()
             # for stopping simulation with the esc key.
@@ -314,6 +321,7 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.circle):
                 lambda event: [exit(0) if event.key == 'escape' else None])
             plt.plot(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1], "-g")
             plt.plot(predicted_trajectory2[:, 0], predicted_trajectory2[:, 1], "-g")
+            plot_polygon(dilated, ax=ax, add_points=False, alpha=0.5)
             plt.plot(x1[0], x1[1], "xr")
             plt.plot(x2[0], x2[1], "xg")
             plt.plot(goal1[0], goal1[1], "xb")
