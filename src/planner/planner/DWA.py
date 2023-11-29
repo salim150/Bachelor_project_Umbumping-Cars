@@ -7,6 +7,7 @@ import pathlib
 import json
 from custom_message.msg import ControlInputs
 from shapely.geometry import Point, Polygon, LineString
+from shapely import intersection, distance
 from shapely.plotting import plot_polygon, plot_line
 
 path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
@@ -56,7 +57,7 @@ class Config:
     def __init__(self):
         # robot parameter
         self.max_acc = 40 # [m/s]
-        self.min_acc = 40# [m/s]
+        self.min_acc = -40# [m/s]
         self.max_speed = 2 # [m/s]
         self.min_speed = -2# [m/s]
         self.max_delta = np.radians(45)  # [rad]
@@ -65,10 +66,10 @@ class Config:
         self.v_resolution = 0.5# [m/s]
         self.delta_resolution = math.radians(5)  # [rad/s]
         self.dt = 0.1  # [s] Time tick for motion prediction
-        self.predict_time = 0.5  # [s]
+        self.predict_time = 0.7  # [s]
         self.to_goal_cost_gain = 0.15
         self.speed_cost_gain = 1.0
-        self.obstacle_cost_gain = 50.0
+        self.obstacle_cost_gain = 70.0
         self.robot_stuck_flag_cons = 0.001  # constant to prevent robot stucked
         self.robot_type = RobotType.rectangle
         # if robot_type == RobotType.circle
@@ -209,35 +210,42 @@ def calc_obstacle_cost(trajectory, ob, config):
     """
     calc obstacle cost inf: collision
     """
+    line = LineString(zip(trajectory[:, 0], trajectory[:, 1]))
+    dilated = line.buffer(0.5, cap_style=3)
     
-    ob = ob.reshape(ob.shape[0], N-1)
-    ox = ob[0, :]
-    oy = ob[1, :]
-    dx = trajectory[:, 0] - ox[:, None]
-    dy = trajectory[:, 1] - oy[:, None]
-    r = np.hypot(dx, dy)
+    if intersection(dilated, ob):
+        return float("Inf")
+    else:
+        return 1/distance(dilated, ob)
+    
+    # ob = ob.reshape(ob.shape[0], N-1)
+    # ox = ob[0, :]
+    # oy = ob[1, :]
+    # dx = trajectory[:, 0] - ox[:, None]
+    # dy = trajectory[:, 1] - oy[:, None]
+    # r = np.hypot(dx, dy)
 
-    if config.robot_type == RobotType.rectangle:
-        yaw = trajectory[:, 2]
-        rot = np.array([[np.cos(yaw), -np.sin(yaw)], [np.sin(yaw), np.cos(yaw)]])
-        rot = np.transpose(rot, [2, 0, 1])
-        local_ob = ob[:, None] - trajectory[:, 0:2]
-        local_ob = local_ob.reshape(-1, local_ob.shape[-1])
-        local_ob = np.array([local_ob @ x for x in rot])
-        local_ob = local_ob.reshape(-1, local_ob.shape[-1])
-        upper_check = local_ob[:, 0] <= L / 2
-        right_check = local_ob[:, 1] <= L / 2
-        bottom_check = local_ob[:, 0] >= - L / 2
-        left_check = local_ob[:, 1] >= - L / 2
-        if (np.logical_and(np.logical_and(upper_check, right_check),
-                           np.logical_and(bottom_check, left_check))).any():
-            return float("Inf")
-    elif config.robot_type == RobotType.circle:
-        if np.array(r <= config.robot_radius).any():
-            return float("Inf")
+    # if config.robot_type == RobotType.rectangle:
+    #     yaw = trajectory[:, 2]
+    #     rot = np.array([[np.cos(yaw), -np.sin(yaw)], [np.sin(yaw), np.cos(yaw)]])
+    #     rot = np.transpose(rot, [2, 0, 1])
+    #     local_ob = ob[:, None] - trajectory[:, 0:2]
+    #     local_ob = local_ob.reshape(-1, local_ob.shape[-1])
+    #     local_ob = np.array([local_ob @ x for x in rot])
+    #     local_ob = local_ob.reshape(-1, local_ob.shape[-1])
+    #     upper_check = local_ob[:, 0] <= L / 2
+    #     right_check = local_ob[:, 1] <= L / 2
+    #     bottom_check = local_ob[:, 0] >= - L / 2
+    #     left_check = local_ob[:, 1] >= - L / 2
+    #     if (np.logical_and(np.logical_and(upper_check, right_check),
+    #                        np.logical_and(bottom_check, left_check))).any():
+    #         return float("Inf")
+    # elif config.robot_type == RobotType.circle:
+    #     if np.array(r <= config.robot_radius).any():
+    #         return float("Inf")
 
-    min_r = np.min(r)
-    return 1.0 / min_r  # OK
+    # min_r = np.min(r)
+    # return 1.0 / min_r  # OK
 
 def calc_to_goal_cost(trajectory, goal):
     """
@@ -294,24 +302,29 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.circle):
     trajectory2 = np.array(x[:,1])
     # input [throttle, steer (delta)]
     config.robot_type = robot_type
-    # ob = config.ob
     fig = plt.figure(1, dpi=90)
     ax = fig.add_subplot(111)
     for i in range(iterations):
-        ob = x[:2,:]
+        ob = []
+        for i in range(N):
+            line = Point(x[0, i], x[1, i])
+            line = line.buffer(0.5, cap_style=3)
+            ob.append(line)
+        
+        # ob = x[:2,:]
         x1 = x[:, 0]
         x2 = x[:, 1]
-        u1, predicted_trajectory1 = dwa_control(x1, config, goal1, ob[:,1])
-        u2, predicted_trajectory2 = dwa_control(x2, config, goal2, ob[:,0])
+        u1, predicted_trajectory1 = dwa_control(x1, config, goal1, ob[1])
+        line = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1]))
+        dilated = line.buffer(1, cap_style=3)
+        ob.append(dilated)
+        u2, predicted_trajectory2 = dwa_control(x2, config, goal2, ob[2])
         x1 = motion(x1, u1, config.dt)  # simulate robot
         x2 = motion(x2, u2, config.dt)  # simulate robot
         x = np.concatenate((x1[:, None], x2[:, None]), axis=1)
 
         trajectory1 = np.vstack((trajectory1, x1))
         trajectory2 = np.vstack((trajectory2, x2))
-
-        line = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1]))
-        dilated = line.buffer(0.5, cap_style=3)
 
         if show_animation:
             plt.cla()
