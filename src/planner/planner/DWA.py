@@ -30,7 +30,7 @@ m = json_object["Car_model"]["m"]  # kg
 c_a = json_object["Car_model"]["c_a"]
 c_r1 = json_object["Car_model"]["c_r1"]
 WB = json_object["Controller"]["WB"] # Wheel base
-N=2
+N=3
 
 robot_num = json_object["robot_num"]
 timer_freq = json_object["timer_freq"]
@@ -297,9 +297,9 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.circle):
     # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
     # x = np.array([0.0, 0.0, math.pi / 8.0, 1.0, 0.0])
     iterations = 3000
-
-    x = np.array([[0, 20], [0, 0], [0, np.pi], [0, 0]])
-    goal = np.array([[20, 0], [10, 10]])
+    break_flag = False
+    x = np.array([[0, 20, 10], [0, 0, 20], [0, np.pi, -np.pi/2], [0, 0, 0]])
+    goal = np.array([[20, 0, 10], [10, 10, 0]])
     # goal2 = np.array([0, 10])
     cmd1 = ControlInputs()
     cmd2 = ControlInputs()
@@ -363,34 +363,55 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.circle):
             plt.gcf().canvas.mpl_connect(
                 'key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
-            plt.plot(predicted_trajectory[0, :, 0], predicted_trajectory[0, :, 1], "-g")
-            plt.plot(predicted_trajectory[1, :, 0], predicted_trajectory[1, :, 1], "-g")
-            plot_polygon(dilated, ax=ax, add_points=False, alpha=0.5)
-            plt.plot(x[0,0], x[1,0], "xr")
-            plt.plot(x[0,1], x[1,1], "xg")
-            plt.plot(goal[0,0], goal[1,0], "xb")
-            plt.plot(goal[0,1], goal[1,1], "xk")
+            
+            for i in range(N):
+                plt.plot(predicted_trajectory[i, :, 0], predicted_trajectory[i, :, 1], "-g")
+                plot_polygon(dilated_traj[i], ax=ax, add_points=False, alpha=0.5)
+                plt.plot(x[0,i], x[1,i], "xr")
+                plt.plot(goal[0,i], goal[1,i], "xb")
+                plot_robot(x[0,i], x[1,i], x[2,i], config)
+                plot_arrow(x[0,i], x[1,i], x[2,i])
 
-            plot_robot(x[0,0], x[1,0], x[2,0], config)
-            plot_arrow(x[0,0], x[1,0], x[2,0])
-            plot_robot(x[0,1], x[1,1], x[2,1], config)
-            plot_arrow(x[0,1], x[1,1], x[2,1])
+            # plt.plot(predicted_trajectory[0, :, 0], predicted_trajectory[0, :, 1], "-g")
+            # plt.plot(predicted_trajectory[1, :, 0], predicted_trajectory[1, :, 1], "-g")
+            # plot_polygon(dilated, ax=ax, add_points=False, alpha=0.5)
+            # plt.plot(x[0,0], x[1,0], "xr")
+            # plt.plot(x[0,1], x[1,1], "xg")
+            # plt.plot(goal[0,0], goal[1,0], "xb")
+            # plt.plot(goal[0,1], goal[1,1], "xk")
+
+            # plot_robot(x[0,0], x[1,0], x[2,0], config)
+            # plot_arrow(x[0,0], x[1,0], x[2,0])
+            # plot_robot(x[0,1], x[1,1], x[2,1], config)
+            # plot_arrow(x[0,1], x[1,1], x[2,1])
             plt.axis("equal")
             plt.grid(True)
             plt.pause(0.0001)
         # check reaching goal
-        dist_to_goal1 = math.hypot(x[0,0] - goal[0,0], x[1,0] - goal[1,0])
-        dist_to_goal2 = math.hypot(x[0,1] - goal[0,1], x[1,1] - goal[1,1])
-        if dist_to_goal1 <= 5 or dist_to_goal2 <= 5:
-            print("Goal!!")
+        # dist_to_goal1 = math.hypot(x[0,0] - goal[0,0], x[1,0] - goal[1,0])
+        # dist_to_goal2 = math.hypot(x[0,1] - goal[0,1], x[1,1] - goal[1,1])
+        for i in range(N):
+            dist_to_goal = math.hypot(x[0,i] - goal[0,i], x[1,i] - goal[1,i])
+            if dist_to_goal <= 5:
+                print("Goal!!")
+                break_flag = True
+        
+        if break_flag:
             break
+        # if dist_to_goal1 <= 5 or dist_to_goal2 <= 5:
+        #     print("Goal!!")
+        #     break
     print("Done")
     if show_animation:
         # trajectory = np.zeros((x.shape[0], N, 1))
-        plt.plot(trajectory[0,0,:], trajectory[1,0,:], "-r")
-        plt.plot(trajectory[0,1,:], trajectory[1,1,:], "-r")
+        for i in range(N):
+            plt.plot(trajectory[0,i,:], trajectory[1,i,:], "-r")
         plt.pause(0.0001)
         plt.show()
+        # plt.plot(trajectory[0,0,:], trajectory[1,0,:], "-r")
+        # plt.plot(trajectory[0,1,:], trajectory[1,1,:], "-r")
+        # plt.pause(0.0001)
+        # plt.show()
 if __name__ == '__main__':
     main(robot_type=RobotType.rectangle)
     # main(robot_type=RobotType.circle)
