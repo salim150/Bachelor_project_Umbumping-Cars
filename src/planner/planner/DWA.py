@@ -63,7 +63,7 @@ class Config:
         self.v_resolution = 0.5# [m/s]
         self.delta_resolution = math.radians(5)  # [rad/s]
         self.dt = 0.1  # [s] Time tick for motion prediction
-        self.predict_time = 1.0  # [s]
+        self.predict_time = 0.5  # [s]
         self.to_goal_cost_gain = 0.15
         self.speed_cost_gain = 1.0
         self.obstacle_cost_gain = 50.0
