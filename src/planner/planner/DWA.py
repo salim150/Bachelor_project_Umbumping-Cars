@@ -67,7 +67,7 @@ class Config:
         self.delta_resolution = math.radians(5)  # [rad/s]
         self.dt = 0.1  # [s] Time tick for motion prediction
         self.predict_time = 0.7  # [s]
-        self.to_goal_cost_gain = 0.15
+        self.to_goal_cost_gain = 1.5
         self.speed_cost_gain = 1.0
         self.obstacle_cost_gain = 70.0
         self.robot_stuck_flag_cons = 0.001  # constant to prevent robot stucked
@@ -212,11 +212,17 @@ def calc_obstacle_cost(trajectory, ob, config):
     """
     line = LineString(zip(trajectory[:, 0], trajectory[:, 1]))
     dilated = line.buffer(0.5, cap_style=3)
+
+    min_distance = np.inf
     
-    if intersection(dilated, ob):
-        return float("Inf")
-    else:
-        return 1/distance(dilated, ob)
+    for obstacle in ob:
+        if intersection(dilated, obstacle):
+            return float("Inf")
+        elif distance(dilated, obstacle) < min_distance:
+            min_distance = distance(dilated, obstacle)
+            
+        
+    return 1/distance(dilated, obstacle)
     
     # ob = ob.reshape(ob.shape[0], N-1)
     # ox = ob[0, :]
@@ -293,38 +299,63 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.circle):
     iterations = 3000
 
     x = np.array([[0, 20], [0, 0], [0, np.pi], [0, 0]])
-    goal1 = np.array([20, 10])
-    goal2 = np.array([0, 10])
+    goal = np.array([[20, 0], [10, 10]])
+    # goal2 = np.array([0, 10])
     cmd1 = ControlInputs()
     cmd2 = ControlInputs()
 
-    trajectory1 = np.array(x[:,0])
-    trajectory2 = np.array(x[:,1])
+    # create a trajcetory array to store the trajectory of the N robots
+    trajectory = np.zeros((x.shape[0], N, 1))
+    # append the firt state to the trajectory
+    trajectory[:, :, 0] = x
+    # trajectory = np.dstack([trajectory, x])
+
+    predicted_trajectory = np.zeros((N, 9, x.shape[0]))
+
+    dilated_traj = []
+    for i in range(N):
+        dilated_traj.append(Point(x[0, i], x[1, i]).buffer(0.5, cap_style=3))
+
     # input [throttle, steer (delta)]
     config.robot_type = robot_type
     fig = plt.figure(1, dpi=90)
     ax = fig.add_subplot(111)
-    for i in range(iterations):
-        ob = []
+    for z in range(iterations):
         for i in range(N):
-            line = Point(x[0, i], x[1, i])
-            line = line.buffer(0.5, cap_style=3)
-            ob.append(line)
-        
-        # ob = x[:2,:]
-        x1 = x[:, 0]
-        x2 = x[:, 1]
-        u1, predicted_trajectory1 = dwa_control(x1, config, goal1, ob[1])
-        line = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1]))
-        dilated = line.buffer(1, cap_style=3)
-        ob.append(dilated)
-        u2, predicted_trajectory2 = dwa_control(x2, config, goal2, ob[2])
-        x1 = motion(x1, u1, config.dt)  # simulate robot
-        x2 = motion(x2, u2, config.dt)  # simulate robot
-        x = np.concatenate((x1[:, None], x2[:, None]), axis=1)
+            ob = []
+            for idx in range(N):
+                if idx == i:
+                    continue
+                point = Point(x[0, idx], x[1, idx])
+                point = point.buffer(0.5, cap_style=3)
+                ob.append(point)
+                ob.append(dilated_traj[idx])
+            
+            x1 = x[:, i]
+            u1, predicted_trajectory1 = dwa_control(x1, config, goal[:,i], ob)
+            line = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1]))
+            dilated = line.buffer(1, cap_style=3)
+            dilated_traj[i] = dilated
+            x1 = motion(x1, u1, config.dt)
+            x[:, i] = x1
+            predicted_trajectory[i, :, :] = predicted_trajectory1
 
-        trajectory1 = np.vstack((trajectory1, x1))
-        trajectory2 = np.vstack((trajectory2, x2))
+        trajectory = np.dstack([trajectory, x])
+        
+        # # ob = x[:2,:]
+        # x1 = x[:, 0]
+        # x2 = x[:, 1]
+        # u1, predicted_trajectory1 = dwa_control(x1, config, goal1, ob)
+        # line = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1]))
+        # dilated = line.buffer(1, cap_style=3)
+        # ob.append(dilated)
+        # u2, predicted_trajectory2 = dwa_control(x2, config, goal2, ob[2])
+        # x1 = motion(x1, u1, config.dt)  # simulate robot
+        # x2 = motion(x2, u2, config.dt)  # simulate robot
+        # x = np.concatenate((x1[:, None], x2[:, None]), axis=1)
+
+        # trajectory1 = np.vstack((trajectory1, x1))
+        # trajectory2 = np.vstack((trajectory2, x2))
 
         if show_animation:
             plt.cla()
@@ -332,31 +363,32 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.circle):
             plt.gcf().canvas.mpl_connect(
                 'key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
-            plt.plot(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1], "-g")
-            plt.plot(predicted_trajectory2[:, 0], predicted_trajectory2[:, 1], "-g")
+            plt.plot(predicted_trajectory[0, :, 0], predicted_trajectory[0, :, 1], "-g")
+            plt.plot(predicted_trajectory[1, :, 0], predicted_trajectory[1, :, 1], "-g")
             plot_polygon(dilated, ax=ax, add_points=False, alpha=0.5)
-            plt.plot(x1[0], x1[1], "xr")
-            plt.plot(x2[0], x2[1], "xg")
-            plt.plot(goal1[0], goal1[1], "xb")
-            plt.plot(goal2[0], goal2[1], "xk")
+            plt.plot(x[0,0], x[1,0], "xr")
+            plt.plot(x[0,1], x[1,1], "xg")
+            plt.plot(goal[0,0], goal[1,0], "xb")
+            plt.plot(goal[0,1], goal[1,1], "xk")
 
-            plot_robot(x1[0], x1[1], x1[2], config)
-            plot_arrow(x1[0], x1[1], x1[2])
-            plot_robot(x2[0], x2[1], x2[2], config)
-            plot_arrow(x2[0], x2[1], x2[2])
+            plot_robot(x[0,0], x[1,0], x[2,0], config)
+            plot_arrow(x[0,0], x[1,0], x[2,0])
+            plot_robot(x[0,1], x[1,1], x[2,1], config)
+            plot_arrow(x[0,1], x[1,1], x[2,1])
             plt.axis("equal")
             plt.grid(True)
             plt.pause(0.0001)
         # check reaching goal
-        dist_to_goal1 = math.hypot(x1[0] - goal1[0], x1[1] - goal1[1])
-        dist_to_goal2 = math.hypot(x2[0] - goal2[0], x2[1] - goal2[1])
+        dist_to_goal1 = math.hypot(x[0,0] - goal[0,0], x[1,0] - goal[1,0])
+        dist_to_goal2 = math.hypot(x[0,1] - goal[0,1], x[1,1] - goal[1,1])
         if dist_to_goal1 <= 5 or dist_to_goal2 <= 5:
             print("Goal!!")
             break
     print("Done")
     if show_animation:
-        plt.plot(trajectory1[:, 0], trajectory1[:, 1], "-r")
-        plt.plot(trajectory2[:, 0], trajectory2[:, 1], "-r")
+        # trajectory = np.zeros((x.shape[0], N, 1))
+        plt.plot(trajectory[0,0,:], trajectory[1,0,:], "-r")
+        plt.plot(trajectory[0,1,:], trajectory[1,1,:], "-r")
         plt.pause(0.0001)
         plt.show()
 if __name__ == '__main__':
