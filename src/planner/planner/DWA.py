@@ -41,6 +41,10 @@ m = json_object["Car_model"]["m"]  # kg
 c_a = json_object["Car_model"]["c_a"]
 c_r1 = json_object["Car_model"]["c_r1"]
 WB = json_object["Controller"]["WB"] # Wheel base
+robot_num = json_object["robot_num"]
+safety_init = json_object["safety"]
+width_init = json_object["width"]
+height_init = json_object["height"]
 N=3
 
 robot_num = json_object["robot_num"]
@@ -117,7 +121,11 @@ def calc_dynamic_window(x):
     Vs = [min_acc, max_acc,
           -max_steer, max_steer]
     
-    dw = [Vs[0], Vs[1], Vs[2], Vs[3]]
+    Vd = [(min_speed - x[3])/0.1 , (max_speed - x[3])/0.1,
+          -max_steer, max_steer]
+    
+    # dw = [Vs[0], Vs[1], Vs[2], Vs[3]]
+    dw = [max(Vs[0], Vd[0]), min(Vs[1], Vd[1]), max(Vs[2], Vd[2]), min(Vs[3], Vd[3])]
     return dw
 
 def predict_trajectory(x_init, a, delta):
@@ -151,8 +159,8 @@ def calc_control_and_trajectory(x, dw, goal, ob):
             to_goal_cost = to_goal_cost_gain * calc_to_goal_cost(trajectory, goal)
             speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
             ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory, ob)
-            # heading_cost = to_goal_cost * calc_to_goal_heading_cost(trajectory, goal)
-            final_cost = to_goal_cost + speed_cost + ob_cost # + heading_cost
+            heading_cost = to_goal_cost_gain * calc_to_goal_heading_cost(trajectory, goal)
+            final_cost = to_goal_cost + speed_cost + ob_cost + heading_cost
             # search minimum trajectory
             if min_cost >= final_cost:
                 min_cost = final_cost
@@ -175,10 +183,19 @@ def calc_obstacle_cost(trajectory, ob):
     dilated = line.buffer(0.5, cap_style=3)
 
     min_distance = np.inf
-    
+
+    x = trajectory[:, 0]
+    y = trajectory[:, 1]
+
+    # check if the trajectory is out of bounds
+    if any(element < -width_init/2 or element > width_init/2 for element in x):
+        return 10000
+    if any(element < -height_init/2 or element > height_init/2 for element in y):
+        return 10000
+
     for obstacle in ob:
         if dilated.intersects(obstacle):
-            return 1000 # collision
+            return 100000 # collision        
         elif distance(dilated, obstacle) < min_distance:
             min_distance = distance(dilated, obstacle)
             
