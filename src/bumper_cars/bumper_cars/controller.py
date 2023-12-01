@@ -240,14 +240,14 @@ class Controller(Node):
         """
         predict_time = 2
         dt = 0.1
-        
+
         multi_control = MultiControl()
         dilation_factor = 2
         dilated_traj = []
         for i in range(robot_num):
             dilated_traj.append(Point(multi_state.multiple_state[i].x, multi_state.multiple_state[i].y).buffer(dilation_factor, cap_style=3))
         
-        predicted_trajectory = np.zeros((robot_num, round(predict_time/dt)+1, 4))
+        # predicted_trajectory = np.zeros((robot_num, round(predict_time/dt)+1, 4))
 
         for i in range(robot_num):
             pose = multi_state.multiple_state[i]
@@ -267,13 +267,13 @@ class Controller(Node):
                 ob.append(dilated_traj[idx])
         
             x1 = state_to_array(multi_state.multiple_state[i]).reshape(4)
-            u1, predicted_trajectory1 = dwa_control(x1, config, self.targets[i], ob)
+            u1, predicted_trajectory1 = dwa_control(x1, self.targets[i], ob)
             line = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1]))
             dilated = line.buffer(dilation_factor, cap_style=3)
             dilated_traj[i] = dilated
             # x1 = motion(x1, u1, config.dt)
             # x[:, i] = x1
-            predicted_trajectory[i, :, :] = predicted_trajectory1
+            # predicted_trajectory[i, :, :] = predicted_trajectory1
 
             cmd = ControlInputs(throttle=float(u1[0]), delta=float(u1[1]))
             multi_control.multi_control.append(cmd)
