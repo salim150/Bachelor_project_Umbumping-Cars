@@ -68,7 +68,7 @@ class Config:
         self.dt = 0.1  # [s] Time tick for motion prediction
         self.predict_time = 0.7  # [s]
         self.to_goal_cost_gain = 1.5
-        self.speed_cost_gain = 1.0
+        self.speed_cost_gain = 0.5
         self.obstacle_cost_gain = 70.0
         self.robot_stuck_flag_cons = 0.001  # constant to prevent robot stucked
         self.robot_type = RobotType.rectangle
@@ -298,6 +298,7 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.circle):
     # x = np.array([0.0, 0.0, math.pi / 8.0, 1.0, 0.0])
     iterations = 3000
     break_flag = False
+    dilation_factor = 1.25
     x = np.array([[0, 20, 10], [0, 0, 20], [0, np.pi, -np.pi/2], [0, 0, 0]])
     goal = np.array([[20, 0, 10], [10, 10, 0]])
     # goal2 = np.array([0, 10])
@@ -314,7 +315,7 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.circle):
 
     dilated_traj = []
     for i in range(N):
-        dilated_traj.append(Point(x[0, i], x[1, i]).buffer(0.5, cap_style=3))
+        dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
 
     # input [throttle, steer (delta)]
     config.robot_type = robot_type
@@ -327,14 +328,14 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.circle):
                 if idx == i:
                     continue
                 point = Point(x[0, idx], x[1, idx])
-                point = point.buffer(0.5, cap_style=3)
+                point = point.buffer(dilation_factor, cap_style=3)
                 ob.append(point)
                 ob.append(dilated_traj[idx])
             
             x1 = x[:, i]
             u1, predicted_trajectory1 = dwa_control(x1, config, goal[:,i], ob)
             line = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1]))
-            dilated = line.buffer(1, cap_style=3)
+            dilated = line.buffer(dilation_factor, cap_style=3)
             dilated_traj[i] = dilated
             x1 = motion(x1, u1, config.dt)
             x[:, i] = x1
@@ -370,7 +371,7 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.circle):
                 plt.plot(x[0,i], x[1,i], "xr")
                 plt.plot(goal[0,i], goal[1,i], "xb")
                 plot_robot(x[0,i], x[1,i], x[2,i], config)
-                plot_arrow(x[0,i], x[1,i], x[2,i])
+                plot_arrow(x[0,i], x[1,i], x[2,i], length=2, width=1)
 
             # plt.plot(predicted_trajectory[0, :, 0], predicted_trajectory[0, :, 1], "-g")
             # plt.plot(predicted_trajectory[1, :, 0], predicted_trajectory[1, :, 1], "-g")
