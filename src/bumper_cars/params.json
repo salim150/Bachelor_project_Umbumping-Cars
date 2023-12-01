@@ -58,9 +58,9 @@
             "min_acc": -5,
             "max_speed": 10,
             "min_speed": -1,
-            "controller_type": "random_goal"
+            "controller_type": "DWA"
         },
-    "robot_num": 10,
+    "robot_num": 5,
     "safety": 30, 
     "width": 200,
     "height": 200.0,

@@ -56,17 +56,17 @@ class Config:
 
     def __init__(self):
         # robot parameter
-        self.max_acc = 40 # [m/s]
-        self.min_acc = -40# [m/s]
+        self.max_acc = 2 # [m/s]
+        self.min_acc = -2# [m/s]
         self.max_speed = 2 # [m/s]
         self.min_speed = -2# [m/s]
         self.max_delta = np.radians(45)  # [rad]
         self.max_accel = 0.2  # [m/ss]
         # self.max_delta_yaw_rate = 40.0 * math.pi / 180.0  # [rad/ss]
-        self.v_resolution = 0.5# [m/s]
-        self.delta_resolution = math.radians(5)  # [rad/s]
+        self.v_resolution = 1# [m/s]
+        self.delta_resolution = math.radians(15)  # [rad/s]
         self.dt = 0.1  # [s] Time tick for motion prediction
-        self.predict_time = 0.7  # [s]
+        self.predict_time = 2  # [s]
         self.to_goal_cost_gain = 1.5
         self.speed_cost_gain = 0.5
         self.obstacle_cost_gain = 70.0
@@ -146,19 +146,23 @@ def calc_dynamic_window(x, config):
     initial state [x(m), y(m), yaw(rad), v(m/s), delta(rad)]
     """
     # Dynamic window from robot specification
-    Vs = [min_speed, max_speed,
+    # Vs = [min_speed, max_speed,
+    #       -max_steer, max_steer]
+    
+    
+    # # Dynamic window from motion model
+    # Vd = [x[3] - config.max_acc*0.1,
+    #       x[3] + config.max_acc*0.1,
+    #       -max_steer,
+    #       max_steer]
+    
+    # #  [min_throttle, max_throttle, min_steer, max_steer]
+    # dw = [min(Vs[0], Vd[0]), min(Vs[1], Vd[1]), min(Vs[2], Vd[2]), min(Vs[3], Vd[3])]
+    
+    Vs = [config.min_acc, config.max_acc,
           -max_steer, max_steer]
     
-    
-    # Dynamic window from motion model
-    Vd = [x[3] - config.max_acc*0.1,
-          x[3] + config.max_acc*0.1,
-          -max_steer,
-          max_steer]
-    
-    #  [min_throttle, max_throttle, min_steer, max_steer]
-    dw = [min(Vs[0], Vd[0]), min(Vs[1], Vd[1]), min(Vs[2], Vd[2]), min(Vs[3], Vd[3])]
-    
+    dw = [Vs[0], Vs[1], Vs[2], Vs[3]]
     return dw
 
 def predict_trajectory(x_init, a, delta, config):
@@ -170,7 +174,7 @@ def predict_trajectory(x_init, a, delta, config):
     x = np.array(x_init)
     trajectory = np.array(x)
     time = 0
-    while time <= config.predict_time:
+    while time < config.predict_time:
         x = motion(x, [a, delta], config.dt)
         trajectory = np.vstack((trajectory, x))
         time += config.dt
@@ -205,6 +209,7 @@ def calc_control_and_trajectory(x, dw, config, goal, ob):
                     # best omega=0 rad/s (heading to the goal with
                     # angle difference of 0)
                     best_u[1] = -max_steer
+    
     return best_u, best_trajectory
 def calc_obstacle_cost(trajectory, ob, config):
     """
@@ -259,9 +264,13 @@ def calc_to_goal_cost(trajectory, goal):
     """
     dx = goal[0] - trajectory[-1, 0]
     dy = goal[1] - trajectory[-1, 1]
-    error_angle = math.atan2(dy, dx)
-    cost_angle = error_angle - trajectory[-1, 2]
-    cost = abs(math.atan2(math.sin(cost_angle), math.cos(cost_angle)))
+
+    # either using the angle difference or the distance --> if we want to use the angle difference, we need to normalize the angle before taking the difference
+    # error_angle = math.atan2(dy, dx)
+    # cost_angle = error_angle - trajectory[-1, 2]
+    # cost = abs(math.atan2(math.sin(cost_angle), math.cos(cost_angle)))
+
+    cost = math.hypot(dx, dy)
     return cost
 
 def plot_arrow(x, y, yaw, length=0.5, width=0.1):  # pragma: no cover
@@ -298,9 +307,9 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.circle):
     # x = np.array([0.0, 0.0, math.pi / 8.0, 1.0, 0.0])
     iterations = 3000
     break_flag = False
-    dilation_factor = 1.25
-    x = np.array([[0, 20, 10], [0, 0, 20], [0, np.pi, -np.pi/2], [0, 0, 0]])
-    goal = np.array([[20, 0, 10], [10, 10, 0]])
+    dilation_factor = 2
+    x = np.array([[0, 20, 15], [0, 0, 20], [0, np.pi, -np.pi/2], [0, 0, 0]])
+    goal = np.array([[30, 0, 15], [10, 10, 0]])
     # goal2 = np.array([0, 10])
     cmd1 = ControlInputs()
     cmd2 = ControlInputs()
@@ -311,7 +320,7 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.circle):
     trajectory[:, :, 0] = x
     # trajectory = np.dstack([trajectory, x])
 
-    predicted_trajectory = np.zeros((N, 9, x.shape[0]))
+    predicted_trajectory = np.zeros((N, round(config.predict_time/config.dt)+1, x.shape[0]))
 
     dilated_traj = []
     for i in range(N):

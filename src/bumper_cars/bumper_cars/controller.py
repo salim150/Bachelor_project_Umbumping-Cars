@@ -105,17 +105,26 @@ class Controller(Node):
 
         elif self.controller_type == "DWA":
             # Initializing the robots
+            self.paths = []
             self.targets = []
+            if plot_traj:
+                self.multi_traj = MultiplePaths()
             multi_control = MultiControl()
 
             for i in range(robot_num):
-                self.targets.append(random.choice([idx for idx in range(0,robot_num) if idx not in [i]]))
+                self.paths.append(self.create_path())
+                self.targets.append([self.paths[i][0].x, self.paths[i][0].y])
                 initial_state = State(x=x0[i], y=y0[i], yaw=yaw[i], v=v[i], omega=omega[i])
+                if plot_traj:
+                    self.multi_traj.multiple_path.append(predict_trajectory(initial_state, self.targets[i]))
+                # TODO initialize control
                 multi_control.multi_control.append(ControlInputs(delta=0.0, throttle=0.0))
-
-            self.time_bkp = time.time()
+            
             ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 4, 0.3, allow_headerless=True)
-            ts.registerCallback(self.random_harem_callback)  
+            ts.registerCallback(self.DWA_callback)
+    
+            if plot_traj:
+                self.multi_path_pub.publish(self.multi_traj)    
      
         else:
             # Initializing the robots
@@ -229,16 +238,49 @@ class Controller(Node):
         """
         DWA callback function, that uses the dynamic window approach algorithm. 
         """
+        predict_time = 2
+        dt = 0.1
         
-        # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
-        x = np.array([0.0, 0.0, math.pi / 8.0, 1.0, 0.0])
-        # goal position [x(m), y(m)]
-        goal = np.array([gx, gy])
-        # input [throttle, steer (delta)]
-        trajectory = np.array(x)
-        ob = config.ob
-        u, predicted_trajectory = dwa_control(x, config, goal, ob)
-        x = motion(x, u, config.dt)  # simulate robot
+        multi_control = MultiControl()
+        dilation_factor = 2
+        dilated_traj = []
+        for i in range(robot_num):
+            dilated_traj.append(Point(multi_state.multiple_state[i].x, multi_state.multiple_state[i].y).buffer(dilation_factor, cap_style=3))
+        
+        predicted_trajectory = np.zeros((robot_num, round(predict_time/dt)+1, 4))
+
+        for i in range(robot_num):
+            pose = multi_state.multiple_state[i]
+            if self.dist(point1=(pose.x, pose.y), point2=self.targets[i]) < L_d:
+                # self.get_logger().info("Updating the path for robot " + str(i))
+                self.paths[i] = self.update_path(self.paths[i])
+                self.targets[i] = (self.paths[i][0].x, self.paths[i][0].y)
+                if plot_traj:
+                    trajectory = predict_trajectory(pose, target)
+
+            ob = []
+            for idx in range(robot_num):
+                if idx == i:
+                    continue
+                point = Point(multi_state.multiple_state[idx].x, multi_state.multiple_state[idx].y).buffer(dilation_factor, cap_style=3)
+                ob.append(point)
+                ob.append(dilated_traj[idx])
+        
+            x1 = state_to_array(multi_state.multiple_state[i]).reshape(4)
+            u1, predicted_trajectory1 = dwa_control(x1, config, self.targets[i], ob)
+            line = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1]))
+            dilated = line.buffer(dilation_factor, cap_style=3)
+            dilated_traj[i] = dilated
+            # x1 = motion(x1, u1, config.dt)
+            # x[:, i] = x1
+            predicted_trajectory[i, :, :] = predicted_trajectory1
+
+            cmd = ControlInputs(throttle=float(u1[0]), delta=float(u1[1]))
+            multi_control.multi_control.append(cmd)
+        
+        self.multi_control_pub.publish(multi_control)
+
+    # trajectory = np.dstack([trajectory, x])
         
 
     def control_callback(self, pose: FullState, target, path, trajectory):
