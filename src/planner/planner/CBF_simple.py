@@ -81,10 +81,15 @@ def CBF(x, u_ref):
 
             Lf_h = 2 * x[3,i] * (np.cos(x[2,i]) * (x[0,i]-x[0,j]) + np.sin(x[2,i]) * (x[1,i] - x[1,j]))
             Lg_h = 2 * x[3,i] * (np.cos(x[2,i]) * (x[1,i]-x[1,j]) - np.sin(x[2,i]) * (x[0,i] - x[0,j]))
-            h = (x[0,i]-x[0,j]) * (x[0,i]-x[0,j]) + (x[1,i] - x[1,j]) * (x[1,i] - x[1,j]) - (safety_radius**2 + Kv * x[3,i])
+            h = (x[0,i]-x[0,j]) * (x[0,i]-x[0,j]) + (x[1,i] - x[1,j]) * (x[1,i] - x[1,j]) - (safety_radius**2 + Kv * abs(x[3,i]))
 
             H[count] = np.array([barrier_gain*np.power(h, 3) + Lf_h])
-            G[count,:] = np.array([Kv, -Lg_h])
+
+            if x[3,i] >= 0:
+                G[count,:] = np.array([Kv, -Lg_h])
+            else:
+                G[count,:] = np.array([-Kv, Lg_h])
+                
             count+=1
         
         # Add the input constraint
@@ -95,32 +100,44 @@ def CBF(x, u_ref):
 
         # Adding arena boundary constraints
         # Pos Y
-        h = ((x[1,i] - boundary_points[3])**2 - safety_radius**2 - Kv * x[3,i])
-        gradH = np.array([0, 2*(x[1,i] - boundary_points[3]), 0, -Kv])
+        h = ((x[1,i] - boundary_points[3])**2 - safety_radius**2 - Kv * abs(x[3,i]))
+        if x[3,i] >= 0:
+            gradH = np.array([0, 2*(x[1,i] - boundary_points[3]), 0, -Kv])
+        else:
+            gradH = np.array([0, 2*(x[1,i] - boundary_points[3]), 0, Kv])
         Lf_h = np.dot(gradH.T, f)
         Lg_h = np.dot(gradH.T, g)
         G = np.vstack([G, -Lg_h])
         H = np.vstack([H, np.array([0.1*h**3 + Lf_h])])
 
         # Neg Y
-        h = ((x[1,i] - boundary_points[2])**2 - safety_radius**2 - Kv * x[3,i])
-        gradH = np.array([0, 2*(x[1,i] - boundary_points[2]), 0, -Kv])
+        h = ((x[1,i] - boundary_points[2])**2 - safety_radius**2 - Kv * abs(x[3,i]))
+        if x[3,i] >= 0:
+            gradH = np.array([0, 2*(x[1,i] - boundary_points[2]), 0, -Kv])
+        else:
+            gradH = np.array([0, 2*(x[1,i] - boundary_points[2]), 0, Kv])
         Lf_h = np.dot(gradH.T, f)
         Lg_h = np.dot(gradH.T, g)
         G = np.vstack([G, -Lg_h])
         H = np.vstack([H, np.array([0.1*h**3 + Lf_h])])
 
         # Pos X
-        h = ((x[0,i] - boundary_points[1])**2 - safety_radius**2 - Kv * x[3,i])
-        gradH = np.array([2*(x[0,i] - boundary_points[1]), 0, 0, -Kv])
+        h = ((x[0,i] - boundary_points[1])**2 - safety_radius**2 - Kv * abs(x[3,i]))
+        if x[3,i] >= 0:
+            gradH = np.array([2*(x[0,i] - boundary_points[1]), 0, 0, -Kv])
+        else:
+            gradH = np.array([2*(x[0,i] - boundary_points[1]), 0, 0, Kv])
         Lf_h = np.dot(gradH.T, f)
         Lg_h = np.dot(gradH.T, g)
         G = np.vstack([G, -Lg_h])
         H = np.vstack([H, np.array([0.1*h**3 + Lf_h])])
 
         # Neg X
-        h = ((x[0,i] - boundary_points[0])**2 - safety_radius**2 - Kv * x[3,i])
-        gradH = np.array([2*(x[0,i] - boundary_points[0]), 0, 0, -Kv])
+        h = ((x[0,i] - boundary_points[0])**2 - safety_radius**2 - Kv * abs(x[3,i]))
+        if x[3,i] >= 0:
+            gradH = np.array([2*(x[0,i] - boundary_points[0]), 0, 0, -Kv])
+        else:
+            gradH = np.array([2*(x[0,i] - boundary_points[0]), 0, 0, Kv])
         Lf_h = np.dot(gradH.T, f)
         Lg_h = np.dot(gradH.T, g)
         G = np.vstack([G, -Lg_h])

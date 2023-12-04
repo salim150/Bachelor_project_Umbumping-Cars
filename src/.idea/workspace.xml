@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="01d53278-337c-4357-98da-edf174ee7419" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/bumper_cars/init.json" beforeDir="false" afterPath="$PROJECT_DIR$/bumper_cars/init.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bumper_cars/params.json" beforeDir="false" afterPath="$PROJECT_DIR$/bumper_cars/params.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/planner/DWA.py" beforeDir="false" afterPath="$PROJECT_DIR$/planner/planner/DWA.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 7
+}]]></component>
+  <component name="ProjectId" id="2YwY4caZV1vHaQ25PMFpMP1SHQP" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "dynamic__window__approach",
+    "last_opened_file_path": "/home/giacomo/thesis_ws/src/planner/planner/DWA_buf.py",
+    "two.files.diff.last.used.file": "/home/giacomo/thesis_ws/src/planner/planner/DWA_buf.py"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="01d53278-337c-4357-98da-edf174ee7419" name="Changes" comment="" />
+      <created>1701437918926</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1701437918926</updated>
+    </task>
+    <servers />
+  </component>
+</project>

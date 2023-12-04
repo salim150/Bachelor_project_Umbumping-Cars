@@ -40,7 +40,7 @@
         {
             "max_steer": 0.785398,
             "max_speed": 10,
-            "min_speed": -1.0,
+            "min_speed": 0.5,
             "L": 2.9, 
             "Cf": 320.0,
             "Cr": 340.0, 
