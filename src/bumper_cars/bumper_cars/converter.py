@@ -58,7 +58,7 @@ class Converter(Node):
         # self.pose_array_state.header.frame_id = "map"
         self.pose_array_steering = PoseArray()
         self.pose_array_steering.header.frame_id = "map"
-        self.marker_array = MarkerArray()
+        # self.marker_array = MarkerArray()
         if plot_traj:
             self.point_cloud = PointCloud()
 
@@ -68,15 +68,15 @@ class Converter(Node):
             #                                                  omega=omega[i], delta=0.0, throttle=0.0))
             steering = self.convert_to_steering_pose(FullState(x=x0[i], y=y0[i], yaw=yaw[i], v=v[i], omega=omega[i],
                                                              delta=0.0, throttle=0.0))
-            marker = self.convert_to_marker(FullState(x=x0[i], y=y0[i], yaw=yaw[i], v=v[i], omega=omega[i],
-                                                             delta=0.0, throttle=0.0), i)
+            # marker = self.convert_to_marker(FullState(x=x0[i], y=y0[i], yaw=yaw[i], v=v[i], omega=omega[i],
+            #                                                  delta=0.0, throttle=0.0), i)
             # self.pose_array_state.poses.append(pose)
             self.pose_array_steering.poses.append(steering)
-            self.marker_array.markers.append(marker)
+            # self.marker_array.markers.append(marker)
         
         # self.pose_array_pub = self.create_publisher(PoseArray, "/pose_array", 2)
         self.pose_array_steering_pub = self.create_publisher(PoseArray, "/pose_array_steering", 2)
-        self.marker_array_pub = self.create_publisher(MarkerArray, "/marker_array", 2)
+        # self.marker_array_pub = self.create_publisher(MarkerArray, "/marker_array", 2)
         self.point_cloud_pub = self.create_publisher(PointCloud, "/point_cloud", 2)
         self.timer = self.create_timer(timer_freq, self.timer_callback)
 
@@ -212,10 +212,10 @@ class Converter(Node):
         for idx, state in enumerate(multi_state_in.multiple_state):
             # pose = self.convert_to_pose(state)
             steering = self.convert_to_steering_pose(state)
-            marker = self.convert_to_marker(state, idx)
+            # marker = self.convert_to_marker(state, idx)
             # self.pose_array_state.poses.append(pose)
             self.pose_array_steering.poses.append(steering)
-            self.marker_array.markers.append(marker)
+            # self.marker_array.markers.append(marker)
 
             if plot_traj:
                 self.path_to_pointcloud(multi_trajectory_in.multiple_path[idx].path)
@@ -244,7 +244,7 @@ class Converter(Node):
         """
         # self.pose_array_pub.publish(self.pose_array_state)
         self.pose_array_steering_pub.publish(self.pose_array_steering)
-        self.marker_array_pub.publish(self.marker_array)
+        # self.marker_array_pub.publish(self.marker_array)
         if plot_traj:
             self.point_cloud_pub.publish(self.point_cloud)
 

@@ -3,6 +3,8 @@
 import rclpy
 from rclpy.node import Node
 from custom_message.msg import ControlInputs, State, Path, Coordinate, MultiplePaths, MultiState, MultiControl
+from visualization_msgs.msg import Marker, MarkerArray
+from geometry_msgs.msg import Pose, PoseArray, Point32
 import message_filters
 import random
 import math
@@ -76,7 +78,8 @@ class Controller(Node):
         self.heigth = height
             
         self.multi_control_pub = self.create_publisher(MultiControl, '/multi_control', 20)
-        self.multi_path_pub = self.create_publisher(MultiplePaths, "/robot_multi_traj", 2)
+        self.marker_array_pub = self.create_publisher(MarkerArray, "/marker_array", 2)
+        self.marker_array = MarkerArray()
         multi_state_sub = message_filters.Subscriber(self, MultiState, "/robot_multi_state")
 
         self.controller_type = controller_type
@@ -124,6 +127,7 @@ class Controller(Node):
             ts.registerCallback(self.general_pose_callback)
     
             if plot_traj:
+                self.multi_path_pub = self.create_publisher(MultiplePaths, "/robot_multi_traj", 2)
                 self.multi_path_pub.publish(self.multi_traj)  
      
 
@@ -193,6 +197,8 @@ class Controller(Node):
         Applies control barrier function (CBF) to ensure safety.
         """
         multi_control = MultiControl()
+        multi_control_buf = MultiControl()
+        self.marker_array = MarkerArray()
         for i in range(robot_num):
             if plot_traj:
                 cmd, self.paths[i], self.targets[i], self.multi_traj.multiple_path[i] = self.control_callback(multi_state.multiple_state[i], 
@@ -203,10 +209,24 @@ class Controller(Node):
             multi_control.multi_control.append(cmd)
         
         # Applying the CBF
+        multi_control_buf = multi_control
         multi_control = self.apply_CBF(multi_control=multi_control, multi_state=multi_state)
+
+        for i in range(robot_num):
+            if round(multi_control.multi_control[i].throttle, 2) != round(multi_control_buf.multi_control[i].throttle, 2) or round(multi_control.multi_control[i].delta,2) != round(multi_control_buf.multi_control[i].delta, 2):
+                # self.get_logger().info("CBF applied")
+                # self.get_logger().info("Throttle: " + str(multi_control.multi_control[i].throttle) + " Delta: " + str(multi_control.multi_control[i].delta))
+                # self.get_logger().info("Throttle buf: " + str(multi_control_buf.multi_control[i].throttle) + " Delta buf: " + str(multi_control_buf.multi_control[i].delta))
+                marker = self.convert_to_marker(multi_state.multiple_state[i], i, [0.0, 0.0, 1.0])
+            else:
+                # self.get_logger().info("CBF not applied")
+                marker = self.convert_to_marker(multi_state.multiple_state[i], i, [1.0, 0.0, 0.0])
+            
+            self.marker_array.markers.append(marker)
 
         # Publishing everything in the general callback to avoid deadlocks
         self.multi_control_pub.publish(multi_control)
+        self.marker_array_pub.publish(self.marker_array)
 
         if plot_traj:
             self.multi_path_pub.publish(self.multi_traj)
@@ -353,6 +373,78 @@ class Controller(Node):
             angle += 2.0 * np.pi
 
         return angle
+    
+    def convert_to_marker(self, state: FullState, idx, color):
+        """
+        Convert a robot state to a marker.
+
+        Input
+            :param state: The robot state.
+            :param idx: The index of the marker.
+
+        Output
+            :return marker: The converted marker.
+        """
+        marker = Marker()
+        marker.header.frame_id = "map"
+        marker.header.stamp = self.get_clock().now().to_msg()
+        marker.id = idx
+        marker.type = Marker.CUBE
+        marker.action = Marker.ADD
+        marker.pose = self.convert_to_pose(state)
+        # so that the marker is on the ground
+        marker.pose.position.z = 0.5
+        marker.scale.x = 2.9
+        marker.scale.y = 1.45
+        marker.scale.z = 1.0
+        marker.color.r = color[0]
+        marker.color.g = color[1]
+        marker.color.b = color[2]
+    
+        marker.color.a = 1.0
+        return marker
+    
+    def get_quaternion_from_euler(self, roll, pitch, yaw):
+        """
+        Convert an Euler angle to a quaternion.
+        
+        Input
+            :param roll: The roll (rotation around x-axis) angle in radians.
+            :param pitch: The pitch (rotation around y-axis) angle in radians.
+            :param yaw: The yaw (rotation around z-axis) angle in radians.
+        
+        Output
+            :return qx, qy, qz, qw: The orientation in quaternion [x,y,z,w] format
+        """
+        qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+        qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
+        qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
+        qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+        
+        return [qx, qy, qz, qw]
+        
+    def convert_to_pose(self, state: FullState):
+        """
+        Convert a robot state to a pose.
+
+        Input
+            :param state: The robot state.
+
+        Output
+            :return pose: The converted pose.
+        """
+        pose = Pose()
+        pose.position.x = state.x
+        pose.position.y = state.y
+        pose.position.z = 0.0
+
+        q = self.get_quaternion_from_euler(0, 0, state.yaw)
+        pose.orientation.x = q[0]
+        pose.orientation.y = q[1]
+        pose.orientation.z = q[2]
+        pose.orientation.w = q[3]
+        return pose
+
        
 def main(args=None):
     rclpy.init(args=args)
