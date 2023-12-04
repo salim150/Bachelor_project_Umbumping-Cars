@@ -152,15 +152,15 @@ def calc_control_and_trajectory(x, dw, goal, ob):
     best_u = [0.0, 0.0]
     best_trajectory = np.array([x])
     # evaluate all trajectory with sampled input in dynamic window
-    for a in np.arange(dw[0], dw[1], v_resolution):
-        for delta in np.arange(dw[2], dw[3], delta_resolution):
+    for a in np.arange(dw[0], dw[1]+v_resolution, v_resolution):
+        for delta in np.arange(dw[2], dw[3]+delta_resolution, delta_resolution):
             trajectory = predict_trajectory(x_init, a, delta)
             # calc cost
             to_goal_cost = to_goal_cost_gain * calc_to_goal_cost(trajectory, goal)
             speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
             ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory, ob)
             heading_cost = to_goal_cost_gain * calc_to_goal_heading_cost(trajectory, goal)
-            final_cost = to_goal_cost + speed_cost + ob_cost + heading_cost
+            final_cost = to_goal_cost + ob_cost + heading_cost + speed_cost
             # search minimum trajectory
             if min_cost >= final_cost:
                 min_cost = final_cost
@@ -180,7 +180,7 @@ def calc_obstacle_cost(trajectory, ob):
     calc obstacle cost inf: collision
     """
     line = LineString(zip(trajectory[:, 0], trajectory[:, 1]))
-    dilated = line.buffer(0.5, cap_style=3)
+    dilated = line.buffer(dilation_factor, cap_style=3)
 
     min_distance = np.inf
 
@@ -189,9 +189,9 @@ def calc_obstacle_cost(trajectory, ob):
 
     # check if the trajectory is out of bounds
     if any(element < -width_init/2 or element > width_init/2 for element in x):
-        return 10000
+        return np.inf
     if any(element < -height_init/2 or element > height_init/2 for element in y):
-        return 10000
+        return np.inf
 
     for obstacle in ob:
         if dilated.intersects(obstacle):
