@@ -51,7 +51,7 @@
             "speed_cost_gain": 0.5,
             "obstacle_cost_gain": 10,
             "robot_stuck_flag_cons": 0.001,
-            "dilation_factor": 1.5
+            "dilation_factor": 0.75
         },
     "Car_model":
         {

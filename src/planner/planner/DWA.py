@@ -54,6 +54,10 @@ timer_freq = json_object["timer_freq"]
 
 show_animation = True
 
+
+with open('/home/giacomo/thesis_ws/src/trajectories.json', 'r') as file:
+    data = json.load(file)
+
 def dwa_control(x, goal, ob):
     """
     Dynamic Window Approach control
@@ -100,6 +104,14 @@ def normalize_angle(angle):
         angle += 2.0 * np.pi
     return angle
 
+def rotateMatrix(a):
+    return np.array([[np.cos(a), -np.sin(a)], [np.sin(a), np.cos(a)]])
+
+def find_nearest(array, value):
+    array = np.asarray(array)
+    idx = (np.abs(array - value)).argmin()
+    return array[idx]
+
 def calc_dynamic_window(x):
     """
     calculation dynamic window based on current state x
@@ -123,11 +135,11 @@ def calc_dynamic_window(x):
     Vs = [min_acc, max_acc,
           -max_steer, max_steer]
     
-    Vd = [(min_speed - x[3])/0.1 , (max_speed - x[3])/0.1,
-          -max_steer, max_steer]
+    # Vd = [(min_speed - x[3])/0.1 , (max_speed - x[3])/0.1,
+    #       -max_steer, max_steer]
     
-    # dw = [Vs[0], Vs[1], Vs[2], Vs[3]]
-    dw = [max(Vs[0], Vd[0]), min(Vs[1], Vd[1]), max(Vs[2], Vd[2]), min(Vs[3], Vd[3])]
+    dw = [Vs[0], Vs[1], Vs[2], Vs[3]]
+    # dw = [max(Vs[0], Vd[0]), min(Vs[1], Vd[1]), max(Vs[2], Vd[2]), min(Vs[3], Vd[3])]
     return dw
 
 def predict_trajectory(x_init, a, delta):
@@ -153,17 +165,27 @@ def calc_control_and_trajectory(x, dw, goal, ob):
     min_cost = float("inf")
     best_u = [0.0, 0.0]
     best_trajectory = np.array([x])
+
     # evaluate all trajectory with sampled input in dynamic window
     old_time = time.time()
     for a in np.arange(dw[0], dw[1]+v_resolution, v_resolution):
         for delta in np.arange(dw[2], dw[3]+delta_resolution, delta_resolution):
-            trajectory = predict_trajectory(x_init, a, delta)
+
+            # old_time = time.time()
+            nearest = find_nearest(np.arange(min_speed, max_speed, 0.5), x[3])
+            geom = data[str(nearest)][str(a)][str(delta)]
+            geom = np.array(geom)
+            geom[:,0:2] = (geom[:,0:2]) @ rotateMatrix(np.radians(90)-x[2]) + [x[0],x[1]]
+            # print(time.time()-old_time)
+
+            # trajectory = predict_trajectory(x_init, a, delta)
+            trajectory = geom
             # calc cost
             to_goal_cost = to_goal_cost_gain * calc_to_goal_cost(trajectory, goal)
             speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
             ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory, ob)
             heading_cost = to_goal_cost_gain * calc_to_goal_heading_cost(trajectory, goal)
-            final_cost = to_goal_cost + ob_cost + heading_cost + speed_cost
+            final_cost = to_goal_cost + ob_cost# + heading_cost # + speed_cost
             # search minimum trajectory
             if min_cost >= final_cost:
                 min_cost = final_cost
