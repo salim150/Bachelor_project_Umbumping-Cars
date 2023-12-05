@@ -9,6 +9,8 @@ from custom_message.msg import ControlInputs
 from shapely.geometry import Point, Polygon, LineString
 from shapely import intersection, distance
 from shapely.plotting import plot_polygon, plot_line
+# for debugging
+import time
 
 path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
 # Opening JSON file
@@ -152,6 +154,7 @@ def calc_control_and_trajectory(x, dw, goal, ob):
     best_u = [0.0, 0.0]
     best_trajectory = np.array([x])
     # evaluate all trajectory with sampled input in dynamic window
+    old_time = time.time()
     for a in np.arange(dw[0], dw[1]+v_resolution, v_resolution):
         for delta in np.arange(dw[2], dw[3]+delta_resolution, delta_resolution):
             trajectory = predict_trajectory(x_init, a, delta)
@@ -173,7 +176,7 @@ def calc_control_and_trajectory(x, dw, goal, ob):
                     # best omega=0 rad/s (heading to the goal with
                     # angle difference of 0)
                     best_u[1] = -max_steer
-    
+    print(time.time()-old_time)
     return best_u, best_trajectory
 def calc_obstacle_cost(trajectory, ob):
     """
