@@ -181,11 +181,13 @@ def calc_control_and_trajectory(x, dw, goal, ob):
             # trajectory = predict_trajectory(x_init, a, delta)
             trajectory = geom
             # calc cost
+
             to_goal_cost = to_goal_cost_gain * calc_to_goal_cost(trajectory, goal)
-            speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
+            # speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
             ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory, ob)
-            heading_cost = to_goal_cost_gain * calc_to_goal_heading_cost(trajectory, goal)
+            # heading_cost = to_goal_cost_gain * calc_to_goal_heading_cost(trajectory, goal)
             final_cost = to_goal_cost + ob_cost# + heading_cost # + speed_cost
+            
             # search minimum trajectory
             if min_cost >= final_cost:
                 min_cost = final_cost
@@ -354,7 +356,7 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.rectangle):
        
         for i in range(N):
             dist_to_goal = math.hypot(x[0,i] - goal[0,i], x[1,i] - goal[1,i])
-            if dist_to_goal <= 5:
+            if dist_to_goal <= 1:
                 print("Goal!!")
                 break_flag = True
         
