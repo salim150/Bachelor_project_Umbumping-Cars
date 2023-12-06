@@ -167,7 +167,7 @@ def calc_control_and_trajectory(x, dw, goal, ob):
     best_trajectory = np.array([x])
 
     # evaluate all trajectory with sampled input in dynamic window
-    old_time = time.time()
+    # old_time = time.time()
     for a in np.arange(dw[0], dw[1]+v_resolution, v_resolution):
         for delta in np.arange(dw[2], dw[3]+delta_resolution, delta_resolution):
 
@@ -200,7 +200,7 @@ def calc_control_and_trajectory(x, dw, goal, ob):
                     # best omega=0 rad/s (heading to the goal with
                     # angle difference of 0)
                     best_u[1] = -max_steer
-    print(time.time()-old_time)
+    # print(time.time()-old_time)
     return best_u, best_trajectory
 def calc_obstacle_cost(trajectory, ob):
     """

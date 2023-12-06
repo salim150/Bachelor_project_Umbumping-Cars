@@ -50,11 +50,10 @@ width_init = json_object["width"]
 height_init = json_object["height"]
 N=3
 save_flag = False
-
+show_animation = True
+plot_flag = True
 robot_num = json_object["robot_num"]
 timer_freq = json_object["timer_freq"]
-
-show_animation = True
 
 class RobotType(Enum):
     circle = 0
@@ -138,8 +137,6 @@ def generate_trajectories(x_init):
     Generate trajectories
     """
     dw = calc_dynamic_window(x_init)
-    # print(np.arange(dw[0], dw[1]+v_resolution, v_resolution))
-    # print(np.arange(dw[2], dw[3]+delta_resolution, delta_resolution))
     traj = []
     u_total = []
     for a in np.arange(dw[0], dw[1]+v_resolution, v_resolution):
@@ -169,46 +166,42 @@ def main():
             x_init = np.array([0.0, 0.0, np.radians(90.0), v])
             traj, u_total = generate_trajectories(x_init)
 
-            # plt.plot(x_init[0], x_init[1], "xr")
-            # for trajectory in traj:
-            #     # for stopping simulation with the esc key.
-            #     plt.gcf().canvas.mpl_connect(
-            #         'key_release_event',
-            #         lambda event: [exit(0) if event.key == 'escape' else None])
-            #     plt.plot(trajectory[:, 0], trajectory[:, 1], "-g")
-            #     # plt.plot(x_goal[0], x_goal[1], "xb")
-            #     plt.grid(True)
-            #     plt.axis("equal")
+            if plot_flag:
+                plt.plot(x_init[0], x_init[1], "xr")
+                for trajectory in traj:
+                    # for stopping simulation with the esc key.
+                    plt.gcf().canvas.mpl_connect(
+                        'key_release_event',
+                        lambda event: [exit(0) if event.key == 'escape' else None])
+                    plt.plot(trajectory[:, 0], trajectory[:, 1], "-g")
+                    plt.grid(True)
+                    plt.axis("equal")
 
-            # plt.show()
+                plt.show()
 
-            # fig = plt.figure(1, dpi=90)
-            # ax = fig.add_subplot(111)
-
-            # for i in range(len(traj)):
-            #     plot_line(line, ax=ax, add_points=False, linewidth=3)
-            #     plot_polygon(dilated, ax=ax, add_points=False, alpha=0.5)
-            # plt.show()
+                fig = plt.figure(1, dpi=90)
+                ax = fig.add_subplot(111)
+                traj = np.array(traj)
+                for i in range(len(traj)):
+                    line = LineString(zip(traj[i, :, 0], traj[i, :, 1]))
+                    dilated = line.buffer(dilation_factor, cap_style=3, join_style=3)
+                    plot_line(line, ax=ax, add_points=False, linewidth=3)
+                    plot_polygon(dilated, ax=ax, add_points=False, alpha=0.5)
+                plt.show()
 
 
             traj = np.array(traj)
-            # dilated_traj = {}
             temp2 = {}
             for j in range(len(traj)):
                 temp2[u_total[j][0]] = {}
             
             for i in range(len(traj)):
-                # temp1 = {}
-                # print(u_total[i][0], u_total[i][1])
                 line = LineString(zip(traj[i, :, 0], traj[i, :, 1]))
                 dilated = line.buffer(dilation_factor, cap_style=3, join_style=3)
-                # temp1[u_total[i][1]] = dilated
                 coords = []
                 for idx in range(len(dilated.boundary.xy[0])):
                     coords.append([dilated.boundary.xy[0][idx], dilated.boundary.xy[1][idx]])
-                # temp2[u_total[i][0]][u_total[i][1]] = coords
                 temp2[u_total[i][0]][u_total[i][1]] = traj[i, :, :].tolist()
-                # dilated_traj[(u_total[i][0], u_total[i][1])] = dilated
             complete_trajectories[v] = temp2
         
         print(complete_trajectories)
@@ -253,18 +246,17 @@ def main():
     N=2
     break_flag = False
     v = np.arange(min_speed, max_speed, 0.5)
+
     # x = np.array([[0, 20, 15], [0, 0, 20], [0, np.pi, -np.pi/2], [0, 0, 0]])
     x = np.array([[0, 20], [0, 0], [0, np.pi], [0, 0]])
     goal = np.array([[30, 0], [10, 10]])
+    # goal = np.array([[30, 0, 15], [10, 10, 0]])
     u = np.zeros((2, N))
     
-    # goal = np.array([[30, 0, 15], [10, 10, 0]])
-
     # create a trajcetory array to store the trajectory of the N robots
     trajectory = np.zeros((x.shape[0], N, 1))
     # append the firt state to the trajectory
     trajectory[:, :, 0] = x
-    # trajectory = np.dstack([trajectory, x])
 
     predicted_trajectory = np.zeros((N, round(predict_time/dt)+1, x.shape[0]))
 
@@ -273,7 +265,6 @@ def main():
         dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
 
     # input [throttle, steer (delta)]
-    # robot_type = robot_type
     fig = plt.figure(1, dpi=90)
     ax = fig.add_subplot(111)
 
