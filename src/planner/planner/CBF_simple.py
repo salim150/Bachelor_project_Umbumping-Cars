@@ -63,6 +63,9 @@ def CBF(x, u_ref):
         G = np.zeros([N-1,M])
         H = np.zeros([N-1,1])
 
+        # when the car goes backwards the yaw angle should be flipped --> Why??
+        x[2,i] = (1-np.sign(x[3,i]))*(np.pi/2) + x[2,i]
+
         f = np.array([x[3,i]*np.cos(x[2,i]),
                           x[3,i]*np.sin(x[2,i]), 
                           0, 
@@ -88,7 +91,7 @@ def CBF(x, u_ref):
             if x[3,i] >= 0:
                 G[count,:] = np.array([Kv, -Lg_h])
             else:
-                G[count,:] = np.array([-Kv, Lg_h])
+                G[count,:] = np.array([-Kv, -Lg_h])
                 
             count+=1
         
@@ -105,6 +108,7 @@ def CBF(x, u_ref):
             gradH = np.array([0, 2*(x[1,i] - boundary_points[3]), 0, -Kv])
         else:
             gradH = np.array([0, 2*(x[1,i] - boundary_points[3]), 0, Kv])
+
         Lf_h = np.dot(gradH.T, f)
         Lg_h = np.dot(gradH.T, g)
         G = np.vstack([G, -Lg_h])

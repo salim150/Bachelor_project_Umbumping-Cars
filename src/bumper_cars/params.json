@@ -15,7 +15,7 @@
             "L": 2.9,
             "max_steer": 0.523599,
             "max_speed": 6,
-            "min_speed": 0.5,
+            "min_speed": -1.0,
             "max_acc": 400,
             "min_acc": -400,
             "dt": 0.1,
@@ -40,7 +40,7 @@
         {
             "max_steer": 0.785398,
             "max_speed": 10,
-            "min_speed": 0.5,
+            "min_speed": -1.0,
             "L": 2.9, 
             "Cf": 320.0,
             "Cr": 340.0, 
@@ -60,10 +60,10 @@
             "min_speed": -1,
             "controller_type": "random_goal"
         },
-    "robot_num": 10,
+    "robot_num": 4,
     "safety": 30, 
-    "width": 200,
-    "height": 200.0,
+    "width": 100,
+    "height": 100.0,
     "timer_freq": 0.01,
     "plot_traj": false
     
