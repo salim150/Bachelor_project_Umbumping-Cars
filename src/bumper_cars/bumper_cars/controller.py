@@ -341,8 +341,8 @@ class Controller(Node):
             dxu[0,i], dxu[1,i] = multi_control.multi_control[i].throttle, multi_control.multi_control[i].delta
             x[:,i] = state_to_array(multi_state.multiple_state[i]).reshape(4)
         
-        # dxu = CBF(x, dxu)
-        dxu = C3BF(x, dxu)
+        dxu = CBF(x, dxu)
+        # dxu = C3BF(x, dxu)
 
         multi_control = MultiControl()
         for i in range(robot_num):
