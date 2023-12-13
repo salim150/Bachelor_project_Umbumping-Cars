@@ -51,7 +51,7 @@ height_init = json_object["height"]
 N=3
 save_flag = False
 show_animation = True
-plot_flag = True
+plot_flag = False
 robot_num = json_object["robot_num"]
 timer_freq = json_object["timer_freq"]
 
@@ -199,8 +199,8 @@ def main():
                 line = LineString(zip(traj[i, :, 0], traj[i, :, 1]))
                 dilated = line.buffer(dilation_factor, cap_style=3, join_style=3)
                 coords = []
-                for idx in range(len(dilated.boundary.xy[0])):
-                    coords.append([dilated.boundary.xy[0][idx], dilated.boundary.xy[1][idx]])
+                for idx in range(len(dilated.exterior.coords)):
+                    coords.append([dilated.exterior.coords[idx][0], dilated.exterior.coords[idx][1]])
                 temp2[u_total[i][0]][u_total[i][1]] = traj[i, :, :].tolist()
             complete_trajectories[v] = temp2
         
@@ -243,14 +243,15 @@ def main():
 
     print("Starting the simulation!")
     iterations = 3000
-    N=2
+    N=3
     break_flag = False
     v = np.arange(min_speed, max_speed, 0.5)
 
-    # x = np.array([[0, 20, 15], [0, 0, 20], [0, np.pi, -np.pi/2], [0, 0, 0]])
-    x = np.array([[0, 20], [0, 0], [0, np.pi], [0, 0]])
-    goal = np.array([[30, 0], [10, 10]])
-    # goal = np.array([[30, 0, 15], [10, 10, 0]])
+    x = np.array([[0, 20, 15], [0, 0, 20], [0, np.pi, -np.pi/2], [0, 0, 0]])
+    goal = np.array([[30, 0, 15], [10, 10, 0]])
+    # x = np.array([[0, 20], [0, 0], [0, np.pi], [0, 0]])
+    # goal = np.array([[30, 0], [10, 10]])
+    
     u = np.zeros((2, N))
     
     # create a trajcetory array to store the trajectory of the N robots

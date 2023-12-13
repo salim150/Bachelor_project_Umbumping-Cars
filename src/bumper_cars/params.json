@@ -55,7 +55,7 @@
             "max_steer": 0.785398,
             "max_speed": 10,
             "min_speed": -1.0,
-            "L": 2.9, 
+            "L": 1.0, 
             "Cf": 320.0,
             "Cr": 340.0, 
             "Iz": 225.0,
@@ -66,7 +66,7 @@
     "Controller":
         {
             "max_steer": 0.785398,
-            "WB": 1.45,
+            "WB": 0.7,
             "L_d": 20,
             "max_acc": 5,
             "min_acc": -5,
@@ -75,9 +75,10 @@
             "controller_type": "DWA"
         },
     "robot_num": 4,
-    "safety": 30, 
-    "width": 100,
-    "height": 100.0,
+    "safety": 10, 
+    "min_dist": 5,
+    "width": 30,
+    "height": 30,
     "timer_freq": 0.01,
     "plot_traj": false
     
