@@ -30,6 +30,7 @@ predict_time = json_object["DWA"]["predict_time"] # [s]
 to_goal_cost_gain = json_object["DWA"]["to_goal_cost_gain"]
 speed_cost_gain = json_object["DWA"]["speed_cost_gain"]
 obstacle_cost_gain = json_object["DWA"]["obstacle_cost_gain"]
+heading_cost_gain = json_object["DWA"]["heading_cost_gain"]
 robot_stuck_flag_cons = json_object["DWA"]["robot_stuck_flag_cons"]
 dilation_factor = json_object["DWA"]["dilation_factor"]
 L = json_object["Car_model"]["L"]  # [m] Wheel base of vehicle
@@ -172,7 +173,7 @@ def calc_control_and_trajectory(x, dw, goal, ob):
         for delta in np.arange(dw[2], dw[3]+delta_resolution, delta_resolution):
 
             # old_time = time.time()
-            nearest = find_nearest(np.arange(min_speed, max_speed, 0.5), x[3])
+            nearest = find_nearest(np.arange(min_speed, max_speed, v_resolution), x[3])
             geom = data[str(nearest)][str(a)][str(delta)]
             geom = np.array(geom)
             geom[:,0:2] = (geom[:,0:2]) @ rotateMatrix(np.radians(90)-x[2]) + [x[0],x[1]]
@@ -183,10 +184,10 @@ def calc_control_and_trajectory(x, dw, goal, ob):
             # calc cost
 
             to_goal_cost = to_goal_cost_gain * calc_to_goal_cost(trajectory, goal)
-            # speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
+            speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
             ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory, ob)
-            # heading_cost = to_goal_cost_gain * calc_to_goal_heading_cost(trajectory, goal)
-            final_cost = to_goal_cost + ob_cost# + heading_cost # + speed_cost
+            heading_cost = heading_cost_gain * calc_to_goal_heading_cost(trajectory, goal)
+            final_cost = to_goal_cost + ob_cost# + speed_cost + heading_cost 
             
             # search minimum trajectory
             if min_cost >= final_cost:
@@ -290,8 +291,11 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.rectangle):
     # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
     iterations = 3000
     break_flag = False
-    x = np.array([[0, 20, 15], [0, 0, 20], [0, np.pi, -np.pi/2], [0, 0, 0]])
+    x = np.array([[0, 10, 10], [0, 0, 10], [0, np.pi, -np.pi/2], [0, 0, 0]])
     goal = np.array([[30, 0, 15], [10, 10, 0]])
+    # x = np.array([[0, 20], [0, 0], [0, np.pi], [0, 0]])
+    # goal = np.array([[30, 0], [10, 10]])
+
     # goal2 = np.array([0, 10])
     cmd1 = ControlInputs()
     cmd2 = ControlInputs()
@@ -302,7 +306,8 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.rectangle):
     trajectory[:, :, 0] = x
     # trajectory = np.dstack([trajectory, x])
 
-    predicted_trajectory = np.zeros((N, round(predict_time/dt)+1, x.shape[0]))
+    # predicted_trajectory = np.zeros((N, round(predict_time/dt)+1, x.shape[0]))
+    predicted_trajectory = np.zeros((N, 12, x.shape[0]))
 
     dilated_traj = []
     for i in range(N):

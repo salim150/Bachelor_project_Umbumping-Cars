@@ -110,6 +110,7 @@ class Controller(Node):
             # Initializing the robots
             self.paths = []
             self.targets = []
+            self.dilated_traj = []
             if plot_traj:
                 self.multi_traj = MultiplePaths()
             multi_control = MultiControl()
@@ -117,6 +118,7 @@ class Controller(Node):
             for i in range(robot_num):
                 self.paths.append(self.create_path())
                 self.targets.append([self.paths[i][0].x, self.paths[i][0].y])
+                self.dilated_traj.append(Point(x0[i], y0[i]).buffer(dilation_factor, cap_style=3))
                 initial_state = State(x=x0[i], y=y0[i], yaw=yaw[i], v=v[i], omega=omega[i])
                 if plot_traj:
                     self.multi_traj.multiple_path.append(predict_trajectory(initial_state, self.targets[i]))
@@ -262,11 +264,12 @@ class Controller(Node):
         dt = 0.1
 
         multi_control = MultiControl()
-        dilation_factor = 2
-        dilated_traj = []
-        for i in range(robot_num):
-            dilated_traj.append(Point(multi_state.multiple_state[i].x, multi_state.multiple_state[i].y).buffer(dilation_factor, cap_style=3))
+        # dilation_factor = 2
+        # dilated_traj = []
+        # for i in range(robot_num):
+        #     dilated_traj.append(Point(multi_state.multiple_state[i].x, multi_state.multiple_state[i].y).buffer(dilation_factor, cap_style=3))
         
+
         # predicted_trajectory = np.zeros((robot_num, round(predict_time/dt)+1, 4))
 
         for i in range(robot_num):
@@ -284,13 +287,14 @@ class Controller(Node):
                     continue
                 point = Point(multi_state.multiple_state[idx].x, multi_state.multiple_state[idx].y).buffer(dilation_factor, cap_style=3)
                 ob.append(point)
-                ob.append(dilated_traj[idx])
+                if len(self.dilated_traj)>0:
+                    ob.append(self.dilated_traj[idx])
         
             x1 = state_to_array(multi_state.multiple_state[i]).reshape(4)
             u1, predicted_trajectory1 = dwa_control(x1, self.targets[i], ob)
             line = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1]))
             dilated = line.buffer(dilation_factor, cap_style=3)
-            dilated_traj[i] = dilated
+            self.dilated_traj[i] = dilated
             # x1 = motion(x1, u1, config.dt)
             # x[:, i] = x1
             # predicted_trajectory[i, :, :] = predicted_trajectory1

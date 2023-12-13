@@ -37,7 +37,7 @@ Visualization Manager:
   Class: ""
   Displays:
     - Alpha: 0.5
-      Cell Size: 10
+      Cell Size: 1
       Class: rviz_default_plugins/Grid
       Color: 160; 160; 164
       Enabled: true
@@ -51,65 +51,23 @@ Visualization Manager:
         Y: 0
         Z: 0
       Plane: XY
-      Plane Cell Count: 20
+      Plane Cell Count: 30
       Reference Frame: <Fixed Frame>
       Value: true
     - Class: rviz_default_plugins/TF
-      Enabled: true
+      Enabled: false
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        map:
-          Value: true
-        robot_frame_0:
-          Value: true
-        robot_frame_1:
-          Value: true
-        robot_frame_2:
-          Value: true
-        robot_frame_3:
-          Value: true
-        robot_frame_4:
-          Value: true
-        robot_frame_5:
-          Value: true
-        robot_frame_6:
-          Value: true
-        robot_frame_7:
-          Value: true
-        robot_frame_8:
-          Value: true
-        robot_frame_9:
-          Value: true
       Marker Scale: 10
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
       Tree:
-        map:
-          robot_frame_0:
-            {}
-          robot_frame_1:
-            {}
-          robot_frame_2:
-            {}
-          robot_frame_3:
-            {}
-          robot_frame_4:
-            {}
-          robot_frame_5:
-            {}
-          robot_frame_6:
-            {}
-          robot_frame_7:
-            {}
-          robot_frame_8:
-            {}
-          robot_frame_9:
-            {}
+        {}
       Update Interval: 0
-      Value: true
+      Value: false
     - Alpha: 1
       Arrow Length: 3
       Axes Length: 0.30000001192092896
@@ -244,16 +202,16 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 301.6768493652344
+      Distance: 42.954345703125
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -2.9011502265930176
-        Y: 15.127238273620605
-        Z: -1.5448600053787231
+        X: 5.681985855102539
+        Y: -0.8033283352851868
+        Z: -1.5608582496643066
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
@@ -262,7 +220,7 @@ Visualization Manager:
       Pitch: 1.5697963237762451
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.720394611358643
+      Yaw: 4.700394153594971
     Saved: ~
 Window Geometry:
   Displays:

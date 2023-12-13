@@ -36,24 +36,25 @@
     "DWA":
         {
             "max_steer": 0.785398,
-            "max_speed": 6,
+            "max_speed": 2,
             "min_speed": -1.0,
             "max_acc": 2,
             "min_acc": -2,
-            "v_resolution": 1.0,
+            "v_resolution": 0.5,
             "delta_resolution": 15,
             "dt": 0.1,
-            "predict_time": 2,
-            "to_goal_cost_gain": 1.0,
-            "speed_cost_gain": 0.5,
-            "obstacle_cost_gain": 10,
+            "predict_time": 1,
+            "to_goal_cost_gain": 0.5,
+            "speed_cost_gain": 1,
+            "obstacle_cost_gain": 100,
+            "heading_cost_gain": 1,
             "robot_stuck_flag_cons": 0.001,
-            "dilation_factor": 0.75
+            "dilation_factor": 0.35
         },
     "Car_model":
         {
             "max_steer": 0.785398,
-            "max_speed": 10,
+            "max_speed": 2,
             "min_speed": -1.0,
             "L": 1.0, 
             "Cf": 320.0,
@@ -70,7 +71,7 @@
             "L_d": 20,
             "max_acc": 5,
             "min_acc": -5,
-            "max_speed": 10,
+            "max_speed": 2,
             "min_speed": -1,
             "controller_type": "DWA"
         },

@@ -49,7 +49,7 @@ safety_init = json_object["safety"]
 width_init = json_object["width"]
 height_init = json_object["height"]
 N=3
-save_flag = False
+save_flag = True
 show_animation = True
 plot_flag = False
 robot_num = json_object["robot_num"]
@@ -204,7 +204,7 @@ def main():
                 temp2[u_total[i][0]][u_total[i][1]] = traj[i, :, :].tolist()
             complete_trajectories[v] = temp2
         
-        print(complete_trajectories)
+        # print(complete_trajectories)
         
         # saving the complete trajectories to a csv file
         with open('trajectories.json', 'w') as file:
@@ -243,14 +243,14 @@ def main():
 
     print("Starting the simulation!")
     iterations = 3000
-    N=3
+    N=2
     break_flag = False
     v = np.arange(min_speed, max_speed, 0.5)
 
-    x = np.array([[0, 20, 15], [0, 0, 20], [0, np.pi, -np.pi/2], [0, 0, 0]])
-    goal = np.array([[30, 0, 15], [10, 10, 0]])
-    # x = np.array([[0, 20], [0, 0], [0, np.pi], [0, 0]])
-    # goal = np.array([[30, 0], [10, 10]])
+    # x = np.array([[0, 20, 15], [0, 0, 20], [0, np.pi, -np.pi/2], [0, 0, 0]])
+    # goal = np.array([[30, 0, 15], [10, 10, 0]])
+    x = np.array([[0, 20], [0, 0], [0, np.pi], [0, 0]])
+    goal = np.array([[30, 0], [10, 10]])
     
     u = np.zeros((2, N))
     
