@@ -84,8 +84,8 @@ def generate_last_state(s, km, kf, k0):
     kp = [fkp(ti) for ti in t]
     dt = time / n
 
-    #  plt.plot(t, kp)
-    #  plt.show()
+    # plt.plot(t, kp)
+    # plt.show()
 
     state = State()
 

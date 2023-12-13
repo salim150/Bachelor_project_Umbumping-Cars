@@ -124,7 +124,7 @@ def optimize_trajectory(target, k0, p):
         alpha = selection_learning_param(dp, p, k0, target)
 
         p += alpha * np.array(dp)
-        #  print(p.T)
+        # print(p.T)
 
         if show_animation:  # pragma: no cover
             show_trajectory(target, xc, yc)
@@ -137,11 +137,12 @@ def optimize_trajectory(target, k0, p):
 
 def optimize_trajectory_demo():  # pragma: no cover
 
-    #  target = motion_model.State(x=5.0, y=2.0, yaw=np.deg2rad(00.0))
+    # target = motion_model.State(x=5.0, y=2.0, yaw=np.deg2rad(00.0))
     target = motion_model.State(x=5.0, y=2.0, yaw=np.deg2rad(90.0))
     k0 = 0.0
 
     init_p = np.array([6.0, 0.0, 0.0]).reshape(3, 1)
+    # init_p = np.array([5.84663478, 0.20309538, 0.68336985]).reshape(3, 1)
 
     x, y, yaw, p = optimize_trajectory(target, k0, init_p)
 
