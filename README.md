@@ -29,7 +29,7 @@ This repository contains the code and documentation for my master's thesis proje
 ## Project Structure
 
 Describe the structure of your project. Highlight the main directories and their purposes.
-<img src="./rosgraph.svg" alt="Project Structure" width="500" height="300">
+<img src="./rosgraph.png" alt="Project Structure" style="width:100%;">
 
 ## Dependencies
 
