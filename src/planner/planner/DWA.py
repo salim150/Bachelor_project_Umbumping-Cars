@@ -19,8 +19,8 @@ with open(path, 'r') as openfile:
     json_object = json.load(openfile)
 
 max_steer = json_object["DWA"]["max_steer"] # [rad] max steering angle
-max_speed = json_object["DWA"]["max_speed"] # [m/s]
-min_speed = json_object["DWA"]["min_speed"] # [m/s]
+max_speed = json_object["Car_model"]["max_speed"] # [m/s]
+min_speed = json_object["Car_model"]["min_speed"] # [m/s]
 v_resolution = json_object["DWA"]["v_resolution"] # [m/s]
 delta_resolution = math.radians(json_object["DWA"]["delta_resolution"])# [rad/s]
 max_acc = json_object["DWA"]["max_acc"] # [m/ss]
@@ -187,7 +187,7 @@ def calc_control_and_trajectory(x, dw, goal, ob):
             speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
             ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory, ob)
             heading_cost = heading_cost_gain * calc_to_goal_heading_cost(trajectory, goal)
-            final_cost = to_goal_cost + ob_cost# + speed_cost + heading_cost 
+            final_cost = to_goal_cost + ob_cost # + heading_cost #+ speed_cost 
             
             # search minimum trajectory
             if min_cost >= final_cost:
@@ -252,8 +252,8 @@ def calc_to_goal_heading_cost(trajectory, goal):
     dy = goal[1] - trajectory[-1, 1]
 
     # either using the angle difference or the distance --> if we want to use the angle difference, we need to normalize the angle before taking the difference
-    error_angle = math.atan2(dy, dx)
-    cost_angle = error_angle - trajectory[-1, 2]
+    error_angle = normalize_angle(math.atan2(dy, dx))
+    cost_angle = error_angle - normalize_angle(trajectory[-1, 2])
     cost = abs(math.atan2(math.sin(cost_angle), math.cos(cost_angle)))
 
     return cost

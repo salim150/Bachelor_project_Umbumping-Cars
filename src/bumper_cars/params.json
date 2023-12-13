@@ -12,32 +12,28 @@
     "CBF_simple":
         {
             "max_steer": 0.523599,
-            "max_speed": 6,
-            "min_speed": -1.0,
-            "max_acc": 400,
-            "min_acc": -400,
+            "max_acc": 100,
+            "min_acc": -100,
             "dt": 0.1,
-            "safety_radius": 6,
-            "barrier_gain": 0.00001, 
+            "safety_radius": 1.5,
+            "barrier_gain": 0.1, 
+            "arena_gain": 0.001,
             "Kv": 0.1
         },
     "C3BF":
         {
             "max_steer": 0.785398,
-            "max_speed": 10,
-            "min_speed": -1.0,
-            "max_acc": 60,
-            "min_acc": -60,
+            "max_acc": 100,
+            "min_acc": -100,
             "dt": 0.1,
-            "safety_radius": 5,
+            "safety_radius": 1.5,
             "barrier_gain": 1, 
-            "Kv": 20
+            "arena_gain": 0.01,
+            "Kv": 0.1
         },
     "DWA":
         {
             "max_steer": 0.785398,
-            "max_speed": 2,
-            "min_speed": -1.0,
             "max_acc": 2,
             "min_acc": -2,
             "v_resolution": 0.5,
@@ -46,7 +42,7 @@
             "predict_time": 1,
             "to_goal_cost_gain": 0.5,
             "speed_cost_gain": 1,
-            "obstacle_cost_gain": 100,
+            "obstacle_cost_gain": 30,
             "heading_cost_gain": 1,
             "robot_stuck_flag_cons": 0.001,
             "dilation_factor": 0.35
@@ -73,10 +69,10 @@
             "min_acc": -5,
             "max_speed": 2,
             "min_speed": -1,
-            "controller_type": "DWA"
+            "controller_type": "random_goal"
         },
     "robot_num": 4,
-    "safety": 10, 
+    "safety": 20, 
     "min_dist": 5,
     "width": 30,
     "height": 30,

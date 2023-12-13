@@ -19,8 +19,8 @@ with open(path, 'r') as openfile:
     json_object = json.load(openfile)
 
 max_steer = json_object["CBF_simple"]["max_steer"]   # [rad] max steering angle
-max_speed = json_object["CBF_simple"]["max_speed"] # [m/s]
-min_speed = json_object["CBF_simple"]["min_speed"]  # [m/s]
+max_speed = json_object["Car_model"]["max_speed"] # [m/s]
+min_speed = json_object["Car_model"]["min_speed"]  # [m/s]
 dt = json_object["CBF_simple"]["dt"] 
 L = json_object["Car_model"]["L"] # [m] Wheel base of vehicle
 Lr = L / 2.0  # [m]

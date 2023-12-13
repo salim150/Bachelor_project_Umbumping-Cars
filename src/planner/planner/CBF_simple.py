@@ -22,14 +22,14 @@ with open(path, 'r') as openfile:
 
 L = json_object["Car_model"]["L"]
 max_steer = json_object["CBF_simple"]["max_steer"]  # [rad] max steering angle
-max_speed = json_object["CBF_simple"]["max_speed"] # [m/s]
-min_speed = json_object["CBF_simple"]["min_speed"] # [m/s]
-magnitude_limit= json_object["CBF_simple"]["max_speed"] 
+max_speed = json_object["Car_model"]["max_speed"] # [m/s]
+min_speed = json_object["Car_model"]["min_speed"] # [m/s]
 max_acc = json_object["CBF_simple"]["max_acc"] 
 min_acc = json_object["CBF_simple"]["min_acc"] 
 dt = json_object["CBF_simple"]["dt"]
 safety_radius = json_object["CBF_simple"]["safety_radius"]
 barrier_gain = json_object["CBF_simple"]["barrier_gain"]
+arena_gain = json_object["CBF_simple"]["arena_gain"]
 Kv = json_object["CBF_simple"]["Kv"] # interval [0.5-1]
 Lr = L / 2.0  # [m]
 Lf = L - Lr
@@ -98,8 +98,8 @@ def CBF(x, u_ref):
         # Add the input constraint
         G = np.vstack([G, [[0, 1], [0, -1]]])
         H = np.vstack([H, delta_to_beta(max_steer), -delta_to_beta(-max_steer)])
-        # G = np.vstack([G, [[1, 0], [-1, 0]]])
-        # H = np.vstack([H, max_acc, -min_acc])
+        G = np.vstack([G, [[1, 0], [-1, 0]]])
+        H = np.vstack([H, max_acc, -min_acc])
 
         # Adding arena boundary constraints
         # Pos Y
@@ -112,7 +112,7 @@ def CBF(x, u_ref):
         Lf_h = np.dot(gradH.T, f)
         Lg_h = np.dot(gradH.T, g)
         G = np.vstack([G, -Lg_h])
-        H = np.vstack([H, np.array([0.1*h**3 + Lf_h])])
+        H = np.vstack([H, np.array([arena_gain*h**3 + Lf_h])])
 
         # Neg Y
         h = ((x[1,i] - boundary_points[2])**2 - safety_radius**2 - Kv * abs(x[3,i]))
@@ -123,7 +123,7 @@ def CBF(x, u_ref):
         Lf_h = np.dot(gradH.T, f)
         Lg_h = np.dot(gradH.T, g)
         G = np.vstack([G, -Lg_h])
-        H = np.vstack([H, np.array([0.1*h**3 + Lf_h])])
+        H = np.vstack([H, np.array([arena_gain*h**3 + Lf_h])])
 
         # Pos X
         h = ((x[0,i] - boundary_points[1])**2 - safety_radius**2 - Kv * abs(x[3,i]))
@@ -134,7 +134,7 @@ def CBF(x, u_ref):
         Lf_h = np.dot(gradH.T, f)
         Lg_h = np.dot(gradH.T, g)
         G = np.vstack([G, -Lg_h])
-        H = np.vstack([H, np.array([0.1*h**3 + Lf_h])])
+        H = np.vstack([H, np.array([arena_gain*h**3 + Lf_h])])
 
         # Neg X
         h = ((x[0,i] - boundary_points[0])**2 - safety_radius**2 - Kv * abs(x[3,i]))
@@ -145,11 +145,7 @@ def CBF(x, u_ref):
         Lf_h = np.dot(gradH.T, f)
         Lg_h = np.dot(gradH.T, g)
         G = np.vstack([G, -Lg_h])
-        H = np.vstack([H, np.array([0.1*h**3 + Lf_h])])
-        
-        """G = np.vstack([G, np.identity(M)])
-        G = np.vstack([G, -np.identity(M)])
-        H = np.vstack([H, max_acc, delta_to_beta(max_steer), -min_acc, -delta_to_beta(-max_steer)]) """ 
+        H = np.vstack([H, np.array([arena_gain*h**3 + Lf_h])])
         
         solvers.options['show_progress'] = False
         sol = solvers.qp(matrix(P), matrix(q), matrix(G), matrix(H))

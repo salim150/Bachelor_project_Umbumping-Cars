@@ -19,14 +19,9 @@ with open(path, 'r') as openfile:
     json_object = json.load(openfile)
 
 controller_type = json_object["Controller"]["controller_type"]
-if controller_type == 'DWA':
-    max_steer = json_object["DWA"]["max_steer"] # [rad] max steering angle
-    max_speed = json_object["DWA"]["max_speed"] # [m/s]
-    min_speed = json_object["DWA"]["min_speed"] # [m/s]
-else:
-    max_steer = json_object["Car_model"]["max_steer"] # [rad] max steering angle
-    max_speed = json_object["Car_model"]["max_speed"] # [m/s]
-    min_speed = json_object["Car_model"]["min_speed"] # [m/s]
+max_steer = json_object["Car_model"]["max_steer"] # [rad] max steering angle
+max_speed = json_object["Car_model"]["max_speed"] # [m/s]
+min_speed = json_object["Car_model"]["min_speed"] # [m/s]
 L = json_object["Car_model"]["L"]  # [m] Wheel base of vehicle
 Lr = L / 2.0  # [m]
 Lf = L - Lr

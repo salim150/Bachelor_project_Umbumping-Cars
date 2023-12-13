@@ -34,8 +34,8 @@ L_d = json_object["Controller"]["L_d"]  # [m] look-ahead distance
 max_steer = json_object["Controller"]["max_steer"]  # [rad] max steering angle
 max_acc = json_object["Controller"]["max_acc"]  # [rad] max acceleration
 min_acc = json_object["Controller"]["min_acc"]  # [rad] min acceleration
-max_speed = json_object["Controller"]["max_speed"]  # [rad] max speed
-min_speed = json_object["Controller"]["min_speed"]  # [rad] min speed
+max_speed = json_object["Car_model"]["max_speed"]  # [rad] max speed
+min_speed = json_object["Car_model"]["min_speed"]  # [rad] min speed
 controller_type = json_object["Controller"]["controller_type"]
 debug = False
 robot_num = json_object["robot_num"]
@@ -470,8 +470,8 @@ class Controller(Node):
         marker.pose = self.convert_to_pose(state)
         # so that the marker is on the ground
         marker.pose.position.z = 0.5
-        marker.scale.x = 2.9
-        marker.scale.y = 1.45
+        marker.scale.x = L
+        marker.scale.y = WB
         marker.scale.z = 1.0
         marker.color.r = color[0]
         marker.color.g = color[1]

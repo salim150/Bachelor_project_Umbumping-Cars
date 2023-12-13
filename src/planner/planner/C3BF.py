@@ -24,14 +24,14 @@ with open(path, 'r') as openfile:
 
 L = json_object["Car_model"]["L"]
 max_steer = json_object["C3BF"]["max_steer"]  # [rad] max steering angle
-max_speed = json_object["C3BF"]["max_speed"] # [m/s]
-min_speed = json_object["C3BF"]["min_speed"] # [m/s]
-magnitude_limit= json_object["C3BF"]["max_speed"] 
+max_speed = json_object["Car_model"]["max_speed"] # [m/s]
+min_speed = json_object["Car_model"]["min_speed"] # [m/s]
 max_acc = json_object["C3BF"]["max_acc"] 
 min_acc = json_object["C3BF"]["min_acc"] 
 dt = json_object["C3BF"]["dt"]
 safety_radius = json_object["C3BF"]["safety_radius"]
 barrier_gain = json_object["C3BF"]["barrier_gain"]
+arena_gain = json_object["C3BF"]["arena_gain"]
 Kv = json_object["C3BF"]["Kv"] # interval [0.5-1]
 Lr = L / 2.0  # [m]
 Lf = L - Lr
@@ -64,6 +64,9 @@ def C3BF(x, u_ref):
         count = 0
         G = np.zeros([N-1,M])
         H = np.zeros([N-1,1])
+
+        # when the car goes backwards the yaw angle should be flipped --> Why??
+        x[2,i] = (1-np.sign(x[3,i]))*(np.pi/2) + x[2,i]
 
         f = np.array([x[3,i]*np.cos(x[2,i]),
                           x[3,i]*np.sin(x[2,i]), 
@@ -150,35 +153,47 @@ def C3BF(x, u_ref):
         # Adding arena boundary constraints
         # Pos Y
         h = ((x[1,i] - boundary_points[3])**2 - safety_radius**2 - Kv * abs(x[3,i]))
-        gradH = np.array([0, 2*(x[1,i] - boundary_points[3]), 0, -Kv])
+        if x[3,i] >= 0:
+            gradH = np.array([0, 2*(x[1,i] - boundary_points[3]), 0, -Kv])
+        else:
+            gradH = np.array([0, 2*(x[1,i] - boundary_points[3]), 0, Kv])
         Lf_h = np.dot(gradH.T, f)
         Lg_h = np.dot(gradH.T, g)
         G = np.vstack([G, -Lg_h])
-        H = np.vstack([H, np.array([0.001*h**3 + Lf_h])])
+        H = np.vstack([H, np.array([arena_gain*h**3 + Lf_h])])
         
         # Neg Y
         h = ((x[1,i] - boundary_points[2])**2 - safety_radius**2 - Kv * abs(x[3,i]))
-        gradH = np.array([0, 2*(x[1,i] - boundary_points[2]), 0, -Kv])
+        if x[3,i] >= 0:
+            gradH = np.array([0, 2*(x[1,i] - boundary_points[2]), 0, -Kv])
+        else:
+            gradH = np.array([0, 2*(x[1,i] - boundary_points[2]), 0, Kv])
         Lf_h = np.dot(gradH.T, f)
         Lg_h = np.dot(gradH.T, g)
         G = np.vstack([G, -Lg_h])
-        H = np.vstack([H, np.array([0.001*h**3 + Lf_h])])
+        H = np.vstack([H, np.array([arena_gain*h**3 + Lf_h])])
         
         # Pos X
         h = ((x[0,i] - boundary_points[1])**2 - safety_radius**2 - Kv * abs(x[3,i]))
-        gradH = np.array([2*(x[0,i] - boundary_points[1]), 0, 0, -Kv])
+        if x[3,i] >= 0:
+            gradH = np.array([2*(x[0,i] - boundary_points[1]), 0, 0, -Kv])
+        else:
+            gradH = np.array([2*(x[0,i] - boundary_points[1]), 0, 0, Kv])
         Lf_h = np.dot(gradH.T, f)
         Lg_h = np.dot(gradH.T, g)
         G = np.vstack([G, -Lg_h])
-        H = np.vstack([H, np.array([0.001*h**3 + Lf_h])])
+        H = np.vstack([H, np.array([arena_gain*h**3 + Lf_h])])
 
         # Neg X
         h = ((x[0,i] - boundary_points[0])**2 - safety_radius**2 - Kv * abs(x[3,i]))
-        gradH = np.array([2*(x[0,i] - boundary_points[0]), 0, 0, -Kv])
+        if x[3,i] >= 0:
+            gradH = np.array([2*(x[0,i] - boundary_points[0]), 0, 0, -Kv])
+        else:
+            gradH = np.array([2*(x[0,i] - boundary_points[0]), 0, 0, Kv])
         Lf_h = np.dot(gradH.T, f)
         Lg_h = np.dot(gradH.T, g)
         G = np.vstack([G, -Lg_h])
-        H = np.vstack([H, np.array([0.001*h**3 + Lf_h])])
+        H = np.vstack([H, np.array([arena_gain*h**3 + Lf_h])])
         
         # Input constraints
         G = np.vstack([G, [[0, 1], [0, -1]]])
