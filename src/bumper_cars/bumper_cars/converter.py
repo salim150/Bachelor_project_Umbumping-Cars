@@ -27,6 +27,7 @@ plot_traj = json_object["plot_traj"]
 robot_num = json_object["robot_num"]
 timer_freq = json_object["timer_freq"]
 controller_type = json_object["Controller"]["controller_type"]
+L = json_object["Car_model"]["L"]
 
 class Converter(Node):
     """
@@ -177,8 +178,8 @@ class Converter(Node):
         marker.pose = self.convert_to_pose(state)
         # so that the marker is on the ground
         marker.pose.position.z = 0.5
-        marker.scale.x = 2.9
-        marker.scale.y = 1.45
+        marker.scale.x = L
+        marker.scale.y = L/2.0
         marker.scale.z = 1.0
         if state.v > 0.0:
             marker.color.r = 1.0

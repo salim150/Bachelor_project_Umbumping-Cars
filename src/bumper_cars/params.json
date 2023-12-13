@@ -1,7 +1,6 @@
 {
     "CBF_robotarium": 
         {
-            "L": 2.9,
             "max_steer": 0.523599,
             "max_speed": 6,
             "min_speed": -1.0,
@@ -12,7 +11,6 @@
         },
     "CBF_simple":
         {
-            "L": 2.9,
             "max_steer": 0.523599,
             "max_speed": 6,
             "min_speed": -1.0,
@@ -25,7 +23,6 @@
         },
     "C3BF":
         {
-            "L": 2.9,
             "max_steer": 0.785398,
             "max_speed": 10,
             "min_speed": -1.0,
@@ -75,7 +72,7 @@
             "min_acc": -5,
             "max_speed": 10,
             "min_speed": -1,
-            "controller_type": "random_goal"
+            "controller_type": "DWA"
         },
     "robot_num": 4,
     "safety": 30, 

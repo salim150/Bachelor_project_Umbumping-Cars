@@ -22,7 +22,7 @@ with open(path, 'r') as openfile:
     # Reading from json file
     json_object = json.load(openfile)
 
-L = json_object["C3BF"]["L"]
+L = json_object["Car_model"]["L"]
 max_steer = json_object["C3BF"]["max_steer"]  # [rad] max steering angle
 max_speed = json_object["C3BF"]["max_speed"] # [m/s]
 min_speed = json_object["C3BF"]["min_speed"] # [m/s]
