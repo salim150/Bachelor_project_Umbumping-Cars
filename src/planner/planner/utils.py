@@ -6,6 +6,7 @@ from planner.cubic_spline_planner import *
 from planner.frenet import *
 from planner.predict_traj import *
 from scipy.spatial.transform import Rotation as Rot
+import random
 
 # For the parameter file
 import pathlib
@@ -318,3 +319,41 @@ def rot_mat_2d(angle):
 
     """
     return Rot.from_euler('z', angle).as_matrix()[0:2, 0:2]
+
+def samplegrid(width_init, height_init, min_dist, robot_num, safety_init):
+    """
+    Generate random grid coordinates for robots in a given map.
+
+    Args:
+        width_init (float): Initial width of the map.
+        height_init (float): Initial height of the map.
+        min_dist (float): Minimum distance between robots.
+        robot_num (int): Number of robots.
+        safety_init (float): Safety border around the map boundaries.
+
+    Returns:
+        tuple: A tuple containing the x-coordinates, y-coordinates, yaw angles,
+               velocities, angular velocities, and model types for the robots.
+    """
+    # defining the boundaries
+    safety = safety_init # safety border around the map boundaries
+    width = width_init - safety
+    height = height_init - safety
+    # min_dis
+    N = int(width/min_dist)
+    M = int(height/min_dist)
+    x_mesh = np.linspace(-width/2, width/2, N)
+    y_mesh = np.linspace(-height/2, height/2, M)
+
+    list = [divmod(i, M) for i in random.sample(range(N * M), robot_num)]
+    list = np.array(list)
+    x = x_mesh[list[:, 0]]
+    y = y_mesh[list[:, 1]]
+    yaw = []
+    while len(yaw)<robot_num:
+        yaw.append(np.radians(random.randint(-180, 180)))
+
+    v = robot_num * [0.0]
+    omega = robot_num * [0.0]
+    model_type = robot_num * ['linear']
+    return x.tolist(), y.tolist(), yaw, v, omega, model_type
