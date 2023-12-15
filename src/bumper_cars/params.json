@@ -11,13 +11,13 @@
         },
     "CBF_simple":
         {
-            "max_steer": 0.523599,
+            "max_steer": 0.785398,
             "max_acc": 100,
             "min_acc": -100,
             "dt": 0.1,
             "safety_radius": 1.5,
             "barrier_gain": 0.1, 
-            "arena_gain": 0.001,
+            "arena_gain": 0.01,
             "Kv": 0.1
         },
     "C3BF":
@@ -53,7 +53,7 @@
         {
             "max_steer": 0.785398,
             "max_speed": 2,
-            "min_speed": 0.05,
+            "min_speed": -1.0,
             "L": 1.0, 
             "Cf": 320.0,
             "Cr": 340.0, 

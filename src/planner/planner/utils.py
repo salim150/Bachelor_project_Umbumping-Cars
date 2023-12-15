@@ -402,3 +402,17 @@ def create_path():
         path.append(Coordinate(x=float(random.randint(-width_init/2, width_init/2)), y=float(random.randint(-height_init/2, height_init/2))))
     return path
     
+def plot_robot(x, y, yaw):  # pragma: no cover
+    outline = np.array([[-L / 2, L / 2,
+                            (L / 2), -L / 2,
+                            -L / 2],
+                        [WB / 2, WB / 2,
+                            - WB / 2, -WB / 2,
+                            WB / 2]])
+    Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
+                        [-math.sin(yaw), math.cos(yaw)]])
+    outline = (outline.T.dot(Rot1)).T
+    outline[0, :] += x
+    outline[1, :] += y
+    plt.plot(np.array(outline[0, :]).flatten(),
+                np.array(outline[1, :]).flatten(), "-k")

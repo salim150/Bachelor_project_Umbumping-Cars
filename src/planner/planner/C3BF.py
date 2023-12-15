@@ -9,8 +9,9 @@ from cvxopt.blas import dot
 from cvxopt.solvers import qp, options
 from cvxopt import matrix, sparse
 from planner.utils import *
+from planner.utils import plot_robot
 from planner.predict_traj import predict_trajectory
-import planner.utils as utils
+# import planner.utils as utils
 
 from custom_message.msg import ControlInputs, State, Path, Coordinate, MultiplePaths, MultiState, MultiControl
 
@@ -260,21 +261,6 @@ def plot_rect(x, y, yaw, r):  # pragma: no cover
         outline[1, :] += y
         plt.plot(np.array(outline[0, :]).flatten(),
                     np.array(outline[1, :]).flatten(), "-k")
-
-def plot_robot(x, y, yaw):  # pragma: no cover
-    outline = np.array([[-L / 2, L / 2,
-                            (L / 2), -L / 2,
-                            -L / 2],
-                        [WB / 2, WB / 2,
-                            - WB / 2, -WB / 2,
-                            WB / 2]])
-    Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
-                        [-math.sin(yaw), math.cos(yaw)]])
-    outline = (outline.T.dot(Rot1)).T
-    outline[0, :] += x
-    outline[1, :] += y
-    plt.plot(np.array(outline[0, :]).flatten(),
-                np.array(outline[1, :]).flatten(), "-k")
    
 
 def main(args=None):
@@ -282,7 +268,7 @@ def main(args=None):
     # The robots will never reach their goal points so set iteration number
     iterations = 3000
     # Define goal points outside of the arena
-    x0, y, yaw, v, omega, model_type = utils.samplegrid(width_init, height_init, min_dist, robot_num, safety_init)
+    x0, y, yaw, v, omega, model_type = samplegrid(width_init, height_init, min_dist, robot_num, safety_init)
     x = np.array([x0, y, yaw, v])
 
     paths = []
@@ -291,7 +277,7 @@ def main(args=None):
     multi_control = MultiControl()
     dxu = np.zeros((2,robot_num))
     for i in range(robot_num):
-        paths.append(utils.create_path())
+        paths.append(create_path())
         targets.append([paths[i][0].x, paths[i][0].y])
         initial_state = State(x=x0[i], y=y[i], yaw=yaw[i], v=v[i], omega=omega[i])
         # multi_traj.multiple_path.append(predict_trajectory(initial_state, targets[i]))
@@ -309,13 +295,13 @@ def main(args=None):
         # Create single-integrator control inputs
         for i in range(robot_num):
             x1 = array_to_state(x[:,i])
-            if utils.dist(point1=(x[0,i], x[1,i]), point2=targets[i]) < 5:
-                paths[i] = utils.update_path(paths[i])
+            if dist(point1=(x[0,i], x[1,i]), point2=targets[i]) < 5:
+                paths[i] = update_path(paths[i])
                 targets[i] = (paths[i][0].x, paths[i][0].y)
                 # multi_traj.multiple_path[i] = predict_trajectory(x1, targets[i])
 
             cmd = ControlInputs()
-            cmd.throttle, cmd.delta= utils.pure_pursuit_steer_control(targets[i], x1)
+            cmd.throttle, cmd.delta= pure_pursuit_steer_control(targets[i], x1)
 
             dxu[0,i], dxu[1,i] = cmd.throttle, cmd.delta            
             dxu = C3BF(x, dxu)
@@ -334,7 +320,7 @@ def main(args=None):
             plt.plot(targets[i][0], targets[i][1], "xg")
             # plot_path(multi_traj.multiple_path[i])
 
-        utils.plot_map(width=width_init, height=height_init)
+        plot_map(width=width_init, height=height_init)
         plt.axis("equal")
         plt.grid(True)
         plt.pause(0.0001)
