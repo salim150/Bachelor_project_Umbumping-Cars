@@ -94,6 +94,8 @@ To run the single collision avoidance files, one can simply open the files in th
 ## Collision Avoidance Methods
 
 Briefly explain each implemented collision avoidance method. Provide references or links to relevant literature or documentation.
+<img src="./output.gif" alt="Simulation GIF" width="50%">
+
 
 ## ROS2 and Rviz2 Integration
 
