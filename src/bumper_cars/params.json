@@ -71,9 +71,10 @@
             "min_acc": -5,
             "max_speed": 2,
             "min_speed": -1,
-            "controller_type": "DWA"
+            "controller_type": "DWA",
+            "cbf_type": "CBF_simple"
         },
-    "robot_num": 4,
+    "robot_num": 7,
     "safety": 20, 
     "min_dist": 3,
     "width": 30,

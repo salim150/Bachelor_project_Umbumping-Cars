@@ -21,8 +21,8 @@ with open(path, 'r') as openfile:
     json_object = json.load(openfile)
 
 max_steer = json_object["DWA"]["max_steer"] # [rad] max steering angle
-max_speed = json_object["Car_model"]["max_speed"] # [m/s]
-min_speed = json_object["Car_model"]["min_speed"] # [m/s]
+max_speed = json_object["DWA"]["max_speed"] # [m/s]
+min_speed = json_object["DWA"]["min_speed"] # [m/s]
 v_resolution = json_object["DWA"]["v_resolution"] # [m/s]
 delta_resolution = math.radians(json_object["DWA"]["delta_resolution"])# [rad/s]
 max_acc = json_object["DWA"]["max_acc"] # [m/ss]
@@ -131,8 +131,8 @@ def motion(x, u, dt):
     x[0] = x[0] + x[3] * math.cos(x[2]) * dt
     x[1] = x[1] + x[3] * math.sin(x[2]) * dt
     x[2] = x[2] + x[3] / L * math.tan(delta) * dt
-    x[3] = x[3] + throttle * dt
     x[2] = normalize_angle(x[2])
+    x[3] = x[3] + throttle * dt
     x[3] = np.clip(x[3], min_speed, max_speed)
 
     return x
@@ -341,16 +341,9 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.rectangle):
     # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
     iterations = 3000
     break_flag = False
-    # x = np.array([[0, 10, 10], [0, 0, 10], [0, np.pi, -np.pi/2], [0, 0, 0]])
-    # goal = np.array([[30, 0, 15], [10, 10, 0]])
+    
     x0, y, yaw, v, omega, model_type = utils.samplegrid(width_init, height_init, min_dist, robot_num, safety_init)
     x = np.array([x0, y, yaw, v])
-    # x = np.array([[0, 20], [0, 0], [0, np.pi], [0, 0]])
-    # goal = np.array([[30, 0], [10, 10]])
-
-    # goal2 = np.array([0, 10])
-    cmd1 = ControlInputs()
-    cmd2 = ControlInputs()
 
     # create a trajcetory array to store the trajectory of the robot_num robots
     trajectory = np.zeros((x.shape[0], robot_num, 1))
@@ -374,6 +367,7 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.rectangle):
     fig = plt.figure(1, dpi=90)
     ax = fig.add_subplot(111)
     for z in range(iterations):
+        old_time = time.time()
         for i in range(robot_num):
             # Updating the paths of the robots
             if dist(point1=(x[0,i], x[1,i]), point2=targets[i]) < 5:
@@ -385,20 +379,17 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.rectangle):
             for idx in range(robot_num):
                 if idx == i:
                     continue
-                # point = Point(x[0, idx], x[1, idx])
-                # point = point.buffer(dilation_factor, cap_style=3)
-                # ob.append(point)
                 ob.append(dilated_traj[idx])
             
             x1 = x[:, i]
             u1, predicted_trajectory1 = dwa_control(x1, targets[i], ob)
-            # u1, predicted_trajectory1 = dwa_control(x1, goal[:,i], ob)
             line = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1]))
             dilated = line.buffer(dilation_factor, cap_style=3)
             dilated_traj[i] = dilated
             x1 = motion(x1, u1, dt)
             x[:, i] = x1
             predicted_trajectory[i, :, :] = predicted_trajectory1
+            # print(f'Speed of robot {i}: {x[3,i]}')
 
         trajectory = np.dstack([trajectory, x])
         
@@ -431,6 +422,8 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.rectangle):
         
         if break_flag:
             break
+
+        print(time.time()-old_time)
         
     print("Done")
     if show_animation:

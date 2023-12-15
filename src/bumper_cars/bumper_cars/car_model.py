@@ -19,9 +19,14 @@ with open(path, 'r') as openfile:
     json_object = json.load(openfile)
 
 controller_type = json_object["Controller"]["controller_type"]
-max_steer = json_object["Car_model"]["max_steer"] # [rad] max steering angle
-max_speed = json_object["Car_model"]["max_speed"] # [m/s]
-min_speed = json_object["Car_model"]["min_speed"] # [m/s]
+if controller_type == "DWA":
+    max_steer = json_object["DWA"]["max_steer"] # [rad] max steering angle
+    max_speed = json_object["DWA"]["max_speed"] # [m/s]
+    min_speed = json_object["DWA"]["min_speed"] # [m/s]
+else:
+    max_steer = json_object["Car_model"]["max_steer"] # [rad] max steering angle
+    max_speed = json_object["Car_model"]["max_speed"] # [m/s]
+    min_speed = json_object["Car_model"]["min_speed"] # [m/s]
 L = json_object["Car_model"]["L"]  # [m] Wheel base of vehicle
 Lr = L / 2.0  # [m]
 Lf = L - Lr
@@ -95,6 +100,7 @@ class CarModel(Node):
         for i in range(robot_num):
             if self.model_type[0] == 'linear':
                 self.multi_state.multiple_state[i], self.old_time[i] = self.linear_model_callback(self.multi_state.multiple_state[i], control.multi_control[i], self.old_time[i])
+                # self.get_logger().info("Speed of robot " + str(i) + ": " + str(self.multi_state.multiple_state[i].v))
             elif self.model_type[0] == 'nonlinear':
                 self.multi_state.multiple_state[i], self.old_time[i] = self.nonlinear_model_callback(self.multi_state.multiple_state[i], control.multi_control[i], self.old_time[i])
 
@@ -115,7 +121,11 @@ class CarModel(Node):
             float: The current time.
         """
 
-        dt = time.time() - old_time
+        if controller_type == "DWA":
+            dt = 0.1
+        else:
+            dt = time.time() - old_time
+            
         state = FullState()
         cmd.delta = np.clip(cmd.delta, -max_steer, max_steer)
 
