@@ -23,6 +23,10 @@ max_steer = json_object["CBF_simple"]["max_steer"]   # [rad] max steering angle
 max_speed = json_object["Car_model"]["max_speed"] # [m/s]
 min_speed = json_object["Car_model"]["min_speed"]  # [m/s]
 dt = json_object["CBF_simple"]["dt"] 
+safety_init = json_object["safety"]
+width_init = json_object["width"]
+height_init = json_object["height"]
+min_dist = json_object["min_dist"]
 L = json_object["Car_model"]["L"] # [m] Wheel base of vehicle
 Lr = L / 2.0  # [m]
 Lf = L - Lr
@@ -207,9 +211,9 @@ def plot_arrow(x, y, yaw, length=0.5, width=0.1):  # pragma: no cover
         plt.arrow(x, y, length * math.cos(yaw), length * math.sin(yaw),
                 head_length=width, head_width=width)
         
-def plot_map(width=100, heigth=100):
+def plot_map(width=100, height=100):
         corner_x = [-width/2.0, width/2.0, width/2.0, -width/2.0, -width/2.0]
-        corner_y = [heigth/2.0, heigth/2.0, -heigth/2.0, -heigth/2.0, heigth/2.0]
+        corner_y = [height/2.0, height/2.0, -height/2.0, -height/2.0, height/2.0]
 
         plt.plot(corner_x, corner_y)
 
@@ -357,3 +361,44 @@ def samplegrid(width_init, height_init, min_dist, robot_num, safety_init):
     omega = robot_num * [0.0]
     model_type = robot_num * ['linear']
     return x.tolist(), y.tolist(), yaw, v, omega, model_type
+
+def dist(point1, point2):
+    """
+    Calculates the Euclidean distance between two points.
+
+    :param point1: (tuple) x, y coordinates of the first point
+    :param point2: (tuple) x, y coordinates of the second point
+    :return: (float) Euclidean distance between the two points
+    """
+    x1, y1 = point1
+    x2, y2 = point2
+
+    x1 = float(x1)
+    x2 = float(x2)
+    y1 = float(y1)
+    y2 = float(y2)
+
+    distance = math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+    return distance
+
+def update_path(path: Path):
+    """
+    Updates the path by removing the first waypoint and adding a new random waypoint.
+
+    Removes the first waypoint from the path and adds a new random waypoint within the specified boundaries.
+    """
+    path.pop(0)
+    path.append(Coordinate(x=float(random.randint(-width_init/2, width_init/2)), y=float(random.randint(-height_init/2, height_init/2))))
+    return path
+
+def create_path():
+    """
+    Creates a random path.
+
+    Generates a random path by creating a list of waypoints within the specified boundaries.
+    """
+    path = []
+    while len(path)<5:
+        path.append(Coordinate(x=float(random.randint(-width_init/2, width_init/2)), y=float(random.randint(-height_init/2, height_init/2))))
+    return path
+    

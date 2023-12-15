@@ -53,7 +53,7 @@
         {
             "max_steer": 0.785398,
             "max_speed": 2,
-            "min_speed": -1.0,
+            "min_speed": 0.05,
             "L": 1.0, 
             "Cf": 320.0,
             "Cr": 340.0, 
@@ -71,11 +71,11 @@
             "min_acc": -5,
             "max_speed": 2,
             "min_speed": -1,
-            "controller_type": "DWA",
-            "cbf_type": "CBF_simple"
+            "controller_type": "random_goal",
+            "cbf_type": "C3BF"
         },
-    "robot_num": 7,
-    "safety": 20, 
+    "robot_num": 5,
+    "safety": 10, 
     "min_dist": 3,
     "width": 30,
     "height": 30,

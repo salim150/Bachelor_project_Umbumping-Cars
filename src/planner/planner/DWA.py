@@ -63,46 +63,6 @@ show_animation = True
 with open('/home/giacomo/thesis_ws/src/trajectories.json', 'r') as file:
     data = json.load(file)
 
-def dist(point1, point2):
-    """
-    Calculates the Euclidean distance between two points.
-
-    :param point1: (tuple) x, y coordinates of the first point
-    :param point2: (tuple) x, y coordinates of the second point
-    :return: (float) Euclidean distance between the two points
-    """
-    x1, y1 = point1
-    x2, y2 = point2
-
-    x1 = float(x1)
-    x2 = float(x2)
-    y1 = float(y1)
-    y2 = float(y2)
-
-    distance = math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
-    return distance
-
-def update_path(path: Path):
-    """
-    Updates the path by removing the first waypoint and adding a new random waypoint.
-
-    Removes the first waypoint from the path and adds a new random waypoint within the specified boundaries.
-    """
-    path.pop(0)
-    path.append(Coordinate(x=float(random.randint(-width_init/2, width_init/2)), y=float(random.randint(-height_init/2, height_init/2))))
-    return path
-
-def create_path():
-    """
-    Creates a random path.
-
-    Generates a random path by creating a list of waypoints within the specified boundaries.
-    """
-    path = []
-    while len(path)<5:
-        path.append(Coordinate(x=float(random.randint(-width_init/2, width_init/2)), y=float(random.randint(-height_init/2, height_init/2))))
-    return path
-
 def dwa_control(x, goal, ob):
     """
     Dynamic Window Approach control
@@ -359,7 +319,7 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.rectangle):
     dilated_traj = []
     for i in range(robot_num):
         dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
-        paths.append(create_path())
+        paths.append(utils.create_path())
         targets.append([paths[i][0].x, paths[i][0].y])
     
     # input [throttle, steer (delta)]
@@ -367,12 +327,12 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.rectangle):
     fig = plt.figure(1, dpi=90)
     ax = fig.add_subplot(111)
     for z in range(iterations):
-        old_time = time.time()
+        # old_time = time.time()
         for i in range(robot_num):
             # Updating the paths of the robots
-            if dist(point1=(x[0,i], x[1,i]), point2=targets[i]) < 5:
+            if utils.dist(point1=(x[0,i], x[1,i]), point2=targets[i]) < 5:
                 # get_logger().info("Updating the path for robot " + str(i))
-                paths[i] = update_path(paths[i])
+                paths[i] = utils.update_path(paths[i])
                 targets[i] = (paths[i][0].x, paths[i][0].y)
 
             ob = []
@@ -423,7 +383,7 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.rectangle):
         if break_flag:
             break
 
-        print(time.time()-old_time)
+        # print(time.time()-old_time)
         
     print("Done")
     if show_animation:
