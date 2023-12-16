@@ -106,7 +106,8 @@ $$ h_{i,j}(x) = \| x_i -x_j\| ^2 - (r^2 + K_v \cdot v_i) $$
 <p align="center">
 <img src="./Readme/CBF.gif" alt="Simulation GIF" width="50%">
 </p>
-## Collision Cone Control Barrier Function (3CBF)
+
+### Collision Cone Control Barrier Function (3CBF)
 
 $$h_{i,j}(x) = \langle p_{rel} , v_{rel}\rangle + \|p_{rel}\| \|v_{rel}\| \cos(\phi)$$
 
