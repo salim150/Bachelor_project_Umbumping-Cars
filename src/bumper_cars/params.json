@@ -29,7 +29,7 @@
             "safety_radius": 1.5,
             "barrier_gain": 1, 
             "arena_gain": 0.01,
-            "Kv": 0.1
+            "Kv": 0.03
         },
     "DWA":
         {
