@@ -115,6 +115,9 @@ def main():
     dl = 1.0  
     cx, cy, cyaw, ck = get_switch_back_course(dl)
 
+    for i in range(len(cyaw)):
+        cyaw[i] = normalize_angle(cyaw[i])
+
     initial_state = np.array([cx[0], cy[0], cyaw[0], 0.0])
     
     sim_run(options, ModelPredictiveControl, initial_state, cx, cy, cyaw, ck)

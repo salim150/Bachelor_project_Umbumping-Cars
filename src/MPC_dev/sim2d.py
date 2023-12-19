@@ -98,6 +98,9 @@ def sim_run(options, MPC, initial_state, cx, cy, cyaw, ck):
             predicted_state = np.append(predicted_state, np.array([predicted]), axis=0)
         predict_info += [predicted_state]
         state_i = np.append(state_i, np.array([y]), axis=0)
+        # print(f'yaw angle: {y[2]}')
+        # print(f'speed: {y[3]}')
+        # print(f'ref yaw angle: {ref[2]}')
         u_i = np.append(u_i, np.array([(u[0], u[1])]), axis=0)
 
         plt.cla()
