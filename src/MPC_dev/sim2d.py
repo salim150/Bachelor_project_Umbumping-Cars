@@ -27,11 +27,17 @@ def sim_run(options, MPC, initial_state, cx, cy, cyaw, ck):
     num_inputs = 2
     u = np.zeros(mpc.horizon*num_inputs)
     bounds = []
+    constraints = []
 
     # Set bounds for inputs bounded optimization.
     for i in range(mpc.horizon):
-        bounds += [[-1, 1]]
-        bounds += [[-0.8, 0.8]]
+        bounds += [[-MAX_ACCEL, MAX_ACCEL]]
+        bounds += [[-MAX_STEER, MAX_STEER]]
+        # print(i, 2*i, 2*i+1)
+        # constraints += [{'type': 'ineq', 'fun': lambda u: u[i*2] - MAX_ACCEL},
+        #                 {'type': 'ineq', 'fun': lambda u: -u[i*2] - MAX_ACCEL},
+        #                 {'type': 'ineq', 'fun': lambda u: u[i*2+1] - MAX_STEER},
+        #                 {'type': 'ineq', 'fun': lambda u: -u[i*2+1] - MAX_STEER}]
 
     ref_1 = mpc.reference1
     ref_2 = mpc.reference2
@@ -64,26 +70,30 @@ def sim_run(options, MPC, initial_state, cx, cy, cyaw, ck):
         u = np.append(u, u[-2])
         start_time = time.time()
 
+        # explore possibility of iterative MPC: for z in range(3):
         # Non-linear optimization.
         u_solution = minimize(mpc.cost_function, u, (state_i[-1], ref),
                                 method='SLSQP',
                                 bounds=bounds,
                                 tol = 1e-5)
-        print('Step ' + str(i) + ' of ' + str(sim_total) + '   Time ' + str(round(time.time() - start_time,5)))
+        # print('Step ' + str(i) + ' of ' + str(sim_total) + '   Time ' + str(round(time.time() - start_time,5)))
         u = u_solution.x
         y = mpc.plant_model(state_i[-1], mpc.dt, u[0], u[1])
         if (target_ind < len(cx)-1):
             if dist([y[0], y[1]], [cx[target_ind], cy[target_ind]]) < 5:
-                target_ind+=3
+                target_ind+=1
                 ref[0] = cx[target_ind]
                 ref[1] = cy[target_ind]
                 ref[2] = cyaw[target_ind]
 
-
-        if (i > 130 and ref_2 != None):
-            ref = ref_2
         predicted_state = np.array([y])
         for j in range(1, mpc.horizon):
+            if u[2*j]>MAX_ACCEL or u[2*j]<-MAX_ACCEL:
+                print('Acceleration out of bounds')
+                break
+            elif u[2*j+1]>MAX_STEER or u[2*j+1]<-MAX_STEER:
+                print('Steering out of bounds')
+                break
             predicted = mpc.plant_model(predicted_state[-1], mpc.dt, u[2*j], u[2*j+1])
             predicted_state = np.append(predicted_state, np.array([predicted]), axis=0)
         predict_info += [predicted_state]
@@ -100,6 +110,7 @@ def sim_run(options, MPC, initial_state, cx, cy, cyaw, ck):
         plot_robot(state_i[i,0], state_i[i,1], state_i[i,2])
         plot_robot(ref[0],ref[1],ref[2])
         plt.plot(cx, cy, "-r", label="course")
+        plt.plot(predicted_state[:,0], predicted_state[:,1])
         plt.xlim(-10, 40)
         plt.ylim(-10, 40)
         plt.title('MPC 2D')
