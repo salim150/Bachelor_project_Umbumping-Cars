@@ -22,7 +22,7 @@ def sim_run(options, MPC, initial_state, cx, cy, cyaw, ck):
     FIG_SIZE = options['FIG_SIZE'] # [Width, Height]
     OBSTACLES = options['OBSTACLES']
 
-    mpc = MPC()
+    mpc = MPC(obs_x=cx[5:-1:12], obs_y=cy[5:-1:12])
 
     num_inputs = 2
     u = np.zeros(mpc.horizon*num_inputs)
@@ -108,8 +108,9 @@ def sim_run(options, MPC, initial_state, cx, cy, cyaw, ck):
         plt.gcf().canvas.mpl_connect('key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
         if OBSTACLES:
-            patch_obs = mpatches.Circle((mpc.x_obs, mpc.y_obs),0.5)
-            ax.add_patch(patch_obs)
+            for zz in range(len(mpc.x_obs)):
+                patch_obs = mpatches.Circle((mpc.x_obs[zz], mpc.y_obs[zz]),0.5)
+                ax.add_patch(patch_obs)
         plot_robot(state_i[i,0], state_i[i,1], state_i[i,2])
         plot_robot(ref[0],ref[1],ref[2])
         plt.plot(cx, cy, "-r", label="course")

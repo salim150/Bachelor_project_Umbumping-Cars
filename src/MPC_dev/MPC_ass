@@ -27,7 +27,7 @@ def normalize_angle(angle):
     return angle
 
 class ModelPredictiveControl:
-    def __init__(self):
+    def __init__(self, obs_x, obs_y):
         self.horizon = 15
         self.dt = 0.2
 
@@ -37,8 +37,8 @@ class ModelPredictiveControl:
         self.reference1 = [10, 0, 0]
         self.reference2 = None
 
-        self.x_obs = 7
-        self.y_obs = 0.1
+        self.x_obs = obs_x
+        self.y_obs = obs_y
 
     def plant_model(self,prev_state, dt, pedal, steering):
         x_t = prev_state[0]
@@ -70,14 +70,15 @@ class ModelPredictiveControl:
             state = self.plant_model(state, self.dt, u[i*2], u[i*2 + 1])
 
             distance_to_goal = np.sqrt((ref[0] - state[0])**2 + (ref[1] - state[1])**2)
-            distance_to_obstacle = np.sqrt((self.x_obs - state[0])**2 + (self.y_obs - state[1])**2)
 
             # Position cost
             cost +=  distance_to_goal
 
             # Obstacle cost
-            if distance_to_obstacle < 2:
-                cost += 3.5/distance_to_obstacle
+            for z in range(len(self.x_obs)-1):
+                distance_to_obstacle = np.sqrt((self.x_obs[z] - state[0])**2 + (self.y_obs[z] - state[1])**2)
+                if distance_to_obstacle < 2:
+                    cost += 3.5/distance_to_obstacle
 
             # Heading cost
             cost += 10 * (heading - state[2])**2
