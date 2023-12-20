@@ -80,7 +80,7 @@ def sim_run(options, MPC, initial_state, cx, cy, cyaw, ck):
         u = u_solution.x
         y = mpc.plant_model(state_i[-1], mpc.dt, u[0], u[1])
         if (target_ind < len(cx)-1):
-            if dist([y[0], y[1]], [cx[target_ind], cy[target_ind]]) < 5:
+            if dist([y[0], y[1]], [cx[target_ind], cy[target_ind]]) < 4:
                 target_ind+=1
                 ref[0] = cx[target_ind]
                 ref[1] = cy[target_ind]
