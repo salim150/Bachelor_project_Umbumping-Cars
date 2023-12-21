@@ -3,7 +3,8 @@ from sim2d import sim_run
 import cubic_spline_planner
 import math
 import random
-
+import sys
+sys.path.append('/home/giacomo/thesis_ws/src/bumper_cars/src')
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import matplotlib.gridspec as gridspec
@@ -11,7 +12,9 @@ import matplotlib.patches as mpatches
 from scipy.optimize import minimize
 import time
 # from planner.utils import *
+# from planner import *
 import planner.utils as utils
+# import lanner.utils as utils
 
 import pathlib
 import json
@@ -384,7 +387,7 @@ def main2():
             u_solution = minimize(mpc.cost_function, u1, (x1, ref[i]),
                                 method='SLSQP',
                                 bounds=bounds,
-                                tol = 1e-5)
+                                tol = 1e-2)
             print('Step ' + str(i) + ' of ' + str(iterations) + '   Time ' + str(round(time.time() - start_time,5)))
             u1 = u_solution.x
             x1 = mpc.plant_model(x1, dt, u1[0], u1[1])
@@ -405,7 +408,7 @@ def main2():
             # plt.plot(predicted_state[:,0], predicted_state[:,1])
             
             plt.title('MPC 2D')
-            utils.plot_map()
+            utils.plot_map(width=width_init, height=height_init)
             plt.axis("equal")
             plt.grid(True)
             plt.pause(0.0001)
@@ -414,5 +417,5 @@ def main2():
 
 
 if __name__ == '__main__':
-    main()
-    # main2()
+    # main()
+    main2()

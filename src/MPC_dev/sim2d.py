@@ -5,7 +5,11 @@ import matplotlib.gridspec as gridspec
 import matplotlib.patches as mpatches
 from scipy.optimize import minimize
 import time
+import sys
+sys.path.append('/home/giacomo/thesis_ws/src/bumper_cars/src')
+print(sys.path)
 from planner.utils import *
+
 
 MAX_STEER = np.deg2rad(45.0)  # maximum steering angle [rad]
 MAX_DSTEER = np.deg2rad(30.0)  # maximum steering speed [rad/s]
