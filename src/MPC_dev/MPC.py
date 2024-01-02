@@ -52,7 +52,7 @@ c_a = json_object["Car_model"]["c_a"]
 c_r1 = json_object["Car_model"]["c_r1"]
 WB = json_object["Controller"]["WB"] # Wheel base
 L_d = json_object["Controller"]["L_d"]  # [m] look-ahead distance
-robot_num = 1 #json_object["robot_num"]
+robot_num = 3 #json_object["robot_num"]
 safety_init = json_object["safety"]
 width_init = json_object["width"]
 height_init = json_object["height"]
@@ -62,6 +62,7 @@ min_dist = json_object["min_dist"]
 timer_freq = json_object["timer_freq"]
 
 show_animation = True
+debug = False
 
 # Simulator options.
 options = {}
@@ -88,7 +89,7 @@ def normalize_angle(angle):
 
 class ModelPredictiveControl:
     def __init__(self, obs_x, obs_y):
-        self.horizon = 15
+        self.horizon = 10
         self.dt = 0.2
 
         # self.L = 2.5 # Car base [m]
@@ -137,20 +138,23 @@ class ModelPredictiveControl:
             # Obstacle cost
             for z in range(len(self.x_obs)-1):
                 distance_to_obstacle = np.sqrt((self.x_obs[z] - state[0])**2 + (self.y_obs[z] - state[1])**2)
-                if distance_to_obstacle < 2:
-                    cost += 3.5/distance_to_obstacle
+                if distance_to_obstacle < 3:
+                    cost += math.inf #np.inf/distance_to_obstacle
 
             # Heading cost
-            cost += 10 * (heading - state[2])**2
+            cost += 1 * (heading - state[2])**2
 
-            cost +=  2 * (ref[2] - state[2])**2
+            # negative speed cost
+            cost += -10 * np.sign(speed) * 3 * speed
 
             # Acceleration cost
             if abs(u[2*i]) > 0.2:
                 cost += (speed - state[3])**2
 
+        # Final heading and position cost        
+        cost +=  10 * (normalize_angle(ref[2]) - normalize_angle(state[2]))**2
         distance_to_goal = np.sqrt((ref[0] - state[0])**2 + (ref[1] - state[1])**2)
-        cost += 100*distance_to_goal
+        cost += 10*distance_to_goal
         return cost
     
 def get_switch_back_course(dl):
@@ -302,14 +306,17 @@ def main2():
     cx = []
     cy = []
     cyaw = []
+    ref = []
+    target_ind = [1]*robot_num
     for i in range(robot_num):
         sample_point = (float(random.randint(-width_init/2, width_init/2)), float(random.randint(-height_init/2, height_init/2)))
     
         cx.append(get_straight_course(start=(x[0,i], x[1,i]), goal=(sample_point[0], sample_point[1]), dl=dl)[0])
         cy.append(get_straight_course(start=(x[0,i], x[1,i]), goal=(sample_point[0], sample_point[1]), dl=dl)[1])
         cyaw.append(get_straight_course(start=(x[0,i], x[1,i]), goal=(sample_point[0], sample_point[1]), dl=dl)[2])
+   
+        ref.append([cx[i][target_ind[i]], cy[i][target_ind[i]], cyaw[i][target_ind[i]]])
     
-    for i in range(robot_num):
         plt.plot(x[0,i], x[1,i], "xr")
         # plt.plot(targets[i][0], targets[i][1], "xg")
         plt.plot(cx[i], cy[i], "-r", label="course")
@@ -317,7 +324,7 @@ def main2():
     plt.show()
 
     # MPC initialization
-    mpc = ModelPredictiveControl(obs_x=[7], obs_y=[0])
+    mpc = ModelPredictiveControl(obs_x=[0], obs_y=[0])
     # mpc = ModelPredictiveControl(obs_x=cx[0][5:-1:12], obs_y=cy[0][5:-1:12])
 
     num_inputs = 2
@@ -328,10 +335,6 @@ def main2():
     for i in range(mpc.horizon):
         bounds += [[min_acc, max_acc]]
         bounds += [[-max_steer, max_steer]]
-
-
-    target_ind = [1]
-    ref = [[cx[0][target_ind[0]], cy[0][target_ind[0]], cyaw[0][target_ind[0]]]]
 
     # state_i = np.array([x])
     # u_i = np.array([[0,0]])
@@ -344,31 +347,31 @@ def main2():
 
     for z in range(iterations):
         # old_time = time.time()
+        plt.cla()
+        # for stopping simulation with the esc key.
+        plt.gcf().canvas.mpl_connect('key_release_event',
+                lambda event: [exit(0) if event.key == 'escape' else None])
         for i in range(robot_num):
             x1 = x[:, i]
             # Updating the paths of the robots
-            if (target_ind[0] < len(cx[0])-1):
-                if dist([x1[0], x1[1]], [cx[0][target_ind[0]], cy[0][target_ind[0]]]) < 4:
-                    target_ind[0]+=1
-                    ref[0][0] = cx[0][target_ind[0]]
-                    ref[0][1] = cy[0][target_ind[0]]
-                    ref[0][2] = cyaw[0][target_ind[0]]
-            if (target_ind[0] == len(cx[0])-1):
-                target_ind[0] = 1
-                # cx[0] = []
-                # cy[0] = []
-                # cyaw[0] = []
-                cx.pop(0)
-                cy.pop(0)
-                cyaw.pop(0)
+            if (target_ind[i] < len(cx[i])-1):
+                if dist([x1[0], x1[1]], [cx[i][target_ind[i]], cy[i][target_ind[i]]]) < 4:
+                    target_ind[i]+=1
+                    ref[i][0] = cx[i][target_ind[i]]
+                    ref[i][1] = cy[i][target_ind[i]]
+                    ref[i][2] = cyaw[i][target_ind[i]]
+            if (target_ind[i] == len(cx[i])-1):
+                target_ind[i] = 1
+
+                cx.pop(i)
+                cy.pop(i)
+                cyaw.pop(i)
                 sample_point = (float(random.randint(-width_init/2, width_init/2)), float(random.randint(-height_init/2, height_init/2)))
-                cx.insert(0, get_straight_course(start=(x[0,i], x[1,i]), goal=(sample_point[0], sample_point[1]), dl=dl)[0])
-                cy.insert(0, get_straight_course(start=(x[0,i], x[1,i]), goal=(sample_point[0], sample_point[1]), dl=dl)[1])
-                cyaw.insert(0, get_straight_course(start=(x[0,i], x[1,i]), goal=(sample_point[0], sample_point[1]), dl=dl)[2])
-                # cx[0].append(get_straight_course(start=(x[0,i], x[1,i]), goal=(sample_point[0], sample_point[1]), dl=dl)[0])
-                # cy[0].append(get_straight_course(start=(x[0,i], x[1,i]), goal=(sample_point[0], sample_point[1]), dl=dl)[1])
-                # cyaw[0].append(get_straight_course(start=(x[0,i], x[1,i]), goal=(sample_point[0], sample_point[1]), dl=dl)[2])
-                ref = [[cx[0][target_ind[0]], cy[0][target_ind[0]], cyaw[0][target_ind[0]]]]
+                cx.insert(i, get_straight_course(start=(x[0,i], x[1,i]), goal=(sample_point[0], sample_point[1]), dl=dl)[0])
+                cy.insert(i, get_straight_course(start=(x[0,i], x[1,i]), goal=(sample_point[0], sample_point[1]), dl=dl)[1])
+                cyaw.insert(i, get_straight_course(start=(x[0,i], x[1,i]), goal=(sample_point[0], sample_point[1]), dl=dl)[2])
+                
+                ref[i] = [cx[i][target_ind[i]], cy[i][target_ind[i]], cyaw[i][target_ind[i]]]
             
             u1 = u[:,i]
             u1 = np.delete(u1,0)
@@ -377,41 +380,44 @@ def main2():
             u1 = np.append(u1, u1[-2])
             start_time = time.time()
 
-            # ob = []
-            # for idx in range(robot_num):
-            #     if idx == i:
-            #         continue
-                # ob.append(dilated_traj[idx])
+            ob = []
+            for idx in range(robot_num):
+                if idx == i:
+                    continue
+                ob.append([x[0, idx], x[1, idx]])
+            
+            mpc.x_obs = [ob[z][0] for z in range(len(ob))]
+            mpc.y_obs = [ob[z][1] for z in range(len(ob))]
 
             # MPC control
             u_solution = minimize(mpc.cost_function, u1, (x1, ref[i]),
                                 method='SLSQP',
                                 bounds=bounds,
                                 tol = 1e-2)
-            print('Step ' + str(i) + ' of ' + str(iterations) + '   Time ' + str(round(time.time() - start_time,5)))
+            
+            if debug:
+                print('Step ' + str(i) + ' of ' + str(iterations) + '   Time ' + str(round(time.time() - start_time,5)))
             u1 = u_solution.x
             x1 = mpc.plant_model(x1, dt, u1[0], u1[1])
             x[:, i] = x1
             u[:, i] = u1
+            predicted_state = np.array([x1])
 
-            plt.cla()
-            # for stopping simulation with the esc key.
-            plt.gcf().canvas.mpl_connect('key_release_event',
-                    lambda event: [exit(0) if event.key == 'escape' else None])
-            if OBSTACLES:
-                for zz in range(len(mpc.x_obs)):
-                    patch_obs = mpatches.Circle((mpc.x_obs[zz], mpc.y_obs[zz]),0.5)
-                    ax.add_patch(patch_obs)
+            for j in range(1, mpc.horizon):
+                predicted = mpc.plant_model(predicted_state[-1], mpc.dt, u1[2*j], u1[2*j+1])
+                predicted_state = np.append(predicted_state, np.array([predicted]), axis=0)
+
+            plt.plot(mpc.x_obs, mpc.y_obs, "xk")
             utils.plot_robot(x1[0], x1[1], x1[2])
-            utils.plot_robot(ref[0][0],ref[0][1],ref[0][2])
-            plt.plot(cx, cy, "-r", label="course")
-            # plt.plot(predicted_state[:,0], predicted_state[:,1])
+            utils.plot_robot(ref[i][0],ref[i][1],ref[i][2])
+            plt.plot(cx[i], cy[i], "-r", label="course")
+            plt.plot(predicted_state[:,0], predicted_state[:,1])
             
-            plt.title('MPC 2D')
-            utils.plot_map(width=width_init, height=height_init)
-            plt.axis("equal")
-            plt.grid(True)
-            plt.pause(0.0001)
+        plt.title('MPC 2D')
+        utils.plot_map(width=width_init, height=height_init)
+        plt.axis("equal")
+        plt.grid(True)
+        plt.pause(0.0001)
 
 
 
