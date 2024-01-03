@@ -102,7 +102,7 @@ class ModelPredictiveControl:
         self.y_obs = obs_y
 
         self.initial_state = None
-        self.safety_radius = 3.0
+        self.safety_radius = 4.0
 
     def plant_model(self,prev_state, dt, pedal, steering):
         x_t = prev_state[0]
@@ -138,16 +138,16 @@ class ModelPredictiveControl:
             # Position cost
             # cost +=  distance_to_goal
 
-            # # Obstacle cost
-            # for z in range(len(self.x_obs)-1):
-            #     distance_to_obstacle = np.sqrt((self.x_obs[z] - state[0])**2 + (self.y_obs[z] - state[1])**2)
-            #     # if any(distance_to_obstacle < 3):
-            #     if distance_to_obstacle < 2:
-            #         cost += 100 #np.inf/distance_to_obstacle
+            # Obstacle cost
+            for z in range(len(self.x_obs)-1):
+                distance_to_obstacle = np.sqrt((self.x_obs[z] - state[0])**2 + (self.y_obs[z] - state[1])**2)
+                # if any(distance_to_obstacle < 3):
+                if distance_to_obstacle < self.safety_radius:
+                    cost += 100 #np.inf/distance_to_obstacle
 
             # Heading cost
-            # cost += 10 * (heading - state[2])**2
-            cost += 10 * state[3]
+            cost += 10 * (heading - state[2])**2
+            # cost += 10 * state[2]
 
             # negative speed cost
             cost += -5 * np.sign(speed) * 3 * speed
@@ -221,7 +221,7 @@ class ModelPredictiveControl:
 
         for t in range(self.horizon):
             state = self.plant_model(state, self.dt, u[2*t], u[2*t + 1])
-            for i in range(robot_num-1):
+            for i in range(len(self.x_obs)):
                 distance.append((state[0] - self.x_obs[i])**2 + (state[1] - self.y_obs[i])**2-self.safety_radius**2)
 
         return np.array(distance)
@@ -707,21 +707,31 @@ def main4():
             u1 = np.append(u1, u1[-2])
             start_time = time.time()
 
-            ob = []
+
+            mpc.x_obs = []
+            mpc.y_obs = []
             for idx in range(robot_num):
                 if idx == i:
                     continue
-                ob.append([x[0, idx], x[1, idx]])
+                # ob.append([x[0, idx], x[1, idx]])
                 # ob.append([predicted_trajectory[i, :, 0].tolist(), predicted_trajectory[i, :, 1].tolist()])
-            
-            mpc.x_obs = [ob[z][0] for z in range(len(ob))]
-            mpc.y_obs = [ob[z][1] for z in range(len(ob))]
+                # add only if the robots are close enough
+
+                if dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < 10:
+                    if dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < 1: raise Exception('Collision')
+                    mpc.x_obs.append(predicted_trajectory[i, 0:-1:5, 0])
+                    mpc.y_obs.append(predicted_trajectory[i, 0:-1:5, 1])
+            mpc.x_obs = [item for sublist in mpc.x_obs for item in sublist]
+            mpc.y_obs = [item for sublist in mpc.y_obs for item in sublist]
 
             mpc.initial_state = x1
             constraint1 = NonlinearConstraint(fun=mpc.propagation1, lb=-width_init/2, ub=width_init/2)
             constraint2 = NonlinearConstraint(fun=mpc.propagation2, lb=-height_init/2, ub=height_init/2)
-            constraint3 = NonlinearConstraint(fun=mpc.propagation3, lb=0, ub=np.inf)
-            constraints = [constraint1, constraint2, constraint3]
+            if mpc.x_obs == [] and mpc.y_obs == []:
+                constraints = [constraint1, constraint2]
+            else:
+                constraint3 = NonlinearConstraint(fun=mpc.propagation3, lb=0, ub=np.inf)
+                constraints = [constraint1, constraint2, constraint3]
             
             # ob = []
             # for idx in range(robot_num):
@@ -738,7 +748,7 @@ def main4():
                                 method='SLSQP',
                                 bounds=bounds,
                                 constraints=constraints,
-                                tol = 1e-1)
+                                tol = 1e-2)
             
             if debug:
                 print('Step ' + str(i) + ' of ' + str(iterations) + '   Time ' + str(round(time.time() - start_time,5)))
