@@ -102,7 +102,7 @@ class ModelPredictiveControl:
         self.y_obs = obs_y
 
         self.initial_state = None
-        self.safety_radius = 2.0
+        self.safety_radius = 3.0
 
     def plant_model(self,prev_state, dt, pedal, steering):
         x_t = prev_state[0]
@@ -136,29 +136,30 @@ class ModelPredictiveControl:
             distance_to_goal = np.sqrt((ref[0] - state[0])**2 + (ref[1] - state[1])**2)
 
             # Position cost
-            cost +=  distance_to_goal
+            # cost +=  distance_to_goal
 
             # # Obstacle cost
             # for z in range(len(self.x_obs)-1):
             #     distance_to_obstacle = np.sqrt((self.x_obs[z] - state[0])**2 + (self.y_obs[z] - state[1])**2)
-            #     if any(distance_to_obstacle < 3):
-            #     # if distance_to_obstacle < 2:
+            #     # if any(distance_to_obstacle < 3):
+            #     if distance_to_obstacle < 2:
             #         cost += 100 #np.inf/distance_to_obstacle
 
             # Heading cost
-            cost += 1 * (heading - state[2])**2
+            # cost += 10 * (heading - state[2])**2
+            cost += 10 * state[3]
 
             # negative speed cost
-            cost += -10 * np.sign(speed) * 3 * speed
+            cost += -5 * np.sign(speed) * 3 * speed
 
             # Acceleration cost
-            if abs(u[2*i]) > 0.2:
-                cost += (speed - state[3])**2
+            # if abs(u[2*i]) > 0.2:
+            #     cost += (speed - state[3])**2
 
         # Final heading and position cost        
-        cost +=  10 * (normalize_angle(ref[2]) - normalize_angle(state[2]))**2
+        # cost +=  4 * (normalize_angle(ref[2]) - normalize_angle(state[2]))**2
         distance_to_goal = np.sqrt((ref[0] - state[0])**2 + (ref[1] - state[1])**2)
-        cost += 10*distance_to_goal
+        cost += 5*distance_to_goal
         return cost
     
     def cost_function2(self,u, *args):
@@ -218,15 +219,13 @@ class ModelPredictiveControl:
         state = self.initial_state
         distance = []
 
-        for t in range(3):
+        for t in range(self.horizon):
             state = self.plant_model(state, self.dt, u[2*t], u[2*t + 1])
             for i in range(robot_num-1):
                 distance.append((state[0] - self.x_obs[i])**2 + (state[1] - self.y_obs[i])**2-self.safety_radius**2)
 
         return np.array(distance)
 
-
-    
 def get_switch_back_course(dl):
     ax = [0.0, 30.0, 6.0, 20.0, 35.0]
     ay = [0.0, 0.0, 20.0, 35.0, 20.0]
@@ -689,9 +688,8 @@ def main4():
                     ref[i][0] = cx[i][target_ind[i]]
                     ref[i][1] = cy[i][target_ind[i]]
                     ref[i][2] = cyaw[i][target_ind[i]]
-            if (target_ind[i] == len(cx[i])-1):
-                target_ind[i] = 1
-
+            elif (target_ind[i] == len(cx[i])-1):
+                target_ind[i] = 0
                 cx.pop(i)
                 cy.pop(i)
                 cyaw.pop(i)
@@ -720,7 +718,6 @@ def main4():
             mpc.y_obs = [ob[z][1] for z in range(len(ob))]
 
             mpc.initial_state = x1
-            state = mpc.propagation3(u1)
             constraint1 = NonlinearConstraint(fun=mpc.propagation1, lb=-width_init/2, ub=width_init/2)
             constraint2 = NonlinearConstraint(fun=mpc.propagation2, lb=-height_init/2, ub=height_init/2)
             constraint3 = NonlinearConstraint(fun=mpc.propagation3, lb=0, ub=np.inf)
@@ -741,7 +738,7 @@ def main4():
                                 method='SLSQP',
                                 bounds=bounds,
                                 constraints=constraints,
-                                tol = 1e-2)
+                                tol = 1e-1)
             
             if debug:
                 print('Step ' + str(i) + ' of ' + str(iterations) + '   Time ' + str(round(time.time() - start_time,5)))
@@ -758,7 +755,8 @@ def main4():
 
             # plt.plot(mpc.x_obs, mpc.y_obs, "xk")
             utils.plot_robot(x1[0], x1[1], x1[2])
-            utils.plot_robot(ref[i][0],ref[i][1],ref[i][2])
+            # utils.plot_robot(ref[i][0],ref[i][1],ref[i][2])
+            plt.plot(ref[i][0],ref[i][1], "xg")
             plt.plot(cx[i], cy[i], "-r", label="course")
             plt.plot(predicted_trajectory[i, :, 0], predicted_trajectory[i, :, 1], "-g")
             # plt.plot(predicted_state[:,0], predicted_state[:,1])
