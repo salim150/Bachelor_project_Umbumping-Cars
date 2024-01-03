@@ -111,7 +111,9 @@ $$ h_{i,j}(x) = \| x_i -x_j\| ^2 - (r^2 + K_v \cdot v_i) $$
 
 $$h_{i,j}(x) = \langle p_{rel} , v_{rel}\rangle + \|p_{rel}\| \|v_{rel}\| \cos(\phi)$$
 
-$$p_{rel} = \begin{bmatrix} x_i - x_i \\ y_i - y_j \end{bmatrix}$$
+$$p_{rel} = \begin{bmatrix} x_i - x_j \\
+                            y_i - y_j 
+            \end{bmatrix}$$
 
 $$v_{rel} = \begin{bmatrix}
                 v_i\cdot \cos(\theta_i) - v_j\cdot \cos(\theta_j)\\
