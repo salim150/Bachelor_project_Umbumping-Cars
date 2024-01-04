@@ -102,7 +102,7 @@ class ModelPredictiveControl:
         self.y_obs = obs_y
 
         self.initial_state = None
-        self.safety_radius = 4.0
+        self.safety_radius = 3.0
 
     def plant_model(self,prev_state, dt, pedal, steering):
         x_t = prev_state[0]
@@ -219,10 +219,10 @@ class ModelPredictiveControl:
             cost +=  distance_to_goal
 
             # Obstacle cost
-            for z in range(len(self.x_obs)-1):
-                distance_to_obstacle = np.sqrt((self.x_obs[z] - state[0])**2 + (self.y_obs[z] - state[1])**2)
-                if distance_to_obstacle < 1:
-                    cost += 40/distance_to_obstacle
+            # for z in range(len(self.x_obs)-1):
+            #     distance_to_obstacle = np.sqrt((self.x_obs[z] - state[0])**2 + (self.y_obs[z] - state[1])**2)
+            #     if distance_to_obstacle < 1:
+            #         cost += 40/distance_to_obstacle
 
             # Heading cost
             cost += 10 * (heading - state[2])**2
@@ -233,8 +233,9 @@ class ModelPredictiveControl:
             if abs(u[2*i]) > 0.2:
                 cost += (speed - state[3])**2
 
+        cost += (state[3])**2
         distance_to_goal = np.sqrt((ref[0] - state[0])**2 + (ref[1] - state[1])**2)
-        cost += 100*distance_to_goal
+        cost += 50*distance_to_goal
         return cost
 
     def propagation1(self, u):
@@ -568,10 +569,10 @@ def main5():
     # x = np.array([x0, y, yaw, v])
     x = np.array([[0, 10], [0, 0], [0, np.pi], [0,0]])
 
-    ref = [[10, 0, 0], [0, 0, np.pi]]
+    ref = [[10, 0, 0], [0, 0, -np.pi]]
 
     # MPC initialization
-    mpc = ModelPredictiveControl(obs_x=[0,7,5,-2,-4,8,9], obs_y=[0,-6,3,7,-3,5,9])
+    mpc = ModelPredictiveControl(obs_x=[], obs_y=[])
     # mpc = ModelPredictiveControl(obs_x=cx[0][5:-1:12], obs_y=cy[0][5:-1:12])
 
     num_inputs = 2
@@ -584,6 +585,8 @@ def main5():
         bounds += [[-max_steer, max_steer]]
 
     predicted_trajectory = np.zeros((robot_num, mpc.horizon, x.shape[0]))
+    for i in range(robot_num):
+        predicted_trajectory[i, :, :] = x[:, i] 
     
     # input [throttle, steer (delta)]
     fig = plt.figure(1, dpi=90)
