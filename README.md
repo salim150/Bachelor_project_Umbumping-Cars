@@ -95,9 +95,11 @@ To run the single collision avoidance files, one can simply open the files in th
 
 ### Control Barrier Functions (CBF)
 
-$$ u_i^{\ast}(x,t) = \min_{u \in U} \| u_i - u_{ref}(x,t)\| ^2 \\
-        \textrm{s.t. } \mathsterling_f h_{i,j}(x) + \pounds_g h_{i,j}(x)\cdot u_i + \kappa(h_{i,j}(x))\geq 0\\
-        i,j \in \{1, 2, \dots , N\} \textrm{ , } i\neq j $$
+$$ u_i^{\ast}(x,t) = \min_{u \in U} \| u_i - u_{ref}(x,t)\| ^2 $$
+
+$$ \textrm{s.t. } L_f h_{i,j}(x) + L_g h_{i,j}(x)\cdot u_i + \kappa(h_{i,j}(x))\geq 0 $$
+
+$$ i,j \in \{1, 2, \dots , N\} \textrm{ , } i\neq j $$
       
 
 ### Circulare Control Barrier Function (CBF)
