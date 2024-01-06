@@ -1,20 +1,16 @@
 import numpy as np
-from sim2d import sim_run
 import cubic_spline_planner
 import math
 import random
 import sys
-sys.path.append('/home/giacomo/thesis_ws/src/bumper_cars/src')
+sys.path.append("..")
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import matplotlib.gridspec as gridspec
 import matplotlib.patches as mpatches
 from scipy.optimize import minimize, NonlinearConstraint
 import time
-# from planner.utils import *
-# from planner import *
 import planner.utils as utils
-# import lanner.utils as utils
 
 import pathlib
 import json
@@ -658,4 +654,4 @@ def main5():
 if __name__ == '__main__':
     # main()
     # main2()
-    main()
+    main4()
