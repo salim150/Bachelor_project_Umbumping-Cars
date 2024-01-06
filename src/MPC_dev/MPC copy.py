@@ -216,7 +216,7 @@ class ModelPredictiveControl:
             distance_to_goal = np.sqrt((ref[0] - state[0])**2 + (ref[1] - state[1])**2)
 
             # Position cost
-            cost +=  distance_to_goal
+            cost +=  30 * distance_to_goal
 
             # Obstacle cost
             # for z in range(len(self.x_obs)-1):
@@ -235,7 +235,7 @@ class ModelPredictiveControl:
 
         cost += (state[3])**2
         distance_to_goal = np.sqrt((ref[0] - state[0])**2 + (ref[1] - state[1])**2)
-        cost += 50*distance_to_goal
+        cost += 100*distance_to_goal
         return cost
 
     def propagation1(self, u):
@@ -534,6 +534,7 @@ def main4():
             u1 = u_solution.x
             x1 = mpc.plant_model(x1, dt, u1[0], u1[1])
             x[:, i] = x1
+
             u[:, i] = u1
             predicted_state = np.array([x1])
 
@@ -651,6 +652,9 @@ def main5():
             u1 = u_solution.x
             x1 = mpc.plant_model(x1, dt, u1[0], u1[1])
             x[:, i] = x1
+            print(f'X: {x1[0]}, Y: {x1[1]}')
+            print(f'Yaw angle: {x1[2]}')
+            print(f'Speed: {x1[3]}')
             u[:, i] = u1
             predicted_state = np.array([x1])
 
