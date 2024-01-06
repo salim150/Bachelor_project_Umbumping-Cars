@@ -43,7 +43,7 @@ The most important forlder is the /src one, where all the developement code is s
 
 All the nodes and the excanged topics are visible in the following figure:
 
-<img src="./rosgraph.png" alt="Project Structure" style="width:100%;">
+<img src="./Readme/rosgraph.png" alt="Project Structure" style="width:100%;">
 
 ## Dependencies
 I'm running this project on ROS2 humble, using UBUNTU 22.04. 
@@ -93,7 +93,46 @@ To run the single collision avoidance files, one can simply open the files in th
 
 ## Collision Avoidance Methods
 
-Briefly explain each implemented collision avoidance method. Provide references or links to relevant literature or documentation.
+### Control Barrier Functions (CBF)
+
+$$ u_i^{\ast}(x,t) = \min_{u \in U} \| u_i - u_{ref}(x,t)\| ^2 $$
+
+$$ \textrm{s.t. } L_f h_{i,j}(x) + L_g h_{i,j}(x)\cdot u_i + \kappa(h_{i,j}(x))\geq 0 $$
+
+$$ i,j \in \{1, 2, \dots , N\} \textrm{ , } i\neq j $$
+      
+
+### Circulare Control Barrier Function (CBF)
+$$ h_{i,j}(x) = \| x_i -x_j\| ^2 - (r^2 + K_v \cdot v_i) $$
+
+<p align="center">
+<img src="./Readme/CBF.gif" alt="Simulation GIF" width="50%">
+</p>
+
+### Collision Cone Control Barrier Function (3CBF)
+
+$$h_{i,j}(x) = \langle p_{rel} , v_{rel}\rangle + \|p_{rel}\| \|v_{rel}\| \cos(\phi)$$
+
+$$p_{rel} = \begin{bmatrix} x_i - x_j \\
+                            y_i - y_j 
+            \end{bmatrix}$$
+
+$$v_{rel} = \begin{bmatrix}
+                v_i\cdot \cos(\theta_i) - v_j\cdot \cos(\theta_j)\\
+                v_i\cdot \sin(\theta_i) - v_j\cdot \sin(\theta_j)
+            \end{bmatrix}$$
+
+$$\cos(\phi) = \frac{\sqrt{\|p_{rel}\|^2 - R^2}}{\|p_{rel}\|}$$
+
+<p align="center">
+<img src="./Readme/C3BF.gif" alt="Simulation GIF" width="50%">
+</p>
+
+### Dynamic Window Approach
+
+<p align="center">
+<img src="./Readme/DWA.gif" alt="Simulation GIF" width="50%">
+</p>
 
 ## ROS2 and Rviz2 Integration
 
@@ -106,4 +145,3 @@ Specify the license under which your project is distributed. If applicable, incl
 ## Acknowledgements
 
 Acknowledge any individuals, organizations, or resources that contributed to your project.
-

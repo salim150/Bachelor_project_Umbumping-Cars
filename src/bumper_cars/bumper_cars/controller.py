@@ -34,9 +34,10 @@ L_d = json_object["Controller"]["L_d"]  # [m] look-ahead distance
 max_steer = json_object["Controller"]["max_steer"]  # [rad] max steering angle
 max_acc = json_object["Controller"]["max_acc"]  # [rad] max acceleration
 min_acc = json_object["Controller"]["min_acc"]  # [rad] min acceleration
-max_speed = json_object["Controller"]["max_speed"]  # [rad] max speed
-min_speed = json_object["Controller"]["min_speed"]  # [rad] min speed
+max_speed = json_object["Car_model"]["max_speed"]  # [rad] max speed
+min_speed = json_object["Car_model"]["min_speed"]  # [rad] min speed
 controller_type = json_object["Controller"]["controller_type"]
+cbf_type = json_object["Controller"]["cbf_type"]
 debug = False
 robot_num = json_object["robot_num"]
 safety = json_object["safety"]
@@ -110,6 +111,7 @@ class Controller(Node):
             # Initializing the robots
             self.paths = []
             self.targets = []
+            self.dilated_traj = []
             if plot_traj:
                 self.multi_traj = MultiplePaths()
             multi_control = MultiControl()
@@ -117,6 +119,7 @@ class Controller(Node):
             for i in range(robot_num):
                 self.paths.append(self.create_path())
                 self.targets.append([self.paths[i][0].x, self.paths[i][0].y])
+                self.dilated_traj.append(Point(x0[i], y0[i]).buffer(dilation_factor, cap_style=3))
                 initial_state = State(x=x0[i], y=y0[i], yaw=yaw[i], v=v[i], omega=omega[i])
                 if plot_traj:
                     self.multi_traj.multiple_path.append(predict_trajectory(initial_state, self.targets[i]))
@@ -258,49 +261,27 @@ class Controller(Node):
         """
         DWA callback function, that uses the dynamic window approach algorithm. 
         """
-        predict_time = 2
-        dt = 0.1
-
         multi_control = MultiControl()
-        dilation_factor = 2
-        dilated_traj = []
-        for i in range(robot_num):
-            dilated_traj.append(Point(multi_state.multiple_state[i].x, multi_state.multiple_state[i].y).buffer(dilation_factor, cap_style=3))
         
-        # predicted_trajectory = np.zeros((robot_num, round(predict_time/dt)+1, 4))
-
         for i in range(robot_num):
             pose = multi_state.multiple_state[i]
             if self.dist(point1=(pose.x, pose.y), point2=self.targets[i]) < L_d:
-                # self.get_logger().info("Updating the path for robot " + str(i))
                 self.paths[i] = self.update_path(self.paths[i])
                 self.targets[i] = (self.paths[i][0].x, self.paths[i][0].y)
-                if plot_traj:
-                    trajectory = predict_trajectory(pose, target)
 
             ob = []
             for idx in range(robot_num):
                 if idx == i:
                     continue
-                point = Point(multi_state.multiple_state[idx].x, multi_state.multiple_state[idx].y).buffer(dilation_factor, cap_style=3)
-                ob.append(point)
-                ob.append(dilated_traj[idx])
-        
+                ob.append(self.dilated_traj[idx])
+
             x1 = state_to_array(multi_state.multiple_state[i]).reshape(4)
             u1, predicted_trajectory1 = dwa_control(x1, self.targets[i], ob)
-            line = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1]))
-            dilated = line.buffer(dilation_factor, cap_style=3)
-            dilated_traj[i] = dilated
-            # x1 = motion(x1, u1, config.dt)
-            # x[:, i] = x1
-            # predicted_trajectory[i, :, :] = predicted_trajectory1
-
-            cmd = ControlInputs(throttle=float(u1[0]), delta=float(u1[1]))
-            multi_control.multi_control.append(cmd)
+            self.dilated_traj[i] = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1])).buffer(dilation_factor, cap_style=3)
+            
+            multi_control.multi_control.append(ControlInputs(throttle=float(u1[0]), delta=float(u1[1])))
         
         self.multi_control_pub.publish(multi_control)
-
-    # trajectory = np.dstack([trajectory, x])
         
 
     def control_callback(self, pose: FullState, target, path, trajectory):
@@ -341,8 +322,10 @@ class Controller(Node):
             dxu[0,i], dxu[1,i] = multi_control.multi_control[i].throttle, multi_control.multi_control[i].delta
             x[:,i] = state_to_array(multi_state.multiple_state[i]).reshape(4)
         
-        # dxu = CBF(x, dxu)
-        dxu = C3BF(x, dxu)
+        if cbf_type == "CBF_simple":
+            dxu = CBF(x, dxu)
+        else:
+            dxu = C3BF(x, dxu)
 
         multi_control = MultiControl()
         for i in range(robot_num):
@@ -466,8 +449,8 @@ class Controller(Node):
         marker.pose = self.convert_to_pose(state)
         # so that the marker is on the ground
         marker.pose.position.z = 0.5
-        marker.scale.x = 2.9
-        marker.scale.y = 1.45
+        marker.scale.x = L
+        marker.scale.y = WB
         marker.scale.z = 1.0
         marker.color.r = color[0]
         marker.color.g = color[1]

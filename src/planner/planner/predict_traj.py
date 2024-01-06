@@ -91,7 +91,7 @@ def predict_trajectory(initial_state: State, target):
             plt.pause(0.000001)
     
     # Reduce the number of points in the trajectory for efficiency
-    traj = traj[0:-1:5]
+    # traj = traj[0:-1:5]
 
     return Path(path=traj)
 

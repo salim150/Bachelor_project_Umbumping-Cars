@@ -1,1 +1,0 @@
-/home/giacomo/thesis_ws/src/my_bot/description/build/py_pubsub/colcon_command_prefix_setup_py.sh
