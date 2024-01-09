@@ -173,11 +173,20 @@ def calc_control_and_trajectory(x, dw, goal, ob):
 
     # evaluate all trajectory with sampled input in dynamic window
     # old_time = time.time()
+
+    # for id, info in data.items():
+    # print("\nV:", id)
+    # for key1, info1 in info.items():
+    #     print(f'\nAcc: {key1}')
+    #     for key2, info2 in info1.items():
+    #         print(f'delta: {key2}')
+    #         print(info2)
+    nearest = find_nearest(np.arange(min_speed, max_speed, v_resolution), x[3])
+
     for a in np.arange(dw[0], dw[1]+v_resolution, v_resolution):
         for delta in np.arange(dw[2], dw[3]+delta_resolution, delta_resolution):
 
             # old_time = time.time()
-            nearest = find_nearest(np.arange(min_speed, max_speed, v_resolution), x[3])
             geom = data[str(nearest)][str(a)][str(delta)]
             geom = np.array(geom)
             geom[:,0:2] = (geom[:,0:2]) @ rotateMatrix(np.radians(90)-x[2]) + [x[0],x[1]]
@@ -188,9 +197,9 @@ def calc_control_and_trajectory(x, dw, goal, ob):
             # calc cost
 
             to_goal_cost = to_goal_cost_gain * calc_to_goal_cost(trajectory, goal)
-            speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
+            # speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
             ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory, ob)
-            heading_cost = heading_cost_gain * calc_to_goal_heading_cost(trajectory, goal)
+            # heading_cost = heading_cost_gain * calc_to_goal_heading_cost(trajectory, goal)
             final_cost = to_goal_cost + ob_cost # + heading_cost #+ speed_cost 
             
             # search minimum trajectory
@@ -221,9 +230,9 @@ def calc_obstacle_cost(trajectory, ob):
     y = trajectory[:, 1]
 
     # check if the trajectory is out of bounds
-    if any(element < -width_init/2 or element > width_init/2 for element in x):
+    if any(element < -width_init/2+WB or element > width_init/2-WB for element in x):
         return np.inf
-    if any(element < -height_init/2 or element > height_init/2 for element in y):
+    if any(element < -height_init/2+WB or element > height_init/2-WB for element in y):
         return np.inf
 
     for obstacle in ob:
@@ -335,13 +344,16 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.rectangle):
                 paths[i] = utils.update_path(paths[i])
                 targets[i] = (paths[i][0].x, paths[i][0].y)
 
+            x1 = x[:, i]
+
             ob = []
             for idx in range(robot_num):
                 if idx == i:
                     continue
+                if utils.dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < WB: raise Exception('Collision')
+    
                 ob.append(dilated_traj[idx])
             
-            x1 = x[:, i]
             u1, predicted_trajectory1 = dwa_control(x1, targets[i], ob)
             line = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1]))
             dilated = line.buffer(dilation_factor, cap_style=3)
