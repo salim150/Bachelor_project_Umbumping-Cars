@@ -134,6 +134,21 @@ $$\cos(\phi) = \frac{\sqrt{\|p_{rel}\|^2 - R^2}}{\|p_{rel}\|}$$
 <img src="./Readme/DWA.gif" alt="Simulation GIF" width="50%">
 </p>
 
+### Model Predictive Control (MPC)
+
+$$ 
+\begin{align*}
+u_i^{\ast}(x,t) = \min_{u \in U} C_f(x(T), u(T)) + \sum_k C(x(k), u(k)) \textrm{ for k = 1, 2, 3, ..., T} \\
+\textrm{s.t. } L_f h_{i,j}(x) + L_g h_{i,j}(x)\cdot u_i + \kappa(h_{i,j}(x))\geq 0 \\
+
+i,j \in \{1, 2, \dots , N\} \textrm{ , } i\neq j
+\end{align*}
+$$
+
+<p align="center">
+<img src="./Readme/MPC.gif" alt="Simulation GIF" width="50%">
+</p>
+
 ## TODO
 - add a lot of function to make the code more readable. Preferrable: put all this functions in a utils.py file.
 
