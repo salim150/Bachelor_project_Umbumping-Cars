@@ -48,7 +48,7 @@ c_a = json_object["Car_model"]["c_a"]
 c_r1 = json_object["Car_model"]["c_r1"]
 WB = json_object["Controller"]["WB"] # Wheel base
 L_d = json_object["Controller"]["L_d"]  # [m] look-ahead distance
-robot_num = json_object["robot_num"]
+robot_num = 1 #json_object["robot_num"]
 safety_init = json_object["safety"]
 width_init = json_object["width"]
 height_init = json_object["height"]
@@ -224,7 +224,7 @@ class ModelPredictiveControl:
             # Heading cost
             cost += 10 * (heading - state[2])**2
 
-            # cost +=  2 * (ref[2] - state[2])**2
+            cost +=  2 * (ref[2] - state[2])**2
 
             # negative speed cost
             cost += -10 * np.sign(speed) * 3 * speed
@@ -654,4 +654,4 @@ def main5():
 if __name__ == '__main__':
     # main()
     # main2()
-    main4()
+    main5()

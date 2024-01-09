@@ -213,7 +213,7 @@ class ModelPredictiveControl:
 
             state = self.plant_model(state, self.dt, u[i*2], u[i*2 + 1])
 
-            distance_to_goal = np.sqrt((ref[0] - state[0])**2 + (ref[1] - state[1])**2)
+            distance_to_goal = (ref[0] - state[0])**2 + (ref[1] - state[1])**2
 
             # Position cost
             cost +=  30 * distance_to_goal
@@ -227,15 +227,16 @@ class ModelPredictiveControl:
             # Heading cost
             cost += 10 * (heading - state[2])**2
 
-            cost +=  2 * (ref[2] - state[2])**2
+            # cost +=  2 * (ref[2] - state[2])**2
 
             # Acceleration cost
             if abs(u[2*i]) > 0.2:
                 cost += (speed - state[3])**2
 
         cost += (state[3])**2
-        distance_to_goal = np.sqrt((ref[0] - state[0])**2 + (ref[1] - state[1])**2)
-        cost += 100*distance_to_goal
+        cost +=  2 * (ref[2] - state[2])**2
+        distance_to_goal = (ref[0] - state[0])**2 + (ref[1] - state[1])**2
+        cost += 10*distance_to_goal
         return cost
 
     def propagation1(self, u):
@@ -524,7 +525,7 @@ def main4():
             # MPC control
             print("Robot " + str(i))
             u_solution = minimize(mpc.cost_function3, u1, (x1, ref[i]),
-                                method='SLSQP',
+                                method='BFGS',
                                 bounds=bounds,
                                 constraints=constraints,
                                 tol = 1e-3)
