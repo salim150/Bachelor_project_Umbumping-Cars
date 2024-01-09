@@ -300,6 +300,11 @@ def main(args=None):
                 targets[i] = (paths[i][0].x, paths[i][0].y)
                 # multi_traj.multiple_path[i] = predict_trajectory(x1, targets[i])
 
+            for idx in range(robot_num):
+                if idx == i:
+                    continue
+                if dist([x1.x, x1.y], [x[0, idx], x[1, idx]]) < WB: raise Exception('Collision')
+            
             cmd = ControlInputs()
             cmd.throttle, cmd.delta= pure_pursuit_steer_control(targets[i], x1)
 

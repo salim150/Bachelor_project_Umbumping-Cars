@@ -134,6 +134,9 @@ $$\cos(\phi) = \frac{\sqrt{\|p_{rel}\|^2 - R^2}}{\|p_{rel}\|}$$
 <img src="./Readme/DWA.gif" alt="Simulation GIF" width="50%">
 </p>
 
+## TODO
+- add a lot of function to make the code more readable. Preferrable: put all this functions in a utils.py file.
+
 ## ROS2 and Rviz2 Integration
 
 Explain how ROS2 and Rviz2 are integrated into the project. Include details on communication between nodes, topics used, and how to visualize the simulation in Rviz2.
