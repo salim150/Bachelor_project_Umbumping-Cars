@@ -1,6 +1,7 @@
 import math
 import numpy as np
 from scipy.interpolate import interp1d
+import matplotlib.pyplot as plt
 
 # motion parameter
 L = 1.0  # wheel base
@@ -47,7 +48,7 @@ def generate_trajectory(s, km, kf, k0):
     t = np.arange(0.0, time, time / n)
     fkp = interp1d(tk, kk, kind="quadratic")
     kp = [fkp(ti) for ti in t]
-    dt = float(time / n)
+    dt = abs(float(time / n))
 
     #  plt.plot(t, kp)
     #  plt.show()
@@ -66,7 +67,7 @@ def generate_trajectory(s, km, kf, k0):
 
 def generate_last_state(s, km, kf, k0):
     n = s / ds
-    time = s / v  # [s]
+    time = abs(s / v)  # [s]
 
     if isinstance(n, type(np.array([]))):
         n = n[0]

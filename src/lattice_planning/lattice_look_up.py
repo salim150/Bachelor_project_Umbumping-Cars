@@ -14,7 +14,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 import math
 
-from planner import lattice_planner as trajectory_generator,\
+import lattice_planner as trajectory_generator,\
     lattice_motion_model as motion_model
 
 

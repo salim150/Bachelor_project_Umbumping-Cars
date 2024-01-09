@@ -24,8 +24,8 @@ import math
 import pathlib
 sys.path.append(str(pathlib.Path(__file__).parent.parent))
 
-import planner.lattice_planner as planner
-import planner.lattice_motion_model as motion_model
+import lattice_planner as planner
+import lattice_motion_model as motion_model
 
 TABLE_PATH = os.path.dirname(os.path.abspath(__file__)) + "/lookup_table.csv"
 
@@ -145,6 +145,10 @@ def calc_biased_polar_states(goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_
 
     states = sample_states(di, a_min, a_max, d, p_max, p_min, nh)
 
+    di = np.degrees(di)
+    bins = np.arange(min(di), max(di), 2)
+    n, bins, patches = plt.hist(di, bins=bins)
+    plt.show()
     return states
 
 
@@ -275,31 +279,42 @@ def biased_terminal_state_sampling_test1():
 
 
 def biased_terminal_state_sampling_test2():
-    k0 = 0.0
-    nxy = 30
+    k0 = np.deg2rad(10.0)
+    nxy = 20
     nh = 1
     d = 20
-    a_min = np.deg2rad(0.0)
-    a_max = np.deg2rad(45.0)
+    a_min = np.deg2rad(45.0)
+    a_max = np.deg2rad(k0)
     p_min = - np.deg2rad(20.0)
     p_max = np.deg2rad(20.0)
     ns = 100
-    goal_angle = np.deg2rad(30.0)
+    goal_angle = np.deg2rad(0.0)
     states = calc_biased_polar_states(
         goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_max)
     result = generate_path(states, k0)
-
+    
+    yaw_samples = []
     for table in result:
         xc, yc, yawc = motion_model.generate_trajectory(
             table[3], table[4], table[5], k0)
+        yaw_samples.append(yawc[-1])
 
         if show_animation:
             plt.plot(xc, yc, "-r")
 
     if show_animation:
+        a = np.arange(0,d,0.1)
+        plt.plot(a, a*np.sin(goal_angle), "-b")
+        plt.plot(a, a*np.sin(a_min), "-k")
+        plt.plot(a, a*np.sin(a_max), "-k")
         plt.grid(True)
         plt.axis("equal")
         plt.show()
+    
+    yaw_samples = np.degrees(yaw_samples)
+    bins = np.arange(min(yaw_samples), max(yaw_samples), 0.5)
+    n, bins, patches = plt.hist(yaw_samples, bins=bins)
+    plt.show()
 
 
 def lane_state_sampling_test1():
@@ -332,11 +347,11 @@ def lane_state_sampling_test1():
 
 def main():
     planner.show_animation = show_animation
-    uniform_terminal_state_sampling_test1()
-    uniform_terminal_state_sampling_test2()
-    biased_terminal_state_sampling_test1()
+    # uniform_terminal_state_sampling_test1()
+    # uniform_terminal_state_sampling_test2()
+    # biased_terminal_state_sampling_test1()
     biased_terminal_state_sampling_test2()
-    lane_state_sampling_test1()
+    # lane_state_sampling_test1()
 
 
 if __name__ == '__main__':

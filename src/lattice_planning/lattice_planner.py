@@ -14,7 +14,7 @@ import pathlib
 path_planning_dir = pathlib.Path(__file__).parent.parent
 sys.path.append(str(path_planning_dir))
 
-import planner.lattice_motion_model as motion_model
+import lattice_motion_model as motion_model
 
 # optimization parameter
 max_iter = 100
@@ -138,10 +138,13 @@ def optimize_trajectory(target, k0, p):
 def optimize_trajectory_demo():  # pragma: no cover
 
     # target = motion_model.State(x=5.0, y=2.0, yaw=np.deg2rad(00.0))
-    target = motion_model.State(x=5.0, y=2.0, yaw=np.deg2rad(90.0))
+    target = motion_model.State(x=-10.0, y=-2.0, yaw=np.deg2rad(00.0))
+    # target = motion_model.State(19.87806172474534, 2.205144454953997, 0.4595476973074064)
     k0 = 0.0
 
     init_p = np.array([6.0, 0.0, 0.0]).reshape(3, 1)
+    init_p = np.array(
+            [20, 0.0, 0.0]).reshape(3, 1)
     # init_p = np.array([5.84663478, 0.20309538, 0.68336985]).reshape(3, 1)
 
     x, y, yaw, p = optimize_trajectory(target, k0, init_p)
