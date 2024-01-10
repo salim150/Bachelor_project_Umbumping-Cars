@@ -17,11 +17,15 @@ import math
 import lattice_planner as trajectory_generator,\
     lattice_motion_model as motion_model
 
+from shapely.geometry import Point, Polygon, LineString
+from shapely.plotting import plot_polygon, plot_line
+import json
+
 
 def calc_states_list(max_yaw=np.deg2rad(-30.0)):
 
-    x = np.arange(10.0, 30.0, 5.0)
-    y = np.arange(0.0, 20.0, 2.0)
+    x = np.arange(1.5, 6.0, 1.0)
+    y = np.arange(1.0, 4.0, 1.0)
     yaw = np.arange(-max_yaw, max_yaw, max_yaw)
 
     states = []
@@ -61,11 +65,16 @@ def save_lookup_table(file_name, table):
 
 
 def generate_lookup_table():
-    states = calc_states_list(max_yaw=np.deg2rad(-30.0))
+    states = calc_states_list(max_yaw=np.deg2rad(-35.0))
     k0 = 0.0
 
     # x, y, yaw, s, km, kf
     lookup_table = [[1.0, 0.0, 0.0, 1.0, 0.0, 0.0]]
+
+    
+    temp2 = {}
+    temp = {}
+    i = 0
 
     for state in states:
         best_p = search_nearest_one_from_lookup_table(
@@ -82,10 +91,38 @@ def generate_lookup_table():
             print("find good path")
             lookup_table.append(
                 [x[-1], y[-1], yaw[-1], float(p[0, 0]), float(p[1, 0]), float(p[2, 0])])
+            
+            line = LineString(zip(x, y))
+            line1 = LineString(zip(x, -np.array(y)))
+            # dilated = line.buffer(1.5, cap_style=3, join_style=3)
+            # coords = []
+            # for idx in range(len(dilated.exterior.coords)):
+            #     coords.append([dilated.exterior.coords[idx][0], dilated.exterior.coords[idx][1]])
+            temp2[i] = {}
+            temp2[i]['ctrl'] = (float(p[1, 0]), float(p[2, 0]))
+            temp2[i]['x'] = x
+            temp2[i]['y'] = y
+            i +=1
+            temp2[i] = {}
+            temp2[i]['ctrl'] = (-float(p[1, 0]), -float(p[2, 0]))
+            temp2[i]['x'] = x
+            temp2[i]['y'] = list(-np.array(y))
+            i+=1
 
     print("finish lookup table generation")
 
-    save_lookup_table("lookup_table.csv", lookup_table)
+    for id, info in temp2.items():
+        print("\nV:", id)
+        # plot_polygon(info.buffer(0.5, cap_style=3, join_style=3))
+        plot_line(LineString(zip(info['x'], info['y'])))
+    plt.show()
+    # saving the complete trajectories to a csv file
+    with open('src/lattice_planning/LBP.json', 'w') as file:
+        json.dump(temp2, file, indent=4)
+
+    print("\nThe JSON data has been written to 'data.json'")
+
+    save_lookup_table("src/lattice_planning/LBP.csv", lookup_table)
 
     for table in lookup_table:
         x_c, y_c, yaw_c = motion_model.generate_trajectory(

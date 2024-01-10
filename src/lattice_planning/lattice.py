@@ -283,12 +283,12 @@ def biased_terminal_state_sampling_test2():
     nxy = 20
     nh = 1
     d = 20
-    a_min = np.deg2rad(45.0)
-    a_max = np.deg2rad(k0)
+    a_min = np.deg2rad(0.0)
+    a_max = np.deg2rad(45.0)
     p_min = - np.deg2rad(20.0)
     p_max = np.deg2rad(20.0)
     ns = 100
-    goal_angle = np.deg2rad(0.0)
+    goal_angle = np.deg2rad(45.0)
     states = calc_biased_polar_states(
         goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_max)
     result = generate_path(states, k0)
@@ -347,10 +347,10 @@ def lane_state_sampling_test1():
 
 def main():
     planner.show_animation = show_animation
-    # uniform_terminal_state_sampling_test1()
-    # uniform_terminal_state_sampling_test2()
+    uniform_terminal_state_sampling_test1()
+    uniform_terminal_state_sampling_test2()
     # biased_terminal_state_sampling_test1()
-    biased_terminal_state_sampling_test2()
+    # biased_terminal_state_sampling_test2()
     # lane_state_sampling_test1()
 
 

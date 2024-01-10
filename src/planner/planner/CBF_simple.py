@@ -149,11 +149,29 @@ def delta_to_beta_array(delta):
     return beta
 
 def beta_to_delta(beta):
+    """
+    Converts the beta angle to the delta angle.
+
+    Parameters:
+    - beta: The beta angle in radians.
+
+    Returns:
+    - delta: The delta angle in radians.
+    """
     delta = normalize_angle_array(np.arctan2(L*np.tan(beta)/Lr, 1.0))
 
     return delta
 
 def plot_rect(x, y, yaw, r):  # pragma: no cover
+        """
+        Plots a rectangle.
+        
+        Args:
+            x (float): x position.
+            y (float): y position.
+            yaw (float): yaw angle.
+            r (float): length of rectangle.
+        """
         outline = np.array([[-r / 2, r / 2,
                                 (r / 2), -r / 2,
                                 -r / 2],

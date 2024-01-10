@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 # motion parameter
 L = 1.0  # wheel base
 ds = 0.1  # course distance
-v = 10.0 / 3.6  # velocity [m/s]
+v = 1.5 / 3.6  # velocity [m/s]
 
 
 class State:
@@ -24,6 +24,7 @@ def pi_2_pi(angle):
 
 def update(state, v, delta, dt, L):
     state.v = v
+    delta = np.clip(delta, -np.radians(45), np.radians(45))
     state.x = state.x + state.v * math.cos(state.yaw) * dt
     state.y = state.y + state.v * math.sin(state.yaw) * dt
     state.yaw = state.yaw + state.v / L * math.tan(delta) * dt
@@ -35,6 +36,8 @@ def update(state, v, delta, dt, L):
 def generate_trajectory(s, km, kf, k0):
     n = s / ds
     time = s / v  # [s]
+    n = time / 0.1
+
 
     if isinstance(time, type(np.array([]))):
         time = time[0]
@@ -48,7 +51,8 @@ def generate_trajectory(s, km, kf, k0):
     t = np.arange(0.0, time, time / n)
     fkp = interp1d(tk, kk, kind="quadratic")
     kp = [fkp(ti) for ti in t]
-    dt = abs(float(time / n))
+    # dt = abs(float(time / n))
+    dt = 0.1
 
     #  plt.plot(t, kp)
     #  plt.show()
