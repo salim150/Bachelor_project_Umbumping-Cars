@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 # motion parameter
 L = 1.0  # wheel base
 ds = 0.1  # course distance
-v = 1.5 / 3.6  # velocity [m/s]
+v = 5.0 / 3.6  # velocity [m/s]
 
 
 class State:
@@ -34,7 +34,7 @@ def update(state, v, delta, dt, L):
 
 
 def generate_trajectory(s, km, kf, k0):
-    n = s / ds
+    # n = s / ds
     time = s / v  # [s]
     n = time / 0.1
 
@@ -50,7 +50,7 @@ def generate_trajectory(s, km, kf, k0):
     kk = np.array([k0, km, kf])
     t = np.arange(0.0, time, time / n)
     fkp = interp1d(tk, kk, kind="quadratic")
-    kp = [fkp(ti) for ti in t]
+    kp = [float(fkp(ti)) for ti in t]
     # dt = abs(float(time / n))
     dt = 0.1
 
@@ -66,7 +66,7 @@ def generate_trajectory(s, km, kf, k0):
         y.append(state.y)
         yaw.append(state.yaw)
 
-    return x, y, yaw
+    return x, y, yaw, kp
 
 
 def generate_last_state(s, km, kf, k0):

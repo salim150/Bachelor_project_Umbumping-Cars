@@ -49,7 +49,7 @@ safety_init = json_object["safety"]
 width_init = json_object["width"]
 height_init = json_object["height"]
 N=3
-save_flag = False
+save_flag = True
 show_animation = True
 plot_flag = True
 robot_num = json_object["robot_num"]
@@ -204,7 +204,7 @@ def main():
                 temp2[u_total[i][0]][u_total[i][1]] = traj[i, :, :].tolist()
             complete_trajectories[v] = temp2
         
-        print(complete_trajectories)
+        # print(complete_trajectories)
         
         # saving the complete trajectories to a csv file
         with open('trajectories.json', 'w') as file:

@@ -177,6 +177,7 @@ def calc_control_and_trajectory(x, dw, goal, ob):
             geom = np.array(geom)
             geom[:,0:2] = (geom[:,0:2]) @ rotateMatrix(np.radians(90)-x[2]) + [x[0],x[1]]
             # print(time.time()-old_time)
+            geom[:,2] = geom[:,2] - np.pi/2 #bringing also the yaw angle in the new frame
 
             # trajectory = predict_trajectory(x_init, a, delta)
             trajectory = geom

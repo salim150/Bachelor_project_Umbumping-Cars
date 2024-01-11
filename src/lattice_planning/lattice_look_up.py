@@ -24,8 +24,8 @@ import json
 
 def calc_states_list(max_yaw=np.deg2rad(-30.0)):
 
-    x = np.arange(1.5, 6.0, 1.0)
-    y = np.arange(1.0, 4.0, 1.0)
+    x = np.arange(2, 8.0, 1.0)
+    y = np.arange(0.0, 4.0, 1.0)
     yaw = np.arange(-max_yaw, max_yaw, max_yaw)
 
     states = []
@@ -82,9 +82,9 @@ def generate_lookup_table():
 
         target = motion_model.State(x=state[0], y=state[1], yaw=state[2])
         init_p = np.array(
-            [np.hypot(state[0], state[1]), best_p[4], best_p[5]]).reshape(3, 1)
+            [np.hypot(state[0], state[1])*1.5, best_p[4], best_p[5]]).reshape(3, 1)
 
-        x, y, yaw, p = trajectory_generator.optimize_trajectory(target,
+        x, y, yaw, p, kp = trajectory_generator.optimize_trajectory(target,
                                                                 k0, init_p)
 
         if x is not None:
@@ -99,20 +99,22 @@ def generate_lookup_table():
             # for idx in range(len(dilated.exterior.coords)):
             #     coords.append([dilated.exterior.coords[idx][0], dilated.exterior.coords[idx][1]])
             temp2[i] = {}
-            temp2[i]['ctrl'] = (float(p[1, 0]), float(p[2, 0]))
+            temp2[i]['ctrl'] = list(kp)
             temp2[i]['x'] = x
             temp2[i]['y'] = y
+            temp2[i]['yaw'] = yaw
             i +=1
             temp2[i] = {}
-            temp2[i]['ctrl'] = (-float(p[1, 0]), -float(p[2, 0]))
+            temp2[i]['ctrl'] = list(-np.array(kp))
             temp2[i]['x'] = x
             temp2[i]['y'] = list(-np.array(y))
+            temp2[i]['yaw'] = list(-np.array(yaw))
             i+=1
 
     print("finish lookup table generation")
 
     for id, info in temp2.items():
-        print("\nV:", id)
+        print(f"\nV: {id}, lenght: {len(info['x'])}")
         # plot_polygon(info.buffer(0.5, cap_style=3, join_style=3))
         plot_line(LineString(zip(info['x'], info['y'])))
     plt.show()
@@ -125,10 +127,10 @@ def generate_lookup_table():
     save_lookup_table("src/lattice_planning/LBP.csv", lookup_table)
 
     for table in lookup_table:
-        x_c, y_c, yaw_c = motion_model.generate_trajectory(
+        x_c, y_c, yaw_c, kp = motion_model.generate_trajectory(
             table[3], table[4], table[5], k0)
         plt.plot(x_c, y_c, "-r")
-        x_c, y_c, yaw_c = motion_model.generate_trajectory(
+        x_c, y_c, yaw_c, kp = motion_model.generate_trajectory(
             table[3], -table[4], -table[5], k0)
         plt.plot(x_c, y_c, "-r")
 

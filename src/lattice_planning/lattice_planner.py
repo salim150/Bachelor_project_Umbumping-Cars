@@ -106,7 +106,7 @@ def show_trajectory(target, xc, yc):  # pragma: no cover
 
 def optimize_trajectory(target, k0, p):
     for i in range(max_iter):
-        xc, yc, yawc = motion_model.generate_trajectory(p[0, 0], p[1, 0], p[2, 0], k0)
+        xc, yc, yawc, kp = motion_model.generate_trajectory(p[0, 0], p[1, 0], p[2, 0], k0)
         dc = np.array(calc_diff(target, xc, yc, yawc)).reshape(3, 1)
 
         cost = np.linalg.norm(dc)
@@ -132,13 +132,13 @@ def optimize_trajectory(target, k0, p):
         xc, yc, yawc, p = None, None, None, None
         print("cannot calc path")
 
-    return xc, yc, yawc, p
+    return xc, yc, yawc, p, kp
 
 
 def optimize_trajectory_demo():  # pragma: no cover
 
     # target = motion_model.State(x=5.0, y=2.0, yaw=np.deg2rad(00.0))
-    target = motion_model.State(x=-10.0, y=-2.0, yaw=np.deg2rad(00.0))
+    target = motion_model.State(x=10.0, y=0.0, yaw=np.deg2rad(00.0))
     # target = motion_model.State(19.87806172474534, 2.205144454953997, 0.4595476973074064)
     k0 = 0.0
 
@@ -147,7 +147,7 @@ def optimize_trajectory_demo():  # pragma: no cover
             [20, 0.0, 0.0]).reshape(3, 1)
     # init_p = np.array([5.84663478, 0.20309538, 0.68336985]).reshape(3, 1)
 
-    x, y, yaw, p = optimize_trajectory(target, k0, init_p)
+    x, y, yaw, p, kp = optimize_trajectory(target, k0, init_p)
 
     if show_animation:
         show_trajectory(target, x, y)

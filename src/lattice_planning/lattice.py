@@ -65,7 +65,7 @@ def generate_path(target_states, k0):
         init_p = np.array(
             [np.hypot(state[0], state[1]), bestp[4], bestp[5]]).reshape(3, 1)
 
-        x, y, yaw, p = planner.optimize_trajectory(target, k0, init_p)
+        x, y, yaw, p, kp = planner.optimize_trajectory(target, k0, init_p)
 
         if x is not None:
             print("find good path")
@@ -210,7 +210,7 @@ def uniform_terminal_state_sampling_test1():
     result = generate_path(states, k0)
 
     for table in result:
-        xc, yc, yawc = motion_model.generate_trajectory(
+        xc, yc, yawc, kp = motion_model.generate_trajectory(
             table[3], table[4], table[5], k0)
 
         if show_animation:
@@ -237,7 +237,7 @@ def uniform_terminal_state_sampling_test2():
     result = generate_path(states, k0)
 
     for table in result:
-        xc, yc, yawc = motion_model.generate_trajectory(
+        xc, yc, yawc, kp = motion_model.generate_trajectory(
             table[3], table[4], table[5], k0)
 
         if show_animation:
@@ -267,7 +267,7 @@ def biased_terminal_state_sampling_test1():
     result = generate_path(states, k0)
 
     for table in result:
-        xc, yc, yawc = motion_model.generate_trajectory(
+        xc, yc, yawc, kp = motion_model.generate_trajectory(
             table[3], table[4], table[5], k0)
         if show_animation:
             plt.plot(xc, yc, "-r")
@@ -295,7 +295,7 @@ def biased_terminal_state_sampling_test2():
     
     yaw_samples = []
     for table in result:
-        xc, yc, yawc = motion_model.generate_trajectory(
+        xc, yc, yawc, kp = motion_model.generate_trajectory(
             table[3], table[4], table[5], k0)
         yaw_samples.append(yawc[-1])
 
@@ -333,7 +333,7 @@ def lane_state_sampling_test1():
         plt.close("all")
 
     for table in result:
-        x_c, y_c, yaw_c = motion_model.generate_trajectory(
+        x_c, y_c, yaw_c, kp = motion_model.generate_trajectory(
             table[3], table[4], table[5], k0)
 
         if show_animation:
