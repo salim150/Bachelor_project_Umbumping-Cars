@@ -24,7 +24,7 @@ import json
 
 def calc_states_list(max_yaw=np.deg2rad(-30.0)):
 
-    x = np.arange(2, 8.0, 1.0)
+    x = np.arange(1.0, 8.0, 1.0)
     y = np.arange(0.0, 4.0, 1.0)
     yaw = np.arange(-max_yaw, max_yaw, max_yaw)
 
@@ -80,6 +80,7 @@ def generate_lookup_table():
         best_p = search_nearest_one_from_lookup_table(
             state[0], state[1], state[2], lookup_table)
 
+        if state[0] == 1.0: print(state)
         target = motion_model.State(x=state[0], y=state[1], yaw=state[2])
         init_p = np.array(
             [np.hypot(state[0], state[1])*1.5, best_p[4], best_p[5]]).reshape(3, 1)
@@ -114,7 +115,7 @@ def generate_lookup_table():
     print("finish lookup table generation")
 
     for id, info in temp2.items():
-        print(f"\nV: {id}, lenght: {len(info['x'])}")
+        print(f"\nV: {id}, lenght: {np.degrees(info['ctrl'])}")
         # plot_polygon(info.buffer(0.5, cap_style=3, join_style=3))
         plot_line(LineString(zip(info['x'], info['y'])))
     plt.show()

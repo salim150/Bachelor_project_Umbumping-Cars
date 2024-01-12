@@ -47,18 +47,19 @@
             "delta_resolution": 15,
             "dt": 0.1,
             "predict_time": 2,
-            "to_goal_cost_gain": 1.0,
-            "speed_cost_gain": 0.5,
-            "obstacle_cost_gain": 10,
+            "to_goal_cost_gain": 1,
+            "speed_cost_gain": 1,
+            "obstacle_cost_gain": 30,
+            "heading_cost_gain": 1,
             "robot_stuck_flag_cons": 0.001,
-            "dilation_factor": 0.75
+            "dilation_factor": 0.35
         },
     "Car_model":
         {
             "max_steer": 0.785398,
             "max_speed": 10,
             "min_speed": -1.0,
-            "L": 2.9, 
+            "L": 1.0, 
             "Cf": 320.0,
             "Cr": 340.0, 
             "Iz": 225.0,
@@ -69,7 +70,7 @@
     "Controller":
         {
             "max_steer": 0.785398,
-            "WB": 1.45,
+            "WB": 0.7,
             "L_d": 20,
             "max_acc": 5,
             "min_acc": -5,

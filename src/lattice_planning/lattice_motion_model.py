@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 # motion parameter
 L = 1.0  # wheel base
 ds = 0.1  # course distance
-v = 5.0 / 3.6  # velocity [m/s]
+v = 2 # velocity [m/s]
 
 
 class State:

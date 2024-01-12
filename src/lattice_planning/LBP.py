@@ -53,12 +53,12 @@ robot_num = json_object["robot_num"]
 timer_freq = json_object["timer_freq"]
 
 show_animation = True
-v_ref = 5.0 / 3.6 # [m/s] reference speed
+v_ref = 2.0 # [m/s] reference speed
 
 with open('/home/giacomo/thesis_ws/src/lattice_planning/LBP.json', 'r') as file:
     data = json.load(file)
 
-def dwa_control(x, goal, ob):
+def lbp_control(x, goal, ob):
     """
     Dynamic Window Approach control
     """
@@ -207,18 +207,8 @@ def calc_control_and_trajectory(x, dw, goal, ob):
 
             # interpolate the control inputs
 
-            best_u = [a, info['ctrl'][1]]
-            # previous_u = info['ctrl']
-            # previous_cost = final_cost
+            best_u = [a, info['ctrl'][2]]
             best_trajectory = trajectory
-            # if abs(best_u[0]) < robot_stuck_flag_cons \
-            #         and abs(x[2]) < robot_stuck_flag_cons:
-            #     # to ensure the robot do not get stuck in
-            #     # best v=0 m/s (in front of an obstacle) and
-            #     # best omega=0 rad/s (heading to the goal with
-            #     # angle difference of 0)
-            #     best_u[1] = -max_steer
-    # print(time.time()-old_time)
     return best_u, best_trajectory #, previous_u, previous_cost
 
 def calc_obstacle_cost(trajectory, ob):
@@ -292,6 +282,7 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.rectangle):
     iterations = 3000
     break_flag = False
     x = np.array([[0, 20, 15], [0, 0, 20], [0, np.pi, -np.pi/2], [0, 0, 0]])
+    u = np.array([[0, 0, 0], [0, 0, 0]])
     goal = np.array([[30, 0, 15], [10, 10, 0]])
     # goal2 = np.array([0, 10])
     cmd1 = ControlInputs()
@@ -326,12 +317,13 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.rectangle):
                 ob.append(dilated_traj[idx])
             
             x1 = x[:, i]
-            u1, predicted_trajectory1 = dwa_control(x1, goal[:,i], ob)
+            u1, predicted_trajectory1 = lbp_control(x1, goal[:,i], ob)
             line = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1]))
             dilated = line.buffer(dilation_factor, cap_style=3)
             dilated_traj[i] = dilated
             x1 = motion(x1, u1, dt)
             x[:, i] = x1
+            u[:, i] = u1
             predicted_trajectory[i] = predicted_trajectory1
 
         trajectory = np.dstack([trajectory, x])
@@ -349,7 +341,9 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.rectangle):
                 plt.plot(x[0,i], x[1,i], "xr")
                 plt.plot(goal[0,i], goal[1,i], "xb")
                 plot_robot(x[0,i], x[1,i], x[2,i])
-                plot_arrow(x[0,i], x[1,i], x[2,i], length=2, width=1)
+                plot_arrow(x[0,i], x[1,i], x[2,i], length=1, width=0.5)
+                plot_arrow(x[0,i], x[1,i], x[2,i]+u[1,i], length=3, width=0.5)
+
 
            
             plt.axis("equal")
