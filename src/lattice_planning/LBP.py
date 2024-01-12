@@ -284,9 +284,9 @@ def main():
     iterations = 3000
     break_flag = False
 
-    x = np.array([[0, 20, 15], [0, 0, 20], [0, np.pi, -np.pi/2], [0, 0, 0]])
+    x = np.array([[-7, 7, 0.0], [0, 0, 7], [0, np.pi, -np.pi/2], [0, 0, 0]])
     u = np.array([[0, 0, 0], [0, 0, 0]])
-    goal = np.array([[30, 0, 15], [10, 10, 0]])
+    goal = np.array([[7.0, -7.0, 0], [7, 7, 0]])
 
     # create a trajcetory array to store the trajectory of the N robots
     trajectory = np.zeros((x.shape[0], N, 1))
@@ -307,12 +307,14 @@ def main():
     for z in range(iterations):
         for i in range(N):
             ob = []
+            x1 = x[:, i]
             for idx in range(N):
                 if idx == i:
                     continue
                 # point = Point(x[0, idx], x[1, idx])
                 # point = point.buffer(dilation_factor, cap_style=3)
                 # ob.append(point)
+                if utils.dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < WB: raise Exception('Collision')
                 ob.append(dilated_traj[idx])
             
             x1 = x[:, i]
@@ -466,6 +468,7 @@ def main1():
         plt.show()
        
 if __name__ == '__main__':
-    main1()
+    # main1()
+    main()
 
     
