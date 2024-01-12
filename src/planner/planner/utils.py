@@ -162,7 +162,7 @@ def normalize_angle(angle):
     """
     Normalize an angle to [-pi, pi].
     :param angle: (float)
-    :return: (float) Angle in radian in [-pi, pi]
+    :return: (float) Angle in radian in [-pidelta, pi]
     """
     while angle > np.pi:
         angle -= 2.0 * np.pi
