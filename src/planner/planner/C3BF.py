@@ -9,7 +9,11 @@ from cvxopt.blas import dot
 from cvxopt.solvers import qp, options
 from cvxopt import matrix, sparse
 from planner.utils import *
+from planner.utils import plot_robot
 from planner.predict_traj import predict_trajectory
+# import planner.utils as utils
+
+from custom_message.msg import ControlInputs, State, Path, Coordinate, MultiplePaths, MultiState, MultiControl
 
 # For the parameter file
 import pathlib
@@ -22,24 +26,43 @@ with open(path, 'r') as openfile:
     # Reading from json file
     json_object = json.load(openfile)
 
-L = json_object["C3BF"]["L"]
+L = json_object["Car_model"]["L"]
 max_steer = json_object["C3BF"]["max_steer"]  # [rad] max steering angle
-max_speed = json_object["C3BF"]["max_speed"] # [m/s]
-min_speed = json_object["C3BF"]["min_speed"] # [m/s]
-magnitude_limit= json_object["C3BF"]["max_speed"] 
+max_speed = json_object["Car_model"]["max_speed"] # [m/s]
+min_speed = json_object["Car_model"]["min_speed"] # [m/s]
 max_acc = json_object["C3BF"]["max_acc"] 
 min_acc = json_object["C3BF"]["min_acc"] 
 dt = json_object["C3BF"]["dt"]
 safety_radius = json_object["C3BF"]["safety_radius"]
 barrier_gain = json_object["C3BF"]["barrier_gain"]
+arena_gain = json_object["C3BF"]["arena_gain"]
 Kv = json_object["C3BF"]["Kv"] # interval [0.5-1]
 Lr = L / 2.0  # [m]
 Lf = L - Lr
 robot_num = json_object["robot_num"]
-safety = json_object["safety"]
-width = json_object["width"]
-height = json_object["height"]
-boundary_points = np.array([-width/2, width/2, -height/2, height/2])
+safety_init = json_object["safety"]
+width_init = json_object["width"]
+height_init = json_object["height"]
+min_dist = json_object["min_dist"]
+boundary_points = np.array([-width_init/2, width_init/2, -height_init/2, height_init/2])
+
+def motion(x, u, dt):
+    """
+    motion model
+    initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
+    """
+    delta = u[1]
+    delta = np.clip(delta, -max_steer, max_steer)
+    throttle = u[0]
+
+    x[0] = x[0] + x[3] * math.cos(x[2]) * dt
+    x[1] = x[1] + x[3] * math.sin(x[2]) * dt
+    x[2] = x[2] + x[3] / L * math.tan(delta) * dt
+    x[2] = normalize_angle(x[2])
+    x[3] = x[3] + throttle * dt
+    x[3] = np.clip(x[3], min_speed, max_speed)
+
+    return x
 
 def C3BF(x, u_ref):
     """
@@ -64,6 +87,9 @@ def C3BF(x, u_ref):
         count = 0
         G = np.zeros([N-1,M])
         H = np.zeros([N-1,1])
+
+        # when the car goes backwards the yaw angle should be flipped --> Why??
+        x[2,i] = (1-np.sign(x[3,i]))*(np.pi/2) + x[2,i]
 
         f = np.array([x[3,i]*np.cos(x[2,i]),
                           x[3,i]*np.sin(x[2,i]), 
@@ -149,36 +175,48 @@ def C3BF(x, u_ref):
 
         # Adding arena boundary constraints
         # Pos Y
-        h = ((x[1,i] - boundary_points[3])**2 - safety_radius**2 - Kv * x[3,i])
-        gradH = np.array([0, 2*(x[1,i] - boundary_points[3]), 0, -Kv])
+        h = ((x[1,i] - boundary_points[3])**2 - safety_radius**2 - Kv * abs(x[3,i]))
+        if x[3,i] >= 0:
+            gradH = np.array([0, 2*(x[1,i] - boundary_points[3]), 0, -Kv])
+        else:
+            gradH = np.array([0, 2*(x[1,i] - boundary_points[3]), 0, Kv])
         Lf_h = np.dot(gradH.T, f)
         Lg_h = np.dot(gradH.T, g)
         G = np.vstack([G, -Lg_h])
-        H = np.vstack([H, np.array([0.001*h**3 + Lf_h])])
+        H = np.vstack([H, np.array([arena_gain*h**3 + Lf_h])])
         
         # Neg Y
-        h = ((x[1,i] - boundary_points[2])**2 - safety_radius**2 - Kv * x[3,i])
-        gradH = np.array([0, 2*(x[1,i] - boundary_points[2]), 0, -Kv])
+        h = ((x[1,i] - boundary_points[2])**2 - safety_radius**2 - Kv * abs(x[3,i]))
+        if x[3,i] >= 0:
+            gradH = np.array([0, 2*(x[1,i] - boundary_points[2]), 0, -Kv])
+        else:
+            gradH = np.array([0, 2*(x[1,i] - boundary_points[2]), 0, Kv])
         Lf_h = np.dot(gradH.T, f)
         Lg_h = np.dot(gradH.T, g)
         G = np.vstack([G, -Lg_h])
-        H = np.vstack([H, np.array([0.001*h**3 + Lf_h])])
+        H = np.vstack([H, np.array([arena_gain*h**3 + Lf_h])])
         
         # Pos X
-        h = ((x[0,i] - boundary_points[1])**2 - safety_radius**2 - Kv * x[3,i])
-        gradH = np.array([2*(x[0,i] - boundary_points[1]), 0, 0, -Kv])
+        h = ((x[0,i] - boundary_points[1])**2 - safety_radius**2 - Kv * abs(x[3,i]))
+        if x[3,i] >= 0:
+            gradH = np.array([2*(x[0,i] - boundary_points[1]), 0, 0, -Kv])
+        else:
+            gradH = np.array([2*(x[0,i] - boundary_points[1]), 0, 0, Kv])
         Lf_h = np.dot(gradH.T, f)
         Lg_h = np.dot(gradH.T, g)
         G = np.vstack([G, -Lg_h])
-        H = np.vstack([H, np.array([0.001*h**3 + Lf_h])])
+        H = np.vstack([H, np.array([arena_gain*h**3 + Lf_h])])
 
         # Neg X
-        h = ((x[0,i] - boundary_points[0])**2 - safety_radius**2 - Kv * x[3,i])
-        gradH = np.array([2*(x[0,i] - boundary_points[0]), 0, 0, -Kv])
+        h = ((x[0,i] - boundary_points[0])**2 - safety_radius**2 - Kv * abs(x[3,i]))
+        if x[3,i] >= 0:
+            gradH = np.array([2*(x[0,i] - boundary_points[0]), 0, 0, -Kv])
+        else:
+            gradH = np.array([2*(x[0,i] - boundary_points[0]), 0, 0, Kv])
         Lf_h = np.dot(gradH.T, f)
         Lg_h = np.dot(gradH.T, g)
         G = np.vstack([G, -Lg_h])
-        H = np.vstack([H, np.array([0.001*h**3 + Lf_h])])
+        H = np.vstack([H, np.array([arena_gain*h**3 + Lf_h])])
         
         # Input constraints
         G = np.vstack([G, [[0, 1], [0, -1]]])
@@ -223,74 +261,75 @@ def plot_rect(x, y, yaw, r):  # pragma: no cover
         outline[1, :] += y
         plt.plot(np.array(outline[0, :]).flatten(),
                     np.array(outline[1, :]).flatten(), "-k")
+   
 
 def main(args=None):
     # Instantiate Robotarium object
-    N = 2
     # The robots will never reach their goal points so set iteration number
     iterations = 3000
     # Define goal points outside of the arena
-    goal_points = np.array(np.mat('5 5 5 5 5; 5 5 5 5 5; 0 0 0 0 0'))
-    # Create barrier certificates to avoid collision
-    # uni_barrier_cert = create_unicycle_barrier_certificate_with_boundary()
-    # define x initially --> state: [x, y, yaw, v]
-    x = np.array([[0, 20], [0, 0], [0, np.pi], [0, 0]])
-    goal1 = np.array([10, 0])
-    goal2 = np.array([0, 0])
-    cmd1 = ControlInputs()
-    cmd2 = ControlInputs()
-    trajectory = predict_trajectory(array_to_state(x[:,0]), goal1)
-    trajectory2 = predict_trajectory(array_to_state(x[:,1]), goal2)
+    x0, y, yaw, v, omega, model_type = samplegrid(width_init, height_init, min_dist, robot_num, safety_init)
+    x = np.array([x0, y, yaw, v])
+
+    paths = []
+    targets = []
+    # multi_traj = MultiplePaths()
+    multi_control = MultiControl()
+    dxu = np.zeros((2,robot_num))
+    for i in range(robot_num):
+        paths.append(create_path())
+        targets.append([paths[i][0].x, paths[i][0].y])
+        initial_state = State(x=x0[i], y=y[i], yaw=yaw[i], v=v[i], omega=omega[i])
+        # multi_traj.multiple_path.append(predict_trajectory(initial_state, targets[i]))
+        multi_control.multi_control.append(ControlInputs(delta=0.0, throttle=0.0))
+        
     # While the number of robots at the required poses is less
     # than N...
-    for i in range(iterations):
-        # Create single-integrator control inputs
-        x1 = x[:,0]
-        x2 = x[:, 1]
-        x1 = array_to_state(x1)
-        x2 = array_to_state(x2)
-        
-        dxu = np.zeros((2,N))
-        dxu[0,0], dxu[1,0] = pure_pursuit_steer_control(goal1, x1)
-        dxu[0,1], dxu[1,1] = pure_pursuit_steer_control(goal2, x2)
-        # Create safe control inputs (i.e., no collisions)
-        # print(dxu)
-        dxu = C3BF(x, dxu)
-        # print(dxu)
-        # print('\n')
-        cmd1.throttle, cmd1.delta = dxu[0,0], dxu[1,0]
-        cmd2.throttle, cmd2.delta = dxu[0,1], dxu[1,1]
-        # Applying command and current state to the model
-        x1 = linear_model_callback(x1, cmd1)
-        x2 = linear_model_callback(x2, cmd2)
+    for z in range(iterations):
         plt.cla()
         # for stopping simulation with the esc key.
         plt.gcf().canvas.mpl_connect(
             'key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
-        plt.plot(x1.x, x1.y, 'xk')
-        plt.plot(x2.x, x2.y, 'xb')
-        plot_arrow(x1.x, x1.y, x1.yaw)
-        plot_arrow(x1.x, x1.y, x1.yaw + cmd1.delta)
-        plot_rect(x1.x, x1.y, x1.yaw, safety_radius)
-        plot_arrow(x2.x, x2.y, x2.yaw)
-        plot_arrow(x2.x, x2.y, x2.yaw + cmd2.delta)
-        plot_rect(x2.x, x2.y, x2.yaw, safety_radius)
-        plot_path(trajectory)
-        plot_path(trajectory2)
-        plt.plot(goal1[0], goal1[1], '.k')
-        plt.plot(goal2[0], goal2[1], '.b')
-        # plot_map()
-        plt.xlim(-50, 50)
-        plt.ylim(-50, 50)
+        
+        # Create single-integrator control inputs
+        for i in range(robot_num):
+            x1 = array_to_state(x[:,i])
+            if dist(point1=(x[0,i], x[1,i]), point2=targets[i]) < 5:
+                paths[i] = update_path(paths[i])
+                targets[i] = (paths[i][0].x, paths[i][0].y)
+                # multi_traj.multiple_path[i] = predict_trajectory(x1, targets[i])
+
+            for idx in range(robot_num):
+                if idx == i:
+                    continue
+                if dist([x1.x, x1.y], [x[0, idx], x[1, idx]]) < WB: raise Exception('Collision')
+            
+            cmd = ControlInputs()
+            cmd.throttle, cmd.delta= pure_pursuit_steer_control(targets[i], x1)
+
+            dxu[0,i], dxu[1,i] = cmd.throttle, cmd.delta            
+            dxu = C3BF(x, dxu)
+            cmd.throttle, cmd.delta = dxu[0,i], dxu[1,i]
+            x1 = linear_model_callback(x1, cmd)
+            x1 = state_to_array(x1).reshape(4)
+            x[:, i] = x1
+            multi_control.multi_control[i] = cmd
+    
+            # plt.plot(x[0,i], x[1,i], "xr")
+            # plt.plot(goal[0,i], goal[1,i], "xb")plot_arrow(x1.x, x1.y, x1.yaw)
+            plot_robot(x[0,i], x[1,i], x[2,i])
+            # plot_rect(x[0,i], x[1,i], x[2,i], safety_radius)
+            plot_arrow(x[0,i], x[1,i], x[2,i] + multi_control.multi_control[i].delta, length=2, width=1)
+            plot_arrow(x[0,i], x[1,i], x[2,i], length=2, width=1)
+            plt.plot(targets[i][0], targets[i][1], "xg")
+            # plot_path(multi_traj.multiple_path[i])
+
+        plot_map(width=width_init, height=height_init)
         plt.axis("equal")
         plt.grid(True)
-        plt.pause(0.000001)
-        x1 = state_to_array(x1)
-        x2 = state_to_array(x2)
-        x = np.concatenate((x1, x2), axis=1)
+        plt.pause(0.0001)
 
-        print(dxu)
 
 
     

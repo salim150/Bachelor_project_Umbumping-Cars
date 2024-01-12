@@ -6,6 +6,7 @@ from planner.cubic_spline_planner import *
 from planner.frenet import *
 from planner.predict_traj import *
 from scipy.spatial.transform import Rotation as Rot
+import random
 
 # For the parameter file
 import pathlib
@@ -19,10 +20,14 @@ with open(path, 'r') as openfile:
     json_object = json.load(openfile)
 
 max_steer = json_object["CBF_simple"]["max_steer"]   # [rad] max steering angle
-max_speed = json_object["CBF_simple"]["max_speed"] # [m/s]
-min_speed = json_object["CBF_simple"]["min_speed"]  # [m/s]
+max_speed = json_object["Car_model"]["max_speed"] # [m/s]
+min_speed = json_object["Car_model"]["min_speed"]  # [m/s]
 dt = json_object["CBF_simple"]["dt"] 
-L = json_object["CBF_simple"]["L"] # [m] Wheel base of vehicle
+safety_init = json_object["safety"]
+width_init = json_object["width"]
+height_init = json_object["height"]
+min_dist = json_object["min_dist"]
+L = json_object["Car_model"]["L"] # [m] Wheel base of vehicle
 Lr = L / 2.0  # [m]
 Lf = L - Lr
 
@@ -206,9 +211,9 @@ def plot_arrow(x, y, yaw, length=0.5, width=0.1):  # pragma: no cover
         plt.arrow(x, y, length * math.cos(yaw), length * math.sin(yaw),
                 head_length=width, head_width=width)
         
-def plot_map(width=100, heigth=100):
+def plot_map(width=100, height=100):
         corner_x = [-width/2.0, width/2.0, width/2.0, -width/2.0, -width/2.0]
-        corner_y = [heigth/2.0, heigth/2.0, -heigth/2.0, -heigth/2.0, heigth/2.0]
+        corner_y = [height/2.0, height/2.0, -height/2.0, -height/2.0, height/2.0]
 
         plt.plot(corner_x, corner_y)
 
@@ -318,3 +323,96 @@ def rot_mat_2d(angle):
 
     """
     return Rot.from_euler('z', angle).as_matrix()[0:2, 0:2]
+
+def samplegrid(width_init, height_init, min_dist, robot_num, safety_init):
+    """
+    Generate random grid coordinates for robots in a given map.
+
+    Args:
+        width_init (float): Initial width of the map.
+        height_init (float): Initial height of the map.
+        min_dist (float): Minimum distance between robots.
+        robot_num (int): Number of robots.
+        safety_init (float): Safety border around the map boundaries.
+
+    Returns:
+        tuple: A tuple containing the x-coordinates, y-coordinates, yaw angles,
+               velocities, angular velocities, and model types for the robots.
+    """
+    # defining the boundaries
+    safety = safety_init # safety border around the map boundaries
+    width = width_init - safety
+    height = height_init - safety
+    # min_dis
+    N = int(width/min_dist)
+    M = int(height/min_dist)
+    x_mesh = np.linspace(-width/2, width/2, N)
+    y_mesh = np.linspace(-height/2, height/2, M)
+
+    list = [divmod(i, M) for i in random.sample(range(N * M), robot_num)]
+    list = np.array(list)
+    x = x_mesh[list[:, 0]]
+    y = y_mesh[list[:, 1]]
+    yaw = []
+    while len(yaw)<robot_num:
+        yaw.append(np.radians(random.randint(-180, 180)))
+
+    v = robot_num * [0.0]
+    omega = robot_num * [0.0]
+    model_type = robot_num * ['linear']
+    return x.tolist(), y.tolist(), yaw, v, omega, model_type
+
+def dist(point1, point2):
+    """
+    Calculates the Euclidean distance between two points.
+
+    :param point1: (tuple) x, y coordinates of the first point
+    :param point2: (tuple) x, y coordinates of the second point
+    :return: (float) Euclidean distance between the two points
+    """
+    x1, y1 = point1
+    x2, y2 = point2
+
+    x1 = float(x1)
+    x2 = float(x2)
+    y1 = float(y1)
+    y2 = float(y2)
+
+    distance = math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+    return distance
+
+def update_path(path: Path):
+    """
+    Updates the path by removing the first waypoint and adding a new random waypoint.
+
+    Removes the first waypoint from the path and adds a new random waypoint within the specified boundaries.
+    """
+    path.pop(0)
+    path.append(Coordinate(x=float(random.randint(-width_init/2, width_init/2)), y=float(random.randint(-height_init/2, height_init/2))))
+    return path
+
+def create_path(len_path=5):
+    """
+    Creates a random path.
+
+    Generates a random path by creating a list of waypoints within the specified boundaries.
+    """
+    path = []
+    while len(path)<len_path:
+        path.append(Coordinate(x=float(random.randint(-width_init/2, width_init/2)), y=float(random.randint(-height_init/2, height_init/2))))
+    return path
+    
+def plot_robot(x, y, yaw):  # pragma: no cover
+    outline = np.array([[-L / 2, L / 2,
+                            (L / 2), -L / 2,
+                            -L / 2],
+                        [WB / 2, WB / 2,
+                            - WB / 2, -WB / 2,
+                            WB / 2]])
+    Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
+                        [-math.sin(yaw), math.cos(yaw)]])
+    outline = (outline.T.dot(Rot1)).T
+    outline[0, :] += x
+    outline[1, :] += y
+    plt.plot(np.array(outline[0, :]).flatten(),
+                np.array(outline[1, :]).flatten(), "-k")

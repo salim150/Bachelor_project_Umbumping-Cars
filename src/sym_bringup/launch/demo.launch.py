@@ -18,13 +18,14 @@ robot_num = json_object["robot_num"]
 safety_init = json_object["safety"]
 width_init = json_object["width"]
 height_init = json_object["height"]
+min_dist = json_object["min_dist"]
 
 def samplegrid():
     # defining the boundaries
     safety = safety_init # safety border around the map boundaries
     width = width_init - safety
     height = height_init - safety
-    min_dist = 15
+    # min_dis
     N = int(width/min_dist)
     M = int(height/min_dist)
     x_mesh = np.linspace(-width/2, width/2, N)

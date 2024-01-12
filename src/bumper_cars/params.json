@@ -1,7 +1,6 @@
 {
     "CBF_robotarium": 
         {
-            "L": 2.9,
             "max_steer": 0.523599,
             "max_speed": 6,
             "min_speed": -1.0,
@@ -12,38 +11,34 @@
         },
     "CBF_simple":
         {
-            "L": 2.9,
-            "max_steer": 0.523599,
-            "max_speed": 6,
-            "min_speed": 0.5,
-            "max_acc": 400,
-            "min_acc": -400,
+            "max_steer": 0.785398,
+            "max_acc": 100,
+            "min_acc": -100,
             "dt": 0.1,
-            "safety_radius": 6,
-            "barrier_gain": 0.00001, 
+            "safety_radius": 1.5,
+            "barrier_gain": 0.1, 
+            "arena_gain": 0.01,
             "Kv": 0.1
         },
     "C3BF":
         {
-            "L": 2.9,
             "max_steer": 0.785398,
-            "max_speed": 10,
-            "min_speed": -1.0,
-            "max_acc": 60,
-            "min_acc": -60,
+            "max_acc": 100,
+            "min_acc": -100,
             "dt": 0.1,
-            "safety_radius": 5,
+            "safety_radius": 1.5,
             "barrier_gain": 1, 
-            "Kv": 20
+            "arena_gain": 0.01,
+            "Kv": 0.03
         },
     "DWA":
         {
             "max_steer": 0.785398,
-            "max_speed": 6,
+            "max_speed": 2,
             "min_speed": -1.0,
             "max_acc": 2,
             "min_acc": -2,
-            "v_resolution": 1.0,
+            "v_resolution": 0.5,
             "delta_resolution": 15,
             "dt": 0.1,
             "predict_time": 2,
@@ -57,7 +52,7 @@
     "Car_model":
         {
             "max_steer": 0.785398,
-            "max_speed": 10,
+            "max_speed": 2,
             "min_speed": -1.0,
             "L": 1.0, 
             "Cf": 320.0,
@@ -74,14 +69,16 @@
             "L_d": 20,
             "max_acc": 5,
             "min_acc": -5,
-            "max_speed": 10,
+            "max_speed": 2,
             "min_speed": -1,
-            "controller_type": "DWA"
+            "controller_type": "random_goal",
+            "cbf_type": "C3BF"
         },
-    "robot_num": 8,
-    "safety": 30, 
-    "width": 150,
-    "height": 150.0,
+    "robot_num": 5,
+    "safety": 10, 
+    "min_dist": 3,
+    "width": 30,
+    "height": 30,
     "timer_freq": 0.01,
     "plot_traj": false
     

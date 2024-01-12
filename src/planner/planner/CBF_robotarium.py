@@ -20,7 +20,7 @@ with open(path, 'r') as openfile:
     json_object = json.load(openfile)
 
 # TODO: import all this parameters from a config file so that we can easily change them in one place
-L = json_object["CBF_robotarium"]["L"] 
+L = json_object["Car_model"]["L"]
 max_steer = json_object["CBF_robotarium"]["max_steer"]   # [rad] max steering angle
 max_speed = json_object["CBF_robotarium"]["max_speed"]  # [m/s]
 min_speed = json_object["CBF_robotarium"]["min_speed"]  # [m/s]
