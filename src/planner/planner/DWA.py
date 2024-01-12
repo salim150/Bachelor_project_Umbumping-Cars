@@ -306,7 +306,7 @@ def plot_map():
 
         plt.plot(corner_x, corner_y)
 
-def main(gx=10.0, gy=30.0, robot_type=RobotType.rectangle):
+def main(robot_type=RobotType.rectangle):
     print(__file__ + " start!!")
     # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
     iterations = 3000
@@ -336,6 +336,7 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.rectangle):
     robot_type = robot_type
     fig = plt.figure(1, dpi=90)
     ax = fig.add_subplot(111)
+    
     for z in range(iterations):
         # old_time = time.time()
         for i in range(robot_num):

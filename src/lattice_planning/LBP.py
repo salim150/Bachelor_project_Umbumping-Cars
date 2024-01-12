@@ -9,6 +9,7 @@ from custom_message.msg import ControlInputs
 from shapely.geometry import Point, Polygon, LineString
 from shapely import intersection, distance
 from shapely.plotting import plot_polygon, plot_line
+import planner.utils as utils
 # for debugging
 import time
 
@@ -30,8 +31,10 @@ predict_time = json_object["DWA"]["predict_time"] # [s]
 to_goal_cost_gain = json_object["DWA"]["to_goal_cost_gain"]
 speed_cost_gain = json_object["DWA"]["speed_cost_gain"]
 obstacle_cost_gain = json_object["DWA"]["obstacle_cost_gain"]
+heading_cost_gain = json_object["DWA"]["heading_cost_gain"]
 robot_stuck_flag_cons = json_object["DWA"]["robot_stuck_flag_cons"]
 dilation_factor = json_object["DWA"]["dilation_factor"]
+
 L = json_object["Car_model"]["L"]  # [m] Wheel base of vehicle
 Lr = L / 2.0  # [m]
 Lf = L - Lr
@@ -43,14 +46,13 @@ m = json_object["Car_model"]["m"]  # kg
 c_a = json_object["Car_model"]["c_a"]
 c_r1 = json_object["Car_model"]["c_r1"]
 WB = json_object["Controller"]["WB"] # Wheel base
+L_d = json_object["Controller"]["L_d"]  # [m] look-ahead distance
 robot_num = json_object["robot_num"]
 safety_init = json_object["safety"]
 width_init = json_object["width"]
 height_init = json_object["height"]
+min_dist = json_object["min_dist"]
 N=3
-
-robot_num = json_object["robot_num"]
-timer_freq = json_object["timer_freq"]
 
 show_animation = True
 v_ref = 2.0 # [m/s] reference speed
@@ -224,9 +226,9 @@ def calc_obstacle_cost(trajectory, ob):
     y = trajectory[:, 1]
 
     # check if the trajectory is out of bounds
-    if any(element < -width_init/2 or element > width_init/2 for element in x):
+    if any(element < -width_init/2+WB or element > width_init/2-WB for element in x):
         return np.inf
-    if any(element < -height_init/2 or element > height_init/2 for element in y):
+    if any(element < -height_init/2+WB or element > height_init/2-WB for element in y):
         return np.inf
 
     for obstacle in ob:
@@ -276,17 +278,15 @@ def plot_robot(x, y, yaw):  # pragma: no cover
         plt.plot([x, out_x], [y, out_y], "-k")
 
 
-def main(gx=10.0, gy=30.0, robot_type=RobotType.rectangle):
+def main():
     print(__file__ + " start!!")
     # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
     iterations = 3000
     break_flag = False
+
     x = np.array([[0, 20, 15], [0, 0, 20], [0, np.pi, -np.pi/2], [0, 0, 0]])
     u = np.array([[0, 0, 0], [0, 0, 0]])
     goal = np.array([[30, 0, 15], [10, 10, 0]])
-    # goal2 = np.array([0, 10])
-    cmd1 = ControlInputs()
-    cmd2 = ControlInputs()
 
     # create a trajcetory array to store the trajectory of the N robots
     trajectory = np.zeros((x.shape[0], N, 1))
@@ -302,7 +302,6 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.rectangle):
         dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
 
     # input [throttle, steer (delta)]
-    robot_type = robot_type
     fig = plt.figure(1, dpi=90)
     ax = fig.add_subplot(111)
     for z in range(iterations):
@@ -325,6 +324,7 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.rectangle):
             x[:, i] = x1
             u[:, i] = u1
             predicted_trajectory[i] = predicted_trajectory1
+            print(f'Robot {i} v: {x1[3]}')
 
         trajectory = np.dstack([trajectory, x])
         
@@ -365,8 +365,107 @@ def main(gx=10.0, gy=30.0, robot_type=RobotType.rectangle):
             plt.plot(trajectory[0,i,:], trajectory[1,i,:], "-r")
         plt.pause(0.0001)
         plt.show()
+
+def main1():
+    print(__file__ + " start!!")
+    # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
+    iterations = 3000
+    break_flag = False
+
+    x0, y, yaw, v, omega, model_type = utils.samplegrid(width_init, height_init, min_dist, robot_num, safety_init)
+    x = np.array([x0, y, yaw, v])
+    # u = np.array([[0, 0, 0], [0, 0, 0]])
+    u = np.zeros((2, robot_num))
+
+    # create a trajcetory array to store the trajectory of the robot_num robots
+    trajectory = np.zeros((x.shape[0], robot_num, 1))
+    # append the firt state to the trajectory
+    trajectory[:, :, 0] = x
+    # trajectory = np.dstack([trajectory, x])
+
+    # predicted_trajectory = np.zeros((N, round(predict_time/dt)+1, x.shape[0]))
+    predicted_trajectory = {}
+
+    paths = []
+    targets = []
+    dilated_traj = []
+    for i in range(robot_num):
+        dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
+        paths.append(utils.create_path())
+        targets.append([paths[i][0].x, paths[i][0].y])
+
+    # input [throttle, steer (delta)]
+    fig = plt.figure(1, dpi=90)
+    ax = fig.add_subplot(111)
+
+    for z in range(iterations):
+        for i in range(robot_num):
+            # Updating the paths of the robots
+            if utils.dist(point1=(x[0,i], x[1,i]), point2=targets[i]) < 5:
+                # get_logger().info("Updating the path for robot " + str(i))
+                paths[i] = utils.update_path(paths[i])
+                targets[i] = (paths[i][0].x, paths[i][0].y)
+            
+            x1 = x[:, i]
+
+            ob = []
+            for idx in range(robot_num):
+                if idx == i:
+                    continue
+                if utils.dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < WB: raise Exception('Collision')
+    
+                ob.append(dilated_traj[idx])
+
+            u1, predicted_trajectory1 = lbp_control(x1, targets[i], ob)
+            line = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1]))
+            dilated = line.buffer(dilation_factor, cap_style=3)
+            dilated_traj[i] = dilated
+            x1 = motion(x1, u1, dt)
+            x[:, i] = x1
+            u[:, i] = u1
+            predicted_trajectory[i] = predicted_trajectory1
+            print(f'Robot {i} v: {x1[3]}')
+
+        trajectory = np.dstack([trajectory, x])
+        
+        if show_animation:
+            plt.cla()
+            # for stopping simulation with the esc key.
+            plt.gcf().canvas.mpl_connect(
+                'key_release_event',
+                lambda event: [exit(0) if event.key == 'escape' else None])
+            
+            for i in range(robot_num):
+                plt.plot(predicted_trajectory[i][:, 0], predicted_trajectory[i][:, 1], "-g")
+                plot_polygon(dilated_traj[i], ax=ax, add_points=False, alpha=0.5)
+                plt.plot(x[0,i], x[1,i], "xr")
+                plt.plot(targets[i][0], targets[i][1], "xg")
+                plot_robot(x[0,i], x[1,i], x[2,i])
+                plot_arrow(x[0,i], x[1,i], x[2,i], length=1, width=0.5)
+                plot_arrow(x[0,i], x[1,i], x[2,i]+u[1,i], length=3, width=0.5)
+
+            utils.plot_map(width=width_init, height=height_init)
+            plt.axis("equal")
+            plt.grid(True)
+            plt.pause(0.0001)
+        
+        for i in range(robot_num):
+            dist_to_goal = math.hypot(x[0,i] - targets[i][0], x[1,i] - targets[i][1])
+            if dist_to_goal <= 0.5:
+                print("Goal!!")
+                break_flag = True
+        
+        if break_flag:
+            break
+        
+    print("Done")
+    if show_animation:
+        for i in range(robot_num):
+            plt.plot(trajectory[0,i,:], trajectory[1,i,:], "-r")
+        plt.pause(0.0001)
+        plt.show()
        
 if __name__ == '__main__':
-    main(robot_type=RobotType.rectangle)
+    main1()
 
     
