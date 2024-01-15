@@ -19,7 +19,7 @@ import lattice_motion_model as motion_model
 # optimization parameter
 max_iter = 100
 h = np.array([0.3, 0.02, 0.02]).T  # parameter sampling distance
-cost_th = 0.1
+cost_th = 0.12
 
 show_animation = True
 

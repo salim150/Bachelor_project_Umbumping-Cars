@@ -201,7 +201,7 @@ def uniform_terminal_state_sampling_test1():
     k0 = 0.0
     nxy = 5
     nh = 3
-    d = 20
+    d = 3
     a_min = - np.deg2rad(45.0)
     a_max = np.deg2rad(45.0)
     p_min = - np.deg2rad(45.0)
@@ -348,7 +348,7 @@ def lane_state_sampling_test1():
 def main():
     planner.show_animation = show_animation
     uniform_terminal_state_sampling_test1()
-    uniform_terminal_state_sampling_test2()
+    # uniform_terminal_state_sampling_test2()
     # biased_terminal_state_sampling_test1()
     # biased_terminal_state_sampling_test2()
     # lane_state_sampling_test1()

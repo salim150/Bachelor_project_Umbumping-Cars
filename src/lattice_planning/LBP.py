@@ -181,7 +181,6 @@ def calc_control_and_trajectory(x, dw, goal, ob):
     nearest = find_nearest(np.arange(min_speed, max_speed, v_resolution), x[3])
     # previous_u.pop(0)
     a = (v_ref-x[3])/dt
-    
 
     for id, info in data.items():
 
