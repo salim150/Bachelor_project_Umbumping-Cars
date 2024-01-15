@@ -214,9 +214,9 @@ def generate_lookup_table():
 
             temp[v][i] = {}
             temp[v][i]['ctrl'] = list(kp)
-            temp[v][i]['x'] = xc
-            temp[v][i]['y'] = yc
-            temp[v][i]['yaw'] = yawc
+            temp[v][i]['x'] = list(xc)
+            temp[v][i]['y'] = list(yc)
+            temp[v][i]['yaw'] = list(yawc)
             i +=1
             # print(f'len: {len(xc)}')
 
