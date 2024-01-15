@@ -67,7 +67,6 @@ class RobotType(Enum):
 robot_type = RobotType.rectangle
 robot_radius = 1.0
 
-
 def motion(x, u, dt):
     """
     motion model
@@ -238,6 +237,57 @@ def plot_robot(x, y, yaw):  # pragma: no cover
         out_x, out_y = (np.array([x, y]) +
                         np.array([np.cos(yaw), np.sin(yaw)]) * robot_radius)
         plt.plot([x, out_x], [y, out_y], "-k")
+
+def update_targets(paths, targets, x, i):
+    if utils.dist(point1=(x[0, i], x[1, i]), point2=targets[i]) < 5:
+        paths[i] = utils.update_path(paths[i])
+        targets[i] = (paths[i][0].x, paths[i][0].y)
+
+    return paths, targets
+
+def initialize_paths_targets_dilated_traj(x):
+    paths = []
+    targets = []
+    dilated_traj = []
+
+    for i in range(robot_num):
+        dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
+        paths.append(utils.create_path())
+        targets.append([paths[i][0].x, paths[i][0].y])
+
+    return paths, targets, dilated_traj
+
+def update_robot_state(x, u, dt, targets, dilated_traj, predicted_trajectory, i):
+    x1 = x[:, i]
+    ob = [dilated_traj[idx] for idx in range(len(dilated_traj)) if idx != i]
+    u1, predicted_trajectory1 = lbp_control(x1, targets[i], ob)
+    dilated_traj[i] = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1])).buffer(dilation_factor, cap_style=3)
+    
+    # Collision check
+    if any([utils.dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < WB for idx in range(robot_num) if idx != i]): raise Exception('Collision')
+    
+    x1 = motion(x1, u1, dt)
+    x[:, i] = x1
+    u[:, i] = u1
+    predicted_trajectory[i] = predicted_trajectory1
+
+    return x, u, predicted_trajectory
+
+def plot_robot_trajectory(x, u, predicted_trajectory, dilated_traj, targets, ax, i):
+    plt.plot(predicted_trajectory[i][:, 0], predicted_trajectory[i][:, 1], "-g")
+    plot_polygon(dilated_traj[i], ax=ax, add_points=False, alpha=0.5)
+    plt.plot(x[0, i], x[1, i], "xr")
+    plt.plot(targets[i][0], targets[i][1], "xg")
+    plot_robot(x[0, i], x[1, i], x[2, i])
+    plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
+    plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
+
+def check_goal_reached(x, targets, i):
+    dist_to_goal = math.hypot(x[0, i] - targets[i][0], x[1, i] - targets[i][1])
+    if dist_to_goal <= 0.5:
+        print("Goal!!")
+        return True
+    return False
 
 def main():
     print(__file__ + " start!!")
@@ -424,57 +474,6 @@ def main1():
             plt.plot(trajectory[0,i,:], trajectory[1,i,:], "-r")
         plt.pause(0.0001)
         plt.show()
-
-def update_targets(paths, targets, x, i):
-    if utils.dist(point1=(x[0, i], x[1, i]), point2=targets[i]) < 5:
-        paths[i] = utils.update_path(paths[i])
-        targets[i] = (paths[i][0].x, paths[i][0].y)
-
-    return paths, targets
-
-def initialize_paths_targets_dilated_traj(x):
-    paths = []
-    targets = []
-    dilated_traj = []
-
-    for i in range(robot_num):
-        dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
-        paths.append(utils.create_path())
-        targets.append([paths[i][0].x, paths[i][0].y])
-
-    return paths, targets, dilated_traj
-
-def update_robot_state(x, u, dt, targets, dilated_traj, predicted_trajectory, i):
-    x1 = x[:, i]
-    ob = [dilated_traj[idx] for idx in range(len(dilated_traj)) if idx != i]
-    u1, predicted_trajectory1 = lbp_control(x1, targets[i], ob)
-    dilated_traj[i] = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1])).buffer(dilation_factor, cap_style=3)
-    
-    # Collision check
-    if any([utils.dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < WB for idx in range(robot_num) if idx != i]): raise Exception('Collision')
-    
-    x1 = motion(x1, u1, dt)
-    x[:, i] = x1
-    u[:, i] = u1
-    predicted_trajectory[i] = predicted_trajectory1
-
-    return x, u, predicted_trajectory
-
-def plot_robot_trajectory(x, u, predicted_trajectory, dilated_traj, targets, ax, i):
-    plt.plot(predicted_trajectory[i][:, 0], predicted_trajectory[i][:, 1], "-g")
-    plot_polygon(dilated_traj[i], ax=ax, add_points=False, alpha=0.5)
-    plt.plot(x[0, i], x[1, i], "xr")
-    plt.plot(targets[i][0], targets[i][1], "xg")
-    plot_robot(x[0, i], x[1, i], x[2, i])
-    plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
-    plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
-
-def check_goal_reached(x, targets, i):
-    dist_to_goal = math.hypot(x[0, i] - targets[i][0], x[1, i] - targets[i][1])
-    if dist_to_goal <= 0.5:
-        print("Goal!!")
-        return True
-    return False
 
 def main2():
     print(__file__ + " start!!")
