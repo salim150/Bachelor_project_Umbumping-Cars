@@ -94,21 +94,21 @@ def plot_robot(x, y, yaw):  # pragma: no cover
 
 # Implement kinematic bicycle model to follow the trajectory
 def main():
-
+    v = 0.5 # [m/s] reference speed
     x = [0.0, 0.0, 0.0, 0.0] # [x, y, yaw, v]   
-    trajectory = np.zeros((len(data['42']['x']),3))
-    trajectory[:,0] = data['42']['x']
-    trajectory[:,1] = data['42']['y']
-    trajectory[:,2] = data['42']['yaw']
-    control_inputs = data['42']['ctrl']
+    trajectory = np.zeros((len(data[str(v)]['1']['x']),3))
+    trajectory[:,0] = data[str(v)]['1']['x']
+    trajectory[:,1] = data[str(v)]['1']['y']
+    trajectory[:,2] = data[str(v)]['1']['yaw']
+    control_inputs = data[str(v)]['1']['ctrl']
 
-    fig = plt.figurcalce(1, dpi=90)
+    fig = plt.figure(1, dpi=90)
     ax = fig.add_subplot(111)
 
     for i in range(len(control_inputs)):
         # Get current state and control input
         delta = control_inputs[i]
-        a = (v_ref-x[3])/dt
+        a = (v-x[3])/dt
         u = [a, delta]
 
         # Apply control input to the kinematic bicycle model
