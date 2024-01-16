@@ -156,21 +156,6 @@ def calc_control_and_trajectory(x, dw, goal, ob, u_buf, trajectory_buf):
     best_u = [0.0, 0.0]
     best_trajectory = np.array([x])
 
-    u_buf.pop(0)
-    trajectory_buf = trajectory_buf[1:]
-
-    to_goal_cost = 30 * to_goal_cost_gain * calc_to_goal_cost(trajectory_buf, goal)
-    # speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
-    ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory_buf, ob)
-    heading_cost = heading_cost_gain * calc_to_goal_heading_cost(trajectory_buf, goal)
-    final_cost = to_goal_cost + ob_cost + heading_cost #+ speed_cost 
-    min_cost = final_cost
-
-    best_u = [0, u_buf[0]]
-    best_trajectory = trajectory_buf
-    u_history = u_buf
-
-
     for v in v_search:
         dict = data[str(v)]
         for id, info in dict.items():
@@ -201,9 +186,27 @@ def calc_control_and_trajectory(x, dw, goal, ob, u_buf, trajectory_buf):
                 # interpolate the control inputs
                 a = (v-x[3])/dt
 
+                # print(f'v: {v}, id: {id}')
+                # print(f"Control seq. {len(info['ctrl'])}")
                 best_u = [a, info['ctrl'][0]]
                 best_trajectory = trajectory
-                u_history = info['ctrl']
+                u_history = info['ctrl'].copy()
+
+    u_buf.pop(0)
+    trajectory_buf = trajectory_buf[1:]
+
+    to_goal_cost = 30 * to_goal_cost_gain * calc_to_goal_cost(trajectory_buf, goal)
+    # speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
+    ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory_buf, ob)
+    heading_cost = heading_cost_gain * calc_to_goal_heading_cost(trajectory_buf, goal)
+    final_cost = to_goal_cost + ob_cost + heading_cost #+ speed_cost 
+
+    if min_cost >= final_cost:
+        min_cost = final_cost
+        best_u = [0, u_buf[0]]
+        best_trajectory = trajectory_buf
+        u_history = u_buf
+
     return best_u, best_trajectory, u_history
 
 def calc_obstacle_cost(trajectory, ob):
@@ -395,6 +398,8 @@ def main1():
     # predicted_trajectory = np.zeros((N, round(predict_time/dt)+1, x.shape[0]))
     # predicted_trajectory = {}
     predicted_trajectory = dict.fromkeys(range(robot_num),np.zeros([int(predict_time/dt), 3]))
+    for i in range(robot_num):
+        predicted_trajectory[i][:, 0:3] = x[0:3, i]
     # u_hist = {}
     u_hist = dict.fromkeys(range(robot_num),[0]*int(predict_time/dt))
 
@@ -412,6 +417,7 @@ def main1():
 
     for z in range(iterations):
         for i in range(robot_num):
+            # print(z, i)
             # Updating the paths of the robots
             if utils.dist(point1=(x[0,i], x[1,i]), point2=targets[i]) < 5:
                 # get_logger().info("Updating the path for robot " + str(i))
@@ -437,7 +443,7 @@ def main1():
             u[:, i] = u1
             predicted_trajectory[i] = predicted_trajectory1
             u_hist[i] = u_history
-            print(f'Robot {i} v: {x1[3]}')
+            # print(f'Robot {i} v: {x1[3]}')
 
         trajectory = np.dstack([trajectory, x])
         
