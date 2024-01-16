@@ -96,11 +96,12 @@ def plot_robot(x, y, yaw):  # pragma: no cover
 def main():
     v = 0.5 # [m/s] reference speed
     x = [0.0, 0.0, 0.0, 0.0] # [x, y, yaw, v]   
-    trajectory = np.zeros((len(data[str(v)]['1']['x']),3))
-    trajectory[:,0] = data[str(v)]['1']['x']
-    trajectory[:,1] = data[str(v)]['1']['y']
-    trajectory[:,2] = data[str(v)]['1']['yaw']
-    control_inputs = data[str(v)]['1']['ctrl']
+    ref = data[str(v)]['1']
+    trajectory = np.zeros((len(ref['x']),3))
+    trajectory[:,0] = ref['x']
+    trajectory[:,1] = ref['y']
+    trajectory[:,2] = ref['yaw']
+    control_inputs = ref['ctrl']
 
     fig = plt.figure(1, dpi=90)
     ax = fig.add_subplot(111)
@@ -132,8 +133,8 @@ def main():
         plt.plot(x[0], x[1], "xr")
         plt.plot(trajectory[-1, 0], trajectory[-1, 1], "xb")
         plot_robot(x[0], x[1], x[2])
-        plot_arrow(x[0], x[1], x[2], length=1, width=0.5)
-        plot_arrow(x[0], x[1], x[2]+u[1], length=3, width=0.5)
+        plot_arrow(x[0], x[1], x[2], length=1, width=0.2)
+        plot_arrow(x[0], x[1], x[2]+u[1], length=1, width=0.2)
   
         plt.axis("equal")
         plt.grid(True)

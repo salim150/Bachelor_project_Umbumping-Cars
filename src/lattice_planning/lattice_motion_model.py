@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 # motion parameter
 L = 1.0  # wheel base
 ds = 0.1  # course distance
+
+# TODO: remove hardcoded parts
+
 # v = 0.5 # velocity [m/s]
 
 
