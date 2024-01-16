@@ -167,6 +167,8 @@ def calc_control_and_trajectory(x, dw, goal, ob):
             geom[:,2] = info['yaw']
             geom[:,0:2] = (geom[:,0:2]) @ rotateMatrix(-x[2]) + [x[0],x[1]]
 
+            geom[:,2] = geom[:,2] + x[2] #bringing also the yaw angle in the new frame
+            
             # trajectory = predict_trajectory(x_init, a, delta)
             trajectory = geom
             # calc cost
