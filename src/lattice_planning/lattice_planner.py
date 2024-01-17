@@ -21,7 +21,7 @@ max_iter = 100
 h = np.array([0.3, 0.02, 0.02]).T  # parameter sampling distance
 cost_th = 0.12
 
-show_animation = True
+show_animation = False
 
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):  # pragma: no cover

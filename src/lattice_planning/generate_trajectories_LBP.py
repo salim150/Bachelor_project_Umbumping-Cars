@@ -38,7 +38,7 @@ delta_resolution = math.radians(json_object["DWA"]["delta_resolution"])# [rad/s]
 max_acc = json_object["DWA"]["max_acc"] # [m/ss]
 min_acc = json_object["DWA"]["min_acc"] # [m/ss]
 dt = json_object["DWA"]["dt"] # [s] Time tick for motion prediction
-predict_time = 3 # json_object["DWA"]["predict_time"] # [s]
+predict_time = 2 # json_object["DWA"]["predict_time"] # [s]
 to_goal_cost_gain = json_object["DWA"]["to_goal_cost_gain"]
 speed_cost_gain = json_object["DWA"]["speed_cost_gain"]
 obstacle_cost_gain = json_object["DWA"]["obstacle_cost_gain"]
@@ -165,15 +165,17 @@ def generate_lookup_table():
         d = v*predict_time
 
         if v == 0.5:
-            a_min = - np.deg2rad(30.0)
-            a_max = np.deg2rad(30.0)
-            p_min = - np.deg2rad(30.0)
-            p_max = np.deg2rad(30.0)
+            angle = 30
+            a_min = - np.deg2rad(angle)
+            a_max = np.deg2rad(angle)
+            p_min = - np.deg2rad(angle)
+            p_max = np.deg2rad(angle)
         else:
-            a_min = - np.deg2rad(45.0)
-            a_max = np.deg2rad(45.0)
-            p_min = - np.deg2rad(45.0)
-            p_max = np.deg2rad(45.0)
+            angle = 45
+            a_min = - np.deg2rad(angle)
+            a_max = np.deg2rad(angle)
+            p_min = - np.deg2rad(angle)
+            p_max = np.deg2rad(angle)
         states = calc_uniform_polar_states(nxy, nh, d, a_min, a_max, p_min, p_max)
         result = generate_path(states, k0, v)
 
