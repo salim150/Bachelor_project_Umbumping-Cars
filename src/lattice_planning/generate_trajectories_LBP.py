@@ -175,12 +175,13 @@ def generate_lookup_table():
             p_min = - np.deg2rad(45.0)
             p_max = np.deg2rad(45.0)
         states = calc_uniform_polar_states(nxy, nh, d, a_min, a_max, p_min, p_max)
-        result = generate_path(states, k0)
+        result = generate_path(states, k0, v)
 
         i = 0
         for table in result:
             xc, yc, yawc, kp = motion_model.generate_trajectory(
-                table[3], table[4], table[5], k0)
+                table[3], table[4], table[5], k0, v)
+            for id, element in enumerate(kp): kp[id] = np.clip(element, -max_steer, max_steer) # clipping elements withing feasible bounds
             temp[v][i] = {}
             temp[v][i]['ctrl'] = list(kp)
             temp[v][i]['x'] = xc

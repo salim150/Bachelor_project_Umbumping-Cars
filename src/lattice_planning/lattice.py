@@ -52,7 +52,7 @@ def get_lookup_table(table_path):
     return np.loadtxt(table_path, delimiter=',', skiprows=1)
 
 
-def generate_path(target_states, k0):
+def generate_path(target_states, k0, v):
     # x, y, yaw, s, km, kf
     lookup_table = get_lookup_table(TABLE_PATH)
     result = []
@@ -67,7 +67,7 @@ def generate_path(target_states, k0):
         init_p = np.array(
             [np.hypot(state[0], state[1]), 0.0, 0.0]).reshape(3, 1)
 
-        x, y, yaw, p, kp = planner.optimize_trajectory(target, k0, init_p)
+        x, y, yaw, p, kp = planner.optimize_trajectory(target, k0, init_p, v)
 
         if x is not None:
             print("find good path")

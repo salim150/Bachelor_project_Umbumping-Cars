@@ -94,21 +94,22 @@ def plot_robot(x, y, yaw):  # pragma: no cover
 
 # Implement kinematic bicycle model to follow the trajectory
 def main():
-
+    v = 0.5 # [m/s] reference speed
     x = [0.0, 0.0, 0.0, 0.0] # [x, y, yaw, v]   
-    trajectory = np.zeros((len(data['42']['x']),3))
-    trajectory[:,0] = data['42']['x']
-    trajectory[:,1] = data['42']['y']
-    trajectory[:,2] = data['42']['yaw']
-    control_inputs = data['42']['ctrl']
+    ref = data[str(v)]['1']
+    trajectory = np.zeros((len(ref['x']),3))
+    trajectory[:,0] = ref['x']
+    trajectory[:,1] = ref['y']
+    trajectory[:,2] = ref['yaw']
+    control_inputs = ref['ctrl']
 
-    fig = plt.figurcalce(1, dpi=90)
+    fig = plt.figure(1, dpi=90)
     ax = fig.add_subplot(111)
 
     for i in range(len(control_inputs)):
         # Get current state and control input
         delta = control_inputs[i]
-        a = (v_ref-x[3])/dt
+        a = (v-x[3])/dt
         u = [a, delta]
 
         # Apply control input to the kinematic bicycle model
@@ -132,8 +133,8 @@ def main():
         plt.plot(x[0], x[1], "xr")
         plt.plot(trajectory[-1, 0], trajectory[-1, 1], "xb")
         plot_robot(x[0], x[1], x[2])
-        plot_arrow(x[0], x[1], x[2], length=1, width=0.5)
-        plot_arrow(x[0], x[1], x[2]+u[1], length=3, width=0.5)
+        plot_arrow(x[0], x[1], x[2], length=1, width=0.2)
+        plot_arrow(x[0], x[1], x[2]+u[1], length=1, width=0.2)
   
         plt.axis("equal")
         plt.grid(True)

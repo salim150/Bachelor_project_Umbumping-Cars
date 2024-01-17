@@ -60,13 +60,13 @@ v_ref = 2.0 # [m/s] reference speed
 with open('/home/giacomo/thesis_ws/src/lattice_planning/LBP.json', 'r') as file:
     data = json.load(file)
 
-def lbp_control(x, goal, ob):
+def lbp_control(x, goal, ob, u_buf, trajectory_buf):
     """
     Dynamic Window Approach control
     """
     dw = calc_dynamic_window(x)
-    u, trajectory = calc_control_and_trajectory(x, dw, goal, ob)
-    return u, trajectory
+    u, trajectory, u_history = calc_control_and_trajectory(x, dw, goal, ob, u_buf, trajectory_buf)
+    return u, trajectory, u_history
 
 class RobotType(Enum):
     circle = 0
@@ -146,7 +146,7 @@ def calc_dynamic_window(x):
     
     return v_search
 
-def calc_control_and_trajectory(x, dw, goal, ob):
+def calc_control_and_trajectory(x, dw, goal, ob, u_buf, trajectory_buf):
     """
     calculation final input with dynamic window
     """
@@ -166,6 +166,8 @@ def calc_control_and_trajectory(x, dw, goal, ob):
             geom[:,1] = info['y']
             geom[:,2] = info['yaw']
             geom[:,0:2] = (geom[:,0:2]) @ rotateMatrix(-x[2]) + [x[0],x[1]]
+            
+            # TODO: solve the problem of the yaw angle
 
             geom[:,2] = geom[:,2] + x[2] #bringing also the yaw angle in the new frame
             
@@ -186,9 +188,28 @@ def calc_control_and_trajectory(x, dw, goal, ob):
                 # interpolate the control inputs
                 a = (v-x[3])/dt
 
-                best_u = [a, info['ctrl'][2]]
+                # print(f'v: {v}, id: {id}')
+                # print(f"Control seq. {len(info['ctrl'])}")
+                best_u = [a, info['ctrl'][0]]
                 best_trajectory = trajectory
-    return best_u, best_trajectory #, previous_u, previous_cost
+                u_history = info['ctrl'].copy()
+
+    u_buf.pop(0)
+    trajectory_buf = trajectory_buf[1:]
+
+    to_goal_cost = 30 * to_goal_cost_gain * calc_to_goal_cost(trajectory_buf, goal)
+    # speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
+    ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory_buf, ob)
+    heading_cost = heading_cost_gain * calc_to_goal_heading_cost(trajectory_buf, goal)
+    final_cost = to_goal_cost + ob_cost + heading_cost #+ speed_cost 
+
+    if min_cost >= final_cost:
+        min_cost = final_cost
+        best_u = [0, u_buf[0]]
+        best_trajectory = trajectory_buf
+        u_history = u_buf
+
+    return best_u, best_trajectory, u_history
 
 def calc_obstacle_cost(trajectory, ob):
     """
@@ -377,7 +398,12 @@ def main1():
     # trajectory = np.dstack([trajectory, x])
 
     # predicted_trajectory = np.zeros((N, round(predict_time/dt)+1, x.shape[0]))
-    predicted_trajectory = {}
+    # predicted_trajectory = {}
+    predicted_trajectory = dict.fromkeys(range(robot_num),np.zeros([int(predict_time/dt), 3]))
+    for i in range(robot_num):
+        predicted_trajectory[i][:, 0:3] = x[0:3, i]
+    # u_hist = {}
+    u_hist = dict.fromkeys(range(robot_num),[0]*int(predict_time/dt))
 
     paths = []
     targets = []
@@ -393,6 +419,7 @@ def main1():
 
     for z in range(iterations):
         for i in range(robot_num):
+            # print(z, i)
             # Updating the paths of the robots
             if utils.dist(point1=(x[0,i], x[1,i]), point2=targets[i]) < 5:
                 # get_logger().info("Updating the path for robot " + str(i))
@@ -409,7 +436,7 @@ def main1():
     
                 ob.append(dilated_traj[idx])
 
-            u1, predicted_trajectory1 = lbp_control(x1, targets[i], ob)
+            u1, predicted_trajectory1, u_history = lbp_control(x1, targets[i], ob, u_hist[i], predicted_trajectory[i])
             line = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1]))
             dilated = line.buffer(dilation_factor, cap_style=3)
             dilated_traj[i] = dilated
@@ -417,7 +444,8 @@ def main1():
             x[:, i] = x1
             u[:, i] = u1
             predicted_trajectory[i] = predicted_trajectory1
-            print(f'Robot {i} v: {x1[3]}')
+            u_hist[i] = u_history
+            # print(f'Robot {i} v: {x1[3]}')
 
         trajectory = np.dstack([trajectory, x])
         

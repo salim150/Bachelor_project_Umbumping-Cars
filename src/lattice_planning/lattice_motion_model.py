@@ -6,7 +6,10 @@ import matplotlib.pyplot as plt
 # motion parameter
 L = 1.0  # wheel base
 ds = 0.1  # course distance
-v = 0.5 # velocity [m/s]
+
+# TODO: remove hardcoded parts
+
+# v = 0.5 # velocity [m/s]
 
 
 class State:
@@ -32,7 +35,7 @@ def update(state, v, delta, dt):
 
     return state
 
-def generate_trajectory(s, km, kf, k0):
+def generate_trajectory(s, km, kf, k0, v):
     # n = s / ds
     time = s / v  # [s]
     n = time / 0.1
@@ -68,7 +71,7 @@ def generate_trajectory(s, km, kf, k0):
     return x, y, yaw, kp
 
 
-def generate_last_state(s, km, kf, k0):
+def generate_last_state(s, km, kf, k0, v):
     n = s / ds
     time = abs(s / v)  # [s]
 
