@@ -169,6 +169,8 @@ def calc_control_and_trajectory(x, dw, goal, ob, u_buf, trajectory_buf):
             
             # TODO: solve the problem of the yaw angle
 
+            geom[:,2] = geom[:,2] + x[2] #bringing also the yaw angle in the new frame
+            
             # trajectory = predict_trajectory(x_init, a, delta)
             trajectory = geom
             # calc cost

@@ -62,8 +62,10 @@ def generate_path(target_states, k0, v):
             state[0], state[1], state[2], lookup_table)
 
         target = motion_model.State(x=state[0], y=state[1], yaw=state[2])
+        # init_p = np.array(
+        #     [np.hypot(state[0], state[1]), bestp[4], bestp[5]]).reshape(3, 1)
         init_p = np.array(
-            [np.hypot(state[0], state[1]), bestp[4], bestp[5]]).reshape(3, 1)
+            [np.hypot(state[0], state[1]), 0.0, 0.0]).reshape(3, 1)
 
         x, y, yaw, p, kp = planner.optimize_trajectory(target, k0, init_p, v)
 
