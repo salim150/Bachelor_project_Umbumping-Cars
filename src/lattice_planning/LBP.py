@@ -190,7 +190,7 @@ def calc_control_and_trajectory(x, dw, goal, ob, u_buf, trajectory_buf):
 
                 # print(f'v: {v}, id: {id}')
                 # print(f"Control seq. {len(info['ctrl'])}")
-                best_u = [a, info['ctrl'][2]]
+                best_u = [a, info['ctrl'][0]]
                 best_trajectory = trajectory
                 u_history = info['ctrl'].copy()
 
@@ -205,7 +205,7 @@ def calc_control_and_trajectory(x, dw, goal, ob, u_buf, trajectory_buf):
 
     if min_cost >= final_cost:
         min_cost = final_cost
-        best_u = [0, u_buf[2]]
+        best_u = [0, u_buf[0]]
         best_trajectory = trajectory_buf
         u_history = u_buf
 

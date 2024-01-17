@@ -52,7 +52,7 @@ height_init = json_object["height"]
 N=3
 save_flag = True
 show_animation = True
-plot_flag = False
+plot_flag = True
 robot_num = json_object["robot_num"]
 timer_freq = json_object["timer_freq"]
 

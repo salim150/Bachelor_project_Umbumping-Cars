@@ -48,7 +48,7 @@ c_a = json_object["Car_model"]["c_a"]
 c_r1 = json_object["Car_model"]["c_r1"]
 WB = json_object["Controller"]["WB"] # Wheel base
 L_d = json_object["Controller"]["L_d"]  # [m] look-ahead distance
-robot_num = 1 #json_object["robot_num"]
+robot_num = json_object["robot_num"]
 safety_init = json_object["safety"]
 width_init = json_object["width"]
 height_init = json_object["height"]
@@ -654,4 +654,4 @@ def main5():
 if __name__ == '__main__':
     # main()
     # main2()
-    main5()
+    main4()

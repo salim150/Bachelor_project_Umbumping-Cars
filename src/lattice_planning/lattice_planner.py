@@ -18,6 +18,7 @@ import lattice_motion_model as motion_model
 
 # optimization parameter
 max_iter = 100
+# TODO: reduce step sizes with the iterations
 h = np.array([0.3, 0.02, 0.02]).T  # parameter sampling distance
 cost_th = 0.12
 
@@ -116,7 +117,7 @@ def optimize_trajectory(target, k0, p, v):
 
         J = calc_j(target, p, h, k0, v)
         try:
-            dp = - np.linalg.inv(J) @ dc
+            dp = - np.linalg.pinv(J) @ dc
         except np.linalg.linalg.LinAlgError:
             print("cannot calc path LinAlgError")
             xc, yc, yawc, p = None, None, None, None

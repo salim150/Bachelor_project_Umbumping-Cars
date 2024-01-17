@@ -94,7 +94,7 @@ def plot_robot(x, y, yaw):  # pragma: no cover
 
 # Implement kinematic bicycle model to follow the trajectory
 def main():
-    v = 0.5 # [m/s] reference speed
+    v = 2.0 # [m/s] reference speed
     x = [0.0, 0.0, 0.0, 0.0] # [x, y, yaw, v]   
     ref = data[str(v)]['1']
     trajectory = np.zeros((len(ref['x']),3))
