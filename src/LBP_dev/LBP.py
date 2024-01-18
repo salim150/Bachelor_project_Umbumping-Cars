@@ -60,13 +60,6 @@ v_ref = 2.0 # [m/s] reference speed
 with open('/home/giacomo/thesis_ws/src/LBP_dev/LBP.json', 'r') as file:
     data = json.load(file)
 
-class RobotType(Enum):
-    circle = 0
-    rectangle = 1
-
-robot_type = RobotType.rectangle
-robot_radius = 1.0
-
 def motion(x, u, dt):
     """
     motion model
@@ -279,7 +272,6 @@ def plot_arrow(x, y, yaw, length=0.5, width=0.1):  # pragma: no cover
     plt.plot(x, y)
 
 def plot_robot(x, y, yaw):  # pragma: no cover
-    if robot_type == RobotType.rectangle:
         outline = np.array([[-L / 2, L / 2,
                              (L / 2), -L / 2,
                              -L / 2],
@@ -293,12 +285,6 @@ def plot_robot(x, y, yaw):  # pragma: no cover
         outline[1, :] += y
         plt.plot(np.array(outline[0, :]).flatten(),
                  np.array(outline[1, :]).flatten(), "-k")
-    elif robot_type == RobotType.circle:
-        circle = plt.Circle((x, y), robot_radius, color="b")
-        plt.gcf().gca().add_artist(circle)
-        out_x, out_y = (np.array([x, y]) +
-                        np.array([np.cos(yaw), np.sin(yaw)]) * robot_radius)
-        plt.plot([x, out_x], [y, out_y], "-k")
 
 def update_targets(paths, targets, x, i):
     if utils.dist(point1=(x[0, i], x[1, i]), point2=targets[i]) < 5:

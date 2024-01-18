@@ -84,6 +84,27 @@ def normalize_angle(angle):
     return angle
 
 class ModelPredictiveControl:
+    """
+    Class representing a Model Predictive Control (MPC) system.
+
+    Attributes:
+        horizon (int): The prediction horizon.
+        dt (float): The time step.
+        reference1 (list): The reference or set point the controller will achieve.
+        reference2 (list): An optional second reference point.
+        x_obs (list): The x-coordinates of the obstacles.
+        y_obs (list): The y-coordinates of the obstacles.
+        initial_state (list): The initial state of the system.
+        safety_radius (float): The safety radius for obstacle avoidance.
+
+    Methods:
+        plant_model: Computes the next state of the system based on the current state and control inputs.
+        cost_function: Computes the cost associated with a given control sequence.
+        propagation1: Propagates the system state in the x-direction based on a given control sequence.
+        propagation2: Propagates the system state in the y-direction based on a given control sequence.
+        propagation3: Computes the distance between the system state and the obstacles based on a given control sequence.
+    """
+
     def __init__(self, obs_x, obs_y):
         self.horizon = 8
         self.dt = 0.2
@@ -100,7 +121,19 @@ class ModelPredictiveControl:
         self.initial_state = None
         self.safety_radius = 2.5
 
-    def plant_model(self,prev_state, dt, pedal, steering):
+    def plant_model(self, prev_state, dt, pedal, steering):
+        """
+        Computes the next state of the system based on the current state and control inputs.
+
+        Args:
+            prev_state (list): The current state of the system.
+            dt (float): The time step.
+            pedal (float): The control input for acceleration.
+            steering (float): The control input for steering.
+
+        Returns:
+            list: The next state of the system.
+        """
         x_t = prev_state[0]
         y_t = prev_state[1]
         psi_t = prev_state[2]
@@ -119,6 +152,16 @@ class ModelPredictiveControl:
         return [x_t, y_t, psi_t, v_t]
 
     def cost_function(self, u, *args):
+        """
+        Computes the cost associated with a given control sequence.
+
+        Args:
+            u (list): The control sequence.
+            args (tuple): Additional arguments (state, reference).
+
+        Returns:
+            float: The cost.
+        """
         state = args[0]
         ref = args[1]
         cost = 0.0
@@ -199,6 +242,18 @@ class ModelPredictiveControl:
         return cost
 
     def cost_function3(self,u, *args):
+        """
+        Define the cost function for the MPC controller. Composed of a stage cost calculated in
+        the for loop and a terminal cost, calculated at the end on the loop.
+        The cost is based on the input sequence and also the way the states are propagated.
+
+        Args:
+            self
+            u: control sequence used to calculate the state sequence
+
+        Returns:
+            cost: total cost of the control sequence
+        """
         state = args[0]
         ref = args[1]
         cost = 0.0
@@ -238,6 +293,17 @@ class ModelPredictiveControl:
         return cost
 
     def propagation1(self, u):
+        """
+        Propagates the system state in the x-direction based on a given control sequence.
+        This function is used to check wether the states are propagated outside the boundaries
+        for a given control sequence u.
+
+        Args:
+            u (list): The control sequence.
+
+        Returns:
+            numpy.ndarray: The system state in the x-direction.
+        """
         state = [self.initial_state]
 
         for i in range(self.horizon):
@@ -245,6 +311,17 @@ class ModelPredictiveControl:
         return np.array(state)[:,0]
     
     def propagation2(self, u):
+        """
+        Propagates the system state in the y-direction based on a given control sequence.
+        This function is used to check wether the states are propagated outside the boundaries
+        for a given control sequence u.
+
+        Args:
+            u (list): The control sequence.
+
+        Returns:
+            numpy.ndarray: The system state in the y-direction.
+        """
         state = [self.initial_state]
 
         for i in range(self.horizon):
@@ -252,6 +329,15 @@ class ModelPredictiveControl:
         return np.array(state)[:,1]
     
     def propagation3(self, u):
+        """
+        Computes the distance between the system state and the obstacles based on a given control sequence.
+
+        Args:
+            u (list): The control sequence.
+
+        Returns:
+            numpy.ndarray: The distances between the system state and the obstacles.
+        """
         state = self.initial_state
         distance = []
 
@@ -283,6 +369,18 @@ def dist(a, b):
     return math.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)
 
 def get_straight_course(start, goal, dl):
+    """
+    Generates a straight course between the given start and goal points.
+
+    Args:
+        start (tuple): The coordinates of the start point (x, y).
+        goal (tuple): The coordinates of the goal point (x, y).
+        dl (float): The desired spacing between waypoints.
+
+    Returns:
+        tuple: A tuple containing the x-coordinates (cx), y-coordinates (cy),
+               yaw angles (cyaw), and curvature values (ck) of the generated course.
+    """
     ax = [start[0], goal[0]]
     ay = [start[1], goal[1]]
     cx, cy, cyaw, ck, s = cubic_spline_planner.calc_spline_course(
@@ -290,6 +388,22 @@ def get_straight_course(start, goal, dl):
     return cx, cy, cyaw, ck
     
 def update_paths(i, x, cx, cy, cyaw, target_ind, ref, dl):
+    """
+    Update the paths of the robots based on their current positions and target indices.
+
+    Args:
+        i (int): Index of the robot.
+        x (numpy.ndarray): Array of robot positions.
+        cx (list): List of x-coordinates of the path for each robot.
+        cy (list): List of y-coordinates of the path for each robot.
+        cyaw (list): List of yaw angles of the path for each robot.
+        target_ind (list): List of target indices for each robot.
+        ref (list): List of reference points for each robot.
+        dl (float): Length of each path segment.
+
+    Returns:
+        tuple: Updated cx, cy, and ref lists.
+    """
     x1 = x[:, i]
     # Updating the paths of the robots
     if (target_ind[i] < len(cx[i])-1):
@@ -313,26 +427,42 @@ def update_paths(i, x, cx, cy, cyaw, target_ind, ref, dl):
     return cx, cy, ref
 
 def update_obstacles(mpc, i, x1, x, predicted_trajectory):
-        mpc.x_obs = []
-        mpc.y_obs = []
-        for idx in range(robot_num):
-            if idx == i:
-                continue
-            if dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < 1:
-                raise Exception('Collision')
-            
-            next_robot_state = predicted_trajectory[idx]
-            mpc.x_obs.append(next_robot_state[0:-1:5, 0])
-            mpc.y_obs.append(next_robot_state[0:-1:5, 1])
-        mpc.x_obs = [item for sublist in mpc.x_obs for item in sublist]
-        mpc.y_obs = [item for sublist in mpc.y_obs for item in sublist]
+    """
+    Update the obstacles for the model predictive control (MPC) algorithm.
+
+    Args:
+        mpc (MPC): The MPC object.
+        i (int): The index of the current robot.
+        x1 (list): The position of the current robot.
+        x (ndarray): The positions of all robots.
+        predicted_trajectory (list): The predicted trajectories of all robots.
+
+    Raises:
+        Exception: If a collision is detected.
+
+    Returns:
+        None
+    """
+    mpc.x_obs = []
+    mpc.y_obs = []
+    for idx in range(robot_num):
+        if idx == i:
+            continue
+        if dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < 1:
+            raise Exception('Collision')
+        
+        next_robot_state = predicted_trajectory[idx]
+        mpc.x_obs.append(next_robot_state[0:-1:5, 0])
+        mpc.y_obs.append(next_robot_state[0:-1:5, 1])
+    mpc.x_obs = [item for sublist in mpc.x_obs for item in sublist]
+    mpc.y_obs = [item for sublist in mpc.y_obs for item in sublist]
 
 def generate_reference_trajectory(x, dl):
     cx = []
     cy = []
     cyaw = []
     ref = []
-    target_ind = [1] * robot_num
+    target_ind = [0] * robot_num
     for i in range(robot_num):
         sample_point = (float(random.randint(-width_init/2, width_init/2)), float(random.randint(-height_init/2, height_init/2)))
 
@@ -375,6 +505,7 @@ def mpc_control(i, x, u, mpc, bounds, constraints, ref, predicted_trajectory):
     update_obstacles(mpc, i, x1, x, predicted_trajectory)        
 
     mpc.initial_state = x1
+
     # MPC control
     u_solution = minimize(mpc.cost_function3, u1, (x1, ref[i]),
                         method='SLSQP',
@@ -395,8 +526,51 @@ def mpc_control(i, x, u, mpc, bounds, constraints, ref, predicted_trajectory):
 
     return x, u, predicted_trajectory
 
+def plot_arrow(x, y, yaw, length=0.5, width=0.1):  # pragma: no cover
+    plt.arrow(x, y, length * math.cos(yaw), length * math.sin(yaw),
+              head_length=width, head_width=width)
+    plt.plot(x, y)
+
+def plot_robot(x, y, yaw):  # pragma: no cover
+        outline = np.array([[-L / 2, L / 2,
+                             (L / 2), -L / 2,
+                             -L / 2],
+                            [WB / 2, WB / 2,
+                             - WB / 2, -WB / 2,
+                             WB / 2]])
+        Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
+                         [-math.sin(yaw), math.cos(yaw)]])
+        outline = (outline.T.dot(Rot1)).T
+        outline[0, :] += x
+        outline[1, :] += y
+        plt.plot(np.array(outline[0, :]).flatten(),
+                 np.array(outline[1, :]).flatten(), "-k")
+    
+def plot_robot_trajectory(x, u, cx, cy, predicted_trajectory, targets, i):
+    plt.plot(predicted_trajectory[i][:, 0], predicted_trajectory[i][:, 1], "-g")
+    plt.plot(x[0, i], x[1, i], "xr")
+    plt.plot(targets[i][0], targets[i][1], "xg")
+    plt.plot(cx[i], cy[i], "-r", label="course")
+    plot_robot(x[0, i], x[1, i], x[2, i])
+    plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
+    plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
+
+
 def main():
+    """
+    Main function for running the Model Predictive Control (MPC) algorithm.
+
+    This function initializes the necessary variables and objects, generates a reference trajectory,
+    sets the bounds and constraints for the MPC, and performs the MPC control loop for a specified number of iterations.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     print(__file__ + " start!!")
+
     # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
     iterations = 3000
     break_flag = False
@@ -415,10 +589,6 @@ def main():
 
     # Usage:
     bounds, constraints = set_bounds_and_constraints(mpc)
-
-    # predicted_trajectory = np.zeros((robot_num, mpc.horizon, x.shape[0]))
-    # for i in range(robot_num):
-    #     predicted_trajectory[i, :, :] = x[:, i] 
     
     predicted_trajectory = dict.fromkeys(range(robot_num),np.zeros([mpc.horizon, x.shape[0]]))
     for i in range(robot_num):
@@ -440,11 +610,8 @@ def main():
             if debug:
                 print('Robot ' + str(i+1) + ' of ' + str(robot_num) + '   Time ' + str(round(time.time() - start_time,5)))
 
-            utils.plot_robot(x[0, i], x[1, i], x[2,i])
-            plt.plot(ref[i][0],ref[i][1], "xg")
-            plt.plot(cx[i], cy[i], "-r", label="course")
-            plt.plot(predicted_trajectory[i][:,0], predicted_trajectory[i][:, 1], "-g")
-            
+            plot_robot_trajectory(x, u, cx, cy, predicted_trajectory, ref, i)    
+        
         plt.title('MPC 2D')
         utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
@@ -452,6 +619,4 @@ def main():
         plt.pause(0.0001)
 
 if __name__ == '__main__':
-    # main()
-    # main2()
     main()
