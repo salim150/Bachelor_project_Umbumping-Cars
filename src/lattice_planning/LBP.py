@@ -24,8 +24,8 @@ max_speed = json_object["DWA"]["max_speed"] # [m/s]
 min_speed = json_object["DWA"]["min_speed"] # [m/s]
 v_resolution = json_object["DWA"]["v_resolution"] # [m/s]
 delta_resolution = math.radians(json_object["DWA"]["delta_resolution"])# [rad/s]
-max_acc = json_object["DWA"]["max_acc"] # [m/ss]
-min_acc = json_object["DWA"]["min_acc"] # [m/ss]
+max_acc = 10 #json_object["DWA"]["max_acc"] # [m/ss]
+min_acc = -10 #json_object["DWA"]["min_acc"] # [m/ss]
 dt = json_object["DWA"]["dt"] # [s] Time tick for motion prediction
 predict_time = json_object["DWA"]["predict_time"] # [s]
 to_goal_cost_gain = json_object["DWA"]["to_goal_cost_gain"]
@@ -140,39 +140,87 @@ def predict_trajectory(x_init, a, delta):
         time += dt
     return trajectory
 
-def calc_control_and_trajectory(x, dw, goal, ob):
+def calc_dynamic_window(x):
+    """
+    calculation dynamic window based on current state x
+    motion model
+    initial state [x(m), y(m), yaw(rad), v(m/s), delta(rad)]
+    """    
+    v_poss = np.arange(min_speed, max_speed+v_resolution, v_resolution)
+    v_achiv = [x[3] + min_acc*dt, x[3] + max_acc*dt]
+
+    v_search = []
+
+    for v in v_poss:
+        if v >= v_achiv[0] and v <= v_achiv[1]:
+            v_search.append(v)
+    
+    return v_search
+
+def calc_control_and_trajectory(x, dw, goal, ob, u_buf, trajectory_buf):
     """
     calculation final input with dynamic window
     """
+    x_init = x[:]
+    v_search = calc_dynamic_window(x_init)
     min_cost = float("inf")
     best_u = [0.0, 0.0]
     best_trajectory = np.array([x])
 
-    a = (v_ref-x[3])/dt
-    
-    for id, info in data.items():
-        geom = np.zeros((len(info['x']),3))
-        geom[:,0] = info['x']
-        geom[:,1] = info['y']
-        geom[:,2] = info['yaw']
-        geom[:,0:2] = (geom[:,0:2]) @ rotateMatrix(-x[2]) + [x[0],x[1]]
+    for v in v_search:
+        dict = data[str(v)]
+        for id, info in dict.items():
 
-        # trajectory = predict_trajectory(x_init, a, delta)
-        trajectory = geom
-        # calc cost
+            # old_time = time.time()
+            geom = np.zeros((len(info['x']),3))
+            geom[:,0] = info['x']
+            geom[:,1] = info['y']
+            geom[:,2] = info['yaw']
+            geom[:,0:2] = (geom[:,0:2]) @ rotateMatrix(-x[2]) + [x[0],x[1]]
+            
+            # TODO: solve the problem of the yaw angle
 
-        to_goal_cost = to_goal_cost_gain * calc_to_goal_cost(trajectory, goal)
-        # speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
-        ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory, ob)
-        # heading_cost = heading_cost_gain * calc_to_goal_heading_cost(trajectory, goal)
-        final_cost = to_goal_cost + ob_cost # + heading_cost #+ speed_cost 
-        
-        # search minimum trajectory
-        if min_cost >= final_cost:
-            min_cost = final_cost
-            best_u = [a, info['ctrl'][2]]
-            best_trajectory = trajectory
-    return best_u, best_trajectory #, previous_u, previous_cost
+            geom[:,2] = geom[:,2] + x[2] #bringing also the yaw angle in the new frame
+            
+            # trajectory = predict_trajectory(x_init, a, delta)
+            trajectory = geom
+            # calc cost
+
+            to_goal_cost = 20 * to_goal_cost_gain * calc_to_goal_cost(trajectory, goal)
+            # speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
+            ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory, ob)
+            heading_cost = heading_cost_gain * calc_to_goal_heading_cost(trajectory, goal)
+            final_cost = to_goal_cost + ob_cost + heading_cost #+ speed_cost 
+            
+            # search minimum trajectory
+            if min_cost >= final_cost:
+                min_cost = final_cost
+
+                # interpolate the control inputs
+                a = (v-x[3])/dt
+
+                # print(f'v: {v}, id: {id}')
+                # print(f"Control seq. {len(info['ctrl'])}")
+                best_u = [a, info['ctrl'][0]]
+                best_trajectory = trajectory
+                u_history = info['ctrl'].copy()
+
+    u_buf.pop(0)
+    trajectory_buf = trajectory_buf[1:]
+
+    to_goal_cost = 30 * to_goal_cost_gain * calc_to_goal_cost(trajectory_buf, goal)
+    # speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
+    ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory_buf, ob)
+    heading_cost = heading_cost_gain * calc_to_goal_heading_cost(trajectory_buf, goal)
+    final_cost = to_goal_cost + ob_cost + heading_cost #+ speed_cost 
+
+    if min_cost >= final_cost:
+        min_cost = final_cost
+        best_u = [0, u_buf[0]]
+        best_trajectory = trajectory_buf
+        u_history = u_buf
+
+    return best_u, best_trajectory, u_history
 
 def calc_obstacle_cost(trajectory, ob):
     """
@@ -208,6 +256,20 @@ def calc_to_goal_cost(trajectory, goal):
     dy = goal[1] - trajectory[-1, 1]
 
     cost = math.hypot(dx, dy)
+
+    return cost
+
+def calc_to_goal_heading_cost(trajectory, goal):
+    """
+        calc to goal cost with angle difference
+    """
+    dx = goal[0] - trajectory[-1, 0]
+    dy = goal[1] - trajectory[-1, 1]
+
+    # either using the angle difference or the distance --> if we want to use the angle difference, we need to normalize the angle before taking the difference
+    error_angle = normalize_angle(math.atan2(dy, dx))
+    cost_angle = error_angle - normalize_angle(trajectory[-1, 2])
+    cost = abs(math.atan2(math.sin(cost_angle), math.cos(cost_angle)))
 
     return cost
 
@@ -394,7 +456,12 @@ def main1():
     # trajectory = np.dstack([trajectory, x])
 
     # predicted_trajectory = np.zeros((N, round(predict_time/dt)+1, x.shape[0]))
-    predicted_trajectory = {}
+    # predicted_trajectory = {}
+    predicted_trajectory = dict.fromkeys(range(robot_num),np.zeros([int(predict_time/dt), 3]))
+    for i in range(robot_num):
+        predicted_trajectory[i][:, 0:3] = x[0:3, i]
+    # u_hist = {}
+    u_hist = dict.fromkeys(range(robot_num),[0]*int(predict_time/dt))
 
     paths = []
     targets = []
@@ -410,6 +477,7 @@ def main1():
 
     for z in range(iterations):
         for i in range(robot_num):
+            # print(z, i)
             # Updating the paths of the robots
             if utils.dist(point1=(x[0,i], x[1,i]), point2=targets[i]) < 5:
                 # get_logger().info("Updating the path for robot " + str(i))
@@ -426,7 +494,7 @@ def main1():
     
                 ob.append(dilated_traj[idx])
 
-            u1, predicted_trajectory1 = lbp_control(x1, targets[i], ob)
+            u1, predicted_trajectory1, u_history = lbp_control(x1, targets[i], ob, u_hist[i], predicted_trajectory[i])
             line = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1]))
             dilated = line.buffer(dilation_factor, cap_style=3)
             dilated_traj[i] = dilated
@@ -434,7 +502,8 @@ def main1():
             x[:, i] = x1
             u[:, i] = u1
             predicted_trajectory[i] = predicted_trajectory1
-            print(f'Robot {i} v: {x1[3]}')
+            u_hist[i] = u_history
+            # print(f'Robot {i} v: {x1[3]}')
 
         trajectory = np.dstack([trajectory, x])
         

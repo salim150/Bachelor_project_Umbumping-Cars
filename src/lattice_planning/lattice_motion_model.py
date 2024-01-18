@@ -6,7 +6,10 @@ import matplotlib.pyplot as plt
 # motion parameter
 L = 1.0  # wheel base
 ds = 0.1  # course distance
-v = 2 # velocity [m/s]
+
+# TODO: remove hardcoded parts
+
+# v = 0.5 # velocity [m/s]
 
 
 class State:
@@ -22,7 +25,7 @@ def pi_2_pi(angle):
     return (angle + math.pi) % (2 * math.pi) - math.pi
 
 
-def update(state, v, delta, dt, L):
+def update(state, v, delta, dt):
     state.v = v
     delta = np.clip(delta, -np.radians(45), np.radians(45))
     state.x = state.x + state.v * math.cos(state.yaw) * dt
@@ -32,8 +35,7 @@ def update(state, v, delta, dt, L):
 
     return state
 
-
-def generate_trajectory(s, km, kf, k0):
+def generate_trajectory(s, km, kf, k0, v):
     # n = s / ds
     time = s / v  # [s]
     n = time / 0.1
@@ -61,7 +63,7 @@ def generate_trajectory(s, km, kf, k0):
     x, y, yaw = [state.x], [state.y], [state.yaw]
 
     for ikp in kp:
-        state = update(state, v, ikp, dt, L)
+        state = update(state, v, ikp, dt)
         x.append(state.x)
         y.append(state.y)
         yaw.append(state.yaw)
@@ -69,7 +71,7 @@ def generate_trajectory(s, km, kf, k0):
     return x, y, yaw, kp
 
 
-def generate_last_state(s, km, kf, k0):
+def generate_last_state(s, km, kf, k0, v):
     n = s / ds
     time = abs(s / v)  # [s]
 
@@ -94,6 +96,6 @@ def generate_last_state(s, km, kf, k0):
 
     state = State()
 
-    _ = [update(state, v, ikp, dt, L) for ikp in kp]
+    _ = [update(state, v, ikp, dt) for ikp in kp]
 
     return state.x, state.y, state.yaw

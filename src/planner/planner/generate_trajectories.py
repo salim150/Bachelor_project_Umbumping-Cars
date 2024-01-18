@@ -22,6 +22,7 @@ with open(path, 'r') as openfile:
 max_steer = json_object["DWA"]["max_steer"] # [rad] max steering angle
 max_speed = json_object["DWA"]["max_speed"] # [m/s]
 min_speed = json_object["DWA"]["min_speed"] # [m/s]
+a_resolution = json_object["DWA"]["a_resolution"] # [m/s²]
 v_resolution = json_object["DWA"]["v_resolution"] # [m/s]
 delta_resolution = math.radians(json_object["DWA"]["delta_resolution"])# [rad/s]
 max_acc = json_object["DWA"]["max_acc"] # [m/ss]
@@ -51,7 +52,7 @@ height_init = json_object["height"]
 N=3
 save_flag = True
 show_animation = True
-plot_flag = False
+plot_flag = True
 robot_num = json_object["robot_num"]
 timer_freq = json_object["timer_freq"]
 
@@ -139,7 +140,7 @@ def generate_trajectories(x_init):
     dw = calc_dynamic_window(x_init)
     traj = []
     u_total = []
-    for a in np.arange(dw[0], dw[1]+v_resolution, v_resolution):
+    for a in np.arange(dw[0], dw[1]+a_resolution, a_resolution):
         for delta in np.arange(dw[2], dw[3]+delta_resolution, delta_resolution):
             u = np.array([a, delta])
             traj.append(calc_trajectory(x_init, u, dt))
@@ -162,7 +163,7 @@ def main():
         complete_trajectories = {}
 
         # initial state [x(m), y(m), yaw(rad), v(m/s)]
-        for v in np.arange(min_speed, max_speed, 0.5):
+        for v in np.arange(min_speed, max_speed, v_resolution):
             x_init = np.array([0.0, 0.0, np.radians(90.0), v])
             traj, u_total = generate_trajectories(x_init)
 
@@ -219,10 +220,10 @@ def main():
 
     fig = plt.figure(1, dpi=90)
     ax = fig.add_subplot(111)
-    for v in np.arange(min_speed, max_speed, 0.5):
+    for v in np.arange(min_speed, max_speed, v_resolution):
         x_init = np.array([0.0, 0.0, np.radians(90.0), v])
         dw = calc_dynamic_window(x_init)
-        for a in np.arange(dw[0], dw[1]+v_resolution, v_resolution):
+        for a in np.arange(dw[0], dw[1]+a_resolution, a_resolution):
             for delta in np.arange(dw[2], dw[3]+delta_resolution, delta_resolution):
                 # print(v, a, delta)
                 geom = data[str(v)][str(a)][str(delta)]
@@ -245,7 +246,7 @@ def main():
     iterations = 3000
     N=2
     break_flag = False
-    v = np.arange(min_speed, max_speed, 0.5)
+    v = np.arange(min_speed, max_speed, v_resolution)
 
     # x = np.array([[0, 20, 15], [0, 0, 20], [0, np.pi, -np.pi/2], [0, 0, 0]])
     # goal = np.array([[30, 0, 15], [10, 10, 0]])

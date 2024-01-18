@@ -18,10 +18,11 @@ import lattice_motion_model as motion_model
 
 # optimization parameter
 max_iter = 100
+# TODO: reduce step sizes with the iterations
 h = np.array([0.3, 0.02, 0.02]).T  # parameter sampling distance
-cost_th = 0.1
+cost_th = 0.12
 
-show_animation = True
+show_animation = False
 
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):  # pragma: no cover
@@ -42,28 +43,28 @@ def calc_diff(target, x, y, yaw):
     return d
 
 
-def calc_j(target, p, h, k0):
+def calc_j(target, p, h, k0, v):
     xp, yp, yawp = motion_model.generate_last_state(
-        p[0, 0] + h[0], p[1, 0], p[2, 0], k0)
+        p[0, 0] + h[0], p[1, 0], p[2, 0], k0, v)
     dp = calc_diff(target, [xp], [yp], [yawp])
     xn, yn, yawn = motion_model.generate_last_state(
-        p[0, 0] - h[0], p[1, 0], p[2, 0], k0)
+        p[0, 0] - h[0], p[1, 0], p[2, 0], k0, v)
     dn = calc_diff(target, [xn], [yn], [yawn])
     d1 = np.array((dp - dn) / (2.0 * h[0])).reshape(3, 1)
 
     xp, yp, yawp = motion_model.generate_last_state(
-        p[0, 0], p[1, 0] + h[1], p[2, 0], k0)
+        p[0, 0], p[1, 0] + h[1], p[2, 0], k0, v)
     dp = calc_diff(target, [xp], [yp], [yawp])
     xn, yn, yawn = motion_model.generate_last_state(
-        p[0, 0], p[1, 0] - h[1], p[2, 0], k0)
+        p[0, 0], p[1, 0] - h[1], p[2, 0], k0, v)
     dn = calc_diff(target, [xn], [yn], [yawn])
     d2 = np.array((dp - dn) / (2.0 * h[1])).reshape(3, 1)
 
     xp, yp, yawp = motion_model.generate_last_state(
-        p[0, 0], p[1, 0], p[2, 0] + h[2], k0)
+        p[0, 0], p[1, 0], p[2, 0] + h[2], k0, v)
     dp = calc_diff(target, [xp], [yp], [yawp])
     xn, yn, yawn = motion_model.generate_last_state(
-        p[0, 0], p[1, 0], p[2, 0] - h[2], k0)
+        p[0, 0], p[1, 0], p[2, 0] - h[2], k0, v)
     dn = calc_diff(target, [xn], [yn], [yawn])
     d3 = np.array((dp - dn) / (2.0 * h[2])).reshape(3, 1)
 
@@ -72,7 +73,7 @@ def calc_j(target, p, h, k0):
     return J
 
 
-def selection_learning_param(dp, p, k0, target):
+def selection_learning_param(dp, p, k0, target, v):
     mincost = float("inf")
     mina = 1.0
     maxa = 2.0
@@ -81,7 +82,7 @@ def selection_learning_param(dp, p, k0, target):
     for a in np.arange(mina, maxa, da):
         tp = p + a * dp
         xc, yc, yawc = motion_model.generate_last_state(
-            tp[0], tp[1], tp[2], k0)
+            tp[0], tp[1], tp[2], k0, v)
         dc = calc_diff(target, [xc], [yc], [yawc])
         cost = np.linalg.norm(dc)
 
@@ -104,9 +105,9 @@ def show_trajectory(target, xc, yc):  # pragma: no cover
     plt.pause(0.1)
 
 
-def optimize_trajectory(target, k0, p):
+def optimize_trajectory(target, k0, p, v):
     for i in range(max_iter):
-        xc, yc, yawc, kp = motion_model.generate_trajectory(p[0, 0], p[1, 0], p[2, 0], k0)
+        xc, yc, yawc, kp = motion_model.generate_trajectory(p[0, 0], p[1, 0], p[2, 0], k0, v)
         dc = np.array(calc_diff(target, xc, yc, yawc)).reshape(3, 1)
 
         cost = np.linalg.norm(dc)
@@ -114,14 +115,14 @@ def optimize_trajectory(target, k0, p):
             print("path is ok cost is:" + str(cost))
             break
 
-        J = calc_j(target, p, h, k0)
+        J = calc_j(target, p, h, k0, v)
         try:
-            dp = - np.linalg.inv(J) @ dc
+            dp = - np.linalg.pinv(J) @ dc
         except np.linalg.linalg.LinAlgError:
             print("cannot calc path LinAlgError")
             xc, yc, yawc, p = None, None, None, None
             break
-        alpha = selection_learning_param(dp, p, k0, target)
+        alpha = selection_learning_param(dp, p, k0, target, v)
 
         p += alpha * np.array(dp)
         # print(p.T)

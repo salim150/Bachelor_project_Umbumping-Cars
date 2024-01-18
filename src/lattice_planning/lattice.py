@@ -52,7 +52,7 @@ def get_lookup_table(table_path):
     return np.loadtxt(table_path, delimiter=',', skiprows=1)
 
 
-def generate_path(target_states, k0):
+def generate_path(target_states, k0, v):
     # x, y, yaw, s, km, kf
     lookup_table = get_lookup_table(TABLE_PATH)
     result = []
@@ -62,10 +62,12 @@ def generate_path(target_states, k0):
             state[0], state[1], state[2], lookup_table)
 
         target = motion_model.State(x=state[0], y=state[1], yaw=state[2])
+        # init_p = np.array(
+        #     [np.hypot(state[0], state[1]), bestp[4], bestp[5]]).reshape(3, 1)
         init_p = np.array(
-            [np.hypot(state[0], state[1]), bestp[4], bestp[5]]).reshape(3, 1)
+            [np.hypot(state[0], state[1]), 0.0, 0.0]).reshape(3, 1)
 
-        x, y, yaw, p, kp = planner.optimize_trajectory(target, k0, init_p)
+        x, y, yaw, p, kp = planner.optimize_trajectory(target, k0, init_p, v)
 
         if x is not None:
             print("find good path")
@@ -201,7 +203,7 @@ def uniform_terminal_state_sampling_test1():
     k0 = 0.0
     nxy = 5
     nh = 3
-    d = 20
+    d = 3
     a_min = - np.deg2rad(45.0)
     a_max = np.deg2rad(45.0)
     p_min = - np.deg2rad(45.0)
@@ -348,7 +350,7 @@ def lane_state_sampling_test1():
 def main():
     planner.show_animation = show_animation
     uniform_terminal_state_sampling_test1()
-    uniform_terminal_state_sampling_test2()
+    # uniform_terminal_state_sampling_test2()
     # biased_terminal_state_sampling_test1()
     # biased_terminal_state_sampling_test2()
     # lane_state_sampling_test1()
