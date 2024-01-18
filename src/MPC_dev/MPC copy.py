@@ -1,20 +1,16 @@
 import numpy as np
-from sim2d import sim_run
 import cubic_spline_planner
 import math
 import random
 import sys
-sys.path.append('/home/giacomo/thesis_ws/src/bumper_cars/src')
+sys.path.append("..")
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import matplotlib.gridspec as gridspec
 import matplotlib.patches as mpatches
 from scipy.optimize import minimize, NonlinearConstraint
 import time
-# from planner.utils import *
-# from planner import *
 import planner.utils as utils
-# import lanner.utils as utils
 
 import pathlib
 import json
@@ -52,7 +48,7 @@ c_a = json_object["Car_model"]["c_a"]
 c_r1 = json_object["Car_model"]["c_r1"]
 WB = json_object["Controller"]["WB"] # Wheel base
 L_d = json_object["Controller"]["L_d"]  # [m] look-ahead distance
-robot_num = 2 #json_object["robot_num"]
+robot_num = json_object["robot_num"]
 safety_init = json_object["safety"]
 width_init = json_object["width"]
 height_init = json_object["height"]
@@ -89,7 +85,7 @@ def normalize_angle(angle):
 
 class ModelPredictiveControl:
     def __init__(self, obs_x, obs_y):
-        self.horizon = 10
+        self.horizon = 8
         self.dt = 0.2
 
         # self.L = 2.5 # Car base [m]
@@ -102,7 +98,7 @@ class ModelPredictiveControl:
         self.y_obs = obs_y
 
         self.initial_state = None
-        self.safety_radius = 3.0
+        self.safety_radius = 2.5
 
     def plant_model(self,prev_state, dt, pedal, steering):
         x_t = prev_state[0]
@@ -142,7 +138,7 @@ class ModelPredictiveControl:
             for z in range(len(self.x_obs)-1):
                 distance_to_obstacle = np.sqrt((self.x_obs[z] - state[0])**2 + (self.y_obs[z] - state[1])**2)
                 # if any(distance_to_obstacle < 3):
-                if distance_to_obstacle < 1:
+                if distance_to_obstacle < 5:
                     cost += 100 #np.inf/distance_to_obstacle
 
             # Heading cost
@@ -172,7 +168,7 @@ class ModelPredictiveControl:
             speed = state[3]
             heading = state[2]
 
-            state = self.plant_model(state, self.dt, u[i*3], u[i*3 + 1])
+            state = self.plant_model(state, self.dt, u[i*2], u[i*2 + 1])
 
             distance_to_goal = np.sqrt((ref[0] - state[0])**2 + (ref[1] - state[1])**2)
 
@@ -182,12 +178,13 @@ class ModelPredictiveControl:
             # Obstacle cost
             for z in range(len(self.x_obs)-1):
                 distance_to_obstacle = np.sqrt((self.x_obs[z] - state[0])**2 + (self.y_obs[z] - state[1])**2)
-                # if any(distance_to_obstacle < 3):
-                if distance_to_obstacle < 4:
-                    cost += 1000 #np.inf/distance_to_obstacle
+                if distance_to_obstacle < 3:
+                    cost += 40/distance_to_obstacle
 
             # Heading cost
-            cost += 1 * (heading - state[2])**2
+            cost += 10 * (heading - state[2])**2
+
+            # cost +=  2 * (ref[2] - state[2])**2
 
             # negative speed cost
             cost += -10 * np.sign(speed) * 3 * speed
@@ -196,11 +193,11 @@ class ModelPredictiveControl:
             if abs(u[2*i]) > 0.2:
                 cost += (speed - state[3])**2
 
-        # Final heading and position cost        
-        cost +=  10 * (normalize_angle(ref[2]) - normalize_angle(state[2]))**2
+        cost += (state[3])**2
         distance_to_goal = np.sqrt((ref[0] - state[0])**2 + (ref[1] - state[1])**2)
-        cost += 10*distance_to_goal
+        cost += 100*distance_to_goal
         return cost
+
     
     def cost_function3(self,u, *args):
         state = args[0]
@@ -213,30 +210,32 @@ class ModelPredictiveControl:
 
             state = self.plant_model(state, self.dt, u[i*2], u[i*2 + 1])
 
-            distance_to_goal = (ref[0] - state[0])**2 + (ref[1] - state[1])**2
+            distance_to_goal = np.sqrt((ref[0] - state[0])**2 + (ref[1] - state[1])**2)
 
             # Position cost
-            cost +=  30 * distance_to_goal
+            cost +=  distance_to_goal
 
             # Obstacle cost
             # for z in range(len(self.x_obs)-1):
             #     distance_to_obstacle = np.sqrt((self.x_obs[z] - state[0])**2 + (self.y_obs[z] - state[1])**2)
-            #     if distance_to_obstacle < 1:
+            #     if distance_to_obstacle < 3:
             #         cost += 40/distance_to_obstacle
 
             # Heading cost
             cost += 10 * (heading - state[2])**2
 
-            # cost +=  2 * (ref[2] - state[2])**2
+            cost +=  2 * (ref[2] - state[2])**2
+
+            # negative speed cost
+            cost += -10 * np.sign(speed) * 3 * speed
 
             # Acceleration cost
             if abs(u[2*i]) > 0.2:
                 cost += (speed - state[3])**2
 
         cost += (state[3])**2
-        cost +=  2 * (ref[2] - state[2])**2
-        distance_to_goal = (ref[0] - state[0])**2 + (ref[1] - state[1])**2
-        cost += 10*distance_to_goal
+        distance_to_goal = np.sqrt((ref[0] - state[0])**2 + (ref[1] - state[1])**2)
+        cost += 100*distance_to_goal
         return cost
 
     def propagation1(self, u):
@@ -349,7 +348,7 @@ def main():
 
         # explore possibility of iterative MPC: for z in range(3):
         # Non-linear optimization.
-        u_solution = minimize(mpc.cost_function3, u, (state_i[-1], ref),
+        u_solution = minimize(mpc.cost_function2, u, (state_i[-1], ref),
                                 method='SLSQP',
                                 bounds=bounds,
                                 tol = 1e-2)
@@ -403,7 +402,7 @@ def main4():
     # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
     iterations = 3000
     break_flag = False
-    dl = 2
+    dl = 3
     FIG_SIZE = options['FIG_SIZE'] # [Width, Height]
     OBSTACLES = options['OBSTACLES']
     
@@ -425,14 +424,12 @@ def main4():
         ref.append([cx[i][target_ind[i]], cy[i][target_ind[i]], cyaw[i][target_ind[i]]])
     
         plt.plot(x[0,i], x[1,i], "xr")
-        # plt.plot(targets[i][0], targets[i][1], "xg")
         plt.plot(cx[i], cy[i], "-r", label="course")
     
     plt.show()
 
     # MPC initialization
-    mpc = ModelPredictiveControl(obs_x=[0,7,5,-2,-4,8,9], obs_y=[0,-6,3,7,-3,5,9])
-    # mpc = ModelPredictiveControl(obs_x=cx[0][5:-1:12], obs_y=cy[0][5:-1:12])
+    mpc = ModelPredictiveControl(obs_x=[], obs_y=[])
 
     num_inputs = 2
     u = np.zeros([mpc.horizon*num_inputs, robot_num])
@@ -444,10 +441,17 @@ def main4():
         bounds += [[-max_steer, max_steer]]
 
     predicted_trajectory = np.zeros((robot_num, mpc.horizon, x.shape[0]))
+    for i in range(robot_num):
+        predicted_trajectory[i, :, :] = x[:, i] 
     
     # input [throttle, steer (delta)]
     fig = plt.figure(1, dpi=90)
     ax = fig.add_subplot(111)
+
+    constraint1 = NonlinearConstraint(fun=mpc.propagation1, lb=-width_init/2 + mpc.safety_radius, ub=width_init/2 - mpc.safety_radius)
+    constraint2 = NonlinearConstraint(fun=mpc.propagation2, lb=-height_init/2 + mpc.safety_radius, ub=height_init/2 - mpc.safety_radius)
+    constraint3 = NonlinearConstraint(fun=mpc.propagation3, lb=0, ub=np.inf)
+    constraints = [constraint1, constraint2, constraint3]
 
     for z in range(iterations):
         # old_time = time.time()
@@ -483,59 +487,33 @@ def main4():
             u1 = np.append(u1, u1[-2])
             start_time = time.time()
 
-
             mpc.x_obs = []
             mpc.y_obs = []
             for idx in range(robot_num):
                 if idx == i:
                     continue
-                # ob.append([x[0, idx], x[1, idx]])
-                mpc.x_obs.append(x[0, idx])
-                mpc.y_obs.append(x[1, idx])
-                # ob.append([predicted_trajectory[i, :, 0].tolist(), predicted_trajectory[i, :, 1].tolist()])
-                # add only if the robots are close enough
+                if dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < 1: raise Exception('Collision')
+                # mpc.x_obs.append(x[0, idx])
+                # mpc.y_obs.append(x[1, idx])
+                mpc.x_obs.append(predicted_trajectory[idx, 0:-1:5, 0])
+                mpc.y_obs.append(predicted_trajectory[idx, 0:-1:5, 1])
+            mpc.x_obs = [item for sublist in mpc.x_obs for item in sublist]
+            mpc.y_obs = [item for sublist in mpc.y_obs for item in sublist]
 
-                # if dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < 10:
-                # if dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < 1: raise Exception('Collision')
-                # mpc.x_obs.append(predicted_trajectory[i, 0:-1:5, 0])
-                # mpc.y_obs.append(predicted_trajectory[i, 0:-1:5, 1])
-            # mpc.x_obs = [item for sublist in mpc.x_obs for item in sublist]
-            # mpc.y_obs = [item for sublist in mpc.y_obs for item in sublist]
-
-            mpc.initial_state = x1
-            constraint1 = NonlinearConstraint(fun=mpc.propagation1, lb=-width_init/2, ub=width_init/2)
-            constraint2 = NonlinearConstraint(fun=mpc.propagation2, lb=-height_init/2, ub=height_init/2)
-            # if mpc.x_obs == [] and mpc.y_obs == []:
-            #     constraints = [constraint1, constraint2]
-            # else:
-            #     constraint3 = NonlinearConstraint(fun=mpc.propagation3, lb=0, ub=np.inf)
-            #     constraints = [constraint1, constraint2, constraint3]
-            constraints = [constraint1, constraint2]
+            mpc.initial_state = x1 # stting initial state for the constraints
             
-            # ob = []
-            # for idx in range(robot_num):
-            #     if idx == i:
-            #         continue
-            #     # ob.append([x[0, idx], x[1, idx]])
-            #     ob.append([predicted_trajectory[i, :, 0].tolist(), predicted_trajectory[i, :, 1].tolist()])
-            
-            # mpc.x_obs = [ob[z][0] for z in range(len(ob))]
-            # mpc.y_obs = [ob[z][1] for z in range(len(ob))]
-
             # MPC control
-            print("Robot " + str(i))
             u_solution = minimize(mpc.cost_function3, u1, (x1, ref[i]),
-                                method='BFGS',
+                                method='SLSQP',
                                 bounds=bounds,
                                 constraints=constraints,
-                                tol = 1e-3)
+                                tol = 1e-1)
             
             if debug:
                 print('Step ' + str(i) + ' of ' + str(iterations) + '   Time ' + str(round(time.time() - start_time,5)))
             u1 = u_solution.x
             x1 = mpc.plant_model(x1, dt, u1[0], u1[1])
             x[:, i] = x1
-
             u[:, i] = u1
             predicted_state = np.array([x1])
 
@@ -544,13 +522,10 @@ def main4():
                 predicted_state = np.append(predicted_state, np.array([predicted]), axis=0)
             predicted_trajectory[i, :, :] = predicted_state
 
-            # plt.plot(mpc.x_obs, mpc.y_obs, "xk")
             utils.plot_robot(x1[0], x1[1], x1[2])
-            # utils.plot_robot(ref[i][0],ref[i][1],ref[i][2])
             plt.plot(ref[i][0],ref[i][1], "xg")
             plt.plot(cx[i], cy[i], "-r", label="course")
             plt.plot(predicted_trajectory[i, :, 0], predicted_trajectory[i, :, 1], "-g")
-            # plt.plot(predicted_state[:,0], predicted_state[:,1])
             
         plt.title('MPC 2D')
         utils.plot_map(width=width_init, height=height_init)
@@ -653,9 +628,6 @@ def main5():
             u1 = u_solution.x
             x1 = mpc.plant_model(x1, dt, u1[0], u1[1])
             x[:, i] = x1
-            print(f'X: {x1[0]}, Y: {x1[1]}')
-            print(f'Yaw angle: {x1[2]}')
-            print(f'Speed: {x1[3]}')
             u[:, i] = u1
             predicted_state = np.array([x1])
 
@@ -680,5 +652,4 @@ def main5():
 if __name__ == '__main__':
     # main()
     # main2()
-    # main4()
-    main5()
+    main4()
