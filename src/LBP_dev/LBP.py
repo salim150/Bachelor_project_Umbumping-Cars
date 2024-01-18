@@ -47,7 +47,7 @@ c_a = json_object["Car_model"]["c_a"]
 c_r1 = json_object["Car_model"]["c_r1"]
 WB = json_object["Controller"]["WB"] # Wheel base
 L_d = json_object["Controller"]["L_d"]  # [m] look-ahead distance
-robot_num = 3#json_object["robot_num"]
+robot_num = json_object["robot_num"]
 safety_init = json_object["safety"]
 width_init = json_object["width"]
 height_init = json_object["height"]
@@ -201,7 +201,7 @@ def calc_control_and_trajectory(x, dw, goal, ob, u_buf, trajectory_buf):
 
                 # print(f'v: {v}, id: {id}')
                 # print(f"Control seq. {len(info['ctrl'])}")
-                best_u = [a, info['ctrl'][0]]
+                best_u = [a, info['ctrl'][1]]
                 best_trajectory = trajectory
                 u_history = info['ctrl'].copy()
 
@@ -216,7 +216,7 @@ def calc_control_and_trajectory(x, dw, goal, ob, u_buf, trajectory_buf):
 
     if min_cost >= final_cost:
         min_cost = final_cost
-        best_u = [0, u_buf[0]]
+        best_u = [0, u_buf[1]]
         best_trajectory = trajectory_buf
         u_history = u_buf
 
@@ -428,8 +428,8 @@ def main2():
 
     predicted_trajectory = dict.fromkeys(range(robot_num),np.zeros([int(predict_time/dt), 3]))
     for i in range(robot_num):
-        predicted_trajectory[i][:, 0:3] = x[0:3, i]
-    # u_hist = {}
+        predicted_trajectory[i] = np.full((int(predict_time/dt), 3), x[0:3,i])
+    
     u_hist = dict.fromkeys(range(robot_num),[0]*int(predict_time/dt))
 
     paths, targets, dilated_traj = initialize_paths_targets_dilated_traj(x)
@@ -472,6 +472,6 @@ def main2():
        
 if __name__ == '__main__':
     # main1()
-    main()
+    main2()
 
     

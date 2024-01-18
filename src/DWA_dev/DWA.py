@@ -71,14 +71,6 @@ def dwa_control(x, goal, ob):
     u, trajectory = calc_control_and_trajectory(x, dw, goal, ob)
     return u, trajectory
 
-class RobotType(Enum):
-    circle = 0
-    rectangle = 1
-
-robot_type = RobotType.rectangle
-robot_radius = 1.0
-
-
 def motion(x, u, dt):
     """
     motion model
@@ -279,7 +271,6 @@ def plot_arrow(x, y, yaw, length=0.5, width=0.1):  # pragma: no cover
     plt.plot(x, y)
 
 def plot_robot(x, y, yaw):  # pragma: no cover
-    if robot_type == RobotType.rectangle:
         outline = np.array([[-L / 2, L / 2,
                              (L / 2), -L / 2,
                              -L / 2],
@@ -293,12 +284,6 @@ def plot_robot(x, y, yaw):  # pragma: no cover
         outline[1, :] += y
         plt.plot(np.array(outline[0, :]).flatten(),
                  np.array(outline[1, :]).flatten(), "-k")
-    elif robot_type == RobotType.circle:
-        circle = plt.Circle((x, y), robot_radius, color="b")
-        plt.gcf().gca().add_artist(circle)
-        out_x, out_y = (np.array([x, y]) +
-                        np.array([np.cos(yaw), np.sin(yaw)]) * robot_radius)
-        plt.plot([x, out_x], [y, out_y], "-k")
 
 def plot_map():
         corner_x = [-width_init/2.0, width_init/2.0, width_init/2.0, -width_init/2.0, -width_init/2.0]
@@ -306,105 +291,110 @@ def plot_map():
 
         plt.plot(corner_x, corner_y)
 
-def main(robot_type=RobotType.rectangle):
+def update_targets(paths, targets, x, i):
+    if utils.dist(point1=(x[0, i], x[1, i]), point2=targets[i]) < 5:
+        paths[i] = utils.update_path(paths[i])
+        targets[i] = (paths[i][0].x, paths[i][0].y)
+
+    return paths, targets
+
+def initialize_paths_targets_dilated_traj(x):
+    paths = []
+    targets = []
+    dilated_traj = []
+
+    for i in range(robot_num):
+        dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
+        paths.append(utils.create_path())
+        targets.append([paths[i][0].x, paths[i][0].y])
+
+    return paths, targets, dilated_traj
+
+def update_robot_state(x, u, dt, targets, dilated_traj, predicted_trajectory, i):
+    x1 = x[:, i]
+    ob = [dilated_traj[idx] for idx in range(len(dilated_traj)) if idx != i]
+    u1, predicted_trajectory1 = dwa_control(x1, targets[i], ob)
+    dilated_traj[i] = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1])).buffer(dilation_factor, cap_style=3)
+    
+    # Collision check
+    if any([utils.dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < WB for idx in range(robot_num) if idx != i]): raise Exception('Collision')
+    
+    x1 = motion(x1, u1, dt)
+    x[:, i] = x1
+    u[:, i] = u1
+    predicted_trajectory[i] = predicted_trajectory1
+    
+    return x, u, predicted_trajectory
+
+def plot_robot_trajectory(x, u, predicted_trajectory, dilated_traj, targets, ax, i):
+    plt.plot(predicted_trajectory[i][:, 0], predicted_trajectory[i][:, 1], "-g")
+    plot_polygon(dilated_traj[i], ax=ax, add_points=False, alpha=0.5)
+    plt.plot(x[0, i], x[1, i], "xr")
+    plt.plot(targets[i][0], targets[i][1], "xg")
+    plot_robot(x[0, i], x[1, i], x[2, i])
+    plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
+    plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
+
+def check_goal_reached(x, targets, i):
+    dist_to_goal = math.hypot(x[0, i] - targets[i][0], x[1, i] - targets[i][1])
+    if dist_to_goal <= 0.5:
+        print("Goal!!")
+        return True
+    return False
+
+def main():
     print(__file__ + " start!!")
-    # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
     iterations = 3000
     break_flag = False
     
     x0, y, yaw, v, omega, model_type = utils.samplegrid(width_init, height_init, min_dist, robot_num, safety_init)
     x = np.array([x0, y, yaw, v])
+    u = np.zeros((2, robot_num))
 
-    # create a trajcetory array to store the trajectory of the robot_num robots
     trajectory = np.zeros((x.shape[0], robot_num, 1))
-    # append the firt state to the trajectory
     trajectory[:, :, 0] = x
-    # trajectory = np.dstack([trajectory, x])
 
-    # predicted_trajectory = np.zeros((robot_num, round(predict_time/dt)+1, x.shape[0]))
-    predicted_trajectory = np.zeros((robot_num, 21, x.shape[0]))
-
-    paths = []
-    targets = []
-    dilated_traj = []
+    predicted_trajectory = dict.fromkeys(range(robot_num),np.zeros([int(predict_time/dt), 3]))
     for i in range(robot_num):
-        dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
-        paths.append(utils.create_path())
-        targets.append([paths[i][0].x, paths[i][0].y])
+        predicted_trajectory[i] = np.full((int(predict_time/dt), 3), x[0:3,i])
+
+    paths, targets, dilated_traj = initialize_paths_targets_dilated_traj(x)
     
-    # input [throttle, steer (delta)]
-    robot_type = robot_type
     fig = plt.figure(1, dpi=90)
     ax = fig.add_subplot(111)
     
     for z in range(iterations):
-        # old_time = time.time()
-        for i in range(robot_num):
-            # Updating the paths of the robots
-            if utils.dist(point1=(x[0,i], x[1,i]), point2=targets[i]) < 5:
-                # get_logger().info("Updating the path for robot " + str(i))
-                paths[i] = utils.update_path(paths[i])
-                targets[i] = (paths[i][0].x, paths[i][0].y)
-
-            x1 = x[:, i]
-
-            ob = []
-            for idx in range(robot_num):
-                if idx == i:
-                    continue
-                if utils.dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < WB: raise Exception('Collision')
-    
-                ob.append(dilated_traj[idx])
-            
-            u1, predicted_trajectory1 = dwa_control(x1, targets[i], ob)
-            line = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1]))
-            dilated = line.buffer(dilation_factor, cap_style=3)
-            dilated_traj[i] = dilated
-            x1 = motion(x1, u1, dt)
-            x[:, i] = x1
-            predicted_trajectory[i, :, :] = predicted_trajectory1
-            # print(f'Speed of robot {i}: {x[3,i]}')
-
-        trajectory = np.dstack([trajectory, x])
+        plt.cla()
+        plt.gcf().canvas.mpl_connect('key_release_event', lambda event: [exit(0) if event.key == 'escape' else None])
         
-        if show_animation:
-            plt.cla()
-            # for stopping simulation with the esc key.
-            plt.gcf().canvas.mpl_connect(
-                'key_release_event',
-                lambda event: [exit(0) if event.key == 'escape' else None])
-            
-            for i in range(robot_num):
-                plt.plot(predicted_trajectory[i, :, 0], predicted_trajectory[i, :, 1], "-g")
-                plot_polygon(dilated_traj[i], ax=ax, add_points=False, alpha=0.5)
-                plt.plot(x[0,i], x[1,i], "xr")
-                # plt.plot(goal[0,i], goal[1,i], "xb")
-                plot_robot(x[0,i], x[1,i], x[2,i])
-                plot_arrow(x[0,i], x[1,i], x[2,i], length=2, width=1)
-                plt.plot(targets[i][0], targets[i][1], "xg")
-
-            plot_map()
-            plt.axis("equal")
-            plt.grid(True)
-            plt.pause(0.0001)
-       
         for i in range(robot_num):
-            dist_to_goal = math.hypot(x[0,i] - targets[i][0], x[1,i] - targets[i][1])
-            if dist_to_goal <= 0.5:
-                print("Goal!!")
+            
+            paths, targets = update_targets(paths, targets, x, i)
+
+            x, u, predicted_trajectory = update_robot_state(x, u, dt, targets, dilated_traj, predicted_trajectory, i)
+
+            trajectory = np.dstack([trajectory, x])
+
+            if check_goal_reached(x, targets, i):
                 break_flag = True
-        
+
+            if show_animation:
+                plot_robot_trajectory(x, u, predicted_trajectory, dilated_traj, targets, ax, i)
+
+        utils.plot_map(width=width_init, height=height_init)
+        plt.axis("equal")
+        plt.grid(True)
+        plt.pause(0.0001)
+
         if break_flag:
             break
 
-        # print(time.time()-old_time)
-        
     print("Done")
     if show_animation:
         for i in range(robot_num):
-            plt.plot(trajectory[0,i,:], trajectory[1,i,:], "-r")
+            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-r")
         plt.pause(0.0001)
         plt.show()
        
 if __name__ == '__main__':
-    main(robot_type=RobotType.rectangle)
+    main()
