@@ -105,13 +105,13 @@ def find_nearest(array, value):
     idx = (np.abs(array - value)).argmin()
     return array[idx]
 
-def lbp_control(x, goal, ob):
+def lbp_control(x, goal, ob, u_buf, trajectory_buf):
     """
     Dynamic Window Approach control
     """
     dw = calc_dynamic_window(x)
-    u, trajectory = calc_control_and_trajectory(x, dw, goal, ob)
-    return u, trajectory
+    u, trajectory, u_history = calc_control_and_trajectory(x, dw, goal, ob, u_buf, trajectory_buf)
+    return u, trajectory, u_history
 
 def calc_dynamic_window(x):
     """
@@ -597,7 +597,7 @@ def main2():
         plt.show()
        
 if __name__ == '__main__':
-    # main1()
-    main2()
+    main1()
+    # main2()
 
     
