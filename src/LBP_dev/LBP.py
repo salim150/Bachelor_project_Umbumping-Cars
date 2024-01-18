@@ -62,8 +62,15 @@ with open('/home/giacomo/thesis_ws/src/LBP_dev/LBP.json', 'r') as file:
 
 def motion(x, u, dt):
     """
-    motion model
-    initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
+    Motion model for a vehicle.
+
+    Args:
+        x (list): Initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)].
+        u (list): Control inputs [throttle, delta].
+        dt (float): Time step (s).
+
+    Returns:
+        list: Updated state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)].
     """
     delta = u[1]
     delta = np.clip(delta, -max_steer, max_steer)
@@ -91,39 +98,48 @@ def normalize_angle(angle):
     return angle
 
 def rotateMatrix(a):
-    return np.array([[np.cos(a), -np.sin(a)], [np.sin(a), np.cos(a)]])
+    """
+    Rotate a 2D matrix by the given angle.
 
-def find_nearest(array, value):
-    array = np.asarray(array)
-    idx = (np.abs(array - value)).argmin()
-    return array[idx]
+    Parameters:
+    a (float): The angle of rotation in radians.
+
+    Returns:
+    numpy.ndarray: The rotated matrix.
+    """
+    return np.array([[np.cos(a), -np.sin(a)], [np.sin(a), np.cos(a)]])
 
 def lbp_control(x, goal, ob, u_buf, trajectory_buf):
     """
-    Dynamic Window Approach control
-    """
-    dw = calc_dynamic_window(x)
-    u, trajectory, u_history = calc_control_and_trajectory(x, dw, goal, ob, u_buf, trajectory_buf)
-    return u, trajectory, u_history
+    Calculates the control input, trajectory, and control history for the LBP algorithm.
 
-def calc_dynamic_window(x):
+    Args:
+        x (tuple): Current state of the system.
+        goal (tuple): Goal state.
+        ob (list): List of obstacles.
+        u_buf (list): Buffer for storing control inputs.
+        trajectory_buf (list): Buffer for storing trajectories.
+
+    Returns:
+        tuple: Control input, trajectory, and control history.
     """
-    calculation dynamic window based on current state x
-    motion model
-    initial state [x(m), y(m), yaw(rad), v(m/s), delta(rad)]
-    """
-    Vs = [min_acc, max_acc,
-          -max_steer, max_steer]
-    
-    dw = [Vs[0], Vs[1], Vs[2], Vs[3]]
-    return dw
+    v_search = calc_dynamic_window(x)
+    u, trajectory, u_history = calc_control_and_trajectory(x, v_search, goal, ob, u_buf, trajectory_buf)
+    return u, trajectory, u_history
 
 def predict_trajectory(x_init, a, delta):
     """
-    predict trajectory with an input
-    motion model
-    initial state [x(m), y(m), yaw(rad), v(m/s), delta(rad)]
+    Predicts the trajectory of an object given the initial state, acceleration, and steering angle.
+
+    Parameters:
+    x_init (list): The initial state of the object [x, y, theta].
+    a (float): The acceleration of the object.
+    delta (float): The steering angle of the object.
+
+    Returns:
+    numpy.ndarray: The predicted trajectory of the object.
     """
+
     x = np.array(x_init)
     trajectory = np.array(x)
     time = 0
@@ -135,10 +151,14 @@ def predict_trajectory(x_init, a, delta):
 
 def calc_dynamic_window(x):
     """
-    calculation dynamic window based on current state x
-    motion model
-    initial state [x(m), y(m), yaw(rad), v(m/s), delta(rad)]
-    """    
+    Calculates the dynamic window for velocity search based on the current state.
+
+    Args:
+        x (list): Current state of the system [x, y, theta, v]
+
+    Returns:
+        list: List of possible velocities within the dynamic window
+    """
     v_poss = np.arange(min_speed, max_speed+v_resolution, v_resolution)
     v_achiv = [x[3] + min_acc*dt, x[3] + max_acc*dt]
 
@@ -150,16 +170,27 @@ def calc_dynamic_window(x):
     
     return v_search
 
-def calc_control_and_trajectory(x, dw, goal, ob, u_buf, trajectory_buf):
+def calc_control_and_trajectory(x, v_search, goal, ob, u_buf, trajectory_buf):
     """
-    calculation final input with dynamic window
+    Calculates the final input with LBP method.
+
+    Args:
+        x (list): The current state of the system.
+        dw (float): The dynamic window.
+        goal (list): The goal position.
+        ob (list): The obstacle positions.
+        u_buf (list): The buffer of control inputs.
+        trajectory_buf (list): The buffer of trajectories.
+
+    Returns:
+        tuple: A tuple containing the best control input, the best trajectory, and the control input history.
     """
-    x_init = x[:]
-    v_search = calc_dynamic_window(x_init)
+
     min_cost = float("inf")
     best_u = [0.0, 0.0]
     best_trajectory = np.array([x])
 
+    # Calculate the cost of each possible trajectory and return the minimum
     for v in v_search:
         dict = data[str(v)]
         for id, info in dict.items():
@@ -198,6 +229,8 @@ def calc_control_and_trajectory(x, dw, goal, ob, u_buf, trajectory_buf):
                 best_trajectory = trajectory
                 u_history = info['ctrl'].copy()
 
+    # Calculate cost of the previous best trajectory and compare it with that of the new trajectories
+    # If the cost of the previous best trajectory is lower, use the previous best trajectory
     u_buf.pop(0)
     trajectory_buf = trajectory_buf[1:]
 
@@ -217,8 +250,16 @@ def calc_control_and_trajectory(x, dw, goal, ob, u_buf, trajectory_buf):
 
 def calc_obstacle_cost(trajectory, ob):
     """
-    calc obstacle cost inf: collision
+    Calculate the obstacle cost for a given trajectory.
+
+    Parameters:
+    trajectory (numpy.ndarray): The trajectory to calculate the obstacle cost for.
+    ob (list): List of obstacles.
+
+    Returns:
+    float: The obstacle cost for the trajectory.
     """
+
     line = LineString(zip(trajectory[:, 0], trajectory[:, 1]))
     dilated = line.buffer(dilation_factor, cap_style=3)
 
@@ -242,8 +283,15 @@ def calc_obstacle_cost(trajectory, ob):
     return 1/distance(dilated, obstacle)
 
 def calc_to_goal_cost(trajectory, goal):
-    """np.radians(90)
-        calc to goal cost with angle difference
+    """
+    Calculate the cost to reach the goal from the last point in the trajectory.
+
+    Args:
+        trajectory (numpy.ndarray): The trajectory as a 2D array of shape (n, 2), where n is the number of points.
+        goal (tuple): The goal coordinates as a tuple (x, y).
+
+    Returns:
+        float: The cost to reach the goal from the last point in the trajectory.
     """
     dx = goal[0] - trajectory[-1, 0]
     dy = goal[1] - trajectory[-1, 1]
@@ -254,7 +302,14 @@ def calc_to_goal_cost(trajectory, goal):
 
 def calc_to_goal_heading_cost(trajectory, goal):
     """
-        calc to goal cost with angle difference
+    Calculate the cost to reach the goal based on the heading angle difference.
+
+    Args:
+        trajectory (numpy.ndarray): The trajectory array containing the x, y, and heading values.
+        goal (tuple): The goal coordinates (x, y).
+
+    Returns:
+        float: The cost to reach the goal based on the heading angle difference.
     """
     dx = goal[0] - trajectory[-1, 0]
     dy = goal[1] - trajectory[-1, 1]
@@ -287,6 +342,18 @@ def plot_robot(x, y, yaw):  # pragma: no cover
                  np.array(outline[1, :]).flatten(), "-k")
 
 def update_targets(paths, targets, x, i):
+    """
+    Update the targets based on the current position and distance threshold.
+
+    Args:
+        paths (list): List of paths.
+        targets (list): List of target positions.
+        x (numpy.ndarray): Current position.
+        i (int): Index of the target to update.
+
+    Returns:
+        tuple: Updated paths and targets.
+    """
     if utils.dist(point1=(x[0, i], x[1, i]), point2=targets[i]) < 5:
         paths[i] = utils.update_path(paths[i])
         targets[i] = (paths[i][0].x, paths[i][0].y)
@@ -294,6 +361,18 @@ def update_targets(paths, targets, x, i):
     return paths, targets
 
 def initialize_paths_targets_dilated_traj(x):
+    """
+    Initializes paths, targets, and dilated_traj based on the initial positions.
+
+    Args:
+        x (numpy.ndarray): Input array containing x and y coordinates.
+
+    Returns:
+        tuple: A tuple containing paths, targets, and dilated_traj.
+            - paths (list): A list of paths.
+            - targets (list): A list of target coordinates.
+            - dilated_traj (list): A list of dilated trajectories.
+    """
     paths = []
     targets = []
     dilated_traj = []
@@ -306,6 +385,22 @@ def initialize_paths_targets_dilated_traj(x):
     return paths, targets, dilated_traj
 
 def update_robot_state(x, u, dt, targets, dilated_traj, u_hist, predicted_trajectory, i):
+    """
+    Update the state of a robot in a multi-robot system.
+
+    Args:
+        x (numpy.ndarray): Current state of all robots.
+        u (numpy.ndarray): Current control inputs of all robots.
+        dt (float): Time step.
+        targets (list): List of target positions for each robot.
+        dilated_traj (list): List of dilated trajectories for each robot.
+        u_hist (list): List of control input histories for each robot.
+        predicted_trajectory (list): List of predicted trajectories for each robot.
+        i (int): Index of the robot to update.
+
+    Returns:
+        tuple: Updated state, control inputs, predicted trajectories, and control input histories of all robots.
+    """
     x1 = x[:, i]
     ob = [dilated_traj[idx] for idx in range(len(dilated_traj)) if idx != i]
     u1, predicted_trajectory1, u_history = lbp_control(x1, targets[i], ob, u_hist[i], predicted_trajectory[i])
@@ -332,6 +427,17 @@ def plot_robot_trajectory(x, u, predicted_trajectory, dilated_traj, targets, ax,
     plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
 
 def check_goal_reached(x, targets, i):
+    """
+    Check if the given point has reached the goal.
+
+    Args:
+        x (numpy.ndarray): Array of x-coordinates.
+        targets (list): List of target points.
+        i (int): Index of the current point.
+
+    Returns:
+        bool: True if the point has reached the goal, False otherwise.
+    """
     dist_to_goal = math.hypot(x[0, i] - targets[i][0], x[1, i] - targets[i][1])
     if dist_to_goal <= 0.5:
         print("Goal!!")
@@ -340,6 +446,13 @@ def check_goal_reached(x, targets, i):
 
 def main():
     """
+    This is the main function that controls the execution of the program.
+
+    The simulation if this function has a fixed amout of robots N. This main() is mainly used for debugging purposes.
+
+    It initializes the necessary variables, sets the targets, and updates the robot states.
+    The function also plots the robot trajectory and checks if the goal is reached.
+
     Before using this main comment out the robot_num variable at the begginning of the file and
     put the robot_num value equal to the value of the N variable.
     """
@@ -401,6 +514,14 @@ def main():
 
 
 def main2():
+    """
+    This function runs the main loop for the LBP algorithm.
+    It initializes the necessary variables, updates the robot state, and plots the robot trajectory.
+
+    The simulation if this function has a variable amout of robots robot_num defined in the parameter file.
+    THis is the core a reference implementation of the LBP algorithm with random generation of goals that are updated when 
+    the robot reaches the current goal.
+    """
     print(__file__ + " start!!")
     iterations = 3000
     break_flag = False
