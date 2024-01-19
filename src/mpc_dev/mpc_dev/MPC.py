@@ -558,16 +558,21 @@ def plot_robot_trajectory(x, u, cx, cy, predicted_trajectory, targets, i):
 
 def main():
     """
-    Main function for running the Model Predictive Control (MPC) algorithm.
+    Main function for controlling multiple robots using Model Predictive Control (MPC).
 
-    This function initializes the necessary variables and objects, generates a reference trajectory,
-    sets the bounds and constraints for the MPC, and performs the MPC control loop for a specified number of iterations.
-
-    Args:
-        None
-
-    Returns:
-        None
+    Steps:
+    1. Initialize the necessary variables and parameters.
+    2. Create an instance of the ModelPredictiveControl class.
+    3. Set the initial state and control inputs.
+    4. Generate the reference trajectory for each robot.
+    5. Plot the initial positions and reference trajectory.
+    6. Set the bounds and constraints for the MPC.
+    7. Initialize the predicted trajectory for each robot.
+    8. Enter the main control loop:
+        - Perform MPC control for each robot.
+        - Plot the robot trajectory.
+        - Update the predicted trajectory.
+        - Plot the map and pause for visualization.
     """
     print(__file__ + " start!!")
 
@@ -612,6 +617,189 @@ def main():
 
             plot_robot_trajectory(x, u, cx, cy, predicted_trajectory, ref, i)    
         
+        plt.title('MPC 2D')
+        utils.plot_map(width=width_init, height=height_init)
+        plt.axis("equal")
+        plt.grid(True)
+        plt.pause(0.0001)
+
+def main1():
+    print(__file__ + " start!!")
+
+    dl = 1.0  
+    cx, cy, cyaw, ck = get_switch_back_course(dl)
+
+    for i in range(len(cyaw)):
+        cyaw[i] = normalize_angle(cyaw[i])
+
+    initial_state = np.array([cx[0], cy[0], cyaw[0], 0.0])
+    
+    # sim_run(options, ModelPredictiveControl, initial_state, cx, cy, cyaw, ck)
+
+    # Simulator Options
+    FIG_SIZE = options['FIG_SIZE'] # [Width, Height]
+    OBSTACLES = options['OBSTACLES']
+
+    mpc = ModelPredictiveControl(obs_x=cx[5:-1:12], obs_y=cy[5:-1:12])
+
+    num_inputs = 2
+    u = np.zeros(mpc.horizon*num_inputs)
+
+    # Set bounds for inputs bounded optimization.
+    bounds = []
+    for i in range(mpc.horizon):
+        bounds += [[min_acc, max_acc]]
+        bounds += [[-max_steer, max_steer]]
+    
+    target_ind = 1
+    ref = [cx[target_ind], cy[target_ind], cyaw[target_ind]]
+
+    state_i = np.array([initial_state])
+    u_i = np.array([[0,0]])
+    sim_total = 1000
+    predict_info = [state_i]
+
+    # Total Figure
+    fig = plt.figure(figsize=(FIG_SIZE[0], FIG_SIZE[1]))
+    gs = gridspec.GridSpec(8,8)
+
+    # Elevator plot settings.
+    ax = fig.add_subplot(gs[:8, :8])
+
+    plt.xlim(-3, 17)
+    ax.set_ylim([-3, 17])
+    plt.xticks(np.arange(0,11, step=2))
+    plt.yticks(np.arange(0,11, step=2))
+    plt.title('MPC 2D')
+
+    for i in range(1,sim_total+1):
+        u = np.delete(u,0)
+        u = np.delete(u,0)
+        u = np.append(u, u[-2])
+        u = np.append(u, u[-2])
+        start_time = time.time()
+
+        # explore possibility of iterative MPC: for z in range(3):
+        # Non-linear optimization.
+        u_solution = minimize(mpc.cost_function2, u, (state_i[-1], ref),
+                                method='SLSQP',
+                                bounds=bounds,
+                                tol = 1e-2)
+        print('Step ' + str(i) + ' of ' + str(sim_total) + '   Time ' + str(round(time.time() - start_time,5)))
+        u = u_solution.x
+        y = mpc.plant_model(state_i[-1], mpc.dt, u[0], u[1])
+        if (target_ind < len(cx)-1):
+            if dist([y[0], y[1]], [cx[target_ind], cy[target_ind]]) < 4:
+                target_ind+=1
+                ref[0] = cx[target_ind]
+                ref[1] = cy[target_ind]
+                ref[2] = cyaw[target_ind]
+
+        predicted_state = np.array([y])
+        for j in range(1, mpc.horizon):
+            if u[2*j]>max_acc or u[2*j]<min_acc:
+                print('Acceleration out of bounds')
+                break
+            elif u[2*j+1]>max_steer or u[2*j+1]<-max_steer:
+                print('Steering out of bounds')
+                break
+            predicted = mpc.plant_model(predicted_state[-1], mpc.dt, u[2*j], u[2*j+1])
+            predicted_state = np.append(predicted_state, np.array([predicted]), axis=0)
+        predict_info += [predicted_state]
+        state_i = np.append(state_i, np.array([y]), axis=0)
+        # print(f'yaw angle: {y[2]}')
+        # print(f'speed: {y[3]}')
+        # print(f'ref yaw angle: {ref[2]}')
+        u_i = np.append(u_i, np.array([(u[0], u[1])]), axis=0)
+
+        plt.cla()
+        # for stopping simulation with the esc key.
+        plt.gcf().canvas.mpl_connect('key_release_event',
+                lambda event: [exit(0) if event.key == 'escape' else None])
+        if OBSTACLES:
+            for zz in range(len(mpc.x_obs)):
+                patch_obs = mpatches.Circle((mpc.x_obs[zz], mpc.y_obs[zz]),0.5)
+                ax.add_patch(patch_obs)
+        utils.plot_robot(state_i[i,0], state_i[i,1], state_i[i,2])
+        utils.plot_robot(ref[0],ref[1],ref[2])
+        plt.plot(cx, cy, "-r", label="course")
+        plt.plot(predicted_state[:,0], predicted_state[:,1])
+        plt.xlim(-10, 40)
+        plt.ylim(-10, 40)
+        plt.title('MPC 2D')
+        plt.grid(True)
+        plt.pause(0.0001)
+
+# Uncomment the following line to run the main1() function.
+# robot_num = 2
+def main2():
+    """
+    Main function for controlling multiple robots using Model Predictive Control (MPC).
+
+    Disclaimer: Please make sure to overwrite the robot number to 2 when using this function.
+
+    Steps:
+    1. Initialize the necessary variables and parameters.
+    2. Create an instance of the ModelPredictiveControl class.
+    3. Set the initial state and control inputs.
+    4. Generate the reference trajectory for each robot.
+    5. Plot the initial positions and reference trajectory.
+    6. Set the bounds and constraints for the MPC.
+    7. Initialize the predicted trajectory for each robot.
+    8. Enter the main control loop:
+        - Perform MPC control for each robot.
+        - Plot the robot trajectory.
+        - Update the predicted trajectory.
+        - Plot the map and pause for visualization.
+    """
+    print(__file__ + " start!!")
+    # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
+    iterations = 3000
+    break_flag = False
+    dl = 2
+    
+    mpc = ModelPredictiveControl(obs_x=[], obs_y=[])
+
+    # x0, y, yaw, v, omega, model_type = utils.samplegrid(width_init, height_init, min_dist, robot_num, safety_init)
+    # x = np.array([x0, y, yaw, v])
+    x = np.array([[0, 10], [0, 0], [0, np.pi], [0,0]])
+    num_inputs = 2
+    u = np.zeros([mpc.horizon*num_inputs, robot_num])
+
+    ref = [[10, 0, 0], [0, 0, -np.pi]]
+    cx = []
+    cy = []
+    cyaw = []
+    for i in range(robot_num):
+        cx.append(get_straight_course(start=(x[0, i], x[1, i]), goal=(ref[i][0], ref[i][1]), dl=dl)[0])
+        cy.append(get_straight_course(start=(x[0, i], x[1, i]), goal=(ref[i][0], ref[i][1]), dl=dl)[1])
+        cyaw.append(get_straight_course(start=(x[0, i], x[1, i]), goal=(ref[i][0], ref[i][1]), dl=dl)[2])
+        
+        plt.plot(x[0, i], x[1, i], "xr")
+        plt.plot(cx[i], cy[i], "-r", label="course")
+    plt.show()
+
+    # Usage:
+    bounds, constraints = set_bounds_and_constraints(mpc)
+
+    predicted_trajectory = dict.fromkeys(range(robot_num),np.zeros([mpc.horizon, x.shape[0]]))
+    for i in range(robot_num):
+        predicted_trajectory[i] = np.full((mpc.horizon, 4), x[:,i])
+    
+    # input [throttle, steer (delta)]
+    fig = plt.figure(1, dpi=90)
+    ax = fig.add_subplot(111)
+
+    for z in range(iterations):
+        plt.cla()
+        plt.gcf().canvas.mpl_connect('key_release_event',
+                lambda event: [exit(0) if event.key == 'escape' else None])
+        
+        for i in range(robot_num):
+            x, u, predicted_trajectory = mpc_control(i, x, u, mpc, bounds, constraints, ref, predicted_trajectory)
+            
+            plot_robot_trajectory(x, u, cx, cy, predicted_trajectory, ref, i)
+            
         plt.title('MPC 2D')
         utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
