@@ -569,6 +569,8 @@ def main():
     6. Set the bounds and constraints for the MPC.
     7. Initialize the predicted trajectory for each robot.
     8. Enter the main control loop:
+        - Check if the distance between the current position and the target is less than 5.
+            - If yes, update the path and target.
         - Perform MPC control for each robot.
         - Plot the robot trajectory.
         - Update the predicted trajectory.
