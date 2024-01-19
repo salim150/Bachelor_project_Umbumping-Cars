@@ -320,8 +320,8 @@ def main(args=None):
             # plt.plot(goal[0,i], goal[1,i], "xb")plot_arrow(x1.x, x1.y, x1.yaw)
             plot_robot(x[0,i], x[1,i], x[2,i])
             # plot_rect(x[0,i], x[1,i], x[2,i], safety_radius)
-            plot_arrow(x[0,i], x[1,i], x[2,i] + multi_control.multi_control[i].delta, length=2, width=1)
-            plot_arrow(x[0,i], x[1,i], x[2,i], length=2, width=1)
+            plot_arrow(x[0,i], x[1,i], x[2,i] + multi_control.multi_control[i].delta, length=3, width=0.5)
+            plot_arrow(x[0,i], x[1,i], x[2,i], length=1, width=0.5)
             plt.plot(targets[i][0], targets[i][1], "xg")
             # plot_path(multi_traj.multiple_path[i])
 

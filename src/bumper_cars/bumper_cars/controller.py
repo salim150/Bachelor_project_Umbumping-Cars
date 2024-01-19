@@ -275,6 +275,8 @@ class Controller(Node):
             for idx in range(robot_num):
                 if idx == i:
                     continue
+                if self.dist(point1=(pose.x, pose.y), point2=(multi_state.multiple_state[idx].x, multi_state.multiple_state[idx].y)) < WB:
+                    raise Exception("Collision detected")
                 ob.append(self.dilated_traj[idx])
 
             x1 = state_to_array(multi_state.multiple_state[i]).reshape(4)
