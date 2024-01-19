@@ -262,8 +262,74 @@ def plot_rect(x, y, yaw, r):  # pragma: no cover
         plt.plot(np.array(outline[0, :]).flatten(),
                     np.array(outline[1, :]).flatten(), "-k")
    
+def update_paths(paths):
+    updated_paths = []
+    for path in paths:
+        updated_paths.append(update_path(path))
+    return updated_paths
+
+def check_collision(x,i):
+    for idx in range(robot_num):
+        if idx == i:
+            continue
+        if dist([x[0,i], x[1,i]], [x[0, idx], x[1, idx]]) < WB:
+            raise Exception('Collision')
+
+def plot_robot_and_arrows(i, x, multi_control, targets):
+    plot_robot(x[0, i], x[1, i], x[2, i])
+    plot_arrow(x[0, i], x[1, i], x[2, i] + multi_control.multi_control[i].delta, length=3, width=0.5)
+    plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
+    plt.plot(targets[i][0], targets[i][1], "xg")
+
+def control_robot(i, x, targets, robot_num, multi_control, paths):
+    dxu = np.zeros((2, robot_num))
+
+    check_collision(x, i)
+
+    x1 = array_to_state(x[:, i])
+    cmd = ControlInputs()
+    cmd.throttle, cmd.delta = pure_pursuit_steer_control(targets[i], x1)
+    dxu[0, i], dxu[1, i] = cmd.throttle, cmd.delta
+
+    dxu = C3BF(x, dxu)
+
+    cmd.throttle, cmd.delta = dxu[0, i], dxu[1, i]
+    x1 = linear_model_callback(x1, cmd)
+    x1 = state_to_array(x1).reshape(4)
+    x[:, i] = x1
+    multi_control.multi_control[i] = cmd
+
+    plot_robot_and_arrows(i, x, multi_control, targets)
+
+    return x, targets, multi_control
 
 def main(args=None):
+    iterations = 3000
+    x0, y, yaw, v, omega, model_type = samplegrid(width_init, height_init, min_dist, robot_num, safety_init)
+    x = np.array([x0, y, yaw, v])
+    paths = [create_path() for _ in range(robot_num)]
+    targets = [[path[0].x, path[0].y] for path in paths]
+    multi_control = MultiControl()
+    multi_control.multi_control = [ControlInputs(delta=0.0, throttle=0.0) for _ in range(robot_num)]
+    
+    for z in range(iterations):
+        plt.cla()
+        plt.gcf().canvas.mpl_connect(
+            'key_release_event',
+            lambda event: [exit(0) if event.key == 'escape' else None])
+        for i in range(robot_num):
+            if dist(point1=(x[0,i], x[1,i]), point2=targets[i]) < 5:
+                paths[i] = update_path(paths[i])
+                targets[i] = (paths[i][0].x, paths[i][0].y)
+
+            x, targets, multi_control = control_robot(i, x, targets, robot_num, multi_control, paths)
+        
+        plot_map(width=width_init, height=height_init)
+        plt.axis("equal")
+        plt.grid(True)
+        plt.pause(0.0001)
+
+def main1(args=None):
     # Instantiate Robotarium object
     # The robots will never reach their goal points so set iteration number
     iterations = 3000
@@ -329,7 +395,6 @@ def main(args=None):
         plt.axis("equal")
         plt.grid(True)
         plt.pause(0.0001)
-
 
 
     
