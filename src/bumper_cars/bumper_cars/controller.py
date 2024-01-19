@@ -9,15 +9,17 @@ import message_filters
 import random
 import math
 import numpy as np
+import os
+os.path.abspath('..')
 # from planner.cubic_spline_planner import *
 # from planner.frenet import *
 from planner.predict_traj import *
-from planner.DWA import *
+from dwa_dev.DWA import *
 
 # for the CBF
-from planner.CBF_robotarium import *
-from planner.CBF_simple import *
-from planner.C3BF import *
+from cbf_dev.CBF_robotarium import *
+from cbf_dev.CBF_simple import *
+from cbf_dev.C3BF import *
 
 # For the parameter file
 import pathlib

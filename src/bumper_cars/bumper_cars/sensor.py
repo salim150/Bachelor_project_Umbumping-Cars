@@ -11,6 +11,7 @@ import pathlib
 import json
 
 path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
+
 # Opening JSON file
 with open(path, 'r') as openfile:
     # Reading from json file
