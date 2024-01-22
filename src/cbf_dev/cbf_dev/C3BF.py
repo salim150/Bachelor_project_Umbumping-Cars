@@ -1,19 +1,11 @@
-import itertools
 import numpy as np
-from scipy.special import comb
-import time
-from matplotlib.animation import FuncAnimation
 
 from cvxopt import matrix, solvers
-from cvxopt.blas import dot
-from cvxopt.solvers import qp, options
-from cvxopt import matrix, sparse
+from cvxopt import matrix
 from planner.utils import *
-from planner.utils import plot_robot
-from planner.predict_traj import predict_trajectory
 # import planner.utils as utils
 
-from custom_message.msg import ControlInputs, State, Path, Coordinate, MultiplePaths, MultiState, MultiControl
+from custom_message.msg import ControlInputs, State, MultiControl
 
 # For the parameter file
 import pathlib
@@ -48,8 +40,16 @@ boundary_points = np.array([-width_init/2, width_init/2, -height_init/2, height_
 
 def motion(x, u, dt):
     """
-    motion model
-    initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
+    Motion model for a robot.
+
+    Args:
+        x (list): Initial state of the robot [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)].
+        u (list): Control inputs [throttle, delta].
+        dt (float): Time step.
+
+    Returns:
+        list: Updated state of the robot.
+
     """
     delta = u[1]
     delta = np.clip(delta, -max_steer, max_steer)
@@ -233,37 +233,225 @@ def C3BF(x, u_ref):
     return dxu
             
 def delta_to_beta(delta):
+    """
+    Converts the steering angle delta to the slip angle beta.
+
+    Args:
+        delta (float): Steering angle in radians.
+
+    Returns:
+        float: Slip angle in radians.
+
+    """
     beta = normalize_angle(np.arctan2(Lr*np.tan(delta)/L, 1.0))
 
     return beta
 
+
 def delta_to_beta_array(delta):
+    """
+    Converts an array of steering angles delta to an array of slip angles beta.
+
+    Args:
+        delta (numpy.ndarray): Array of steering angles in radians.
+
+    Returns:
+        numpy.ndarray: Array of slip angles in radians.
+
+    """
     beta = normalize_angle_array(np.arctan2(Lr*np.tan(delta)/L, 1.0))
 
     return beta
 
 def beta_to_delta(beta):
+    """
+    Converts the slip angle beta to the steering angle delta.
+
+    Args:
+        beta (float): Slip angle in radians.
+
+    Returns:
+        float: Steering angle in radians.
+
+    """
     delta = normalize_angle_array(np.arctan2(L*np.tan(beta)/Lr, 1.0))
 
     return delta           
 
 def plot_rect(x, y, yaw, r):  # pragma: no cover
-        outline = np.array([[-r / 2, r / 2,
-                                (r / 2), -r / 2,
-                                -r / 2],
-                            [r / 2, r/ 2,
-                                - r / 2, -r / 2,
-                                r / 2]])
-        Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
-                            [-math.sin(yaw), math.cos(yaw)]])
-        outline = (outline.T.dot(Rot1)).T
-        outline[0, :] += x
-        outline[1, :] += y
-        plt.plot(np.array(outline[0, :]).flatten(),
-                    np.array(outline[1, :]).flatten(), "-k")
+    """
+    Plots a rectangle with the given parameters.
+
+    Args:
+        x (float): x-coordinate of the center of the rectangle.
+        y (float): y-coordinate of the center of the rectangle.
+        yaw (float): Orientation of the rectangle in radians.
+        r (float): Length of the sides of the rectangle.
+
+    """
+    outline = np.array([[-r / 2, r / 2,
+                            (r / 2), -r / 2,
+                            -r / 2],
+                        [r / 2, r/ 2,
+                            - r / 2, -r / 2,
+                            r / 2]])
+    Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
+                        [-math.sin(yaw), math.cos(yaw)]])
+    outline = (outline.T.dot(Rot1)).T
+    outline[0, :] += x
+    outline[1, :] += y
+    plt.plot(np.array(outline[0, :]).flatten(),
+                np.array(outline[1, :]).flatten(), "-k")
    
+def update_paths(paths):
+    """
+    Updates the given paths.
+
+    Args:
+        paths (list): List of paths.
+
+    Returns:
+        list: Updated paths.
+
+    """
+    updated_paths = []
+    for path in paths:
+        updated_paths.append(update_path(path))
+    return updated_paths
+
+def check_collision(x,i):
+    """
+    Checks for collision between the robot at index i and other robots.
+
+    Args:
+        x (numpy.ndarray): State vector of shape (4, N), where N is the number of time steps.
+        i (int): Index of the robot to check collision for.
+
+    Raises:
+        Exception: If collision is detected.
+
+    """
+    for idx in range(robot_num):
+        if idx == i:
+            continue
+        if dist([x[0,i], x[1,i]], [x[0, idx], x[1, idx]]) < WB:
+            raise Exception('Collision')
+
+def plot_robot_and_arrows(i, x, multi_control, targets):
+    """
+    Plots the robot and arrows for visualization.
+
+    Args:
+        i (int): Index of the robot.
+        x (numpy.ndarray): State vector of shape (4, N), where N is the number of time steps.
+        multi_control (numpy.ndarray): Control inputs of shape (2, N).
+        targets (list): List of target points.
+
+    """
+    plot_robot(x[0, i], x[1, i], x[2, i])
+    plot_arrow(x[0, i], x[1, i], x[2, i] + multi_control.multi_control[i].delta, length=3, width=0.5)
+    plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
+    plt.plot(targets[i][0], targets[i][1], "xg")
+
+def control_robot(i, x, targets, robot_num, multi_control):
+    """
+    Controls the movement of a robot based on its current state and target positions.
+
+    Args:
+        i (int): Index of the robot.
+        x (numpy.ndarray): Array representing the current state of all robots.
+        targets (list): List of target positions for each robot.
+        robot_num (int): Total number of robots.
+        multi_control (MultiControl): Object for storing control inputs for all robots.
+        paths (list): List of paths for each robot.
+
+    Returns:
+        tuple: Updated state of all robots, updated target positions, and updated multi_control object.
+    """
+    dxu = np.zeros((2, robot_num))
+
+    check_collision(x, i)
+
+    x1 = array_to_state(x[:, i])
+    cmd = ControlInputs()
+    cmd.throttle, cmd.delta = pure_pursuit_steer_control(targets[i], x1)
+    dxu[0, i], dxu[1, i] = cmd.throttle, cmd.delta
+
+    dxu = C3BF(x, dxu)
+
+    cmd.throttle, cmd.delta = dxu[0, i], dxu[1, i]
+    x1 = linear_model_callback(x1, cmd)
+    x1 = state_to_array(x1).reshape(4)
+    x[:, i] = x1
+    multi_control.multi_control[i] = cmd
+
+    plot_robot_and_arrows(i, x, multi_control, targets)
+
+    return x, targets, multi_control
 
 def main(args=None):
+    """
+    Main function for controlling multiple robots using Model Predictive Control (MPC).
+
+    Steps:
+    1. Initialize the necessary variables and parameters.
+    2. Create an instance of the ModelPredictiveControl class.
+    3. Set the initial state and control inputs.
+    4. Generate the reference trajectory for each robot.
+    5. Plot the initial positions and reference trajectory.
+    6. Set the bounds and constraints for the MPC.
+    7. Initialize the predicted trajectory for each robot.
+    8. Enter the main control loop:
+        - Check if the distance between the current position and the target is less than 5.
+            - If yes, update the path and target.
+        - Perform 3CBF control for each robot.
+        - Plot the robot trajectory.
+        - Update the predicted trajectory.
+        - Plot the map and pause for visualization.
+    """
+    # Step 1: Set the number of iterations
+    iterations = 3000
+    
+    # Step 2: Sample initial values for x0, y, yaw, v, omega, and model_type
+    x0, y, yaw, v, omega, model_type = samplegrid(width_init, height_init, min_dist, robot_num, safety_init)
+    
+    # Step 3: Create an array x with the initial values
+    x = np.array([x0, y, yaw, v])
+    
+    # Step 4: Create paths for each robot
+    paths = [create_path() for _ in range(robot_num)]
+    
+    # Step 5: Extract the target coordinates from the paths
+    targets = [[path[0].x, path[0].y] for path in paths]
+    
+    # Step 6: Create a MultiControl object
+    multi_control = MultiControl()
+    
+    # Step 7: Initialize the multi_control list with ControlInputs objects
+    multi_control.multi_control = [ControlInputs(delta=0.0, throttle=0.0) for _ in range(robot_num)]
+    
+    # Step 8: Perform the simulation for the specified number of iterations
+    for z in range(iterations):
+        plt.cla()
+        plt.gcf().canvas.mpl_connect(
+            'key_release_event',
+            lambda event: [exit(0) if event.key == 'escape' else None])
+        for i in range(robot_num):
+            # Step 9: Check if the distance between the current position and the target is less than 5
+            if dist(point1=(x[0,i], x[1,i]), point2=targets[i]) < 5:
+                # Perform some action when the condition is met
+                pass
+                paths[i] = update_path(paths[i])
+                targets[i] = (paths[i][0].x, paths[i][0].y)
+
+            x, targets, multi_control = control_robot(i, x, targets, robot_num, multi_control)
+        
+        plot_map(width=width_init, height=height_init)
+        plt.axis("equal")
+        plt.grid(True)
+        plt.pause(0.0001)
+
+def main1(args=None):
     # Instantiate Robotarium object
     # The robots will never reach their goal points so set iteration number
     iterations = 3000
@@ -320,8 +508,8 @@ def main(args=None):
             # plt.plot(goal[0,i], goal[1,i], "xb")plot_arrow(x1.x, x1.y, x1.yaw)
             plot_robot(x[0,i], x[1,i], x[2,i])
             # plot_rect(x[0,i], x[1,i], x[2,i], safety_radius)
-            plot_arrow(x[0,i], x[1,i], x[2,i] + multi_control.multi_control[i].delta, length=2, width=1)
-            plot_arrow(x[0,i], x[1,i], x[2,i], length=2, width=1)
+            plot_arrow(x[0,i], x[1,i], x[2,i] + multi_control.multi_control[i].delta, length=3, width=0.5)
+            plot_arrow(x[0,i], x[1,i], x[2,i], length=1, width=0.5)
             plt.plot(targets[i][0], targets[i][1], "xg")
             # plot_path(multi_traj.multiple_path[i])
 
@@ -329,7 +517,6 @@ def main(args=None):
         plt.axis("equal")
         plt.grid(True)
         plt.pause(0.0001)
-
 
 
     

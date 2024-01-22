@@ -123,6 +123,7 @@ class CarModel(Node):
 
         if controller_type == "DWA":
             dt = 0.1
+            # dt = time.time() - old_time
         else:
             dt = time.time() - old_time
             
