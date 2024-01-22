@@ -1,16 +1,10 @@
-import itertools
 import numpy as np
-from scipy.special import comb
 
 from cvxopt import matrix, solvers
-from cvxopt.blas import dot
-from cvxopt.solvers import qp, options
-from cvxopt import matrix, sparse
+from cvxopt import matrix
 from planner.utils import *
-from planner.utils import plot_robot
-from planner.predict_traj import predict_trajectory
 
-from custom_message.msg import ControlInputs, State, Path, Coordinate, MultiplePaths, MultiState, MultiControl
+from custom_message.msg import ControlInputs, MultiControl
 
 # For the parameter file
 import pathlib

@@ -1,17 +1,14 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import math
-from enum import Enum
 # For the parameter file
 import pathlib
 import json
-from custom_message.msg import ControlInputs
-from shapely.geometry import Point, Polygon, LineString
-from shapely import intersection, distance
-from shapely.plotting import plot_polygon, plot_line
+from shapely.geometry import Point, LineString
+from shapely import distance
+from shapely.plotting import plot_polygon
 import planner.utils as utils
 # for debugging
-import time
 
 path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
 # Opening JSON file

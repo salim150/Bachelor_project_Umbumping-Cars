@@ -5,7 +5,6 @@ import random
 import sys
 sys.path.append("..")
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
 import matplotlib.gridspec as gridspec
 import matplotlib.patches as mpatches
 from scipy.optimize import minimize, NonlinearConstraint
