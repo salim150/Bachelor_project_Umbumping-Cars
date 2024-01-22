@@ -79,7 +79,6 @@ def C3BF(x, u_ref):
     N = x.shape[1]
     M = u_ref.shape[0]
     dxu = np.zeros([u_ref.shape[0], u_ref.shape[1]])
-    count_dxu = 0
 
     u_ref[1,:] = delta_to_beta_array(u_ref[1,:])
 
@@ -89,7 +88,7 @@ def C3BF(x, u_ref):
         H = np.zeros([N-1,1])
 
         # when the car goes backwards the yaw angle should be flipped --> Why??
-        x[2,i] = (1-np.sign(x[3,i]))*(np.pi/2) + x[2,i]
+        # x[2,i] = (1-np.sign(x[3,i]))*(np.pi/2) + x[2,i]
 
         f = np.array([x[3,i]*np.cos(x[2,i]),
                           x[3,i]*np.sin(x[2,i]), 
@@ -226,8 +225,7 @@ def C3BF(x, u_ref):
 
         solvers.options['show_progress'] = False
         sol = solvers.qp(matrix(P), matrix(q), matrix(G), matrix(H))
-        dxu[:,count_dxu] = np.reshape(np.array(sol['x']), (M,))
-        count_dxu += 1
+        dxu[:,i] = np.reshape(np.array(sol['x']), (M,))
     
     dxu[1,:] = beta_to_delta(dxu[1,:])    
     return dxu
@@ -353,7 +351,7 @@ def plot_robot_and_arrows(i, x, multi_control, targets):
     plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
     plt.plot(targets[i][0], targets[i][1], "xg")
 
-def control_robot(i, x, targets, robot_num, multi_control):
+def control_robot(x, targets, robot_num, multi_control):
     """
     Controls the movement of a robot based on its current state and target positions.
 
@@ -370,22 +368,25 @@ def control_robot(i, x, targets, robot_num, multi_control):
     """
     dxu = np.zeros((2, robot_num))
 
-    check_collision(x, i)
-
-    x1 = array_to_state(x[:, i])
     cmd = ControlInputs()
-    cmd.throttle, cmd.delta = pure_pursuit_steer_control(targets[i], x1)
-    dxu[0, i], dxu[1, i] = cmd.throttle, cmd.delta
+    
+    for idx in range(robot_num):
+        check_collision(x, idx)
+        x1 = array_to_state(x[:, idx])
+        cmd.throttle, cmd.delta = pure_pursuit_steer_control(targets[idx], x1)
+        dxu[0, idx], dxu[1, idx] = cmd.throttle, cmd.delta
 
     dxu = C3BF(x, dxu)
 
-    cmd.throttle, cmd.delta = dxu[0, i], dxu[1, i]
-    x1 = linear_model_callback(x1, cmd)
-    x1 = state_to_array(x1).reshape(4)
-    x[:, i] = x1
-    multi_control.multi_control[i] = cmd
+    for idx in range(robot_num):
+        x1 = array_to_state(x[:, idx])
+        cmd.throttle, cmd.delta = dxu[0, idx], dxu[1, idx]
+        x1 = linear_model_callback(x1, cmd)
+        x1 = state_to_array(x1).reshape(4)
+        x[:, idx] = x1
+        multi_control.multi_control[idx] = cmd
 
-    plot_robot_and_arrows(i, x, multi_control, targets)
+        plot_robot_and_arrows(idx, x, multi_control, targets)
 
     return x, targets, multi_control
 
@@ -444,7 +445,7 @@ def main(args=None):
                 paths[i] = update_path(paths[i])
                 targets[i] = (paths[i][0].x, paths[i][0].y)
 
-            x, targets, multi_control = control_robot(i, x, targets, robot_num, multi_control)
+        x, targets, multi_control = control_robot(x, targets, robot_num, multi_control)
         
         plot_map(width=width_init, height=height_init)
         plt.axis("equal")
