@@ -57,7 +57,7 @@ N=3
 show_animation = True
 v_ref = 2.0 # [m/s] reference speed
 
-with open('/home/giacomo/thesis_ws/src/LBP_dev/LBP.json', 'r') as file:
+with open('/home/giacomo/thesis_ws/src/lbp_dev/lbp_dev/LBP.json', 'r') as file:
     data = json.load(file)
 
 def motion(x, u, dt):
