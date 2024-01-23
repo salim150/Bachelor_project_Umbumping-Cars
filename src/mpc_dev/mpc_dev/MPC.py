@@ -64,11 +64,8 @@ options = {}
 options['FIG_SIZE'] = [8,8]
 options['OBSTACLES'] = True
 
-MAX_STEER = np.deg2rad(45.0)  # maximum steering angle [rad]
-MAX_DSTEER = np.deg2rad(30.0)  # maximum steering speed [rad/s]
-MAX_SPEED = 3.0 # maximum speed [m/s]
-MIN_SPEED = -3.0  # minimum speed [m/s]
-MAX_ACCEL = 5.0  # maximum accel [m/ss]
+with open('/home/giacomo/thesis_ws/src/seed_1.json', 'r') as file:
+    seed = json.load(file)
 
 def normalize_angle(angle):
     """
@@ -290,6 +287,57 @@ class ModelPredictiveControl:
         distance_to_goal = np.sqrt((ref[0] - state[0])**2 + (ref[1] - state[1])**2)
         cost += 100*distance_to_goal
         return cost
+    
+    def seed_cost(self,u, *args):
+        """
+        Define the cost function for the MPC controller. Composed of a stage cost calculated in
+        the for loop and a terminal cost, calculated at the end on the loop.
+        The cost is based on the input sequence and also the way the states are propagated.
+
+        Args:
+            self
+            u: control sequence used to calculate the state sequence
+
+        Returns:
+            cost: total cost of the control sequence
+        """
+        state = args[0]
+        ref = args[1]
+        cost = 0.0
+
+        for i in range(self.horizon):
+            speed = state[3]
+            heading = state[2]
+
+            state = self.plant_model(state, self.dt, u[i*2], u[i*2 + 1])
+
+            distance_to_goal = np.sqrt((ref[0] - state[0])**2 + (ref[1] - state[1])**2)
+
+            # Position cost
+            cost +=  distance_to_goal
+
+            # Obstacle cost
+            # for z in range(len(self.x_obs)-1):
+            #     distance_to_obstacle = np.sqrt((self.x_obs[z] - state[0])**2 + (self.y_obs[z] - state[1])**2)
+            #     if distance_to_obstacle < 3:
+            #         cost += 40/distance_to_obstacle
+
+            # Heading cost
+            cost += 10 * (heading - state[2])**2
+
+            # cost +=  2 * (ref[2] - state[2])**2
+
+            # negative speed cost
+            cost += -10 * np.sign(speed) * 3 * speed
+
+            # Acceleration cost
+            if abs(u[2*i]) > 0.2:
+                cost += (speed - state[3])**2
+
+        cost += (state[3])**2
+        distance_to_goal = np.sqrt((ref[0] - state[0])**2 + (ref[1] - state[1])**2)
+        cost += 100*distance_to_goal
+        return cost
 
     def propagation1(self, u):
         """
@@ -417,9 +465,11 @@ def update_paths(i, x, cx, cy, cyaw, target_ind, ref, dl):
         cy.pop(i)
         cyaw.pop(i)
         sample_point = (float(random.randint(-width_init/2, width_init/2)), float(random.randint(-height_init/2, height_init/2)))
-        cx.insert(i, get_straight_course(start=(x[0,i], x[1,i]), goal=(sample_point[0], sample_point[1]), dl=dl)[0])
-        cy.insert(i, get_straight_course(start=(x[0,i], x[1,i]), goal=(sample_point[0], sample_point[1]), dl=dl)[1])
-        cyaw.insert(i, get_straight_course(start=(x[0,i], x[1,i]), goal=(sample_point[0], sample_point[1]), dl=dl)[2])
+
+        cx1, cy1, cyaw1, ck1 = get_straight_course(start=(x[0, i], x[1, i]), goal=(sample_point[0], sample_point[1]), dl=dl)
+        cx.insert(i, cx1)
+        cy.insert(i, cy1)
+        cyaw.insert(i, cyaw1)
         
         ref[i] = [cx[i][target_ind[i]], cy[i][target_ind[i]], cyaw[i][target_ind[i]]]
     
@@ -464,11 +514,11 @@ def generate_reference_trajectory(x, dl):
     target_ind = [0] * robot_num
     for i in range(robot_num):
         sample_point = (float(random.randint(-width_init/2, width_init/2)), float(random.randint(-height_init/2, height_init/2)))
-
-        cx.append(get_straight_course(start=(x[0, i], x[1, i]), goal=(sample_point[0], sample_point[1]), dl=dl)[0])
-        cy.append(get_straight_course(start=(x[0, i], x[1, i]), goal=(sample_point[0], sample_point[1]), dl=dl)[1])
-        cyaw.append(get_straight_course(start=(x[0, i], x[1, i]), goal=(sample_point[0], sample_point[1]), dl=dl)[2])
-
+        
+        cx1, cy1, cyaw1, ck1 = get_straight_course(start=(x[0, i], x[1, i]), goal=(sample_point[0], sample_point[1]), dl=dl)
+        cx.append(cx1)
+        cy.append(cy1)
+        cyaw.append(cyaw1)
         ref.append([cx[i][target_ind[i]], cy[i][target_ind[i]], cyaw[i][target_ind[i]]])
 
         if debug:
@@ -493,7 +543,7 @@ def set_bounds_and_constraints(mpc):
 
         return bounds, constraints
 
-def mpc_control(i, x, u, mpc, bounds, constraints, ref, predicted_trajectory):
+def mpc_control(i, x, u, mpc, bounds, constraints, ref, predicted_trajectory, cost_function):
     x1 = x[:, i]
     u1 = u[:,i]
     u1 = np.delete(u1,0)
@@ -506,11 +556,11 @@ def mpc_control(i, x, u, mpc, bounds, constraints, ref, predicted_trajectory):
     mpc.initial_state = x1
 
     # MPC control
-    u_solution = minimize(mpc.cost_function3, u1, (x1, ref[i]),
+    u_solution = minimize(cost_function, u1, (x1, ref[i]),
                         method='SLSQP',
                         bounds=bounds,
                         constraints=constraints,
-                        tol = 1e-3)
+                        tol = 1e-1)
     
     u1 = u_solution.x
     x1 = mpc.plant_model(x1, dt, u1[0], u1[1])
@@ -554,6 +604,13 @@ def plot_robot_trajectory(x, u, cx, cy, predicted_trajectory, targets, i):
     plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
     plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
 
+def plot_robot_seed(x, u, predicted_trajectory, targets, i):
+    plt.plot(predicted_trajectory[i][:, 0], predicted_trajectory[i][:, 1], "-g")
+    plt.plot(x[0, i], x[1, i], "xr")
+    plt.plot(targets[i][0], targets[i][1], "xg")
+    plot_robot(x[0, i], x[1, i], x[2, i])
+    plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
+    plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
 
 def main():
     """
@@ -611,7 +668,7 @@ def main():
         for i in range(robot_num):
             start_time = time.time()
             cx, cy, ref = update_paths(i, x, cx, cy, cyaw, target_ind, ref, dl)
-            x, u, predicted_trajectory = mpc_control(i, x, u, mpc, bounds, constraints, ref, predicted_trajectory)
+            x, u, predicted_trajectory = mpc_control(i, x, u, mpc, bounds, constraints, ref, predicted_trajectory, mpc.cost_function3)
             
             if debug:
                 print('Robot ' + str(i+1) + ' of ' + str(robot_num) + '   Time ' + str(round(time.time() - start_time,5)))
@@ -772,9 +829,11 @@ def main2():
     cy = []
     cyaw = []
     for i in range(robot_num):
-        cx.append(get_straight_course(start=(x[0, i], x[1, i]), goal=(ref[i][0], ref[i][1]), dl=dl)[0])
-        cy.append(get_straight_course(start=(x[0, i], x[1, i]), goal=(ref[i][0], ref[i][1]), dl=dl)[1])
-        cyaw.append(get_straight_course(start=(x[0, i], x[1, i]), goal=(ref[i][0], ref[i][1]), dl=dl)[2])
+        cx1, cy1, cyaw1, ck1 = get_straight_course(start=(x[0, i], x[1, i]), goal=(ref[i][0], ref[i][1]), dl=dl)
+
+        cx.append(cx1)
+        cy.append(cy1)
+        cyaw.append(cyaw1)
         
         plt.plot(x[0, i], x[1, i], "xr")
         plt.plot(cx[i], cy[i], "-r", label="course")
@@ -797,7 +856,7 @@ def main2():
                 lambda event: [exit(0) if event.key == 'escape' else None])
         
         for i in range(robot_num):
-            x, u, predicted_trajectory = mpc_control(i, x, u, mpc, bounds, constraints, ref, predicted_trajectory)
+            x, u, predicted_trajectory = mpc_control(i, x, u, mpc, bounds, constraints, ref, predicted_trajectory, mpc.cost_function3)
             
             plot_robot_trajectory(x, u, cx, cy, predicted_trajectory, ref, i)
             
@@ -807,5 +866,100 @@ def main2():
         plt.grid(True)
         plt.pause(0.0001)
 
+def main3():
+    """
+    Main function for controlling multiple robots using Model Predictive Control (MPC).
+
+    Steps:
+    1. Initialize the necessary variables and parameters.
+    2. Create an instance of the ModelPredictiveControl class.
+    3. Set the initial state and control inputs.
+    4. Generate the reference trajectory for each robot.
+    5. Plot the initial positions and reference trajectory.
+    6. Set the bounds and constraints for the MPC.
+    7. Initialize the predicted trajectory for each robot.
+    8. Enter the main control loop:
+        - Check if the distance between the current position and the target is less than 5.
+            - If yes, update the path and target.
+        - Perform MPC control for each robot.
+        - Plot the robot trajectory.
+        - Update the predicted trajectory.
+        - Plot the map and pause for visualization.
+    """
+    print(__file__ + " start!!")
+
+    # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
+    iterations = 3000
+    break_flag = False
+    dl = 3
+    
+    # MPC initialization
+    mpc = ModelPredictiveControl(obs_x=[], obs_y=[])
+    
+    initial_state = seed['initial_position']
+    x0 = initial_state['x']
+    y = initial_state['y']
+    yaw = initial_state['yaw']
+    v = initial_state['v']
+    x = np.array([x0, y, yaw, v])
+    num_inputs = 2
+    u = np.zeros([mpc.horizon*num_inputs, robot_num])
+
+    # Generate reference trajectory
+    traj = seed['trajectories']
+    cx = []
+    cy = []
+    ref = []
+
+    for i in range(robot_num):
+        x_buf = []
+        y_buf = []
+        for idx in range(len(traj[str(i)])):
+            x_buf.append(traj[str(i)][idx][0])
+            y_buf.append(traj[str(i)][idx][1])
+        cx.append(x_buf)
+        cy.append(y_buf)
+        ref.append([cx[i][0], cy[i][0]])
+
+    # Usage:
+    bounds, constraints = set_bounds_and_constraints(mpc)
+    
+    predicted_trajectory = dict.fromkeys(range(robot_num),np.zeros([mpc.horizon, x.shape[0]]))
+    for i in range(robot_num):
+        predicted_trajectory[i] = np.full((mpc.horizon, 4), x[:,i])
+    
+    # input [throttle, steer (delta)]
+    fig = plt.figure(1, dpi=90)
+    ax = fig.add_subplot(111)
+
+    for z in range(iterations):
+        plt.cla()
+        plt.gcf().canvas.mpl_connect('key_release_event',
+                lambda event: [exit(0) if event.key == 'escape' else None])
+        for i in range(robot_num):
+            start_time = time.time()
+            if dist([x[0, i], x[1, i]], [ref[i][0], ref[i][0]]) < 5:
+                cx[i].pop(0)
+                cy[i].pop(0)
+                if not cx[i]:
+                    print("Path complete")
+                    return
+                ref[i][0] = cx[i][0]
+                ref[i][1] = cy[i][0]
+
+            # cx, cy, ref = update_paths(i, x, cx, cy, cyaw, target_ind, ref, dl)
+            x, u, predicted_trajectory = mpc_control(i, x, u, mpc, bounds, constraints, ref, predicted_trajectory, mpc.seed_cost)
+            
+            if debug:
+                print('Robot ' + str(i+1) + ' of ' + str(robot_num) + '   Time ' + str(round(time.time() - start_time,5)))
+
+            plot_robot_seed(x, u, predicted_trajectory, ref, i)    
+        
+        plt.title('MPC 2D')
+        utils.plot_map(width=width_init, height=height_init)
+        plt.axis("equal")
+        plt.grid(True)
+        plt.pause(0.0001)
+
 if __name__ == '__main__':
-    main()
+    main3()

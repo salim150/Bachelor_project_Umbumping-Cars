@@ -599,7 +599,14 @@ def main1():
         
         for i in range(robot_num):
             
-            paths, targets = update_targets(paths, targets, x, i)
+            # Step 9: Check if the distance between the current position and the target is less than 5
+            if utils.dist(point1=(x[0,i], x[1,i]), point2=targets[i]) < 5:
+                # Perform some action when the condition is met
+                paths[i].pop(0)
+                if not paths[i]:
+                    print("Path complete")
+                    return
+                targets[i] = (paths[i][0].x, paths[i][0].y)
 
             x, u, predicted_trajectory = update_robot_state(x, u, dt, targets, dilated_traj, predicted_trajectory, i)
 
