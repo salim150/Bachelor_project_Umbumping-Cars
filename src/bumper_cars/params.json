@@ -26,10 +26,10 @@
             "max_acc": 100,
             "min_acc": -100,
             "dt": 0.1,
-            "safety_radius": 1.5,
-            "barrier_gain": 1, 
-            "arena_gain": 0.1,
-            "Kv": 0.01
+            "safety_radius": 2,
+            "barrier_gain": 0.0001, 
+            "arena_gain": 0.01,
+            "Kv": 0.03
         },
     "DWA":
         {
@@ -72,7 +72,7 @@
             "min_acc": -5,
             "max_speed": 2,
             "min_speed": -1,
-            "controller_type": "DWA",
+            "controller_type": "random_goal",
             "cbf_type": "C3BF"
         },
     "robot_num": 5,
