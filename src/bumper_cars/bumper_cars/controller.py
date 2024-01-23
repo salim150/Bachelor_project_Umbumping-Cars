@@ -323,10 +323,15 @@ class Controller(Node):
         x = np.zeros((4,robot_num))
 
         for i in range(robot_num):
+            for idx in range(robot_num):
+                if idx == i:
+                    continue
+                if self.dist(point1=(multi_state.multiple_state[i].x, multi_state.multiple_state[i].y), point2=(multi_state.multiple_state[idx].x, multi_state.multiple_state[idx].y)) < WB:
+                    raise Exception("Collision detected")
             dxu[0,i], dxu[1,i] = multi_control.multi_control[i].throttle, multi_control.multi_control[i].delta
             x[:,i] = state_to_array(multi_state.multiple_state[i]).reshape(4)
         
-        if cbf_type == "CBF_simple":
+        if cbf_type == "CBF":
             dxu = CBF(x, dxu)
         else:
             dxu = C3BF(x, dxu)

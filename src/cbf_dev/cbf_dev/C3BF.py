@@ -24,7 +24,7 @@ max_speed = json_object["Car_model"]["max_speed"] # [m/s]
 min_speed = json_object["Car_model"]["min_speed"] # [m/s]
 max_acc = json_object["C3BF"]["max_acc"] 
 min_acc = json_object["C3BF"]["min_acc"] 
-dt = json_object["C3BF"]["dt"]
+dt = 0.2 #json_object["C3BF"]["dt"]
 safety_radius = json_object["C3BF"]["safety_radius"]
 barrier_gain = json_object["C3BF"]["barrier_gain"]
 arena_gain = json_object["C3BF"]["arena_gain"]
@@ -351,7 +351,34 @@ def plot_robot_and_arrows(i, x, multi_control, targets):
     plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
     plt.plot(targets[i][0], targets[i][1], "xg")
 
-def control_robot(x, targets, robot_num, multi_control):
+def update_robot_state(x, dxu, multi_control, targets):
+    """
+    Updates the state of all robots.
+
+    Args:
+        x (numpy.ndarray): State vector of shape (4, N), where N is the number of time steps.
+        dxu (numpy.ndarray): Control inputs of shape (2, N).
+        multi_control (MultiControl): Object for storing control inputs for all robots.
+        targets (list): List of target positions for each robot.
+    
+    Returns:
+        tuple: Updated state of all robots and updated multi_control object.
+
+    """
+    cmd = ControlInputs()
+    for idx in range(robot_num):
+        x1 = array_to_state(x[:, idx])
+        cmd.throttle, cmd.delta = dxu[0, idx], dxu[1, idx]
+        x1 = linear_model_callback(x1, cmd)
+        x1 = state_to_array(x1).reshape(4)
+        x[:, idx] = x1
+        multi_control.multi_control[idx] = cmd
+
+        plot_robot_and_arrows(idx, x, multi_control, targets)
+    
+    return x, multi_control
+
+def control_robot(x, targets):
     """
     Controls the movement of a robot based on its current state and target positions.
 
@@ -378,17 +405,7 @@ def control_robot(x, targets, robot_num, multi_control):
 
     dxu = C3BF(x, dxu)
 
-    for idx in range(robot_num):
-        x1 = array_to_state(x[:, idx])
-        cmd.throttle, cmd.delta = dxu[0, idx], dxu[1, idx]
-        x1 = linear_model_callback(x1, cmd)
-        x1 = state_to_array(x1).reshape(4)
-        x[:, idx] = x1
-        multi_control.multi_control[idx] = cmd
-
-        plot_robot_and_arrows(idx, x, multi_control, targets)
-
-    return x, targets, multi_control
+    return dxu
 
 def main(args=None):
     """
@@ -445,7 +462,8 @@ def main(args=None):
                 paths[i] = update_path(paths[i])
                 targets[i] = (paths[i][0].x, paths[i][0].y)
 
-        x, targets, multi_control = control_robot(x, targets, robot_num, multi_control)
+        dxu = control_robot(x, targets)
+        x, multi_control = update_robot_state(x, dxu, multi_control, targets)
         
         plot_map(width=width_init, height=height_init)
         plt.axis("equal")

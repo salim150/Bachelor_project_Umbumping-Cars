@@ -46,7 +46,6 @@ def linear_model_callback(initial_state: State, cmd: ControlInputs):
     dt = 0.1
     state = State()
     cmd.delta = np.clip(cmd.delta, -max_steer, max_steer)
-    cmd.delta = np.clip(cmd.delta, -max_steer, max_steer)
 
     state.x = initial_state.x + initial_state.v * np.cos(initial_state.yaw) * dt
     state.y = initial_state.y + initial_state.v * np.sin(initial_state.yaw) * dt

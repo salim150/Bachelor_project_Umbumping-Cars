@@ -122,10 +122,12 @@ class CarModel(Node):
         """
 
         if controller_type == "DWA":
-            dt = 0.1
-            # dt = time.time() - old_time
+            # dt = 0.1
+            dt = time.time() - old_time
         else:
             dt = time.time() - old_time
+        
+        self.get_logger().info("dt: " + str(dt))
             
         state = FullState()
         cmd.delta = np.clip(cmd.delta, -max_steer, max_steer)
