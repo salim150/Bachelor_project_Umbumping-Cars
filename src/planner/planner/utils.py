@@ -400,6 +400,17 @@ def create_path(len_path=5):
     while len(path)<len_path:
         path.append(Coordinate(x=float(random.randint(-width_init/2, width_init/2)), y=float(random.randint(-height_init/2, height_init/2))))
     return path
+
+def create_seed(len_path=5):
+    """
+    Creates a random path.
+
+    Generates a random path by creating a list of waypoints within the specified boundaries.
+    """
+    path = []
+    while len(path)<len_path:
+        path.append([float(random.randint(-width_init/2, width_init/2)), float(random.randint(-height_init/2, height_init/2))])
+    return path
     
 def plot_robot(x, y, yaw):  # pragma: no cover
     outline = np.array([[-L / 2, L / 2,

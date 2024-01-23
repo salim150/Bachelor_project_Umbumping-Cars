@@ -532,6 +532,78 @@ def main():
             plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-r")
         plt.pause(0.0001)
         plt.show()
+
+def main1():
+    """
+    Main function that controls the execution of the program.
+
+    Steps:
+    1. Initialize the necessary variables and arrays.
+    2. Generate initial robot states and trajectories.
+    3. Initialize paths, targets, and dilated trajectories.
+    4. Start the main loop for a specified number of iterations.
+    5. Update targets and robot states for each robot.
+    6. Calculate the right input using the Dynamic Window Approach method.
+    7. Predict the future trajectory using the calculated input.
+    8. Check if the goal is reached for each robot.
+    9. Plot the robot trajectories and the map.
+    11. Break the loop if the goal is reached for any robot.
+    12. Print "Done" when the loop is finished.
+    13. Plot the final trajectories if animation is enabled.
+    """
+    
+    print(__file__ + " start!!")
+    iterations = 3000
+    break_flag = False
+    
+    x0, y, yaw, v, omega, model_type = utils.samplegrid(width_init, height_init, min_dist, robot_num, safety_init)
+    x = np.array([x0, y, yaw, v])
+    u = np.zeros((2, robot_num))
+
+    trajectory = np.zeros((x.shape[0], robot_num, 1))
+    trajectory[:, :, 0] = x
+
+    predicted_trajectory = dict.fromkeys(range(robot_num),np.zeros([int(predict_time/dt), 3]))
+    for i in range(robot_num):
+        predicted_trajectory[i] = np.full((int(predict_time/dt), 3), x[0:3,i])
+
+    paths, targets, dilated_traj = initialize_paths_targets_dilated_traj(x)
+    
+    fig = plt.figure(1, dpi=90)
+    ax = fig.add_subplot(111)
+    
+    for z in range(iterations):
+        plt.cla()
+        plt.gcf().canvas.mpl_connect('key_release_event', lambda event: [exit(0) if event.key == 'escape' else None])
+        
+        for i in range(robot_num):
+            
+            paths, targets = update_targets(paths, targets, x, i)
+
+            x, u, predicted_trajectory = update_robot_state(x, u, dt, targets, dilated_traj, predicted_trajectory, i)
+
+            trajectory = np.dstack([trajectory, x])
+
+            if check_goal_reached(x, targets, i):
+                break_flag = True
+
+            if show_animation:
+                plot_robot_trajectory(x, u, predicted_trajectory, dilated_traj, targets, ax, i)
+
+        utils.plot_map(width=width_init, height=height_init)
+        plt.axis("equal")
+        plt.grid(True)
+        plt.pause(0.0001)
+
+        if break_flag:
+            break
+
+    print("Done")
+    if show_animation:
+        for i in range(robot_num):
+            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-r")
+        plt.pause(0.0001)
+        plt.show()
        
 if __name__ == '__main__':
     main()

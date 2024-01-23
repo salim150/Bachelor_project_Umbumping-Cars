@@ -11,7 +11,6 @@ from custom_message.msg import ControlInputs, State, MultiControl
 import pathlib
 import json
 
-# TODO: import all this parameters from a config file so that we can easily change them in one place
 path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
 # Opening JSON file
 with open(path, 'r') as openfile:
@@ -37,6 +36,9 @@ width_init = json_object["width"]
 height_init = json_object["height"]
 min_dist = json_object["min_dist"]
 boundary_points = np.array([-width_init/2, width_init/2, -height_init/2, height_init/2])
+
+with open('/home/giacomo/thesis_ws/src/seed_1.json', 'r') as file:
+    data = json.load(file)
 
 def motion(x, u, dt):
     """
@@ -432,13 +434,13 @@ def main(args=None):
     
     # Step 2: Sample initial values for x0, y, yaw, v, omega, and model_type
     x0, y, yaw, v, omega, model_type = samplegrid(width_init, height_init, min_dist, robot_num, safety_init)
-    
+
     # Step 3: Create an array x with the initial values
     x = np.array([x0, y, yaw, v])
     
     # Step 4: Create paths for each robot
     paths = [create_path() for _ in range(robot_num)]
-    
+
     # Step 5: Extract the target coordinates from the paths
     targets = [[path[0].x, path[0].y] for path in paths]
     
@@ -537,8 +539,76 @@ def main1(args=None):
         plt.grid(True)
         plt.pause(0.0001)
 
+def main2(args=None):
+    """
+    Main function for controlling multiple robots using Model Predictive Control (MPC).
 
+    Steps:
+    1. Initialize the necessary variables and parameters.
+    2. Create an instance of the ModelPredictiveControl class.
+    3. Set the initial state and control inputs.
+    4. Generate the reference trajectory for each robot.
+    5. Plot the initial positions and reference trajectory.
+    6. Set the bounds and constraints for the MPC.
+    7. Initialize the predicted trajectory for each robot.
+    8. Enter the main control loop:
+        - Check if the distance between the current position and the target is less than 5.
+            - If yes, update the path and target.
+        - Perform 3CBF control for each robot.
+        - Plot the robot trajectory.
+        - Update the predicted trajectory.
+        - Plot the map and pause for visualization.
+    """
+    # Step 1: Set the number of iterations
+    iterations = 3000
+    
+    # Step 2: Sample initial values for x0, y, yaw, v, omega, and model_type
+    initial_state = data['initial_position']
+    x0 = initial_state['x']
+    y = initial_state['y']
+    yaw = initial_state['yaw']
+    v = initial_state['v']
+
+    # Step 3: Create an array x with the initial values
+    x = np.array([x0, y, yaw, v])
+    
+    # Step 4: Create paths for each robot
+    traj = data['trajectories']
+    paths = [[Coordinate(x=traj[str(idx)][i][0], y=traj[str(idx)][i][1]) for i in range(len(traj[str(idx)]))] for idx in range(robot_num)]
+
+    # Step 5: Extract the target coordinates from the paths
+    targets = [[path[0].x, path[0].y] for path in paths]
+    
+    # Step 6: Create a MultiControl object
+    multi_control = MultiControl()
+    
+    # Step 7: Initialize the multi_control list with ControlInputs objects
+    multi_control.multi_control = [ControlInputs(delta=0.0, throttle=0.0) for _ in range(robot_num)]
+    
+    # Step 8: Perform the simulation for the specified number of iterations
+    for z in range(iterations):
+        plt.cla()
+        plt.gcf().canvas.mpl_connect(
+            'key_release_event',
+            lambda event: [exit(0) if event.key == 'escape' else None])
+        for i in range(robot_num):
+            # Step 9: Check if the distance between the current position and the target is less than 5
+            if dist(point1=(x[0,i], x[1,i]), point2=targets[i]) < 5:
+                # Perform some action when the condition is met
+                paths[i].pop(0)
+                if not paths[i]:
+                    print("Path complete")
+                    return
+                targets[i] = (paths[i][0].x, paths[i][0].y)
+
+        dxu = control_robot(x, targets)
+        x, multi_control = update_robot_state(x, dxu, multi_control, targets)
+        
+        plot_map(width=width_init, height=height_init)
+        plt.axis("equal")
+        plt.grid(True)
+        plt.pause(0.0001)
     
 if __name__=='__main__':
-    main()
+    main2()
         
