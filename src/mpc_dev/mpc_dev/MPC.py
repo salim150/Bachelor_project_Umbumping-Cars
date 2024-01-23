@@ -115,7 +115,7 @@ class ModelPredictiveControl:
         self.y_obs = obs_y
 
         self.initial_state = None
-        self.safety_radius = 2.5
+        self.safety_radius = 1.5
 
     def plant_model(self, prev_state, dt, pedal, steering):
         """
@@ -412,8 +412,24 @@ def get_switch_back_course(dl):
 
     return cx, cy, cyaw, ck
 
-def dist(a, b):
-    return math.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)
+def dist(point1, point2):
+    """
+    Calculates the Euclidean distance between two points.
+
+    :param point1: (tuple) x, y coordinates of the first point
+    :param point2: (tuple) x, y coordinates of the second point
+    :return: (float) Euclidean distance between the two points
+    """
+    x1, y1 = point1
+    x2, y2 = point2
+
+    x1 = float(x1)
+    x2 = float(x2)
+    y1 = float(y1)
+    y2 = float(y2)
+
+    distance = math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+    return distance
 
 def get_straight_course(start, goal, dl):
     """
@@ -938,7 +954,7 @@ def main3():
                 lambda event: [exit(0) if event.key == 'escape' else None])
         for i in range(robot_num):
             start_time = time.time()
-            if dist([x[0, i], x[1, i]], [ref[i][0], ref[i][0]]) < 5:
+            if dist([x[0, i], x[1, i]], point2=ref[i]) < 5:
                 cx[i].pop(0)
                 cy[i].pop(0)
                 if not cx[i]:
