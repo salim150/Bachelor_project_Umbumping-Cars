@@ -1,14 +1,17 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+from enum import Enum
 # For the parameter file
 import pathlib
 import json
-from shapely.geometry import Point, LineString
-from shapely import distance
-from shapely.plotting import plot_polygon
+from custom_message.msg import Coordinate
+from shapely.geometry import Point, Polygon, LineString
+from shapely import intersection, distance
+from shapely.plotting import plot_polygon, plot_line
 import planner.utils as utils
 # for debugging
+import time
 
 path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
 # Opening JSON file
@@ -56,6 +59,9 @@ v_ref = 2.0 # [m/s] reference speed
 
 with open('/home/giacomo/thesis_ws/src/lbp_dev/lbp_dev/LBP.json', 'r') as file:
     data = json.load(file)
+
+with open('/home/giacomo/thesis_ws/src/seed_1.json', 'r') as file:
+    seed = json.load(file)
 
 def motion(x, u, dt):
     """
@@ -509,7 +515,6 @@ def main():
         plt.pause(0.0001)
         plt.show()
 
-
 def main2():
     """
     This function runs the main loop for the LBP algorithm.
@@ -573,9 +578,89 @@ def main2():
             plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-r")
         plt.pause(0.0001)
         plt.show()
+
+def main3():
+    """
+    This function runs the main loop for the LBP algorithm.
+    It initializes the necessary variables, updates the robot state, and plots the robot trajectory.
+
+    The simulation if this function has a variable amout of robots robot_num defined in the parameter file.
+    THis is the core a reference implementation of the LBP algorithm with random generation of goals that are updated when 
+    the robot reaches the current goal.
+    """
+    print(__file__ + " start!!")
+    iterations = 3000
+    break_flag = False
+
+    # Step 2: Sample initial values for x0, y, yaw, v, omega, and model_type
+    initial_state = seed['initial_position']
+    x0 = initial_state['x']
+    y = initial_state['y']
+    yaw = initial_state['yaw']
+    v = initial_state['v']
+
+    # Step 3: Create an array x with the initial values
+    x = np.array([x0, y, yaw, v])
+    u = np.zeros((2, robot_num))
+
+    trajectory = np.zeros((x.shape[0], robot_num, 1))
+    trajectory[:, :, 0] = x
+
+    predicted_trajectory = dict.fromkeys(range(robot_num),np.zeros([int(predict_time/dt), 3]))
+    for i in range(robot_num):
+        predicted_trajectory[i] = np.full((int(predict_time/dt), 3), x[0:3,i])
+
+    # Step 4: Create paths for each robot
+    traj = seed['trajectories']
+    paths = [[Coordinate(x=traj[str(idx)][i][0], y=traj[str(idx)][i][1]) for i in range(len(traj[str(idx)]))] for idx in range(robot_num)]
+
+    # Step 5: Extract the target coordinates from the paths
+    targets = [[path[0].x, path[0].y] for path in paths]
+
+    # Step 6: Create dilated trajectories for each robot
+    dilated_traj = []
+    for i in range(robot_num):
+        dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
+
+    u_hist = dict.fromkeys(range(robot_num),[0]*int(predict_time/dt))
+    fig = plt.figure(1, dpi=90)
+    ax = fig.add_subplot(111)
+
+    for z in range(iterations):
+        plt.cla()
+        plt.gcf().canvas.mpl_connect('key_release_event', lambda event: [exit(0) if event.key == 'escape' else None])
+        
+        for i in range(robot_num):
+            
+            paths, targets = update_targets(paths, targets, x, i)
+
+            x, u, predicted_trajectory, u_hist = update_robot_state(x, u, dt, targets, dilated_traj, u_hist, predicted_trajectory, i)
+
+            trajectory = np.dstack([trajectory, x])
+
+            if check_goal_reached(x, targets, i):
+                break_flag = True
+
+            if show_animation:
+                plot_robot_trajectory(x, u, predicted_trajectory, dilated_traj, targets, ax, i)
+
+        utils.plot_map(width=width_init, height=height_init)
+        plt.axis("equal")
+        plt.grid(True)
+        plt.pause(0.0001)
+
+        if break_flag:
+            break
+
+    print("Done")
+    if show_animation:
+        for i in range(robot_num):
+            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-r")
+        plt.pause(0.0001)
+        plt.show()
        
 if __name__ == '__main__':
     # main1()
-    main2()
+    main3()
 
     

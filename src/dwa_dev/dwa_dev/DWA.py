@@ -5,6 +5,7 @@ import planner.utils as utils
 # For the parameter file
 import pathlib
 import json
+from custom_message.msg import Coordinate
 from shapely.geometry import Point, LineString
 from shapely import distance
 from shapely.plotting import plot_polygon
@@ -57,6 +58,9 @@ show_animation = True
 
 with open('/home/giacomo/thesis_ws/src/trajectories.json', 'r') as file:
     data = json.load(file)
+
+with open('/home/giacomo/thesis_ws/src/seed_1.json', 'r') as file:
+    seed = json.load(file)
 
 def dwa_control(x, goal, ob):
     """
@@ -556,7 +560,14 @@ def main1():
     iterations = 3000
     break_flag = False
     
-    x0, y, yaw, v, omega, model_type = utils.samplegrid(width_init, height_init, min_dist, robot_num, safety_init)
+    # Step 2: Sample initial values for x0, y, yaw, v, omega, and model_type
+    initial_state = seed['initial_position']
+    x0 = initial_state['x']
+    y = initial_state['y']
+    yaw = initial_state['yaw']
+    v = initial_state['v']
+
+    # Step 3: Create an array x with the initial values
     x = np.array([x0, y, yaw, v])
     u = np.zeros((2, robot_num))
 
@@ -567,7 +578,17 @@ def main1():
     for i in range(robot_num):
         predicted_trajectory[i] = np.full((int(predict_time/dt), 3), x[0:3,i])
 
-    paths, targets, dilated_traj = initialize_paths_targets_dilated_traj(x)
+    # Step 4: Create paths for each robot
+    traj = seed['trajectories']
+    paths = [[Coordinate(x=traj[str(idx)][i][0], y=traj[str(idx)][i][1]) for i in range(len(traj[str(idx)]))] for idx in range(robot_num)]
+
+    # Step 5: Extract the target coordinates from the paths
+    targets = [[path[0].x, path[0].y] for path in paths]
+
+    # Step 6: Create dilated trajectories for each robot
+    dilated_traj = []
+    for i in range(robot_num):
+        dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
     
     fig = plt.figure(1, dpi=90)
     ax = fig.add_subplot(111)
@@ -606,4 +627,4 @@ def main1():
         plt.show()
        
 if __name__ == '__main__':
-    main()
+    main1()
