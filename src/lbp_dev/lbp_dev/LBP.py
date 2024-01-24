@@ -47,7 +47,7 @@ c_a = json_object["Car_model"]["c_a"]
 c_r1 = json_object["Car_model"]["c_r1"]
 WB = json_object["Controller"]["WB"] # Wheel base
 L_d = json_object["Controller"]["L_d"]  # [m] look-ahead distance
-robot_num = json_object["robot_num"]
+robot_num = 1 #json_object["robot_num"]
 safety_init = json_object["safety"]
 width_init = json_object["width"]
 height_init = json_object["height"]
@@ -213,7 +213,7 @@ def calc_control_and_trajectory(x, v_search, goal, ob, u_buf, trajectory_buf):
             trajectory = geom
             # calc cost
 
-            to_goal_cost = 20 * to_goal_cost_gain * calc_to_goal_cost(trajectory, goal)
+            to_goal_cost = 30 * to_goal_cost_gain * calc_to_goal_cost(trajectory, goal)
             # speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
             ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory, ob)
             heading_cost = heading_cost_gain * calc_to_goal_heading_cost(trajectory, goal)
@@ -277,13 +277,16 @@ def calc_obstacle_cost(trajectory, ob):
     if any(element < -height_init/2+WB or element > height_init/2-WB for element in y):
         return np.inf
 
-    for obstacle in ob:
-        if dilated.intersects(obstacle):
-            return 100000 # collision        
-        elif distance(dilated, obstacle) < min_distance:
-            min_distance = distance(dilated, obstacle)
-            
-    return 1/distance(dilated, obstacle)
+    if ob:
+        for obstacle in ob:
+            if dilated.intersects(obstacle):
+                return 100000 # collision        
+            elif distance(dilated, obstacle) < min_distance:
+                min_distance = distance(dilated, obstacle)
+                
+        return 1/distance(dilated, obstacle)
+    else:
+        return 0.0
 
 def calc_to_goal_cost(trajectory, goal):
     """
@@ -300,6 +303,12 @@ def calc_to_goal_cost(trajectory, goal):
     dy = goal[1] - trajectory[-1, 1]
 
     cost = math.hypot(dx, dy)
+
+    # TODO: this causes bug when we use old traj because when popping elements we reduce the length and it may be less than 5
+    # dx = goal[0] - trajectory[5, 0]
+    # dy = goal[1] - trajectory[5, 1]
+
+    # cost += math.hypot(dx, dy)
 
     return cost
 
@@ -357,7 +366,7 @@ def update_targets(paths, targets, x, i):
     Returns:
         tuple: Updated paths and targets.
     """
-    if utils.dist(point1=(x[0, i], x[1, i]), point2=targets[i]) < 5:
+    if utils.dist(point1=(x[0, i], x[1, i]), point2=targets[i]) < 1:
         paths[i] = utils.update_path(paths[i])
         targets[i] = (paths[i][0].x, paths[i][0].y)
 
@@ -515,7 +524,7 @@ def main():
         plt.pause(0.0001)
         plt.show()
 
-def main2():
+def main1():
     """
     This function runs the main loop for the LBP algorithm.
     It initializes the necessary variables, updates the robot state, and plots the robot trajectory.
@@ -579,7 +588,7 @@ def main2():
         plt.pause(0.0001)
         plt.show()
 
-def main3():
+def main2():
     """
     This function runs the main loop for the LBP algorithm.
     It initializes the necessary variables, updates the robot state, and plots the robot trajectory.
@@ -668,6 +677,6 @@ def main3():
        
 if __name__ == '__main__':
     # main1()
-    main3()
+    main1()
 
     

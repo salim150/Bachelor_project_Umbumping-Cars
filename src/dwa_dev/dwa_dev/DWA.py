@@ -265,13 +265,16 @@ def calc_obstacle_cost(trajectory, ob):
     if any(element < -height_init/2+WB or element > height_init/2-WB for element in y):
         return np.inf
 
-    for obstacle in ob:
-        if dilated.intersects(obstacle):
-            return 100000 # collision        
-        elif distance(dilated, obstacle) < min_distance:
-            min_distance = distance(dilated, obstacle)
-            
-    return 1/distance(dilated, obstacle)
+    if ob:
+        for obstacle in ob:
+            if dilated.intersects(obstacle):
+                return 100000 # collision        
+            elif distance(dilated, obstacle) < min_distance:
+                min_distance = distance(dilated, obstacle)
+                
+        return 1/distance(dilated, obstacle)
+    else:
+        return 0.0
 
 def calc_to_goal_cost(trajectory, goal):
     """
