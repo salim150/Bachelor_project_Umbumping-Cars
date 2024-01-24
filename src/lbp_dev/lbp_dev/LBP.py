@@ -19,21 +19,21 @@ with open(path, 'r') as openfile:
     # Reading from json file
     json_object = json.load(openfile)
 
-max_steer = json_object["DWA"]["max_steer"] # [rad] max steering angle
-max_speed = json_object["DWA"]["max_speed"] # [m/s]
-min_speed = json_object["DWA"]["min_speed"] # [m/s]
-v_resolution = json_object["DWA"]["v_resolution"] # [m/s]
-delta_resolution = math.radians(json_object["DWA"]["delta_resolution"])# [rad/s]
-max_acc = 10 #json_object["DWA"]["max_acc"] # [m/ss]
-min_acc = -10 #json_object["DWA"]["min_acc"] # [m/ss]
-dt = json_object["DWA"]["dt"] # [s] Time tick for motion prediction
-predict_time = json_object["DWA"]["predict_time"] # [s]
-to_goal_cost_gain = json_object["DWA"]["to_goal_cost_gain"]
-speed_cost_gain = json_object["DWA"]["speed_cost_gain"]
-obstacle_cost_gain = json_object["DWA"]["obstacle_cost_gain"]
-heading_cost_gain = json_object["DWA"]["heading_cost_gain"]
-robot_stuck_flag_cons = json_object["DWA"]["robot_stuck_flag_cons"]
-dilation_factor = json_object["DWA"]["dilation_factor"]
+max_steer = json_object["LBP"]["max_steer"] # [rad] max steering angle
+max_speed = json_object["LBP"]["max_speed"] # [m/s]
+min_speed = json_object["LBP"]["min_speed"] # [m/s]
+v_resolution = json_object["LBP"]["v_resolution"] # [m/s]
+delta_resolution = math.radians(json_object["LBP"]["delta_resolution"])# [rad/s]
+max_acc = 10 #json_object["LBP"]["max_acc"] # [m/ss]
+min_acc = -10 #json_object["LBP"]["min_acc"] # [m/ss]
+dt = json_object["LBP"]["dt"] # [s] Time tick for motion prediction
+predict_time = json_object["LBP"]["predict_time"] # [s]
+to_goal_cost_gain = json_object["LBP"]["to_goal_cost_gain"]
+speed_cost_gain = json_object["LBP"]["speed_cost_gain"]
+obstacle_cost_gain = json_object["LBP"]["obstacle_cost_gain"]
+heading_cost_gain = json_object["LBP"]["heading_cost_gain"]
+robot_stuck_flag_cons = json_object["LBP"]["robot_stuck_flag_cons"]
+dilation_factor = json_object["LBP"]["dilation_factor"]
 
 L = json_object["Car_model"]["L"]  # [m] Wheel base of vehicle
 Lr = L / 2.0  # [m]
@@ -47,7 +47,7 @@ c_a = json_object["Car_model"]["c_a"]
 c_r1 = json_object["Car_model"]["c_r1"]
 WB = json_object["Controller"]["WB"] # Wheel base
 L_d = json_object["Controller"]["L_d"]  # [m] look-ahead distance
-robot_num = 1 #json_object["robot_num"]
+robot_num = json_object["robot_num"]
 safety_init = json_object["safety"]
 width_init = json_object["width"]
 height_init = json_object["height"]
@@ -205,15 +205,14 @@ def calc_control_and_trajectory(x, v_search, goal, ob, u_buf, trajectory_buf):
             geom[:,2] = info['yaw']
             geom[:,0:2] = (geom[:,0:2]) @ rotateMatrix(-x[2]) + [x[0],x[1]]
             
-            # TODO: solve the problem of the yaw angle
-
             geom[:,2] = geom[:,2] + x[2] #bringing also the yaw angle in the new frame
             
             # trajectory = predict_trajectory(x_init, a, delta)
             trajectory = geom
             # calc cost
 
-            to_goal_cost = 30 * to_goal_cost_gain * calc_to_goal_cost(trajectory, goal)
+            # TODO: small bug when increasing the factor too much for the to_goal_cost_gain
+            to_goal_cost = to_goal_cost_gain * calc_to_goal_cost(trajectory, goal)
             # speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
             ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory, ob)
             heading_cost = heading_cost_gain * calc_to_goal_heading_cost(trajectory, goal)
@@ -234,10 +233,13 @@ def calc_control_and_trajectory(x, v_search, goal, ob, u_buf, trajectory_buf):
 
     # Calculate cost of the previous best trajectory and compare it with that of the new trajectories
     # If the cost of the previous best trajectory is lower, use the previous best trajectory
+    
+    #TODO: this section has a small bug due to popping elements from the buffer, it gets to a point where there 
+    # are no more elements in the buffer to use
     u_buf.pop(0)
     trajectory_buf = trajectory_buf[1:]
 
-    to_goal_cost = 30 * to_goal_cost_gain * calc_to_goal_cost(trajectory_buf, goal)
+    to_goal_cost = to_goal_cost_gain * calc_to_goal_cost(trajectory_buf, goal)
     # speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
     ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory_buf, ob)
     heading_cost = heading_cost_gain * calc_to_goal_heading_cost(trajectory_buf, goal)
@@ -309,6 +311,11 @@ def calc_to_goal_cost(trajectory, goal):
     # dy = goal[1] - trajectory[5, 1]
 
     # cost += math.hypot(dx, dy)
+
+    # dx = goal[0] - trajectory[:, 0]
+    # dy = goal[1] - trajectory[:, 1]
+
+    # cost = sum(dx**2+dy**2)
 
     return cost
 
