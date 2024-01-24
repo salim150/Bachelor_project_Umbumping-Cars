@@ -226,8 +226,14 @@ def C3BF(x, u_ref):
         # H = np.vstack([H, max_acc, -min_acc])
 
         solvers.options['show_progress'] = False
-        sol = solvers.qp(matrix(P), matrix(q), matrix(G), matrix(H))
-        dxu[:,i] = np.reshape(np.array(sol['x']), (M,))
+        # TODO: add try except block
+        try:
+            sol = solvers.qp(matrix(P), matrix(q), matrix(G), matrix(H))
+            dxu[:,i] = np.reshape(np.array(sol['x']), (M,))
+        except:
+            print("QP solver failed")
+            dxu[:,i] = u_ref[:,i]
+        
     
     dxu[1,:] = beta_to_delta(dxu[1,:])    
     return dxu
@@ -610,5 +616,5 @@ def main2(args=None):
         plt.pause(0.0001)
     
 if __name__=='__main__':
-    main2()
+    main()
         

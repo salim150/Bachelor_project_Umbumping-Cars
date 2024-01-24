@@ -47,7 +47,7 @@ c_a = json_object["Car_model"]["c_a"]
 c_r1 = json_object["Car_model"]["c_r1"]
 WB = json_object["Controller"]["WB"] # Wheel base
 L_d = json_object["Controller"]["L_d"]  # [m] look-ahead distance
-robot_num = json_object["robot_num"]
+robot_num = 1 #json_object["robot_num"]
 safety_init = json_object["safety"]
 width_init = json_object["width"]
 height_init = json_object["height"]
@@ -237,19 +237,20 @@ def calc_control_and_trajectory(x, v_search, goal, ob, u_buf, trajectory_buf):
     #TODO: this section has a small bug due to popping elements from the buffer, it gets to a point where there 
     # are no more elements in the buffer to use
     u_buf.pop(0)
-    trajectory_buf = trajectory_buf[1:]
+    if len(u_buf) >= 2:
+        trajectory_buf = trajectory_buf[1:]
 
-    to_goal_cost = to_goal_cost_gain * calc_to_goal_cost(trajectory_buf, goal)
-    # speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
-    ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory_buf, ob)
-    heading_cost = heading_cost_gain * calc_to_goal_heading_cost(trajectory_buf, goal)
-    final_cost = to_goal_cost + ob_cost + heading_cost #+ speed_cost 
+        to_goal_cost = to_goal_cost_gain * calc_to_goal_cost(trajectory_buf, goal)
+        # speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
+        ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory_buf, ob)
+        heading_cost = heading_cost_gain * calc_to_goal_heading_cost(trajectory_buf, goal)
+        final_cost = to_goal_cost + ob_cost + heading_cost #+ speed_cost 
 
-    if min_cost >= final_cost:
-        min_cost = final_cost
-        best_u = [0, u_buf[1]]
-        best_trajectory = trajectory_buf
-        u_history = u_buf
+        if min_cost >= final_cost:
+            min_cost = final_cost
+            best_u = [0, u_buf[1]]
+            best_trajectory = trajectory_buf
+            u_history = u_buf
 
     return best_u, best_trajectory, u_history
 
@@ -301,10 +302,10 @@ def calc_to_goal_cost(trajectory, goal):
     Returns:
         float: The cost to reach the goal from the last point in the trajectory.
     """
-    dx = goal[0] - trajectory[-1, 0]
-    dy = goal[1] - trajectory[-1, 1]
+    # dx = goal[0] - trajectory[-1, 0]
+    # dy = goal[1] - trajectory[-1, 1]
 
-    cost = math.hypot(dx, dy)
+    # cost = math.hypot(dx, dy)
 
     # TODO: this causes bug when we use old traj because when popping elements we reduce the length and it may be less than 5
     # dx = goal[0] - trajectory[5, 0]
@@ -312,10 +313,10 @@ def calc_to_goal_cost(trajectory, goal):
 
     # cost += math.hypot(dx, dy)
 
-    # dx = goal[0] - trajectory[:, 0]
-    # dy = goal[1] - trajectory[:, 1]
+    dx = goal[0] - trajectory[:, 0]
+    dy = goal[1] - trajectory[:, 1]
 
-    # cost = sum(dx**2+dy**2)
+    cost = min(np.sqrt(dx**2+dy**2))
 
     return cost
 
