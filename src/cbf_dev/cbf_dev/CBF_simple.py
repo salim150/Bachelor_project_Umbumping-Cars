@@ -39,6 +39,32 @@ boundary_points = np.array([-width/2, width/2, -height/2, height/2])
 with open('/home/giacomo/thesis_ws/src/seed_1.json', 'r') as file:
     data = json.load(file)
 
+def motion(x, u, dt):
+    """
+    Motion model for a robot.
+
+    Args:
+        x (list): Initial state of the robot [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)].
+        u (list): Control inputs [throttle, delta].
+        dt (float): Time step.
+
+    Returns:
+        list: Updated state of the robot.
+
+    """
+    delta = u[1]
+    delta = np.clip(delta, -max_steer, max_steer)
+    throttle = u[0]
+
+    x[0] = x[0] + x[3] * math.cos(x[2]) * dt
+    x[1] = x[1] + x[3] * math.sin(x[2]) * dt
+    x[2] = x[2] + x[3] / L * math.tan(delta) * dt
+    x[2] = normalize_angle(x[2])
+    x[3] = x[3] + throttle * dt
+    x[3] = np.clip(x[3], min_speed, max_speed)
+
+    return x
+
 def CBF(x, u_ref):
     """
     Computes the control input for the C3BF (Collision Cone Control Barrier Function) algorithm.
@@ -329,6 +355,33 @@ def control_robot(x, targets):
 
     return dxu
 
+class CBF_algorithm():
+    def __init__(self, targets, paths):
+        self.targets = targets
+        self.paths = paths
+        
+    def run_cbf(self, x):
+        
+        for i in range(robot_num):
+            # Step 9: Check if the distance between the current position and the target is less than 5
+            if dist(point1=(x[0,i], x[1,i]), point2=self.targets[i]) < 5:
+                # Perform some action when the condition is met
+                self.paths[i].pop(0)
+                if not self.paths[i]:
+                    print("Path complete")
+                    return
+                self.targets[i] = (self.paths[i][0].x, self.paths[i][0].y)
+
+        dxu = control_robot(x, self.targets)
+        for i in range(robot_num):
+            x[:, i] = motion(x[:, i], dxu[:, i], dt)
+            plot_robot(x[0, i], x[1, i], x[2, i])
+            plot_arrow(x[0, i], x[1, i], x[2, i] + dxu[1, i], length=3, width=0.5)
+            plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
+            plt.plot(self.targets[i][0], self.targets[i][1], "xg")
+        
+        return x, dxu
+
 def main(args=None):
     """
     Main function for controlling multiple robots using Model Predictive Control (MPC).
@@ -461,7 +514,60 @@ def main1(args=None):
         plt.grid(True)
         plt.pause(0.0001)
 
+def main_seed(args=None):
+    """
+    Main function for controlling multiple robots using Model Predictive Control (MPC).
 
+    Steps:
+    1. Initialize the necessary variables and parameters.
+    2. Create an instance of the ModelPredictiveControl class.
+    3. Set the initial state and control inputs.
+    4. Generate the reference trajectory for each robot.
+    5. Plot the initial positions and reference trajectory.
+    6. Set the bounds and constraints for the MPC.
+    7. Initialize the predicted trajectory for each robot.
+    8. Enter the main control loop:
+        - Check if the distance between the current position and the target is less than 5.
+            - If yes, update the path and target.
+        - Perform 3CBF control for each robot.
+        - Plot the robot trajectory.
+        - Update the predicted trajectory.
+        - Plot the map and pause for visualization.
+    """
+    # Step 1: Set the number of iterations
+    iterations = 3000
+    
+    # Step 2: Sample initial values for x0, y, yaw, v, omega, and model_type
+    initial_state = data['initial_position']
+    x0 = initial_state['x']
+    y = initial_state['y']
+    yaw = initial_state['yaw']
+    v = initial_state['v']
+
+    # Step 3: Create an array x with the initial values
+    x = np.array([x0, y, yaw, v])
+    
+    # Step 4: Create paths for each robot
+    traj = data['trajectories']
+    paths = [[Coordinate(x=traj[str(idx)][i][0], y=traj[str(idx)][i][1]) for i in range(len(traj[str(idx)]))] for idx in range(robot_num)]
+
+    # Step 5: Extract the target coordinates from the paths
+    targets = [[path[0].x, path[0].y] for path in paths]
+
+    cbf = CBF_algorithm(targets, paths)
+    # Step 8: Perform the simulation for the specified number of iterations
+    for z in range(iterations):
+        plt.cla()
+        plt.gcf().canvas.mpl_connect(
+            'key_release_event',
+            lambda event: [exit(0) if event.key == 'escape' else None])
+        
+        x, dxu = cbf.run_cbf(x) 
+        
+        plot_map(width=width_init, height=height_init)
+        plt.axis("equal")
+        plt.grid(True)
+        plt.pause(0.0001)
 
 if __name__=='__main__':
     main1()
