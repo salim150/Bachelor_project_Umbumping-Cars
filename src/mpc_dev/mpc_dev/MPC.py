@@ -1,5 +1,5 @@
 import numpy as np
-import cubic_spline_planner
+import mpc_dev.cubic_spline_planner as cubic_spline_planner
 import math
 import random
 import sys
