@@ -56,6 +56,8 @@ N=3
 
 show_animation = True
 check_collision_bool = False
+color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
+
 
 with open('/home/giacomo/thesis_ws/src/lbp_dev/lbp_dev/LBP.json', 'r') as file:
     data = json.load(file)
@@ -346,20 +348,29 @@ def plot_arrow(x, y, yaw, length=0.5, width=0.1):  # pragma: no cover
               head_length=width, head_width=width)
     plt.plot(x, y)
 
-def plot_robot(x, y, yaw):  # pragma: no cover
-        outline = np.array([[-L / 2, L / 2,
-                             (L / 2), -L / 2,
-                             -L / 2],
-                            [WB / 2, WB / 2,
-                             - WB / 2, -WB / 2,
-                             WB / 2]])
-        Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
-                         [-math.sin(yaw), math.cos(yaw)]])
-        outline = (outline.T.dot(Rot1)).T
-        outline[0, :] += x
-        outline[1, :] += y
-        plt.plot(np.array(outline[0, :]).flatten(),
-                 np.array(outline[1, :]).flatten(), "-k")
+def plot_robot(x, y, yaw, i):  
+    """
+    Plot the robot.
+
+    Args:
+        x (float): X-coordinate of the robot.
+        y (float): Y-coordinate of the robot.
+        yaw (float): Yaw angle of the robot.
+        i (int): Index of the robot.
+    """
+    outline = np.array([[-L / 2, L / 2,
+                            (L / 2), -L / 2,
+                            -L / 2],
+                        [WB / 2, WB / 2,
+                            - WB / 2, -WB / 2,
+                            WB / 2]])
+    Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
+                        [-math.sin(yaw), math.cos(yaw)]])
+    outline = (outline.T.dot(Rot1)).T
+    outline[0, :] += x
+    outline[1, :] += y
+    plt.plot(np.array(outline[0, :]).flatten(),
+                np.array(outline[1, :]).flatten(), color_dict[i])
 
 def update_targets(paths, targets, x, i):
     """
@@ -439,11 +450,21 @@ def update_robot_state(x, u, dt, targets, dilated_traj, u_hist, predicted_trajec
     return x, u, predicted_trajectory, u_hist
 
 def plot_robot_trajectory(x, u, predicted_trajectory, dilated_traj, targets, ax, i):
-    plt.plot(predicted_trajectory[i][:, 0], predicted_trajectory[i][:, 1], "-g")
-    plot_polygon(dilated_traj[i], ax=ax, add_points=False, alpha=0.5)
-    plt.plot(x[0, i], x[1, i], "xr")
-    plt.plot(targets[i][0], targets[i][1], "xg")
-    plot_robot(x[0, i], x[1, i], x[2, i])
+    """
+    Plots the robot and arrows for visualization.
+
+    Args:
+        i (int): Index of the robot.
+        x (numpy.ndarray): State vector of shape (4, N), where N is the number of time steps.
+        multi_control (numpy.ndarray): Control inputs of shape (2, N).
+        targets (list): List of target points.
+
+    """
+    plt.plot(predicted_trajectory[i][:, 0], predicted_trajectory[i][:, 1], "-"+color_dict[i])
+    plot_polygon(dilated_traj[i], ax=ax, add_points=False, alpha=0.5, color=color_dict[i])
+    # plt.plot(x[0, i], x[1, i], "xr")
+    plt.plot(targets[i][0], targets[i][1], "x"+color_dict[i])
+    plot_robot(x[0, i], x[1, i], x[2, i], i)
     plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
     plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
 
@@ -560,7 +581,7 @@ def main():
 
     print("Done")
     if show_animation:
-        for i in range(robot_num):
+        for i in range(N):
             plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-r")
         plt.pause(0.0001)
         plt.show()
@@ -791,7 +812,7 @@ def main_seed():
         plt.show()
 
 if __name__ == '__main__':
-    # main1()
-    main_seed()
+    main()
+    # main_seed()
 
     

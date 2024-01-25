@@ -60,6 +60,8 @@ show_animation = True
 debug = False
 check_collision_bool = False
 
+color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
+
 # Simulator options.
 options = {}
 options['FIG_SIZE'] = [8,8]
@@ -585,8 +587,6 @@ def update_paths(i, x, cx, cy, cyaw, target_ind, ref, dl):
     
     return cx, cy, ref
 
-
-
 def generate_reference_trajectory(x, dl):
     cx = []
     cy = []
@@ -629,35 +629,43 @@ def plot_arrow(x, y, yaw, length=0.5, width=0.1):  # pragma: no cover
               head_length=width, head_width=width)
     plt.plot(x, y)
 
-def plot_robot(x, y, yaw):  # pragma: no cover
-        outline = np.array([[-L / 2, L / 2,
-                             (L / 2), -L / 2,
-                             -L / 2],
-                            [WB / 2, WB / 2,
-                             - WB / 2, -WB / 2,
-                             WB / 2]])
-        Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
-                         [-math.sin(yaw), math.cos(yaw)]])
-        outline = (outline.T.dot(Rot1)).T
-        outline[0, :] += x
-        outline[1, :] += y
-        plt.plot(np.array(outline[0, :]).flatten(),
-                 np.array(outline[1, :]).flatten(), "-k")
+def plot_robot(x, y, yaw, i): 
+    """
+    Plot the robot.
+
+    Args:
+        x (float): X-coordinate of the robot.
+        y (float): Y-coordinate of the robot.
+        yaw (float): Yaw angle of the robot.
+        i (int): Index of the robot.
+    """
+    outline = np.array([[-L / 2, L / 2,
+                            (L / 2), -L / 2,
+                            -L / 2],
+                        [WB / 2, WB / 2,
+                            - WB / 2, -WB / 2,
+                            WB / 2]])
+    Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
+                        [-math.sin(yaw), math.cos(yaw)]])
+    outline = (outline.T.dot(Rot1)).T
+    outline[0, :] += x
+    outline[1, :] += y
+    plt.plot(np.array(outline[0, :]).flatten(),
+                np.array(outline[1, :]).flatten(), color_dict[i])
     
 def plot_robot_trajectory(x, u, cx, cy, predicted_trajectory, targets, i):
-    plt.plot(predicted_trajectory[i][:, 0], predicted_trajectory[i][:, 1], "-g")
-    plt.plot(x[0, i], x[1, i], "xr")
-    plt.plot(targets[i][0], targets[i][1], "xg")
-    plt.plot(cx[i], cy[i], "-r", label="course")
-    plot_robot(x[0, i], x[1, i], x[2, i])
+    plt.plot(predicted_trajectory[i][:, 0], predicted_trajectory[i][:, 1], "-"+color_dict[i])
+    # plt.plot(x[0, i], x[1, i], "xr")
+    plt.plot(targets[i][0], targets[i][1], "x"+color_dict[i])
+    plt.plot(cx[i], cy[i], "--"+color_dict[i], label="course")
+    plot_robot(x[0, i], x[1, i], x[2, i], i)
     plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
     plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
 
 def plot_robot_seed(x, u, predicted_trajectory, targets, i):
-    plt.plot(predicted_trajectory[i][:, 0], predicted_trajectory[i][:, 1], "-g")
-    plt.plot(x[0, i], x[1, i], "xr")
-    plt.plot(targets[i][0], targets[i][1], "xg")
-    plot_robot(x[0, i], x[1, i], x[2, i])
+    plt.plot(predicted_trajectory[i][:, 0], predicted_trajectory[i][:, 1], "-"+color_dict[i])
+    plt.plot(targets[i][0], targets[i][1], "x"+color_dict[i])
+    plot_robot(x[0, i], x[1, i], x[2, i], i)
     plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
     plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
 

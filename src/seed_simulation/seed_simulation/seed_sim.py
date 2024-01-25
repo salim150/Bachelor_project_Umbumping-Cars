@@ -29,6 +29,8 @@ robot_num = json_object["robot_num"]
 show_animation = True
 iterations = 40
 
+color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
+
 def dwa_sim(seed):
 
     dt = json_object["DWA"]["dt"] # [s] Time tick for motion prediction
@@ -111,7 +113,7 @@ def dwa_sim(seed):
     print("Done")
     if show_animation:
         for i in range(robot_num):
-            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-r")
+            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
         plt.pause(0.0001)
         plt.show()
 
@@ -206,7 +208,7 @@ def mpc_sim(seed):
     print("Done")
     if show_animation:
         for i in range(robot_num):
-            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-r")
+            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
         plt.pause(0.0001)
         plt.show()
 
@@ -274,7 +276,7 @@ def c3bf_sim(seed):
     print("Done")
     if show_animation:
         for i in range(robot_num):
-            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-r")
+            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
         plt.pause(0.0001)
         plt.show()
 
@@ -342,7 +344,7 @@ def cbf_sim(seed):
     print("Done")
     if show_animation:
         for i in range(robot_num):
-            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-r")
+            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
         plt.pause(0.0001)
         plt.show()
 
@@ -421,7 +423,7 @@ def lbp_sim(seed):
     print("Done")
     if show_animation:
         for i in range(robot_num):
-            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-r")
+            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
         plt.pause(0.0001)
         plt.show()
     
@@ -432,10 +434,10 @@ def main():
     with open('/home/giacomo/thesis_ws/src/seed_1.json', 'r') as file:
         seed = json.load(file)
 
-    dwa_trajectory = dwa_sim(seed)   
-    mpc_trajectory = mpc_sim(seed)
-    c3bf_trajectory = c3bf_sim(seed)
-    cbf_trajectory = cbf_sim(seed)
+    # dwa_trajectory = dwa_sim(seed)   
+    # mpc_trajectory = mpc_sim(seed)
+    # c3bf_trajectory = c3bf_sim(seed)
+    # cbf_trajectory = cbf_sim(seed)
     lbp_trajectory = lbp_sim(seed)
 
 if __name__ == '__main__':

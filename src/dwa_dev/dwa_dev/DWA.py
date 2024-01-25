@@ -56,6 +56,8 @@ timer_freq = json_object["timer_freq"]
 show_animation = True
 check_collision_bool = False
 
+color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
+
 with open('/home/giacomo/thesis_ws/src/trajectories.json', 'r') as file:
     data = json.load(file)
 
@@ -334,7 +336,7 @@ def plot_arrow(x, y, yaw, length=0.5, width=0.1):  # pragma: no cover
               head_length=width, head_width=width)
     plt.plot(x, y)
 
-def plot_robot(x, y, yaw):  # pragma: no cover
+def plot_robot(x, y, yaw, i):  
     """
     Plot the robot.
 
@@ -342,6 +344,7 @@ def plot_robot(x, y, yaw):  # pragma: no cover
         x (float): X-coordinate of the robot.
         y (float): Y-coordinate of the robot.
         yaw (float): Yaw angle of the robot.
+        i (int): Index of the robot.
     """
     outline = np.array([[-L / 2, L / 2,
                             (L / 2), -L / 2,
@@ -355,7 +358,7 @@ def plot_robot(x, y, yaw):  # pragma: no cover
     outline[0, :] += x
     outline[1, :] += y
     plt.plot(np.array(outline[0, :]).flatten(),
-                np.array(outline[1, :]).flatten(), "-k")
+                np.array(outline[1, :]).flatten(), color_dict[i])
 
 def plot_map():
     """
@@ -443,11 +446,21 @@ def update_robot_state(x, u, dt, targets, dilated_traj, predicted_trajectory, i)
     return x, u, predicted_trajectory
 
 def plot_robot_trajectory(x, u, predicted_trajectory, dilated_traj, targets, ax, i):
-    plt.plot(predicted_trajectory[i][:, 0], predicted_trajectory[i][:, 1], "-g")
-    plot_polygon(dilated_traj[i], ax=ax, add_points=False, alpha=0.5)
-    plt.plot(x[0, i], x[1, i], "xr")
-    plt.plot(targets[i][0], targets[i][1], "xg")
-    plot_robot(x[0, i], x[1, i], x[2, i])
+    """
+    Plots the robot and arrows for visualization.
+
+    Args:
+        i (int): Index of the robot.
+        x (numpy.ndarray): State vector of shape (4, N), where N is the number of time steps.
+        multi_control (numpy.ndarray): Control inputs of shape (2, N).
+        targets (list): List of target points.
+
+    """
+    plt.plot(predicted_trajectory[i][:, 0], predicted_trajectory[i][:, 1], "-"+color_dict[i])
+    plot_polygon(dilated_traj[i], ax=ax, add_points=False, alpha=0.5, color=color_dict[i])
+    # plt.plot(x[0, i], x[1, i], "xr")
+    plt.plot(targets[i][0], targets[i][1], "x"+color_dict[i])
+    plot_robot(x[0, i], x[1, i], x[2, i], i)
     plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
     plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
 
@@ -759,3 +772,4 @@ def main_seed():
        
 if __name__ == '__main__':
     main_seed()
+    # main()

@@ -38,6 +38,8 @@ min_dist = json_object["min_dist"]
 boundary_points = np.array([-width_init/2, width_init/2, -height_init/2, height_init/2])
 check_collision_bool = False
 
+color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
+
 with open('/home/giacomo/thesis_ws/src/seed_1.json', 'r') as file:
     data = json.load(file)
 
@@ -111,7 +113,7 @@ def C3BF(x, u_ref):
             v = np.array([x[3,i]*np.cos(x[2,i]), x[3,i]*np.sin(x[2,i])])
             scalar_prod = v @ arr
 
-            if j == i or dist > 3 * safety_radius or scalar_prod < 0: 
+            if j == i or dist > 6 * safety_radius or scalar_prod < 0: 
                 continue
 
             v_rel = np.array([x[3,j]*np.cos(x[2,j]) - x[3,i]*np.cos(x[2,i]), 
@@ -254,7 +256,6 @@ def delta_to_beta(delta):
 
     return beta
 
-
 def delta_to_beta_array(delta):
     """
     Converts an array of steering angles delta to an array of slip angles beta.
@@ -284,31 +285,6 @@ def beta_to_delta(beta):
     delta = normalize_angle_array(np.arctan2(L*np.tan(beta)/Lr, 1.0))
 
     return delta           
-
-def plot_rect(x, y, yaw, r):  # pragma: no cover
-    """
-    Plots a rectangle with the given parameters.
-
-    Args:
-        x (float): x-coordinate of the center of the rectangle.
-        y (float): y-coordinate of the center of the rectangle.
-        yaw (float): Orientation of the rectangle in radians.
-        r (float): Length of the sides of the rectangle.
-
-    """
-    outline = np.array([[-r / 2, r / 2,
-                            (r / 2), -r / 2,
-                            -r / 2],
-                        [r / 2, r/ 2,
-                            - r / 2, -r / 2,
-                            r / 2]])
-    Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
-                        [-math.sin(yaw), math.cos(yaw)]])
-    outline = (outline.T.dot(Rot1)).T
-    outline[0, :] += x
-    outline[1, :] += y
-    plt.plot(np.array(outline[0, :]).flatten(),
-                np.array(outline[1, :]).flatten(), "-k")
    
 def update_paths(paths):
     """
@@ -345,6 +321,30 @@ def check_collision(x,i):
             if dist([x[0,i], x[1,i]], [x[0, idx], x[1, idx]]) < WB:
                 raise Exception('Collision')
 
+def plot_robot(x, y, yaw, i): 
+    """
+    Plot the robot.
+
+    Args:
+        x (float): X-coordinate of the robot.
+        y (float): Y-coordinate of the robot.
+        yaw (float): Yaw angle of the robot.
+        i (int): Index of the robot.
+    """
+    outline = np.array([[-L / 2, L / 2,
+                            (L / 2), -L / 2,
+                            -L / 2],
+                        [WB / 2, WB / 2,
+                            - WB / 2, -WB / 2,
+                            WB / 2]])
+    Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
+                        [-math.sin(yaw), math.cos(yaw)]])
+    outline = (outline.T.dot(Rot1)).T
+    outline[0, :] += x
+    outline[1, :] += y
+    plt.plot(np.array(outline[0, :]).flatten(),
+                np.array(outline[1, :]).flatten(), color_dict[i])
+
 def plot_robot_and_arrows(i, x, multi_control, targets):
     """
     Plots the robot and arrows for visualization.
@@ -356,10 +356,10 @@ def plot_robot_and_arrows(i, x, multi_control, targets):
         targets (list): List of target points.
 
     """
-    plot_robot(x[0, i], x[1, i], x[2, i])
+    plot_robot(x[0, i], x[1, i], x[2, i], i)
     plot_arrow(x[0, i], x[1, i], x[2, i] + multi_control.multi_control[i].delta, length=3, width=0.5)
     plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
-    plt.plot(targets[i][0], targets[i][1], "xg")
+    plt.plot(targets[i][0], targets[i][1], "x"+color_dict[i])
 
 def update_robot_state(x, dxu, multi_control, targets):
     """
@@ -437,10 +437,10 @@ class C3BF_algorithm():
         dxu = control_robot(x, self.targets)
         for i in range(robot_num):
             x[:, i] = motion(x[:, i], dxu[:, i], dt)
-            plot_robot(x[0, i], x[1, i], x[2, i])
+            plot_robot(x[0, i], x[1, i], x[2, i], i)
             plot_arrow(x[0, i], x[1, i], x[2, i] + dxu[1, i], length=3, width=0.5)
             plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
-            plt.plot(self.targets[i][0], self.targets[i][1], "xg")
+            plt.plot(self.targets[i][0], self.targets[i][1], "x"+color_dict[i])
         
         return x, dxu
 
@@ -562,11 +562,10 @@ def main1(args=None):
     
             # plt.plot(x[0,i], x[1,i], "xr")
             # plt.plot(goal[0,i], goal[1,i], "xb")plot_arrow(x1.x, x1.y, x1.yaw)
-            plot_robot(x[0,i], x[1,i], x[2,i])
-            # plot_rect(x[0,i], x[1,i], x[2,i], safety_radius)
+            plot_robot(x[0,i], x[1,i], x[2,i], i)
             plot_arrow(x[0,i], x[1,i], x[2,i] + multi_control.multi_control[i].delta, length=3, width=0.5)
             plot_arrow(x[0,i], x[1,i], x[2,i], length=1, width=0.5)
-            plt.plot(targets[i][0], targets[i][1], "xg")
+            plt.plot(targets[i][0], targets[i][1], "x"+color_dict[i])
             # plot_path(multi_traj.multiple_path[i])
 
         plot_map(width=width_init, height=height_init)
@@ -701,4 +700,5 @@ def main_seed(args=None):
     
 if __name__=='__main__':
     main_seed()
+    # main()
         

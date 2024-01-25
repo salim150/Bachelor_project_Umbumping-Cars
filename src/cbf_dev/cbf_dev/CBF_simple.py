@@ -37,6 +37,8 @@ height = json_object["height"]
 boundary_points = np.array([-width/2, width/2, -height/2, height/2])
 check_collision_bool = False
 
+color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
+
 with open('/home/giacomo/thesis_ws/src/seed_1.json', 'r') as file:
     data = json.load(file)
 
@@ -225,31 +227,6 @@ def beta_to_delta(beta):
 
     return delta
 
-def plot_rect(x, y, yaw, r):  # pragma: no cover
-        """
-    Plots a rectangle with the given parameters.
-
-    Args:
-        x (float): x-coordinate of the center of the rectangle.
-        y (float): y-coordinate of the center of the rectangle.
-        yaw (float): Orientation of the rectangle in radians.
-        r (float): Length of the sides of the rectangle.
-
-    """
-        outline = np.array([[-r / 2, r / 2,
-                                (r / 2), -r / 2,
-                                -r / 2],
-                            [r / 2, r/ 2,
-                                - r / 2, -r / 2,
-                                r / 2]])
-        Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
-                            [-math.sin(yaw), math.cos(yaw)]])
-        outline = (outline.T.dot(Rot1)).T
-        outline[0, :] += x
-        outline[1, :] += y
-        plt.plot(np.array(outline[0, :]).flatten(),
-                    np.array(outline[1, :]).flatten(), "-k")
-
 def update_paths(paths):
     """
     Updates the given paths.
@@ -285,6 +262,30 @@ def check_collision(x,i):
             if dist([x[0,i], x[1,i]], [x[0, idx], x[1, idx]]) < WB:
                 raise Exception('Collision')
 
+def plot_robot(x, y, yaw, i): 
+    """
+    Plot the robot.
+
+    Args:
+        x (float): X-coordinate of the robot.
+        y (float): Y-coordinate of the robot.
+        yaw (float): Yaw angle of the robot.
+        i (int): Index of the robot.
+    """
+    outline = np.array([[-L / 2, L / 2,
+                            (L / 2), -L / 2,
+                            -L / 2],
+                        [WB / 2, WB / 2,
+                            - WB / 2, -WB / 2,
+                            WB / 2]])
+    Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
+                        [-math.sin(yaw), math.cos(yaw)]])
+    outline = (outline.T.dot(Rot1)).T
+    outline[0, :] += x
+    outline[1, :] += y
+    plt.plot(np.array(outline[0, :]).flatten(),
+                np.array(outline[1, :]).flatten(), color_dict[i])
+    
 def plot_robot_and_arrows(i, x, multi_control, targets):
     """
     Plots the robot and arrows for visualization.
@@ -296,10 +297,10 @@ def plot_robot_and_arrows(i, x, multi_control, targets):
         targets (list): List of target points.
 
     """
-    plot_robot(x[0, i], x[1, i], x[2, i])
+    plot_robot(x[0, i], x[1, i], x[2, i], i)
     plot_arrow(x[0, i], x[1, i], x[2, i] + multi_control.multi_control[i].delta, length=3, width=0.5)
     plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
-    plt.plot(targets[i][0], targets[i][1], "xg")
+    plt.plot(targets[i][0], targets[i][1], "x"+color_dict[i])
 
 def update_robot_state(x, dxu, multi_control, targets):
     """
@@ -377,7 +378,7 @@ class CBF_algorithm():
         dxu = control_robot(x, self.targets)
         for i in range(robot_num):
             x[:, i] = motion(x[:, i], dxu[:, i], dt)
-            plot_robot(x[0, i], x[1, i], x[2, i])
+            plot_robot(x[0, i], x[1, i], x[2, i], i)
             plot_arrow(x[0, i], x[1, i], x[2, i] + dxu[1, i], length=3, width=0.5)
             plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(self.targets[i][0], self.targets[i][1], "xg")
