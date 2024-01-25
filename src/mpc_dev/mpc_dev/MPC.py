@@ -58,6 +58,7 @@ timer_freq = json_object["timer_freq"]
 
 show_animation = True
 debug = False
+check_collision_bool = False
 
 # Simulator options.
 options = {}
@@ -478,8 +479,9 @@ class ModelPredictiveControl:
         for idx in range(robot_num):
             if idx == i:
                 continue
-            if dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < 1:
-                raise Exception('Collision')
+            if check_collision_bool:
+                if dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < 1:
+                    raise Exception('Collision')
             
             next_robot_state = predicted_trajectory[idx]
             self.x_obs.append(next_robot_state[0:-1:5, 0])

@@ -35,6 +35,7 @@ safety = json_object["safety"]
 width = json_object["width"]
 height = json_object["height"]
 boundary_points = np.array([-width/2, width/2, -height/2, height/2])
+check_collision_bool = False
 
 with open('/home/giacomo/thesis_ws/src/seed_1.json', 'r') as file:
     data = json.load(file)
@@ -280,8 +281,9 @@ def check_collision(x,i):
     for idx in range(robot_num):
         if idx == i:
             continue
-        if dist([x[0,i], x[1,i]], [x[0, idx], x[1, idx]]) < WB:
-            raise Exception('Collision')
+        if check_collision_bool:
+            if dist([x[0,i], x[1,i]], [x[0, idx], x[1, idx]]) < WB:
+                raise Exception('Collision')
 
 def plot_robot_and_arrows(i, x, multi_control, targets):
     """

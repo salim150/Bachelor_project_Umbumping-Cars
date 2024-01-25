@@ -55,7 +55,7 @@ min_dist = json_object["min_dist"]
 N=3
 
 show_animation = True
-v_ref = 2.0 # [m/s] reference speed
+check_collision_bool = False
 
 with open('/home/giacomo/thesis_ws/src/lbp_dev/lbp_dev/LBP.json', 'r') as file:
     data = json.load(file)
@@ -427,7 +427,8 @@ def update_robot_state(x, u, dt, targets, dilated_traj, u_hist, predicted_trajec
     dilated_traj[i] = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1])).buffer(dilation_factor, cap_style=3)
     
     # Collision check
-    if any([utils.dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < WB for idx in range(robot_num) if idx != i]): raise Exception('Collision')
+    if check_collision_bool:
+        if any([utils.dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < WB for idx in range(robot_num) if idx != i]): raise Exception('Collision')
     
     x1 = motion(x1, u1, dt)
     x[:, i] = x1
