@@ -500,11 +500,10 @@ class DWA_algorithm():
         self.ax = ax
         self.reached_goal = [False]*robot_num
 
-
     def run_dwa(self, x, u, break_flag):
         for i in range(robot_num):
             # Step 9: Check if the distance between the current position and the target is less than 5
-            if utils.dist(point1=(x[0,i], x[1,i]), point2=self.targets[i]) < 5:
+            if utils.dist(point1=(x[0,i], x[1,i]), point2=self.targets[i]) < update_dist:
                 # Perform some action when the condition is met
                 self.paths[i].pop(0)
                 if not self.paths[i]:
@@ -513,7 +512,6 @@ class DWA_algorithm():
                 self.targets[i] = (self.paths[i][0].x, self.paths[i][0].y)
 
             x, u, self.predicted_trajectory = update_robot_state(x, u, dt, self.targets, self.dilated_traj, self.predicted_trajectory, i)
-
 
             if check_goal_reached(x, self.targets, i):
                 break_flag = True

@@ -410,7 +410,8 @@ def lbp_sim(seed):
         plt.cla()
         plt.gcf().canvas.mpl_connect('key_release_event', lambda event: [exit(0) if event.key == 'escape' else None])
         
-        x, u, break_flag = lbp.run_lbp(x, u, break_flag)
+        # x, u, break_flag = lbp.run_lbp(x, u, break_flag)
+        x, u, break_flag = lbp.go_to_goal(x, u, break_flag)
         trajectory = np.dstack([trajectory, np.concatenate((x,u))])
 
         utils.plot_map(width=width_init, height=height_init)
@@ -439,7 +440,7 @@ def main():
     # mpc_trajectory = mpc_sim(seed)
     # c3bf_trajectory = c3bf_sim(seed)
     # cbf_trajectory = cbf_sim(seed)
-    # lbp_trajectory = lbp_sim(seed)
+    lbp_trajectory = lbp_sim(seed)
 
 if __name__ == '__main__':
     main()
