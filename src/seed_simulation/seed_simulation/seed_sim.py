@@ -27,6 +27,7 @@ height_init = json_object["height"]
 min_dist = json_object["min_dist"]
 robot_num = json_object["robot_num"]
 show_animation = True
+go_to_goal_bool = True
 iterations = 1000
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
@@ -91,15 +92,17 @@ def dwa_sim(seed):
     ax = fig.add_subplot(111)
     
     # Step 7: Create an instance of the DWA_algorithm class
-    dwa = DWA.DWA_algorithm(initial_state, paths, robot_num, safety_init, width_init, height_init,
+    dwa = DWA.DWA_algorithm(initial_state, paths, safety_init, width_init, height_init,
                         min_dist, paths, targets, dilated_traj, predicted_trajectory, ax)
     
     for z in range(iterations):
         plt.cla()
         plt.gcf().canvas.mpl_connect('key_release_event', lambda event: [exit(0) if event.key == 'escape' else None])
         
-        # x, u, break_flag = dwa.run_dwa(x, u, break_flag)
-        x, u, break_flag = dwa.go_to_goal(x, u, break_flag)
+        if go_to_goal_bool:
+            x, u, break_flag = dwa.go_to_goal(x, u, break_flag)
+        else:
+            x, u, break_flag = dwa.run_dwa(x, u, break_flag)
         trajectory = np.dstack([trajectory, np.concatenate((x,u))])
             
         utils.plot_map(width=width_init, height=height_init)
@@ -141,7 +144,8 @@ def mpc_sim(seed):
         - Plot the map and pause for visualization.
     """
     print("MPC start!!")
-    
+    break_flag = False
+
     # MPC initialization
     mpc = MPC.ModelPredictiveControl([], [])
     
@@ -197,7 +201,8 @@ def mpc_sim(seed):
         plt.gcf().canvas.mpl_connect('key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
 
-        x, u = mpc.run_mpc(x, u)
+        # x, u = mpc.run_mpc(x, u)
+        x, u, break_flag = mpc.go_to_goal(x, u, break_flag)
         trajectory = np.dstack([trajectory, np.concatenate((x,u))])
 
         plt.title('MPC 2D')
@@ -205,6 +210,9 @@ def mpc_sim(seed):
         plt.axis("equal")
         plt.grid(True)
         plt.pause(0.0001)
+
+        if break_flag:
+            break
     
     print("Done")
     if show_animation:
@@ -236,6 +244,7 @@ def c3bf_sim(seed):
         - Plot the map and pause for visualization.
     """
     print("3CBF start!!")
+    break_flag = False
 
     # Step 2: Sample initial values for x0, y, yaw, v, omega, and model_type
     initial_state = seed['initial_position']
@@ -266,13 +275,19 @@ def c3bf_sim(seed):
             'key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
         
-        x, u = c3bf.run_3cbf(x)
+        if go_to_goal_bool:
+            x, u, break_flag = c3bf.go_to_goal(x, break_flag)
+        else:
+            x, u = c3bf.run_3cbf(x)
         trajectory = np.dstack([trajectory, np.concatenate((x,u))])
         
         C3BF.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
         plt.grid(True)
         plt.pause(0.0001)
+
+        if break_flag:
+            break
 
     print("Done")
     if show_animation:
@@ -304,6 +319,7 @@ def cbf_sim(seed):
         - Plot the map and pause for visualization.
     """
     print("CBF start!!")
+    break_flag = False
 
     # Step 2: Sample initial values for x0, y, yaw, v, omega, and model_type
     initial_state = seed['initial_position']
@@ -334,13 +350,19 @@ def cbf_sim(seed):
             'key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
         
-        x, u = cbf.run_cbf(x) 
+        if go_to_goal_bool:
+            x, u, break_flag = cbf.go_to_goal(x, break_flag)
+        else:
+            x, u = cbf.run_cbf(x) 
         trajectory = np.dstack([trajectory, np.concatenate((x,u))])
         
         CBF.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
         plt.grid(True)
         plt.pause(0.0001)
+
+        if break_flag:
+            break
     
     print("Done")
     if show_animation:
@@ -410,8 +432,10 @@ def lbp_sim(seed):
         plt.cla()
         plt.gcf().canvas.mpl_connect('key_release_event', lambda event: [exit(0) if event.key == 'escape' else None])
         
-        # x, u, break_flag = lbp.run_lbp(x, u, break_flag)
-        x, u, break_flag = lbp.go_to_goal(x, u, break_flag)
+        if go_to_goal_bool:
+            x, u, break_flag = lbp.go_to_goal(x, u, break_flag)
+        else:
+            x, u, break_flag = lbp.run_lbp(x, u, break_flag)
         trajectory = np.dstack([trajectory, np.concatenate((x,u))])
 
         utils.plot_map(width=width_init, height=height_init)
@@ -437,9 +461,9 @@ def main():
         seed = json.load(file)
 
     dwa_trajectory = dwa_sim(seed)   
-    # mpc_trajectory = mpc_sim(seed)
-    # c3bf_trajectory = c3bf_sim(seed)
-    # cbf_trajectory = cbf_sim(seed)
+    mpc_trajectory = mpc_sim(seed)
+    c3bf_trajectory = c3bf_sim(seed)
+    cbf_trajectory = cbf_sim(seed)
     lbp_trajectory = lbp_sim(seed)
 
 if __name__ == '__main__':

@@ -484,11 +484,10 @@ def check_goal_reached(x, targets, i, distance=0.5):
     return False
 
 class DWA_algorithm():
-    def __init__(self, initial_state, trajectories, robot_num, safety, width, height, min_dist,
+    def __init__(self, initial_state, trajectories, safety, width, height, min_dist,
                 paths, targets, dilated_traj, predicted_trajectory, ax):
         self.initial_state = initial_state
         self.trajectories = trajectories
-        self.robot_num = robot_num
         self.safety = safety
         self.width = width
         self.height = height
@@ -531,13 +530,14 @@ class DWA_algorithm():
                     self.reached_goal[i] = True
                 else:
                     x, u, self.predicted_trajectory = update_robot_state(x, u, dt, self.targets, self.dilated_traj, self.predicted_trajectory, i)
-
+            
+            # print(f"Speed of robot {i}: {x[3, i]}")
+            
             # If we want the robot to disappear when it reaches the goal, indent one more time
-            if all(self.reached_goal):
-                break_flag = True
-
             if show_animation:
                 plot_robot_trajectory(x, u, self.predicted_trajectory, self.dilated_traj, self.targets, self.ax, i)
+        if all(self.reached_goal):
+                break_flag = True
         return x, u, break_flag
 
 def main():
@@ -765,7 +765,7 @@ def main_seed():
     ax = fig.add_subplot(111)
     
     # Step 7: Create an instance of the DWA_algorithm class
-    dwa = DWA_algorithm(initial_state, paths, robot_num, safety_init, width_init, height_init,
+    dwa = DWA_algorithm(initial_state, paths, safety_init, width_init, height_init,
                         min_dist, paths, targets, dilated_traj, predicted_trajectory, ax)
     
     for z in range(iterations):

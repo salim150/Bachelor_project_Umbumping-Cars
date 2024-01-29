@@ -126,6 +126,7 @@ class ModelPredictiveControl:
         self.bounds = bounds
         self.constraints = constraints
         self.predicted_trajectory = predicted_trajectory
+        self.reached_goal = [False]*robot_num
 
     def plant_model(self, prev_state, dt, pedal, steering):
         """
@@ -427,6 +428,25 @@ class ModelPredictiveControl:
         
         return x, u
     
+    def go_to_goal(self, x, u, break_flag):
+        for i in range(robot_num):
+            if not self.reached_goal[i]:                
+                # If goal is reached, stop the robot
+                if check_goal_reached(x, self.ref, i, distance=1):
+                    # u[:, i] = np.zeros(2)
+                    x[3, i] = 0
+                    self.reached_goal[i] = True
+                else:
+                    x, u, self.predicted_trajectory = self.mpc_control(i, x, u, self.bounds, self.constraints, self.ref, self.predicted_trajectory, self.seed_cost)
+            
+            # If we want the robot to disappear when it reaches the goal, indent one more time
+            if all(self.reached_goal):
+                break_flag = True
+
+            if show_animation:
+                plot_robot_seed(x, u, self.predicted_trajectory, self.ref, i)
+        return x, u, break_flag
+    
     def mpc_control(self, i, x, u, bounds, constraints, ref, predicted_trajectory, cost_function):
         x1 = x[:, i]
         u1 = u[:,i]
@@ -490,6 +510,24 @@ class ModelPredictiveControl:
             self.y_obs.append(next_robot_state[0:-1:5, 1])
         self.x_obs = [item for sublist in self.x_obs for item in sublist]
         self.y_obs = [item for sublist in self.y_obs for item in sublist]
+
+def check_goal_reached(x, targets, i, distance=0.5):
+    """
+    Check if the robot has reached the goal.
+
+    Parameters:
+    x (numpy.ndarray): Robot's current position.
+    targets (list): List of target positions.
+    i (int): Index of the current target.
+
+    Returns:
+    bool: True if the robot has reached the goal, False otherwise.
+    """
+    dist_to_goal = math.hypot(x[0, i] - targets[i][0], x[1, i] - targets[i][1])
+    if dist_to_goal <= distance:
+        print("Goal!!")
+        return True
+    return False
 
 def get_switch_back_course(dl):
     ax = [0.0, 30.0, 6.0, 20.0, 35.0]
@@ -668,38 +706,6 @@ def plot_robot_seed(x, u, predicted_trajectory, targets, i):
     plot_robot(x[0, i], x[1, i], x[2, i], i)
     plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
     plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
-
-# class MPC_algorithm():
-#     def __init__(self, cx, cy, ref, mpc, bounds, constraints, predicted_trajectory):
-#         self.cx = cx
-#         self.cy = cy
-#         self.ref = ref
-#         self.mpc = mpc
-#         self.bounds = bounds
-#         self.constraints = constraints
-#         self.predicted_trajectory = predicted_trajectory
-   
-#     def run_mpc(self, x, u):
-#         for i in range(robot_num):
-#             start_time = time.time()
-#             if dist([x[0, i], x[1, i]], point2=self.ref[i]) < 5:
-#                 self.cx[i].pop(0)
-#                 self.cy[i].pop(0)
-#                 if not self.cx[i]:
-#                     print("Path complete")
-#                     return
-#                 self.ref[i][0] = self.cx[i][0]
-#                 self.ref[i][1] = self.cy[i][0]
-
-#             # cx, cy, ref = update_paths(i, x, cx, cy, cyaw, target_ind, ref, dl)
-#             x, u, self.predicted_trajectory = mpc_control(i, x, u, self.mpc, self.bounds, self.constraints, self.ref, self.predicted_trajectory, self.mpc.seed_cost)
-            
-#             if debug:
-#                 print('Robot ' + str(i+1) + ' of ' + str(robot_num) + '   Time ' + str(round(time.time() - start_time,5)))
-
-#             plot_robot_seed(x, u, self.predicted_trajectory, self.ref, i) 
-        
-#         return x, u
 
 def main():
     """

@@ -113,7 +113,7 @@ def C3BF(x, u_ref):
             v = np.array([x[3,i]*np.cos(x[2,i]), x[3,i]*np.sin(x[2,i])])
             scalar_prod = v @ arr
 
-            if j == i or dist > 6 * safety_radius or scalar_prod < 0: 
+            if j == i or dist > 2 * safety_radius or scalar_prod < 0: 
                 continue
 
             v_rel = np.array([x[3,j]*np.cos(x[2,j]) - x[3,i]*np.cos(x[2,i]), 
@@ -417,11 +417,30 @@ def control_robot(x, targets):
 
     return dxu
 
+def check_goal_reached(x, targets, i, distance=0.5):
+    """
+    Check if the robot has reached the goal.
+
+    Parameters:
+    x (numpy.ndarray): Robot's current position.
+    targets (list): List of target positions.
+    i (int): Index of the current target.
+
+    Returns:
+    bool: True if the robot has reached the goal, False otherwise.
+    """
+    dist_to_goal = math.hypot(x[0, i] - targets[i][0], x[1, i] - targets[i][1])
+    if dist_to_goal <= distance:
+        print("Goal!!")
+        return True
+    return False
+
 class C3BF_algorithm():
     def __init__(self, targets, paths):
         self.targets = targets
         self.paths = paths
-        
+        self.reached_goal = [False]*robot_num
+
     def run_3cbf(self, x):
         
         for i in range(robot_num):
@@ -443,6 +462,30 @@ class C3BF_algorithm():
             plt.plot(self.targets[i][0], self.targets[i][1], "x"+color_dict[i])
         
         return x, dxu
+    
+    def go_to_goal(self, x, break_flag):
+        
+        dxu = control_robot(x, self.targets)
+        for i in range(robot_num):
+            # Step 9: Check if the distance between the current position and the target is less than 5
+            if not self.reached_goal[i]:                
+                # If goal is reached, stop the robot
+                if check_goal_reached(x, self.targets, i, distance=2):
+                    self.reached_goal[i] = True
+                else:
+                    x[:, i] = motion(x[:, i], dxu[:, i], dt)
+                    
+            # If we want the robot to disappear when it reaches the goal, indent one more time
+            if all(self.reached_goal):
+                break_flag = True
+
+            plot_robot(x[0, i], x[1, i], x[2, i], i)
+            plot_arrow(x[0, i], x[1, i], x[2, i] + dxu[1, i], length=3, width=0.5)
+            plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
+            plt.plot(self.targets[i][0], self.targets[i][1], "x"+color_dict[i])
+            # print(f"Speed of robot {i}: {x[3, i]}")
+        
+        return x, dxu, break_flag
 
 def main(args=None):
     """
