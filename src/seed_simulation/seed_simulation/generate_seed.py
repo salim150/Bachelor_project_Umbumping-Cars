@@ -40,9 +40,8 @@ boundary_points = np.array([-width_init/2, width_init/2, -height_init/2, height_
 
 # write a main function that generates a path for robot_num robots using the function create_path and saves the the generated trajectories to a dictionary.
 # The dictionary is then saved to a file using the function save_dict_to_file
-def save_dict_to_file(dict):
+def save_dict_to_file(dict, filename= 'src/seed_'):
     # save the dictionary to a file
-    filename = 'src/seed_'
     i = 0
     while os.path.exists(f"{filename}{i}.json"):
         i += 1
@@ -74,5 +73,38 @@ def main():
     seed['trajectories'] = trajectories
     save_dict_to_file(seed)
 
+def main2():
+    # generate a path for robot_num robots
+    # save the generated trajectories to a dictionary
+    # save the dictionary to a file
+    # create a dictionary to save the generated trajectories
+    initial_position = {}
+    x0, y, yaw, v, omega, model_type = circular_samples(width_init, height_init, min_dist, robot_num, safety_init)
+    
+    plt.plot(x0, y, 'ro')
+    for i in range(len(x0)):
+        plot_arrow(x0[i], y[i], yaw[i], length=2.5, width=1.0)
+    plt.show()
+    initial_position['x'] = x0
+    initial_position['y'] = y
+    initial_position['yaw'] = yaw
+    initial_position['v'] = v
+
+    trajectories = {}
+    possibles_indexes = np.arange(0, len(x0)).tolist()
+    for i in range(robot_num):
+        path = []
+        # generate a path for each robot
+        idx = random.choice([ele for ele in possibles_indexes if ele != i])
+        path.append([x0[idx], y[idx]])
+        trajectories[i] = path
+        possibles_indexes.remove(idx)
+    # save the dictionary to a file
+        
+    seed = {}
+    seed['initial_position'] = initial_position
+    seed['trajectories'] = trajectories
+    save_dict_to_file(seed, filename='src/circular_seed_')
+
 if __name__ == "__main__":
-    main()
+    main2()

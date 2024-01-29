@@ -457,14 +457,16 @@ def lbp_sim(seed):
 
 def main():
     # Load the seed from a file
-    with open('/home/giacomo/thesis_ws/src/seed_1.json', 'r') as file:
+    # filename = '/home/giacomo/thesis_ws/src/seed_1.json'
+    filename = '/home/giacomo/thesis_ws/src/circular_seed_0.json'
+    with open(filename, 'r') as file:
         seed = json.load(file)
 
-    dwa_trajectory = dwa_sim(seed)   
-    mpc_trajectory = mpc_sim(seed)
+    # dwa_trajectory = dwa_sim(seed)   
+    # mpc_trajectory = mpc_sim(seed)
     c3bf_trajectory = c3bf_sim(seed)
-    cbf_trajectory = cbf_sim(seed)
-    lbp_trajectory = lbp_sim(seed)
+    # cbf_trajectory = cbf_sim(seed)
+    # lbp_trajectory = lbp_sim(seed)
 
 if __name__ == '__main__':
     main()

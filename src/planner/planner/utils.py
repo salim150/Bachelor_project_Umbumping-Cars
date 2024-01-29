@@ -361,6 +361,42 @@ def samplegrid(width_init, height_init, min_dist, robot_num, safety_init):
     model_type = robot_num * ['linear']
     return x.tolist(), y.tolist(), yaw, v, omega, model_type
 
+def circular_samples(width_init, height_init, min_dist, robot_num, safety_init):
+    """
+    Generate random grid coordinates for robots in a given map.
+
+    Args:
+        width_init (float): Initial width of the map.
+        height_init (float): Initial height of the map.
+        min_dist (float): Minimum distance between robots.
+        robot_num (int): Number of robots.
+        safety_init (float): Safety border around the map boundaries.
+
+    Returns:
+        tuple: A tuple containing the x-coordinates, y-coordinates, yaw angles,
+               velocities, angular velocities, and model types for the robots.
+    """
+    # defining the boundaries
+    safety = safety_init # safety border around the map boundaries
+    width = width_init - safety
+    height = height_init - safety
+
+    radius = np.sqrt(width**2 + height**2)/2
+
+    # create robot_num points on a circle and save the angles as yaw
+    x = []
+    y = []
+    yaw = []
+    for i in range(robot_num):
+        x.append(radius*np.cos(2*np.pi*i/robot_num))
+        y.append(radius*np.sin(2*np.pi*i/robot_num))
+        yaw.append(2*np.pi*i/robot_num+np.pi)
+
+    v = robot_num * [0.0]
+    omega = robot_num * [0.0]
+    model_type = robot_num * ['linear']
+    return x, y, yaw, v, omega, model_type
+
 def dist(point1, point2):
     """
     Calculates the Euclidean distance between two points.
