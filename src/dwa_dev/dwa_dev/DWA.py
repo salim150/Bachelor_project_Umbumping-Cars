@@ -48,6 +48,7 @@ safety_init = json_object["safety"]
 width_init = json_object["width"]
 height_init = json_object["height"]
 min_dist = json_object["min_dist"]
+update_dist = 2
 # N=3
 
 robot_num = json_object["robot_num"]
@@ -459,12 +460,12 @@ def plot_robot_trajectory(x, u, predicted_trajectory, dilated_traj, targets, ax,
     plt.plot(predicted_trajectory[i][:, 0], predicted_trajectory[i][:, 1], "-"+color_dict[i])
     plot_polygon(dilated_traj[i], ax=ax, add_points=False, alpha=0.5, color=color_dict[i])
     # plt.plot(x[0, i], x[1, i], "xr")
-    plt.plot(targets[i][0], targets[i][1], "x"+color_dict[i])
+    plt.plot(targets[i][0], targets[i][1], "x"+color_dict[i], markersize=15)
     plot_robot(x[0, i], x[1, i], x[2, i], i)
     plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
     plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
 
-def check_goal_reached(x, targets, i):
+def check_goal_reached(x, targets, i, distance=0.5):
     """
     Check if the robot has reached the goal.
 
@@ -477,7 +478,7 @@ def check_goal_reached(x, targets, i):
     bool: True if the robot has reached the goal, False otherwise.
     """
     dist_to_goal = math.hypot(x[0, i] - targets[i][0], x[1, i] - targets[i][1])
-    if dist_to_goal <= 0.5:
+    if dist_to_goal <= distance:
         print("Goal!!")
         return True
     return False
@@ -497,6 +498,7 @@ class DWA_algorithm():
         self.dilated_traj = dilated_traj
         self.predicted_trajectory = predicted_trajectory
         self.ax = ax
+        self.reached_goal = [False]*robot_num
 
 
     def run_dwa(self, x, u, break_flag):
@@ -514,6 +516,26 @@ class DWA_algorithm():
 
 
             if check_goal_reached(x, self.targets, i):
+                break_flag = True
+
+            if show_animation:
+                plot_robot_trajectory(x, u, self.predicted_trajectory, self.dilated_traj, self.targets, self.ax, i)
+        return x, u, break_flag
+    
+    def go_to_goal(self, x, u, break_flag):
+        for i in range(robot_num):
+            # Step 9: Check if the distance between the current position and the target is less than 5
+            if not self.reached_goal[i]:                
+                # If goal is reached, stop the robot
+                if check_goal_reached(x, self.targets, i, distance=1):
+                    u[:, i] = np.zeros(2)
+                    x[3, i] = 0
+                    self.reached_goal[i] = True
+                else:
+                    x, u, self.predicted_trajectory = update_robot_state(x, u, dt, self.targets, self.dilated_traj, self.predicted_trajectory, i)
+
+            # If we want the robot to disappear when it reaches the goal, indent one more time
+            if all(self.reached_goal):
                 break_flag = True
 
             if show_animation:
