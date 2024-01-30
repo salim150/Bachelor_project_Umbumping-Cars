@@ -9,6 +9,7 @@ from custom_message.msg import Coordinate
 from shapely.geometry import Point, LineString
 from shapely import distance
 from shapely.plotting import plot_polygon
+import time
 
 path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
 # Opening JSON file
@@ -390,6 +391,7 @@ class DWA_algorithm():
         self.predicted_trajectory = predicted_trajectory
         self.ax = ax
         self.reached_goal = [False]*robot_num
+        self.computational_time = []
 
     def run_dwa(self, x, u, break_flag):
         for i in range(robot_num):
@@ -402,7 +404,9 @@ class DWA_algorithm():
                     return
                 self.targets[i] = (self.paths[i][0].x, self.paths[i][0].y)
 
+            t_prev = time.time()
             x, u, self.predicted_trajectory = self.update_robot_state(x, u, dt, self.targets, self.dilated_traj, self.predicted_trajectory, i)
+            self.computational_time.append(time.time()-t_prev)
 
             if check_goal_reached(x, self.targets, i):
                 break_flag = True
@@ -421,8 +425,11 @@ class DWA_algorithm():
                     x[3, i] = 0
                     self.reached_goal[i] = True
                 else:
+                    # If goal is not reached, update the robot's state
+                    time_prev = time.time()
                     x, u, self.predicted_trajectory = self.update_robot_state(x, u, dt, self.targets, self.dilated_traj, self.predicted_trajectory, i)
-            
+                    self.computational_time.append(time.time()-time_prev)
+                    
             # print(f"Speed of robot {i}: {x[3, i]}")
             
             # If we want the robot to disappear when it reaches the goal, indent one more time

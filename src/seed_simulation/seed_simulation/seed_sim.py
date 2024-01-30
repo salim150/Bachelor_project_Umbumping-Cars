@@ -121,7 +121,7 @@ def dwa_sim(seed):
         plt.pause(0.0001)
         plt.show()
 
-    return trajectory 
+    return trajectory, dwa.computational_time 
 
 def mpc_sim(seed):
     """
@@ -462,7 +462,8 @@ def main():
     with open(filename, 'r') as file:
         seed = json.load(file)
 
-    dwa_trajectory = dwa_sim(seed)   
+    dwa_trajectory, dwa_computational_time = dwa_sim(seed)   
+    print(f"DWA average computational time: {sum(dwa_computational_time) / len(dwa_computational_time)}")
     mpc_trajectory = mpc_sim(seed)
     c3bf_trajectory = c3bf_sim(seed)
     cbf_trajectory = cbf_sim(seed)
