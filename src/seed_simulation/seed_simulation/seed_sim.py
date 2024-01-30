@@ -158,8 +158,8 @@ def mpc_sim(seed):
     num_inputs = 2
     u = np.zeros([mpc.horizon*num_inputs, robot_num])
 
-    trajectory = np.zeros((x.shape[0]+u.shape[0], robot_num, 1))
-    trajectory[:, :, 0] = np.concatenate((x,u))
+    trajectory = np.zeros((x.shape[0] + num_inputs, robot_num, 1))
+    trajectory[:, :, 0] = np.concatenate((x,u[:2]))
 
     # Generate reference trajectory
     traj = seed['trajectories']
@@ -203,7 +203,7 @@ def mpc_sim(seed):
 
         # x, u = mpc.run_mpc(x, u)
         x, u, break_flag = mpc.go_to_goal(x, u, break_flag)
-        trajectory = np.dstack([trajectory, np.concatenate((x,u))])
+        trajectory = np.dstack([trajectory, np.concatenate((x,u[:2]))])
 
         plt.title('MPC 2D')
         utils.plot_map(width=width_init, height=height_init)
