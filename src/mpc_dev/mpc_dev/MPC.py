@@ -127,6 +127,7 @@ class ModelPredictiveControl:
         self.constraints = constraints
         self.predicted_trajectory = predicted_trajectory
         self.reached_goal = [False]*robot_num
+        self.computational_time = []
 
     def plant_model(self, prev_state, dt, pedal, steering):
         """
@@ -419,8 +420,10 @@ class ModelPredictiveControl:
                 self.ref[i][1] = self.cy[i][0]
 
             # cx, cy, ref = update_paths(i, x, cx, cy, cyaw, target_ind, ref, dl)
+            t_prev = time.time()
             x, u, self.predicted_trajectory = self.mpc_control(i, x, u, self.bounds, self.constraints, self.ref, self.predicted_trajectory, self.seed_cost)
-            
+            self.computational_time.append(time.time() - t_prev)
+
             if debug:
                 print('Robot ' + str(i+1) + ' of ' + str(robot_num) + '   Time ' + str(round(time.time() - start_time,5)))
 
@@ -437,8 +440,10 @@ class ModelPredictiveControl:
                     x[3, i] = 0
                     self.reached_goal[i] = True
                 else:
+                    t_prev = time.time()
                     x, u, self.predicted_trajectory = self.mpc_control(i, x, u, self.bounds, self.constraints, self.ref, self.predicted_trajectory, self.seed_cost)
-            
+                    self.computational_time.append(time.time() - t_prev)
+                    
             # If we want the robot to disappear when it reaches the goal, indent one more time
             if all(self.reached_goal):
                 break_flag = True

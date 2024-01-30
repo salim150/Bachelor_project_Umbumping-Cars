@@ -504,13 +504,16 @@ class LBP_algorithm():
         self.ax = ax
         self.u_hist = u_hist
         self.reached_goal = [False]*robot_num
+        self.computational_time = []
 
     def run_lbp(self, x, u, break_flag):
         for i in range(robot_num):
             
             self.paths, self.targets = update_targets(self.paths, self.targets, x, i)
 
+            t_prev = time.time()
             x, u, self.predicted_trajectory, self.u_hist = update_robot_state(x, u, dt, self.targets, self.dilated_traj, self.u_hist, self.predicted_trajectory, i)
+            self.computational_time.append(time.time()-t_prev)
 
             if check_goal_reached(x, self.targets, i):
                 break_flag = True
@@ -529,7 +532,9 @@ class LBP_algorithm():
                     x[3, i] = 0
                     self.reached_goal[i] = True
                 else:
+                    t_prev = time.time()
                     x, u, self.predicted_trajectory, self.u_hist = update_robot_state(x, u, dt, self.targets, self.dilated_traj, self.u_hist, self.predicted_trajectory, i)
+                    self.computational_time.append(time.time()-t_prev)
 
             # If we want the robot to disappear when it reaches the goal, indent one more time
             if all(self.reached_goal):

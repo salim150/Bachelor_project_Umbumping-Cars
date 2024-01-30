@@ -440,6 +440,7 @@ class C3BF_algorithm():
         self.targets = targets
         self.paths = paths
         self.reached_goal = [False]*robot_num
+        self.computational_time = []
 
     def run_3cbf(self, x):
         
@@ -452,8 +453,11 @@ class C3BF_algorithm():
                     print("Path complete")
                     return
                 self.targets[i] = (self.paths[i][0].x, self.paths[i][0].y)
-
+        
+        t_prev = time.time()
         dxu = control_robot(x, self.targets)
+        self.computational_time.append((time.time() - t_prev)/robot_num)
+
         for i in range(robot_num):
             x[:, i] = motion(x[:, i], dxu[:, i], dt)
             plot_robot(x[0, i], x[1, i], x[2, i], i)
@@ -465,7 +469,10 @@ class C3BF_algorithm():
     
     def go_to_goal(self, x, break_flag):
         
+        t_prev = time.time()
         dxu = control_robot(x, self.targets)
+        self.computational_time.append((time.time() - t_prev)/robot_num)
+
         for i in range(robot_num):
             # Step 9: Check if the distance between the current position and the target is less than 5
             if not self.reached_goal[i]:                

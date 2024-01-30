@@ -221,7 +221,7 @@ def mpc_sim(seed):
         plt.pause(0.0001)
         plt.show()
 
-    return trajectory
+    return trajectory, mpc.computational_time
 
 def c3bf_sim(seed):
     """
@@ -296,7 +296,7 @@ def c3bf_sim(seed):
         plt.pause(0.0001)
         plt.show()
 
-    return trajectory
+    return trajectory, c3bf.computational_time
 
 def cbf_sim(seed):
     """
@@ -371,7 +371,7 @@ def cbf_sim(seed):
         plt.pause(0.0001)
         plt.show()
 
-    return trajectory
+    return trajectory, cbf.computational_time
 
 def lbp_sim(seed):
     dt = json_object["LBP"]["dt"] # [s] Time tick for motion prediction
@@ -453,7 +453,7 @@ def lbp_sim(seed):
         plt.pause(0.0001)
         plt.show()
     
-    return trajectory
+    return trajectory, lbp.computational_time
 
 def main():
     # Load the seed from a file
@@ -463,11 +463,19 @@ def main():
         seed = json.load(file)
 
     dwa_trajectory, dwa_computational_time = dwa_sim(seed)   
-    print(f"DWA average computational time: {sum(dwa_computational_time) / len(dwa_computational_time)}")
-    mpc_trajectory = mpc_sim(seed)
-    c3bf_trajectory = c3bf_sim(seed)
-    cbf_trajectory = cbf_sim(seed)
-    lbp_trajectory = lbp_sim(seed)
+    print(f"DWA average computational time: {sum(dwa_computational_time) / len(dwa_computational_time)}\n")
+
+    mpc_trajectory, mpc_computational_time = mpc_sim(seed)
+    print(f"MPC average computational time: {sum(mpc_computational_time) / len(mpc_computational_time)}\n")
+
+    c3bf_trajectory, c3bf_computational_time = c3bf_sim(seed)
+    print(f"C3BF average computational time: {sum(c3bf_computational_time) / len(c3bf_computational_time)}\n")
+
+    cbf_trajectory, cbf_computational_time = cbf_sim(seed)
+    print(f"CBF average computational time: {sum(cbf_computational_time) / len(cbf_computational_time)}\n")
+    
+    lbp_trajectory, lbp_computational_time = lbp_sim(seed)
+    print(f"LBP average computational time: {sum(lbp_computational_time) / len(lbp_computational_time)}\n")
 
 if __name__ == '__main__':
     main()
