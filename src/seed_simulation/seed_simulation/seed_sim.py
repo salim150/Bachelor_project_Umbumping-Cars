@@ -92,7 +92,7 @@ def dwa_sim(seed):
     ax = fig.add_subplot(111)
     
     # Step 7: Create an instance of the DWA_algorithm class
-    dwa = DWA.DWA_algorithm(initial_state, paths, safety_init, width_init, height_init,
+    dwa = DWA.DWA_algorithm(paths, safety_init, width_init, height_init,
                         min_dist, paths, targets, dilated_traj, predicted_trajectory, ax)
     
     for z in range(iterations):
@@ -462,11 +462,11 @@ def main():
     with open(filename, 'r') as file:
         seed = json.load(file)
 
-    # dwa_trajectory = dwa_sim(seed)   
-    # mpc_trajectory = mpc_sim(seed)
+    dwa_trajectory = dwa_sim(seed)   
+    mpc_trajectory = mpc_sim(seed)
     c3bf_trajectory = c3bf_sim(seed)
-    # cbf_trajectory = cbf_sim(seed)
-    # lbp_trajectory = lbp_sim(seed)
+    cbf_trajectory = cbf_sim(seed)
+    lbp_trajectory = lbp_sim(seed)
 
 if __name__ == '__main__':
     main()
