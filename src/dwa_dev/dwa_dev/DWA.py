@@ -233,7 +233,7 @@ def calc_control_and_trajectory(x, dw, goal, ob, u_buf, trajectory_buf):
                 min_cost = final_cost
                 best_u = [a, delta]
                 best_trajectory = trajectory
-                u_history = [delta]*len(trajectory)
+                u_history = [[a, delta] for _ in range(len(trajectory-1))]
                 if abs(best_u[0]) < robot_stuck_flag_cons \
                         and abs(x[2]) < robot_stuck_flag_cons:
                     # to ensure the robot do not get stuck in
@@ -257,7 +257,7 @@ def calc_control_and_trajectory(x, dw, goal, ob, u_buf, trajectory_buf):
 
         if min_cost >= final_cost:
             min_cost = final_cost
-            best_u = [0, u_buf[1]]
+            best_u = u_buf[0]
             best_trajectory = trajectory_buf
             u_history = u_buf
     return best_u, best_trajectory, u_history
@@ -309,15 +309,15 @@ def calc_to_goal_cost(trajectory, goal):
     Returns:
         float: Cost to the goal.
     """
-    dx = goal[0] - trajectory[-1, 0]
-    dy = goal[1] - trajectory[-1, 1]
+    # dx = goal[0] - trajectory[-1, 0]
+    # dy = goal[1] - trajectory[-1, 1]
 
-    # either using the angle difference or the distance --> if we want to use the angle difference, we need to normalize the angle before taking the difference
-    # error_angle = math.atan2(dy, dx)
-    # cost_angle = error_angle - trajectory[-1, 2]
-    # cost = abs(math.atan2(math.sin(cost_angle), math.cos(cost_angle)))
+    # cost = math.hypot(dx, dy)
 
-    cost = math.hypot(dx, dy)
+    dx = goal[0] - trajectory[:, 0]
+    dy = goal[1] - trajectory[:, 1]
+
+    cost = min(np.sqrt(dx**2+dy**2))
     return cost
 
 def calc_to_goal_heading_cost(trajectory, goal):
@@ -782,7 +782,7 @@ def main_seed():
     for i in range(robot_num):
         dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
     
-    u_hist = dict.fromkeys(range(robot_num),[0]*int(predict_time/dt))
+    u_hist = dict.fromkeys(range(robot_num),[[0,0] for _ in range(int(predict_time/dt))])
     fig = plt.figure(1, dpi=90)
     ax = fig.add_subplot(111)
     
