@@ -27,7 +27,7 @@ height_init = json_object["height"]
 min_dist = json_object["min_dist"]
 robot_num = json_object["robot_num"]
 show_animation = True
-go_to_goal_bool = True
+go_to_goal_bool = False
 iterations = 1000
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
@@ -201,8 +201,10 @@ def mpc_sim(seed):
         plt.gcf().canvas.mpl_connect('key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
 
-        # x, u = mpc.run_mpc(x, u)
-        x, u, break_flag = mpc.go_to_goal(x, u, break_flag)
+        if go_to_goal_bool:
+            x, u, break_flag = mpc.go_to_goal(x, u, break_flag)
+        else:
+            x, u = mpc.run_mpc(x, u)
         trajectory = np.dstack([trajectory, np.concatenate((x,u[:2]))])
 
         plt.title('MPC 2D')
@@ -278,7 +280,7 @@ def c3bf_sim(seed):
         if go_to_goal_bool:
             x, u, break_flag = c3bf.go_to_goal(x, break_flag)
         else:
-            x, u = c3bf.run_3cbf(x)
+            x, u, break_flag = c3bf.run_3cbf(x, break_flag)
         trajectory = np.dstack([trajectory, np.concatenate((x,u))])
         
         C3BF.plot_map(width=width_init, height=height_init)
@@ -353,7 +355,7 @@ def cbf_sim(seed):
         if go_to_goal_bool:
             x, u, break_flag = cbf.go_to_goal(x, break_flag)
         else:
-            x, u = cbf.run_cbf(x) 
+            x, u, break_flag = cbf.run_cbf(x, break_flag) 
         trajectory = np.dstack([trajectory, np.concatenate((x,u))])
         
         CBF.plot_map(width=width_init, height=height_init)
@@ -457,8 +459,8 @@ def lbp_sim(seed):
 
 def main():
     # Load the seed from a file
-    # filename = '/home/giacomo/thesis_ws/src/seed_1.json'
-    filename = '/home/giacomo/thesis_ws/src/circular_seed_0.json'
+    filename = '/home/giacomo/thesis_ws/src/seed_1.json'
+    # filename = '/home/giacomo/thesis_ws/src/circular_seed_0.json'
     with open(filename, 'r') as file:
         seed = json.load(file)
 

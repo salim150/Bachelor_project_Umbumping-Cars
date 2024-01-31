@@ -442,8 +442,11 @@ class C3BF_algorithm():
         self.reached_goal = [False]*robot_num
         self.computational_time = []
 
-    def run_3cbf(self, x):
-        
+    def run_3cbf(self, x, break_flag):
+        t_prev = time.time()
+        dxu = control_robot(x, self.targets)
+        self.computational_time.append((time.time() - t_prev)/robot_num)
+
         for i in range(robot_num):
             # Step 9: Check if the distance between the current position and the target is less than 5
             if dist(point1=(x[0,i], x[1,i]), point2=self.targets[i]) < 5:
@@ -451,21 +454,17 @@ class C3BF_algorithm():
                 self.paths[i].pop(0)
                 if not self.paths[i]:
                     print("Path complete")
-                    return
+                    break_flag = True
+                    return x, dxu, break_flag
                 self.targets[i] = (self.paths[i][0].x, self.paths[i][0].y)
-        
-        t_prev = time.time()
-        dxu = control_robot(x, self.targets)
-        self.computational_time.append((time.time() - t_prev)/robot_num)
 
-        for i in range(robot_num):
             x[:, i] = motion(x[:, i], dxu[:, i], dt)
             plot_robot(x[0, i], x[1, i], x[2, i], i)
             plot_arrow(x[0, i], x[1, i], x[2, i] + dxu[1, i], length=3, width=0.5)
             plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(self.targets[i][0], self.targets[i][1], "x"+color_dict[i])
         
-        return x, dxu
+        return x, dxu, break_flag
     
     def go_to_goal(self, x, break_flag):
         
@@ -715,6 +714,7 @@ def main_seed(args=None):
     """
     # Step 1: Set the number of iterations
     iterations = 3000
+    break_flag = False
     
     # Step 2: Sample initial values for x0, y, yaw, v, omega, and model_type
     initial_state = data['initial_position']
@@ -741,13 +741,16 @@ def main_seed(args=None):
             'key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
         
-        x, dxu = c3bf.run_3cbf(x) 
+        x, dxu, break_flag = c3bf.run_3cbf(x, break_flag) 
         
         plot_map(width=width_init, height=height_init)
         plt.axis("equal")
         plt.grid(True)
         plt.pause(0.0001)
-    
+
+        if break_flag:
+            break
+        
 if __name__=='__main__':
     main_seed()
     # main()
