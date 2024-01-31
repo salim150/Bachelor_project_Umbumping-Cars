@@ -233,7 +233,7 @@ def generate_lookup_table():
     plt.show()
 
     # saving the complete trajectories to a csv file
-    with open('src/lattice_planning/LBP.json', 'w') as file:
+    with open('src/lbp_dev/lbp_dev/LBP.json', 'w') as file:
         json.dump(temp, file, indent=4)
 
     print("\nThe JSON data has been written to 'data.json'")

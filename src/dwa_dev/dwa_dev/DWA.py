@@ -401,7 +401,7 @@ class DWA_algorithm():
                 self.paths[i].pop(0)
                 if not self.paths[i]:
                     print("Path complete")
-                    return
+                    return x, u, True
                 self.targets[i] = (self.paths[i][0].x, self.paths[i][0].y)
 
             t_prev = time.time()
