@@ -68,114 +68,19 @@ def onclick(event):
     global ix, iy
     ix, iy = event.xdata, event.ydata
 
-    # print 'x = %d, y = %d'%(
-    #     ix, iy)
-
     # assign global variable to access outside of function
     global coords
     coords.pop(0)
     coords.append((ix, iy))
     print(coords[-1])
 
-    # Disconnect after 2 clicks
-    # if len(coords) == 10:
-    #     fig.canvas.mpl_disconnect(cid)
-    #     plt.close()
     return
 
 coords = [(0,0)]
-global break_flag
-break_flag = False
 fig = plt.figure(1, dpi=90, figsize=(10,10))
-
 ax = fig.add_subplot(111)
+
 cid = fig.canvas.mpl_connect('button_press_event', onclick)
-
-# line, = ax.plot([], [], 'o-', lw=2)
-# trace, = ax.plot([], [], '.-', lw=1, ms=2)
-# time_template = 'time = %.1fs'
-# time_text = ax.text(0.05, 0.9, '', transform=ax.transAxes)
-
-"""def animate(i, *fargs):
-    global x, u, trajectory
-    x = fargs[0]
-    u = fargs[1]
-    lbp = fargs[2]
-    break_flag = fargs[3]
-    trajectory = fargs[4]
-    plt.cla()
-    plt.xlim(-width_init, width_init)
-    plt.ylim(-height_init, height_init)
-    plt.plot(coords[-1][0], coords[-1][1], 'k', marker='o', markersize=20)
-    plt.gcf().canvas.mpl_connect('key_release_event', lambda event: [exit(0) if event.key == 'escape' else None])
-    
-    x, u, break_flag = lbp.go_to_goal(x, u, break_flag)
-
-    trajectory = np.dstack([trajectory, x])
-
-    utils.plot_map(width=width_init, height=height_init)
-    plt.axis("equal")
-    plt.grid(True)
-
-    if break_flag:
-        return x, u, trajectory
-
-
-def main_seed():   
-    print(__file__ + " start!!")
-    iterations = 3000
-
-    # Step 2: Sample initial values for x0, y, yaw, v, omega, and model_type
-    initial_state = seed['initial_position']
-    x0 = initial_state['x']
-    y = initial_state['y']
-    yaw = initial_state['yaw']
-    v = initial_state['v']
-
-    # Step 3: Create an array x with the initial values
-    x = np.array([x0, y, yaw, v])
-    u = np.zeros((2, robot_num))
-
-    trajectory = np.zeros((x.shape[0], robot_num, 1))
-    trajectory[:, :, 0] = x
-
-    predicted_trajectory = dict.fromkeys(range(robot_num),np.zeros([int(predict_time/dt), 3]))
-    for i in range(robot_num):
-        predicted_trajectory[i] = np.full((int(predict_time/dt), 3), x[0:3,i])
-
-    # Step 4: Create paths for each robot
-    traj = seed['trajectories']
-    paths = [[Coordinate(x=traj[str(idx)][i][0], y=traj[str(idx)][i][1]) for i in range(len(traj[str(idx)]))] for idx in range(robot_num)]
-
-    # Step 5: Extract the target coordinates from the paths
-    targets = [[path[0].x, path[0].y] for path in paths]
-
-    # Step 6: Create dilated trajectories for each robot
-    dilated_traj = []
-    for i in range(robot_num):
-        dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
-
-    u_hist = dict.fromkeys(range(robot_num),[0]*int(predict_time/dt))
-    
-    lbp = LBP_algorithm(x, predicted_trajectory, robot_num, safety_init, 
-                        width_init, height_init, min_dist, paths, targets, dilated_traj,
-                        predicted_trajectory, ax, u_hist)
-    
-    print(f'Trajectory: {trajectory}')
-    ani = FuncAnimation(
-        fig, animate, 1000, interval=dt*1000, blit=False, fargs=[x, u, lbp, break_flag, trajectory])
-    plt.show()
-
-    print(f'\nANI: {ani}')
-    print(f'\nTrajectory: {trajectory}')
-
-    print("Done")
-    if show_animation:
-        for i in range(robot_num):
-            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-r")
-        plt.pause(0.0001)
-        plt.show()
-"""
 
 def main_seed():
     """
@@ -217,6 +122,9 @@ def main_seed():
 
     # Step 6: Create dilated trajectories for each robot
     dilated_traj = []
+
+    global coords
+    coords = [(10,10)]
     for i in range(robot_num):
         dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
 
