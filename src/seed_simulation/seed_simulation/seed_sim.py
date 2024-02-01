@@ -437,6 +437,7 @@ def lbp_sim(seed):
         if go_to_goal_bool:
             x, u, break_flag = lbp.go_to_goal(x, u, break_flag)
         else:
+            # add noise: gaussians zero mean different variances ~50cm for position and ~5deg for orientation
             x, u, break_flag = lbp.run_lbp(x, u, break_flag)
         trajectory = np.dstack([trajectory, np.concatenate((x,u))])
 
@@ -459,8 +460,8 @@ def lbp_sim(seed):
 
 def main():
     # Load the seed from a file
-    filename = '/home/giacomo/thesis_ws/src/seed_1.json'
-    # filename = '/home/giacomo/thesis_ws/src/circular_seed_0.json'
+    # filename = '/home/giacomo/thesis_ws/src/seed_1.json'
+    filename = '/home/giacomo/thesis_ws/src/circular_seed_0.json'
     with open(filename, 'r') as file:
         seed = json.load(file)
 
