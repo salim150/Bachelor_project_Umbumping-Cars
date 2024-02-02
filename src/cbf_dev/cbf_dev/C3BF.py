@@ -37,6 +37,7 @@ height_init = json_object["height"]
 min_dist = json_object["min_dist"]
 boundary_points = np.array([-width_init/2, width_init/2, -height_init/2, height_init/2])
 check_collision_bool = False
+add_noise = True
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
 
@@ -113,7 +114,7 @@ def C3BF(i, x, u_ref):
         v = np.array([x[3,i]*np.cos(x[2,i]), x[3,i]*np.sin(x[2,i])])
         scalar_prod = v @ arr
 
-        if j == i or dist > 2 * safety_radius or scalar_prod < 0: 
+        if j == i or dist > 3 * safety_radius or scalar_prod < 0: 
             continue
 
         v_rel = np.array([x[3,j]*np.cos(x[2,j]) - x[3,i]*np.cos(x[2,i]), 
@@ -143,39 +144,6 @@ def C3BF(i, x, u_ref):
         H[count] = np.array([barrier_gain*np.power(h, 1) + Lf_h])
         G[count,:] = -Lg_h
         count+=1
-
-    # Adding arena boundary constraints TODO check the calculation/propagation of Kv in the lie derivatives
-    # Pos Y
-    # h = 0.1*(boundary_points[3] - safety_radius - x[1,i] - Kv * x[3,i])**3
-    # gradH = np.array([0,-1, 0, -Kv])
-    # Lf_h = np.dot(gradH.T, f)
-    # Lg_h = np.dot(gradH.T, g)
-    # G = np.vstack([G, -Lg_h])
-    # H = np.vstack([H, np.array([h + Lf_h])])
-
-    # # Neg Y
-    # h = 0.1*(-boundary_points[2] - safety_radius + x[1,i] - Kv * x[3,i])**3
-    # gradH = np.array([0,1, x[3,i]*np.cos(x[2,i]), np.sin(x[2,i])])
-    # Lf_h = np.dot(gradH.T, f)
-    # Lg_h = np.dot(gradH.T, g)
-    # G = np.vstack([G, -Lg_h])
-    # H = np.vstack([H, np.array([h + Lf_h])])
-
-    # # Pos X
-    # h = 0.1*(boundary_points[1] - safety_radius - x[0,i] - Kv * x[3,i])**3
-    # gradH = np.array([-1,0, x[3,i]*np.sin(x[2,i]), -np.cos(x[2,i])])
-    # Lf_h = np.dot(gradH.T, f)
-    # Lg_h = np.dot(gradH.T, g)
-    # G = np.vstack([G, -Lg_h])
-    # H = np.vstack([H, np.array([h + Lf_h])])
-
-    # # Neg X
-    # h = 0.1*(-boundary_points[0] - safety_radius + x[0,i] - Kv * x[3,i])**3
-    # gradH = np.array([1,0, -x[3,i]*np.sin(x[2,i]), np.cos(x[2,i])])
-    # Lf_h = np.dot(gradH.T, f)
-    # Lg_h = np.dot(gradH.T, g)
-    # G = np.vstack([G, -Lg_h])
-    # H = np.vstack([H, np.array([h + Lf_h])])
 
     # Adding arena boundary constraints
     # Pos Y
@@ -229,7 +197,6 @@ def C3BF(i, x, u_ref):
     # H = np.vstack([H, max_acc, -min_acc])
 
     solvers.options['show_progress'] = False
-    # TODO: add try except block
     try:
         sol = solvers.qp(matrix(P), matrix(q), matrix(G), matrix(H))
         dxu[:,i] = np.reshape(np.array(sol['x']), (M,))
@@ -447,7 +414,14 @@ class C3BF_algorithm():
     def run_3cbf(self, x, break_flag):
         for i in range(robot_num):
             t_prev = time.time()
-            dxu = control_robot(i, x, self.targets)
+
+            if add_noise: 
+                noise = np.concatenate([np.random.normal(0, 0.3, 2).reshape(2, 1), np.random.normal(0, np.radians(5), 1).reshape(1,1), np.zeros((1,1))], axis=0)
+                noisy_pos = x + noise
+                dxu = control_robot(i, noisy_pos, self.targets)
+            else:
+                dxu = control_robot(i, x, self.targets)
+
             self.computational_time.append((time.time() - t_prev))
             # Step 9: Check if the distance between the current position and the target is less than 5
             if dist(point1=(x[0,i], x[1,i]), point2=self.targets[i]) < 5:
@@ -460,10 +434,11 @@ class C3BF_algorithm():
                 self.targets[i] = (self.paths[i][0].x, self.paths[i][0].y)
 
             x[:, i] = motion(x[:, i], dxu[:, i], dt)
+            plt.plot(noisy_pos[0,i], noisy_pos[1,i], "x"+color_dict[i], markersize=10)
             plot_robot(x[0, i], x[1, i], x[2, i], i)
             plot_arrow(x[0, i], x[1, i], x[2, i] + dxu[1, i], length=3, width=0.5)
             plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
-            plt.plot(self.targets[i][0], self.targets[i][1], "x"+color_dict[i])
+            plt.plot(self.targets[i][0], self.targets[i][1], "x" + color_dict[i])
         
         return x, dxu, break_flag
     
@@ -543,7 +518,6 @@ def main(args=None):
             # Step 9: Check if the distance between the current position and the target is less than 5
             if dist(point1=(x[0,i], x[1,i]), point2=targets[i]) < 5:
                 # Perform some action when the condition is met
-                pass
                 paths[i] = update_path(paths[i])
                 targets[i] = (paths[i][0].x, paths[i][0].y)
 

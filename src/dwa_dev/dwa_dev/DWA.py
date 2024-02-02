@@ -57,6 +57,7 @@ timer_freq = json_object["timer_freq"]
 
 show_animation = True
 check_collision_bool = False
+add_noise = True
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
 
@@ -134,7 +135,7 @@ def find_nearest(array, value):
     idx = (np.abs(array - value)).argmin()
     return array[idx]
 
-def calc_dynamic_window(x):
+def calc_dynamic_window():
     """
     Calculate the dynamic window based on the current state.
 
@@ -461,7 +462,13 @@ class DWA_algorithm():
         """
         x1 = x[:, i]
         ob = [dilated_traj[idx] for idx in range(len(dilated_traj)) if idx != i]
-        u1, predicted_trajectory1 = self.dwa_control(x1, targets[i], ob)
+        if add_noise:
+            noise = np.concatenate([np.random.normal(0, 0.1, 2).reshape(1, 2), np.random.normal(0, np.radians(5), 1).reshape(1,1), np.zeros((1,1))], axis=1)
+            noisy_pos = x1 + noise[0]
+            u1, predicted_trajectory1 = self.dwa_control(noisy_pos, targets[i], ob)
+            plt.plot(noisy_pos[0], noisy_pos[1], "x"+color_dict[i], markersize=10)
+        else:
+            u1, predicted_trajectory1 = self.dwa_control(x1, targets[i], ob)
         dilated_traj[i] = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1])).buffer(dilation_factor, cap_style=3)
 
         # Collision check
@@ -487,7 +494,7 @@ class DWA_algorithm():
         Returns:
             tuple: Tuple containing the control inputs (throttle, delta) and the trajectory.
         """
-        dw = calc_dynamic_window(x)
+        dw = calc_dynamic_window()
         u, trajectory = self.calc_control_and_trajectory(x, dw, goal, ob)
         return u, trajectory
     

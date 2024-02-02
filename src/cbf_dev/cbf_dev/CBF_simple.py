@@ -36,6 +36,7 @@ width = json_object["width"]
 height = json_object["height"]
 boundary_points = np.array([-width/2, width/2, -height/2, height/2])
 check_collision_bool = False
+add_noise = True
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
 
@@ -176,8 +177,12 @@ def CBF(i, x, u_ref):
     H = np.vstack([H, np.array([arena_gain*h**3 + Lf_h])])
     
     solvers.options['show_progress'] = False
-    sol = solvers.qp(matrix(P), matrix(q), matrix(G), matrix(H))
-    dxu[:,i] = np.reshape(np.array(sol['x']), (M,))
+    try:
+        sol = solvers.qp(matrix(P), matrix(q), matrix(G), matrix(H))
+        dxu[:,i] = np.reshape(np.array(sol['x']), (M,))
+    except:
+        print("QP solver failed")
+        dxu[:,i] = u_ref[:,i]
     
     dxu[1,i] = beta_to_delta(dxu[1,i])
     return dxu
@@ -388,7 +393,12 @@ class CBF_algorithm():
     def run_cbf(self, x, break_flag):
         for i in range(robot_num):
             t_prev = time.time()
-            dxu = control_robot(i, x, self.targets)
+            if add_noise:
+                noise = np.concatenate([np.random.normal(0, 0.3, 2).reshape(2, 1), np.random.normal(0, np.radians(5), 1).reshape(1,1), np.zeros((1,1))], axis=0)
+                noisy_pos = x + noise
+                dxu = control_robot(i, noisy_pos, self.targets)
+            else:
+                dxu = control_robot(i, x, self.targets)
             self.computational_time.append((time.time() - t_prev))
             # Step 9: Check if the distance between the current position and the target is less than 5
             if dist(point1=(x[0,i], x[1,i]), point2=self.targets[i]) < 5:
@@ -401,6 +411,7 @@ class CBF_algorithm():
                 self.targets[i] = (self.paths[i][0].x, self.paths[i][0].y)
 
             x[:, i] = motion(x[:, i], dxu[:, i], dt)
+            plt.plot(noisy_pos[0,i], noisy_pos[1,i], "x"+color_dict[i], markersize=10)
             plot_robot(x[0, i], x[1, i], x[2, i], i)
             plot_arrow(x[0, i], x[1, i], x[2, i] + dxu[1, i], length=3, width=0.5)
             plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
@@ -624,6 +635,6 @@ def main_seed(args=None):
             break
 
 if __name__=='__main__':
-    # main_seed()
-    main1()
+    main_seed()
+    # main1()
         
