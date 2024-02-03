@@ -407,15 +407,16 @@ class ModelPredictiveControl:
 
         return np.array(distance)
     
-    def run_mpc(self, x, u):
+    def run_mpc(self, x, u, break_flag):
         for i in range(robot_num):
             start_time = time.time()
-            if dist([x[0, i], x[1, i]], point2=self.ref[i]) < 5:
+            if dist([x[0, i], x[1, i]], point2=self.ref[i]) < 2:
                 self.cx[i].pop(0)
                 self.cy[i].pop(0)
                 if not self.cx[i]:
                     print("Path complete")
-                    return
+                    return x, u, True
+                
                 self.ref[i][0] = self.cx[i][0]
                 self.ref[i][1] = self.cy[i][0]
 
@@ -429,7 +430,7 @@ class ModelPredictiveControl:
 
             plot_robot_seed(x, u, self.predicted_trajectory, self.ref, i) 
         
-        return x, u
+        return x, u, break_flag
     
     def go_to_goal(self, x, u, break_flag):
         for i in range(robot_num):
@@ -1143,7 +1144,7 @@ def main_seed():
         plt.gcf().canvas.mpl_connect('key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
 
-        x, u = mpc.run_mpc(x, u)
+        x, u, break_flag = mpc.run_mpc(x, u, break_flag)
         trajectory = np.dstack([trajectory, x])
 
         plt.title('MPC 2D')
@@ -1151,6 +1152,16 @@ def main_seed():
         plt.axis("equal")
         plt.grid(True)
         plt.pause(0.0001)
+
+        if break_flag:
+            break
+
+    print("Done")
+    if show_animation:
+        for i in range(robot_num):
+            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-r")
+        plt.pause(0.0001)
+        plt.show()
 
 if __name__ == '__main__':
     main_seed()
