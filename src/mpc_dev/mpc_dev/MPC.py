@@ -459,14 +459,13 @@ class ModelPredictiveControl:
         u1 = np.delete(u1,0)
         u1 = np.delete(u1,0)
         u1 = np.append(u1, u1[-2])
-        u1 = np.append(u1, u1[-2])
-
-        self.update_obstacles(i, x1, x, predicted_trajectory)        
+        u1 = np.append(u1, u1[-2])  
 
         if add_noise:
             noise = np.concatenate([np.random.normal(0, 0.2, 2).reshape(1, 2), np.random.normal(0, np.radians(5), 1).reshape(1,1), np.zeros((1,1))], axis=1)
             noisy_pos = x1 + noise[0]
             plt.plot(noisy_pos[0], noisy_pos[1], "x" + color_dict[i], markersize=10)
+            self.update_obstacles(i, noisy_pos, x, predicted_trajectory) 
             self.initial_state = noisy_pos
             u_solution = minimize(cost_function, u1, (noisy_pos, ref[i]),
                             method='SLSQP',
@@ -474,6 +473,7 @@ class ModelPredictiveControl:
                             constraints=constraints,
                             tol = 1e-1)
         else:
+            self.update_obstacles(i, x1, x, predicted_trajectory) 
             self.initial_state = x1
             u_solution = minimize(cost_function, u1, (x1, ref[i]),
                             method='SLSQP',
@@ -526,6 +526,7 @@ class ModelPredictiveControl:
                 continue
             if check_collision_bool:
                 if dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < 1:
+                    # if dist([x1[0], x1[1]], [predicted_trajectory[idx][0,0], predicted_trajectory[idx][0,1]]) < 1:
                     raise Exception('Collision')
             
             next_robot_state = predicted_trajectory[idx]
