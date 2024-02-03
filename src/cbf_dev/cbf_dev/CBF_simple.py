@@ -176,8 +176,13 @@ def CBF(i, x, u_ref):
     H = np.vstack([H, np.array([arena_gain*h**3 + Lf_h])])
     
     solvers.options['show_progress'] = False
-    sol = solvers.qp(matrix(P), matrix(q), matrix(G), matrix(H))
-    dxu[:,i] = np.reshape(np.array(sol['x']), (M,))
+    # TODO: add try except block
+    try:
+        sol = solvers.qp(matrix(P), matrix(q), matrix(G), matrix(H))
+        dxu[:,i] = np.reshape(np.array(sol['x']), (M,))
+    except:
+        print("QP solver failed")
+        dxu[:,i] = u_ref[:,i]
     
     dxu[1,i] = beta_to_delta(dxu[1,i])
     return dxu
@@ -391,7 +396,7 @@ class CBF_algorithm():
             dxu = control_robot(i, x, self.targets)
             self.computational_time.append((time.time() - t_prev))
             # Step 9: Check if the distance between the current position and the target is less than 5
-            if dist(point1=(x[0,i], x[1,i]), point2=self.targets[i]) < 5:
+            if dist(point1=(x[0,i], x[1,i]), point2=self.targets[i]) < 2:
                 # Perform some action when the condition is met
                 self.paths[i].pop(0)
                 if not self.paths[i]:

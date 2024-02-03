@@ -9,9 +9,11 @@ from custom_message.msg import Coordinate
 from shapely.geometry import Point
 import planner.utils as utils
 
-from lbp_dev.LBP import *
-from dwa_dev.DWA import *
-from mpc_dev.MPC import *
+from lbp_dev import LBP as LBP
+from dwa_dev import DWA as DWA
+from mpc_dev import MPC as MPC
+from cbf_dev import C3BF as C3BF
+from cbf_dev import CBF_simple as CBF
 
 # for debugging
 from numpy import cos, sin
@@ -79,7 +81,7 @@ def onclick(event):
 
 coords = [(0,0)]
 
-def main_lbp():
+def main_lbp(seed):
     """
     This function runs the main loop for the LBP algorithm.
     It initializes the necessary variables, updates the robot state, and plots the robot trajectory.
@@ -134,7 +136,7 @@ def main_lbp():
     # fig = plt.figure(1, dpi=90)
     # ax = fig.add_subplot(111)
     
-    lbp = LBP_algorithm(x, predicted_trajectory, robot_num, safety_init, 
+    lbp = LBP.LBP_algorithm(x, predicted_trajectory, robot_num, safety_init, 
                         width_init, height_init, min_dist, paths, targets, dilated_traj,
                         predicted_trajectory, ax, u_hist)
     
@@ -163,14 +165,14 @@ def main_lbp():
     print("Done")
     if show_animation:
         for i in range(robot_num):
-            plot_robot(x[0, i], x[1, i], x[2, i], i)
-            plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
-            plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
+            LBP.plot_robot(x[0, i], x[1, i], x[2, i], i)
+            LBP.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
+            LBP.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
         plt.pause(0.0001)
         plt.show()
 
-def main_dwa():
+def main_dwa(seed):
     """
     Main function that controls the execution of the program.
 
@@ -230,7 +232,7 @@ def main_dwa():
         dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
     
     # Step 7: Create an instance of the DWA_algorithm class
-    dwa = DWA_algorithm(paths, safety_init, width_init, height_init,
+    dwa = DWA.DWA_algorithm(paths, safety_init, width_init, height_init,
                         min_dist, paths, targets, dilated_traj, predicted_trajectory, ax)
     
     for z in range(iterations):
@@ -253,14 +255,14 @@ def main_dwa():
     print("Done")
     if show_animation:
         for i in range(robot_num):
-            plot_robot(x[0, i], x[1, i], x[2, i], i)
-            plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
-            plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
+            DWA.plot_robot(x[0, i], x[1, i], x[2, i], i)
+            DWA.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
+            DWA.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
         plt.pause(0.0001)
         plt.show()
 
-def main_mpc():
+def main_mpc(seed):
     """
     Main function for controlling multiple robots using Model Predictive Control (MPC).
 
@@ -294,7 +296,7 @@ def main_mpc():
     dl = 3
     
     # MPC initialization
-    mpc = ModelPredictiveControl([], [])
+    mpc = MPC.ModelPredictiveControl([], [])
     
     initial_state = seed['initial_position']
     x0 = initial_state['x']
@@ -325,7 +327,7 @@ def main_mpc():
         ref.append([cx[i][0], cy[i][0]])
 
     # Usage:
-    bounds, constraints = set_bounds_and_constraints(mpc)
+    bounds, constraints = MPC.set_bounds_and_constraints(mpc)
     
     predicted_trajectory = dict.fromkeys(range(robot_num),np.zeros([mpc.horizon, x.shape[0]]))
     for i in range(robot_num):
@@ -363,14 +365,185 @@ def main_mpc():
     print("Done")
     if show_animation:
         for i in range(robot_num):
-            plot_robot(x[0, i], x[1, i], x[2, i], i)
-            plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
-            plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
+            MPC.plot_robot(x[0, i], x[1, i], x[2, i], i)
+            MPC.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
+            MPC.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
+            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
+        plt.pause(0.0001)
+        plt.show()
+
+def main_c3bf(seed):
+    """
+    Main function for controlling multiple robots using Model Predictive Control (MPC).
+
+    Steps:
+    1. Initialize the necessary variables and parameters.
+    2. Create an instance of the ModelPredictiveControl class.
+    3. Set the initial state and control inputs.
+    4. Generate the reference trajectory for each robot.
+    5. Plot the initial positions and reference trajectory.
+    6. Set the bounds and constraints for the MPC.
+    7. Initialize the predicted trajectory for each robot.
+    8. Enter the main control loop:
+        - Check if the distance between the current position and the target is less than 5.
+            - If yes, update the path and target.
+        - Perform 3CBF control for each robot.
+        - Plot the robot trajectory.
+        - Update the predicted trajectory.
+        - Plot the map and pause for visualization.
+    """
+    print("3CBF start!!")
+    iterations = 3000
+    break_flag = False
+    global coords
+    coords = [(0,0)]
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
+    ax = fig.add_subplot(111)
+
+    cid = fig.canvas.mpl_connect('button_press_event', onclick)
+
+    # Step 2: Sample initial values for x0, y, yaw, v, omega, and model_type
+    initial_state = seed['initial_position']
+    x0 = initial_state['x']
+    y = initial_state['y']
+    yaw = initial_state['yaw']
+    v = initial_state['v']
+
+    # Step 3: Create an array x with the initial values
+    x = np.array([x0, y, yaw, v])
+    u = np.zeros((2, robot_num))
+
+    trajectory = np.zeros((x.shape[0]+u.shape[0], robot_num, 1))
+    trajectory[:, :, 0] = np.concatenate((x,u))
+    
+    # Step 4: Create paths for each robot
+    traj = seed['trajectories']
+    paths = [[Coordinate(x=traj[str(idx)][i][0], y=traj[str(idx)][i][1]) for i in range(len(traj[str(idx)]))] for idx in range(robot_num)]
+
+    # Step 5: Extract the target coordinates from the paths
+    targets = [[path[0].x, path[0].y] for path in paths]
+
+    c3bf = C3BF.C3BF_algorithm(targets, paths)
+    # Step 8: Perform the simulation for the specified number of iterations
+    for z in range(iterations):
+        plt.cla()
+        plt.gcf().canvas.mpl_connect(
+            'key_release_event',
+            lambda event: [exit(0) if event.key == 'escape' else None])
+        
+        x, u, break_flag = c3bf.run_3cbf(x, break_flag)
+        trajectory = np.dstack([trajectory, np.concatenate((x,u))])
+        c3bf.targets[0] = (coords[-1][0], coords[-1][1])
+
+        plt.plot(coords[-1][0], coords[-1][1], 'k', marker='o', markersize=20)
+        C3BF.plot_map(width=width_init, height=height_init)
+        plt.axis("equal")
+        plt.grid(True)
+        plt.pause(0.0001)
+
+        if break_flag:
+            break
+
+    print("Done")
+    if show_animation:
+        for i in range(robot_num):
+            C3BF.plot_robot(x[0, i], x[1, i], x[2, i], i)
+            C3BF.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
+            C3BF.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
+            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
+        plt.pause(0.0001)
+        plt.show()
+
+def main_cbf(seed):
+    """
+    Main function for controlling multiple robots using Model Predictive Control (MPC).
+
+    Steps:
+    1. Initialize the necessary variables and parameters.
+    2. Create an instance of the ModelPredictiveControl class.
+    3. Set the initial state and control inputs.
+    4. Generate the reference trajectory for each robot.
+    5. Plot the initial positions and reference trajectory.
+    6. Set the bounds and constraints for the MPC.
+    7. Initialize the predicted trajectory for each robot.
+    8. Enter the main control loop:
+        - Check if the distance between the current position and the target is less than 5.
+            - If yes, update the path and target.
+        - Perform 3CBF control for each robot.
+        - Plot the robot trajectory.
+        - Update the predicted trajectory.
+        - Plot the map and pause for visualization.
+    """
+    print("3CBF start!!")
+    iterations = 3000
+    break_flag = False
+    global coords
+    coords = [(0,0)]
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
+    ax = fig.add_subplot(111)
+
+    cid = fig.canvas.mpl_connect('button_press_event', onclick)
+
+    # Step 2: Sample initial values for x0, y, yaw, v, omega, and model_type
+    initial_state = seed['initial_position']
+    x0 = initial_state['x']
+    y = initial_state['y']
+    yaw = initial_state['yaw']
+    v = initial_state['v']
+
+    # Step 3: Create an array x with the initial values
+    x = np.array([x0, y, yaw, v])
+    u = np.zeros((2, robot_num))
+
+    trajectory = np.zeros((x.shape[0]+u.shape[0], robot_num, 1))
+    trajectory[:, :, 0] = np.concatenate((x,u))
+    
+    # Step 4: Create paths for each robot
+    traj = seed['trajectories']
+    paths = [[Coordinate(x=traj[str(idx)][i][0], y=traj[str(idx)][i][1]) for i in range(len(traj[str(idx)]))] for idx in range(robot_num)]
+
+    # Step 5: Extract the target coordinates from the paths
+    targets = [[path[0].x, path[0].y] for path in paths]
+
+    cbf = CBF.CBF_algorithm(targets, paths)
+    # Step 8: Perform the simulation for the specified number of iterations
+    for z in range(iterations):
+        plt.cla()
+        plt.gcf().canvas.mpl_connect(
+            'key_release_event',
+            lambda event: [exit(0) if event.key == 'escape' else None])
+        
+        x, u, break_flag = cbf.run_cbf(x, break_flag)
+        trajectory = np.dstack([trajectory, np.concatenate((x,u))])
+        cbf.targets[0] = (coords[-1][0], coords[-1][1])
+
+        plt.plot(coords[-1][0], coords[-1][1], 'k', marker='o', markersize=20)
+        CBF.plot_map(width=width_init, height=height_init)
+        plt.axis("equal")
+        plt.grid(True)
+        plt.pause(0.0001)
+
+        if break_flag:
+            break
+
+    print("Done")
+    if show_animation:
+        for i in range(robot_num):
+            CBF.plot_robot(x[0, i], x[1, i], x[2, i], i)
+            CBF.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
+            CBF.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
         plt.pause(0.0001)
         plt.show()
 
 if __name__ == '__main__':
-    main_lbp()
-    main_dwa()
-    main_mpc()
+     # Load the seed from a file
+    filename = '/home/giacomo/thesis_ws/src/seed_1.json'
+    # filename = '/home/giacomo/thesis_ws/src/circular_seed_0.json'
+    with open(filename, 'r') as file:
+        seed = json.load(file)
+    # main_lbp(seed)
+    # main_dwa(seed)
+    # main_mpc(seed)
+    # main_c3bf(seed)
+    main_cbf(seed)  
