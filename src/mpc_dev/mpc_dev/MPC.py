@@ -119,7 +119,7 @@ class ModelPredictiveControl:
         self.y_obs = obs_y
 
         self.initial_state = None
-        self.safety_radius = 1.5
+        self.safety_radius = 2
 
         self.cx = cx
         self.cy = cy
@@ -464,7 +464,7 @@ class ModelPredictiveControl:
         self.update_obstacles(i, x1, x, predicted_trajectory)        
 
         if add_noise:
-            noise = np.concatenate([np.random.normal(0, 0.21, 2).reshape(1, 2), np.random.normal(0, np.radians(5), 1).reshape(1,1), np.zeros((1,1))], axis=1)
+            noise = np.concatenate([np.random.normal(0, 0.2, 2).reshape(1, 2), np.random.normal(0, np.radians(5), 1).reshape(1,1), np.zeros((1,1))], axis=1)
             noisy_pos = x1 + noise[0]
             plt.plot(noisy_pos[0], noisy_pos[1], "x" + color_dict[i], markersize=10)
             self.initial_state = noisy_pos
@@ -485,11 +485,19 @@ class ModelPredictiveControl:
         x1 = self.plant_model(x1, dt, u1[0], u1[1])
         x[:, i] = x1
         u[:, i] = u1
-        predicted_state = np.array([x1])
+        
+        if add_noise:
+            predicted_state = np.array([noisy_pos])
 
-        for j in range(1, self.horizon):
-            predicted = self.plant_model(predicted_state[-1], self.dt, u1[2*j], u1[2*j+1])
-            predicted_state = np.append(predicted_state, np.array([predicted]), axis=0)
+            for j in range(1, self.horizon):
+                predicted = self.plant_model(predicted_state[-1], self.dt, u1[2*j], u1[2*j+1])
+                predicted_state = np.append(predicted_state, np.array([predicted]), axis=0)
+        else:
+            predicted_state = np.array([x1])
+
+            for j in range(1, self.horizon):
+                predicted = self.plant_model(predicted_state[-1], self.dt, u1[2*j], u1[2*j+1])
+                predicted_state = np.append(predicted_state, np.array([predicted]), axis=0)
         predicted_trajectory[i] = predicted_state
 
         return x, u, predicted_trajectory
