@@ -59,6 +59,7 @@ timer_freq = json_object["timer_freq"]
 show_animation = True
 debug = False
 check_collision_bool = False
+add_noise = True 
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
 
@@ -462,15 +463,24 @@ class ModelPredictiveControl:
 
         self.update_obstacles(i, x1, x, predicted_trajectory)        
 
-        self.initial_state = x1
-
-        # MPC control
-        u_solution = minimize(cost_function, u1, (x1, ref[i]),
+        if add_noise:
+            noise = np.concatenate([np.random.normal(0, 0.21, 2).reshape(1, 2), np.random.normal(0, np.radians(5), 1).reshape(1,1), np.zeros((1,1))], axis=1)
+            noisy_pos = x1 + noise[0]
+            plt.plot(noisy_pos[0], noisy_pos[1], "x" + color_dict[i], markersize=10)
+            self.initial_state = noisy_pos
+            u_solution = minimize(cost_function, u1, (noisy_pos, ref[i]),
                             method='SLSQP',
                             bounds=bounds,
                             constraints=constraints,
                             tol = 1e-1)
-        
+        else:
+            self.initial_state = x1
+            u_solution = minimize(cost_function, u1, (x1, ref[i]),
+                            method='SLSQP',
+                            bounds=bounds,
+                            constraints=constraints,
+                            tol = 1e-1)
+               
         u1 = u_solution.x
         x1 = self.plant_model(x1, dt, u1[0], u1[1])
         x[:, i] = x1

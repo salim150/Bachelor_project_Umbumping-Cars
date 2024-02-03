@@ -463,7 +463,7 @@ class DWA_algorithm():
         x1 = x[:, i]
         ob = [dilated_traj[idx] for idx in range(len(dilated_traj)) if idx != i]
         if add_noise:
-            noise = np.concatenate([np.random.normal(0, 0.1, 2).reshape(1, 2), np.random.normal(0, np.radians(5), 1).reshape(1,1), np.zeros((1,1))], axis=1)
+            noise = np.concatenate([np.random.normal(0, 0.21, 2).reshape(1, 2), np.random.normal(0, np.radians(5), 1).reshape(1,1), np.zeros((1,1))], axis=1)
             noisy_pos = x1 + noise[0]
             u1, predicted_trajectory1 = self.dwa_control(noisy_pos, targets[i], ob)
             plt.plot(noisy_pos[0], noisy_pos[1], "x"+color_dict[i], markersize=10)

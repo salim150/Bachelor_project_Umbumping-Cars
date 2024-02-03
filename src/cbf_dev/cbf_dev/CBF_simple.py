@@ -397,6 +397,7 @@ class CBF_algorithm():
                 noise = np.concatenate([np.random.normal(0, 0.3, 2).reshape(2, 1), np.random.normal(0, np.radians(5), 1).reshape(1,1), np.zeros((1,1))], axis=0)
                 noisy_pos = x + noise
                 dxu = control_robot(i, noisy_pos, self.targets)
+                plt.plot(noisy_pos[0,i], noisy_pos[1,i], "x"+color_dict[i], markersize=10)
             else:
                 dxu = control_robot(i, x, self.targets)
             self.computational_time.append((time.time() - t_prev))
@@ -411,7 +412,6 @@ class CBF_algorithm():
                 self.targets[i] = (self.paths[i][0].x, self.paths[i][0].y)
 
             x[:, i] = motion(x[:, i], dxu[:, i], dt)
-            plt.plot(noisy_pos[0,i], noisy_pos[1,i], "x"+color_dict[i], markersize=10)
             plot_robot(x[0, i], x[1, i], x[2, i], i)
             plot_arrow(x[0, i], x[1, i], x[2, i] + dxu[1, i], length=3, width=0.5)
             plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
