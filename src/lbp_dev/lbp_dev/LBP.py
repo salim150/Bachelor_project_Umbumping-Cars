@@ -57,6 +57,7 @@ N=3
 
 show_animation = True
 check_collision_bool = False
+add_noise = True
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
 
 
@@ -435,10 +436,16 @@ def update_robot_state(x, u, dt, targets, dilated_traj, u_hist, predicted_trajec
     """
     x1 = x[:, i]
     ob = [dilated_traj[idx] for idx in range(len(dilated_traj)) if idx != i]
-    u1, predicted_trajectory1, u_history = lbp_control(x1, targets[i], ob, u_hist[i], predicted_trajectory[i])
+    if add_noise:
+        noise = np.concatenate([np.random.normal(0, 0.21, 2).reshape(1, 2), np.random.normal(0, np.radians(5), 1).reshape(1,1), np.zeros((1,1))], axis=1)
+        noisy_pos = x1 + noise[0]
+        u1, predicted_trajectory1, u_history = lbp_control(noisy_pos, targets[i], ob, u_hist[i], predicted_trajectory[i])
+        plt.plot(noisy_pos[0], noisy_pos[1], "x"+color_dict[i], markersize=10)
+    else:
+        u1, predicted_trajectory1, u_history = lbp_control(x1, targets[i], ob, u_hist[i], predicted_trajectory[i])
     dilated_traj[i] = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1])).buffer(dilation_factor, cap_style=3)
-    
-    # Collision check
+   
+   # Collision check
     if check_collision_bool:
         if any([utils.dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < WB for idx in range(robot_num) if idx != i]): raise Exception('Collision')
     
