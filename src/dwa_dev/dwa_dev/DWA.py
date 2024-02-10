@@ -57,7 +57,7 @@ timer_freq = json_object["timer_freq"]
 
 show_animation = True
 check_collision_bool = False
-add_noise = True
+add_noise = False
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
 
@@ -221,15 +221,15 @@ def calc_to_goal_cost(trajectory, goal):
     Returns:
         float: Cost to the goal.
     """
-    dx = goal[0] - trajectory[-1, 0]
-    dy = goal[1] - trajectory[-1, 1]
+    # dx = goal[0] - trajectory[-1, 0]
+    # dy = goal[1] - trajectory[-1, 1]
 
-    # either using the angle difference or the distance --> if we want to use the angle difference, we need to normalize the angle before taking the difference
-    # error_angle = math.atan2(dy, dx)
-    # cost_angle = error_angle - trajectory[-1, 2]
-    # cost = abs(math.atan2(math.sin(cost_angle), math.cos(cost_angle)))
+    # cost = math.hypot(dx, dy)
 
-    cost = math.hypot(dx, dy)
+    dx = goal[0] - trajectory[:, 0]
+    dy = goal[1] - trajectory[:, 1]
+
+    cost = min(np.sqrt(dx**2+dy**2))
     return cost
 
 def calc_to_goal_heading_cost(trajectory, goal):
@@ -379,8 +379,9 @@ def check_goal_reached(x, targets, i, distance=0.5):
     return False
 
 class DWA_algorithm():
-    def __init__(self, trajectories, safety, width, height, min_dist,
-                paths, targets, dilated_traj, predicted_trajectory, ax):
+    def __init__(self, initial_state, trajectories, safety, width, height, min_dist,
+                paths, targets, dilated_traj, predicted_trajectory, ax, u_hist):
+        self.initial_state = initial_state
         self.trajectories = trajectories
         self.safety = safety
         self.width = width
@@ -391,6 +392,7 @@ class DWA_algorithm():
         self.dilated_traj = dilated_traj
         self.predicted_trajectory = predicted_trajectory
         self.ax = ax
+        self.u_hist = u_hist
         self.reached_goal = [False]*robot_num
         self.computational_time = []
 
@@ -407,7 +409,7 @@ class DWA_algorithm():
                 self.targets[i] = (self.paths[i][0].x, self.paths[i][0].y)
 
             t_prev = time.time()
-            x, u, self.predicted_trajectory = self.update_robot_state(x, u, dt, self.targets, self.dilated_traj, self.predicted_trajectory, i)
+            x, u, self.predicted_trajectory, self.u_hist = self.update_robot_state(x, u, dt, self.targets, self.dilated_traj, self.u_hist, self.predicted_trajectory, i)
             self.computational_time.append(time.time()-t_prev)
 
             if check_goal_reached(x, self.targets, i):
@@ -483,7 +485,50 @@ class DWA_algorithm():
 
         return x, u, predicted_trajectory
     
-    def dwa_control(self, x, goal, ob):
+    def update_robot_state(self, x, u, dt, targets, dilated_traj, u_hist, predicted_trajectory, i):
+        """
+        Update the state of a robot based on its current state, control input, and environment information.
+
+        Args:
+            x (numpy.ndarray): Current state of the robot.
+            u (numpy.ndarray): Control input for the robot.
+            dt (float): Time step.
+            targets (list): List of target positions for each robot.
+            dilated_traj (list): List of dilated trajectories for each robot.
+            predicted_trajectory (list): List of predicted trajectories for each robot.
+            i (int): Index of the robot.
+
+        Returns:
+            tuple: Updated state, control input, and predicted trajectory.
+
+        Raises:
+            Exception: If a collision is detected.
+
+        """
+        x1 = x[:, i]
+        ob = [dilated_traj[idx] for idx in range(len(dilated_traj)) if idx != i]
+        if add_noise:
+            noise = np.concatenate([np.random.normal(0, 0.21, 2).reshape(1, 2), np.random.normal(0, np.radians(5), 1).reshape(1,1), np.zeros((1,1))], axis=1)
+            noisy_pos = x1 + noise[0]
+            u1, predicted_trajectory1, u_history = self.dwa_control(noisy_pos, targets[i], ob, u_hist[i], predicted_trajectory[i])
+            plt.plot(noisy_pos[0], noisy_pos[1], "x"+color_dict[i], markersize=10)
+        else:
+            u1, predicted_trajectory1, u_history = self.dwa_control(x1, targets[i], ob, u_hist[i], predicted_trajectory[i])
+        dilated_traj[i] = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1])).buffer(dilation_factor, cap_style=3)
+
+        # Collision check
+        if check_collision_bool:
+            if any([utils.dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < WB for idx in range(robot_num) if idx != i]): raise Exception('Collision')
+        
+        x1 = motion(x1, u1, dt)
+        x[:, i] = x1
+        u[:, i] = u1
+        predicted_trajectory[i] = predicted_trajectory1
+        u_hist[i] = u_history
+        
+        return x, u, predicted_trajectory, u_hist
+    
+    def dwa_control(self, x, goal, ob, u_buf, trajectory_buf):
         """
         Dynamic Window Approach control.
 
@@ -496,10 +541,10 @@ class DWA_algorithm():
             tuple: Tuple containing the control inputs (throttle, delta) and the trajectory.
         """
         dw = calc_dynamic_window()
-        u, trajectory = self.calc_control_and_trajectory(x, dw, goal, ob)
-        return u, trajectory
+        u, trajectory, u_history = self.calc_control_and_trajectory(x, dw, goal, ob, u_buf, trajectory_buf)
+        return u, trajectory, u_history
     
-    def calc_control_and_trajectory(self, x, dw, goal, ob):
+    def calc_control_and_trajectory(self, x, dw, goal, ob, u_buf, trajectory_buf):
         """
         Calculate the final input with the dynamic window.
 
@@ -544,6 +589,7 @@ class DWA_algorithm():
                     min_cost = final_cost
                     best_u = [a, delta]
                     best_trajectory = trajectory
+                    u_history = [[a, delta] for _ in range(len(trajectory-1))]
                     if abs(best_u[0]) < robot_stuck_flag_cons \
                             and abs(x[2]) < robot_stuck_flag_cons:
                         # to ensure the robot do not get stuck in
@@ -551,8 +597,26 @@ class DWA_algorithm():
                         # best omega=0 rad/s (heading to the goal with
                         # angle difference of 0)
                         best_u[1] = -max_steer
+                        best_trajectory = trajectory
+                        u_history = [delta]*len(trajectory)
         # print(time.time()-old_time)
-        return best_u, best_trajectory
+                        
+        u_buf.pop(0)
+        if len(u_buf) >= 2:
+            trajectory_buf = trajectory_buf[1:]
+
+            to_goal_cost = to_goal_cost_gain * calc_to_goal_cost(trajectory_buf, goal)
+            # speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
+            ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory_buf, ob)
+            heading_cost = heading_cost_gain * calc_to_goal_heading_cost(trajectory_buf, goal)
+            final_cost = to_goal_cost + ob_cost + heading_cost #+ speed_cost 
+
+            if min_cost >= final_cost:
+                min_cost = final_cost
+                best_u = u_buf[0]
+                best_trajectory = trajectory_buf
+                u_history = u_buf
+        return best_u, best_trajectory, u_history
 
 def main():
     """
@@ -781,12 +845,13 @@ def main_seed():
     for i in range(robot_num):
         dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
     
+    u_hist = dict.fromkeys(range(robot_num),[[0,0] for _ in range(int(predict_time/dt))])
     fig = plt.figure(1, dpi=90)
     ax = fig.add_subplot(111)
     
     # Step 7: Create an instance of the DWA_algorithm class
-    dwa = DWA_algorithm(paths, safety_init, width_init, height_init,
-                        min_dist, paths, targets, dilated_traj, predicted_trajectory, ax)
+    dwa = DWA_algorithm(initial_state, paths, safety_init, width_init, height_init,
+                        min_dist, paths, targets, dilated_traj, predicted_trajectory, ax, u_hist)
     
     for z in range(iterations):
         plt.cla()
