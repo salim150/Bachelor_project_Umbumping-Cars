@@ -37,7 +37,7 @@ height_init = json_object["height"]
 min_dist = json_object["min_dist"]
 boundary_points = np.array([-width_init/2, width_init/2, -height_init/2, height_init/2])
 check_collision_bool = False
-add_noise = False
+add_noise = True
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
 

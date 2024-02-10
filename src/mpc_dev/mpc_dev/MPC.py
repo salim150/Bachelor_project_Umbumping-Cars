@@ -462,7 +462,7 @@ class ModelPredictiveControl:
         u1 = np.append(u1, u1[-2])  
 
         if add_noise:
-            noise = np.concatenate([np.random.normal(0, 0.2, 2).reshape(1, 2), np.random.normal(0, np.radians(5), 1).reshape(1,1), np.zeros((1,1))], axis=1)
+            noise = np.concatenate([np.random.normal(0, 0.3, 2).reshape(1, 2), np.random.normal(0, np.radians(5), 1).reshape(1,1), np.zeros((1,1))], axis=1)
             noisy_pos = x1 + noise[0]
             plt.plot(noisy_pos[0], noisy_pos[1], "x" + color_dict[i], markersize=10)
             self.update_obstacles(i, noisy_pos, x, predicted_trajectory) 
@@ -1156,6 +1156,8 @@ def main_seed():
     mpc.bounds = bounds
     mpc.constraints = constraints
     mpc.predicted_trajectory = predicted_trajectory
+
+    np.random.seed(1)
 
     for z in range(iterations):
         plt.cla()

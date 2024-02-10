@@ -356,6 +356,7 @@ def cbf_sim(seed):
             x, u, break_flag = cbf.go_to_goal(x, break_flag)
         else:
             x, u, break_flag = cbf.run_cbf(x, break_flag) 
+            
         trajectory = np.dstack([trajectory, np.concatenate((x,u))])
         
         CBF.plot_map(width=width_init, height=height_init)
