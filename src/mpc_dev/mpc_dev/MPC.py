@@ -59,6 +59,7 @@ timer_freq = json_object["timer_freq"]
 show_animation = True
 debug = False
 check_collision_bool = False
+add_noise = True 
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
 
@@ -118,7 +119,7 @@ class ModelPredictiveControl:
         self.y_obs = obs_y
 
         self.initial_state = None
-        self.safety_radius = 1.5
+        self.safety_radius = 2
 
         self.cx = cx
         self.cy = cy
@@ -127,6 +128,7 @@ class ModelPredictiveControl:
         self.constraints = constraints
         self.predicted_trajectory = predicted_trajectory
         self.reached_goal = [False]*robot_num
+        self.computational_time = []
 
     def plant_model(self, prev_state, dt, pedal, steering):
         """
@@ -406,27 +408,30 @@ class ModelPredictiveControl:
 
         return np.array(distance)
     
-    def run_mpc(self, x, u):
+    def run_mpc(self, x, u, break_flag):
         for i in range(robot_num):
             start_time = time.time()
-            if dist([x[0, i], x[1, i]], point2=self.ref[i]) < 5:
+            if dist([x[0, i], x[1, i]], point2=self.ref[i]) < 2:
                 self.cx[i].pop(0)
                 self.cy[i].pop(0)
                 if not self.cx[i]:
                     print("Path complete")
-                    return
+                    return x, u, True
+                
                 self.ref[i][0] = self.cx[i][0]
                 self.ref[i][1] = self.cy[i][0]
 
             # cx, cy, ref = update_paths(i, x, cx, cy, cyaw, target_ind, ref, dl)
+            t_prev = time.time()
             x, u, self.predicted_trajectory = self.mpc_control(i, x, u, self.bounds, self.constraints, self.ref, self.predicted_trajectory, self.seed_cost)
-            
+            self.computational_time.append(time.time() - t_prev)
+
             if debug:
                 print('Robot ' + str(i+1) + ' of ' + str(robot_num) + '   Time ' + str(round(time.time() - start_time,5)))
 
             plot_robot_seed(x, u, self.predicted_trajectory, self.ref, i) 
         
-        return x, u
+        return x, u, break_flag
     
     def go_to_goal(self, x, u, break_flag):
         for i in range(robot_num):
@@ -437,8 +442,10 @@ class ModelPredictiveControl:
                     x[3, i] = 0
                     self.reached_goal[i] = True
                 else:
+                    t_prev = time.time()
                     x, u, self.predicted_trajectory = self.mpc_control(i, x, u, self.bounds, self.constraints, self.ref, self.predicted_trajectory, self.seed_cost)
-            
+                    self.computational_time.append(time.time() - t_prev)
+                    
             # If we want the robot to disappear when it reaches the goal, indent one more time
             if all(self.reached_goal):
                 break_flag = True
@@ -453,28 +460,45 @@ class ModelPredictiveControl:
         u1 = np.delete(u1,0)
         u1 = np.delete(u1,0)
         u1 = np.append(u1, u1[-2])
-        u1 = np.append(u1, u1[-2])
+        u1 = np.append(u1, u1[-2])  
 
-        self.update_obstacles(i, x1, x, predicted_trajectory)        
-
-        self.initial_state = x1
-
-        # MPC control
-        u_solution = minimize(cost_function, u1, (x1, ref[i]),
+        if add_noise:
+            noise = np.concatenate([np.random.normal(0, 0.3, 2).reshape(1, 2), np.random.normal(0, np.radians(5), 1).reshape(1,1), np.zeros((1,1))], axis=1)
+            noisy_pos = x1 + noise[0]
+            plt.plot(noisy_pos[0], noisy_pos[1], "x" + color_dict[i], markersize=10)
+            self.update_obstacles(i, noisy_pos, x, predicted_trajectory) 
+            self.initial_state = noisy_pos
+            u_solution = minimize(cost_function, u1, (noisy_pos, ref[i]),
                             method='SLSQP',
                             bounds=bounds,
                             constraints=constraints,
                             tol = 1e-1)
-        
+        else:
+            self.update_obstacles(i, x1, x, predicted_trajectory) 
+            self.initial_state = x1
+            u_solution = minimize(cost_function, u1, (x1, ref[i]),
+                            method='SLSQP',
+                            bounds=bounds,
+                            constraints=constraints,
+                            tol = 1e-1)
+               
         u1 = u_solution.x
         x1 = self.plant_model(x1, dt, u1[0], u1[1])
         x[:, i] = x1
         u[:, i] = u1
-        predicted_state = np.array([x1])
+        
+        if add_noise:
+            predicted_state = np.array([noisy_pos])
 
-        for j in range(1, self.horizon):
-            predicted = self.plant_model(predicted_state[-1], self.dt, u1[2*j], u1[2*j+1])
-            predicted_state = np.append(predicted_state, np.array([predicted]), axis=0)
+            for j in range(1, self.horizon):
+                predicted = self.plant_model(predicted_state[-1], self.dt, u1[2*j], u1[2*j+1])
+                predicted_state = np.append(predicted_state, np.array([predicted]), axis=0)
+        else:
+            predicted_state = np.array([x1])
+
+            for j in range(1, self.horizon):
+                predicted = self.plant_model(predicted_state[-1], self.dt, u1[2*j], u1[2*j+1])
+                predicted_state = np.append(predicted_state, np.array([predicted]), axis=0)
         predicted_trajectory[i] = predicted_state
 
         return x, u, predicted_trajectory
@@ -503,6 +527,7 @@ class ModelPredictiveControl:
                 continue
             if check_collision_bool:
                 if dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < 1:
+                    # if dist([x1[0], x1[1]], [predicted_trajectory[idx][0,0], predicted_trajectory[idx][0,1]]) < 1:
                     raise Exception('Collision')
             
             next_robot_state = predicted_trajectory[idx]
@@ -1133,12 +1158,14 @@ def main_seed():
     mpc.constraints = constraints
     mpc.predicted_trajectory = predicted_trajectory
 
+    np.random.seed(1)
+
     for z in range(iterations):
         plt.cla()
         plt.gcf().canvas.mpl_connect('key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
 
-        x, u = mpc.run_mpc(x, u)
+        x, u, break_flag = mpc.run_mpc(x, u, break_flag)
         trajectory = np.dstack([trajectory, x])
 
         plt.title('MPC 2D')
@@ -1146,6 +1173,16 @@ def main_seed():
         plt.axis("equal")
         plt.grid(True)
         plt.pause(0.0001)
+
+        if break_flag:
+            break
+
+    print("Done")
+    if show_animation:
+        for i in range(robot_num):
+            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-r")
+        plt.pause(0.0001)
+        plt.show()
 
 if __name__ == '__main__':
     main_seed()

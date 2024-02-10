@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 # motion parameter
 L = 1.0  # wheel base
 ds = 0.1  # course distance
-
+dt = 0.1
 # TODO: remove hardcoded parts
 
 # v = 0.5 # velocity [m/s]
@@ -38,7 +38,7 @@ def update(state, v, delta, dt):
 def generate_trajectory(s, km, kf, k0, v):
     # n = s / ds
     time = s / v  # [s]
-    n = time / 0.1
+    n = time / dt
 
 
     if isinstance(time, type(np.array([]))):
@@ -54,7 +54,6 @@ def generate_trajectory(s, km, kf, k0, v):
     fkp = interp1d(tk, kk, kind="quadratic")
     kp = [float(fkp(ti)) for ti in t]
     # dt = abs(float(time / n))
-    dt = 0.1
 
     #  plt.plot(t, kp)
     #  plt.show()

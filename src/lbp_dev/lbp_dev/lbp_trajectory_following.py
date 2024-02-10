@@ -19,7 +19,7 @@ v_resolution = json_object["DWA"]["v_resolution"] # [m/s]
 delta_resolution = math.radians(json_object["DWA"]["delta_resolution"])# [rad/s]
 max_acc = json_object["DWA"]["max_acc"] # [m/ss]
 min_acc = json_object["DWA"]["min_acc"] # [m/ss]
-dt = json_object["DWA"]["dt"] # [s] Time tick for motion prediction
+dt = json_object["LBP"]["dt"] # [s] Time tick for motion prediction
 predict_time = json_object["DWA"]["predict_time"] # [s]
 to_goal_cost_gain = json_object["DWA"]["to_goal_cost_gain"]
 speed_cost_gain = json_object["DWA"]["speed_cost_gain"]
@@ -50,7 +50,7 @@ show_animation = True
 v_ref = 2.0 # [m/s] reference speed
 
 # Load trajectory and control inputs from LBP.json file
-with open('/home/giacomo/thesis_ws/src/lattice_planning/LBP.json', 'r') as file:
+with open('src/lbp_dev/lbp_dev/LBP.json', 'r') as file:
     data = json.load(file)
 
 def motion(x, u, dt):

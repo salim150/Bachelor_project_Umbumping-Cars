@@ -1,18 +1,22 @@
-import numpy as np
+# from pynput.mouse import Listener
 import matplotlib.pyplot as plt
+import numpy as np
 import math
-import time
-import os
-import json
+# For the parameter file
 import pathlib
-import dwa_dev.DWA as DWA
-import lbp_dev.LBP as LBP
-import cbf_dev.CBF_simple as CBF
-import cbf_dev.C3BF as C3BF
-import mpc_dev.MPC as MPC
-import planner.utils as utils
+import json
 from custom_message.msg import Coordinate
-from shapely.geometry import Point, LineString
+from shapely.geometry import Point
+import planner.utils as utils
+
+from lbp_dev import LBP as LBP
+from dwa_dev import DWA as DWA
+from mpc_dev import MPC as MPC
+from cbf_dev import C3BF as C3BF
+from cbf_dev import CBF_simple as CBF
+
+# for debugging
+from numpy import cos, sin
 
 path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
 # Opening JSON file
@@ -20,24 +24,155 @@ with open(path, 'r') as openfile:
     # Reading from json file
     json_object = json.load(openfile)
 
+max_steer = json_object["LBP"]["max_steer"] # [rad] max steering angle
+max_speed = json_object["LBP"]["max_speed"] # [m/s]
+min_speed = json_object["LBP"]["min_speed"] # [m/s]
+v_resolution = json_object["LBP"]["v_resolution"] # [m/s]
+delta_resolution = math.radians(json_object["LBP"]["delta_resolution"])# [rad/s]
+max_acc = 10 #json_object["LBP"]["max_acc"] # [m/ss]
+min_acc = -10 #json_object["LBP"]["min_acc"] # [m/ss]
+dt = json_object["LBP"]["dt"] # [s] Time tick for motion prediction
+predict_time = json_object["LBP"]["predict_time"] # [s]
+to_goal_cost_gain = json_object["LBP"]["to_goal_cost_gain"]
+speed_cost_gain = json_object["LBP"]["speed_cost_gain"]
+obstacle_cost_gain = json_object["LBP"]["obstacle_cost_gain"]
+heading_cost_gain = json_object["LBP"]["heading_cost_gain"]
+robot_stuck_flag_cons = json_object["LBP"]["robot_stuck_flag_cons"]
+dilation_factor = json_object["LBP"]["dilation_factor"]
+
+L = json_object["Car_model"]["L"]  # [m] Wheel base of vehicle
+Lr = L / 2.0  # [m]
+Lf = L - Lr
+Cf = json_object["Car_model"]["Cf"]  # N/rad
+Cr = json_object["Car_model"]["Cr"] # N/rad
+Iz = json_object["Car_model"]["Iz"]  # kg/m2
+m = json_object["Car_model"]["m"]  # kg
+# Aerodynamic and friction coefficients
+c_a = json_object["Car_model"]["c_a"]
+c_r1 = json_object["Car_model"]["c_r1"]
+WB = json_object["Controller"]["WB"] # Wheel base
+L_d = json_object["Controller"]["L_d"]  # [m] look-ahead distance
 robot_num = json_object["robot_num"]
 safety_init = json_object["safety"]
 width_init = json_object["width"]
 height_init = json_object["height"]
 min_dist = json_object["min_dist"]
-robot_num = json_object["robot_num"]
-show_animation = True
-go_to_goal_bool = False
-iterations = 1000
+update_dist = 2
+N=3
 
+show_animation = True
+check_collision_bool = False
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
 
-def dwa_sim(seed):
+# Simple mouse click function to store coordinates
+def onclick(event):
+    global ix, iy
+    ix, iy = event.xdata, event.ydata
+    if ix is None or iy is None:
+        return
 
-    dt = json_object["DWA"]["dt"] # [s] Time tick for motion prediction
-    predict_time = json_object["DWA"]["predict_time"] # [s]
-    dilation_factor = json_object["DWA"]["dilation_factor"]
+    # assign global variable to access outside of function
+    global coords
+    coords.pop(0)
+    coords.append((ix, iy))
+    print(coords[-1])
 
+    return
+
+coords = [(0,0)]
+
+def main_lbp(seed):
+    """
+    This function runs the main loop for the LBP algorithm.
+    It initializes the necessary variables, updates the robot state, and plots the robot trajectory.
+
+    The simulation if this function has a variable amout of robots robot_num defined in the parameter file.
+    THis is the core a reference implementation of the LBP algorithm with random generation of goals that are updated when 
+    the robot reaches the current goal.
+    """
+    print(__file__ + " start!!")
+    iterations = 3000
+    break_flag = False
+    global coords
+    coords = [(0,0)]
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
+    ax = fig.add_subplot(111)
+
+    cid = fig.canvas.mpl_connect('button_press_event', onclick)
+
+    # Step 2: Sample initial values for x0, y, yaw, v, omega, and model_type
+    initial_state = seed['initial_position']
+    x0 = initial_state['x']
+    y = initial_state['y']
+    yaw = initial_state['yaw']
+    v = initial_state['v']
+
+    # Step 3: Create an array x with the initial values
+    x = np.array([x0, y, yaw, v])
+    u = np.zeros((2, robot_num))
+
+    trajectory = np.zeros((x.shape[0], robot_num, 1))
+    trajectory[:, :, 0] = x
+
+    predicted_trajectory = dict.fromkeys(range(robot_num),np.zeros([int(predict_time/dt), 3]))
+    for i in range(robot_num):
+        predicted_trajectory[i] = np.full((int(predict_time/dt), 3), x[0:3,i])
+
+    # Step 4: Create paths for each robot
+    traj = seed['trajectories']
+    paths = [[Coordinate(x=traj[str(idx)][i][0], y=traj[str(idx)][i][1]) for i in range(len(traj[str(idx)]))] for idx in range(robot_num)]
+
+    # Step 5: Extract the target coordinates from the paths
+    targets = [[path[0].x, path[0].y] for path in paths]
+
+    # Step 6: Create dilated trajectories for each robot
+    dilated_traj = []
+
+    coords = [(10,10)]
+    for i in range(robot_num):
+        dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
+
+    u_hist = dict.fromkeys(range(robot_num),[0]*int(predict_time/dt))
+    # fig = plt.figure(1, dpi=90)
+    # ax = fig.add_subplot(111)
+    
+    lbp = LBP.LBP_algorithm(x, predicted_trajectory, robot_num, safety_init, 
+                        width_init, height_init, min_dist, paths, targets, dilated_traj,
+                        predicted_trajectory, ax, u_hist)
+    
+    for z in range(iterations):
+        plt.cla()
+        plt.xlim(-width_init, width_init)
+        plt.ylim(-height_init, height_init)
+        
+        plt.gcf().canvas.mpl_connect('key_release_event', lambda event: [exit(0) if event.key == 'escape' else None])
+        
+        x, u, break_flag = lbp.run_lbp(x, u, break_flag)
+        # piloting the first robot
+        lbp.targets[0] = (coords[-1][0], coords[-1][1])
+
+        trajectory = np.dstack([trajectory, x])
+
+        utils.plot_map(width=width_init, height=height_init)
+        plt.plot(coords[-1][0], coords[-1][1], 'k', marker='o', markersize=20)
+        plt.axis("equal")
+        plt.grid(True)
+        plt.pause(0.0001)
+
+        if break_flag:
+            break
+
+    print("Done")
+    if show_animation:
+        for i in range(robot_num):
+            LBP.plot_robot(x[0, i], x[1, i], x[2, i], i)
+            LBP.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
+            LBP.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
+            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
+        plt.pause(0.0001)
+        plt.show()
+
+def main_dwa(seed):
     """
     Main function that controls the execution of the program.
 
@@ -55,8 +190,16 @@ def dwa_sim(seed):
     12. Print "Done" when the loop is finished.
     13. Plot the final trajectories if animation is enabled.
     """
-    print("DWA start!!")
+    
+    print(__file__ + " start!!")
+    iterations = 3000
     break_flag = False
+    global coords
+    coords = [(0,0)]
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
+    ax = fig.add_subplot(111)
+
+    cid = fig.canvas.mpl_connect('button_press_event', onclick)
     
     # Step 2: Sample initial values for x0, y, yaw, v, omega, and model_type
     initial_state = seed['initial_position']
@@ -69,8 +212,8 @@ def dwa_sim(seed):
     x = np.array([x0, y, yaw, v])
     u = np.zeros((2, robot_num))
 
-    trajectory = np.zeros((x.shape[0]+u.shape[0], robot_num, 1))
-    trajectory[:, :, 0] = np.concatenate((x,u))
+    trajectory = np.zeros((x.shape[0], robot_num, 1))
+    trajectory[:, :, 0] = x
 
     predicted_trajectory = dict.fromkeys(range(robot_num),np.zeros([int(predict_time/dt), 3]))
     for i in range(robot_num):
@@ -88,9 +231,6 @@ def dwa_sim(seed):
     for i in range(robot_num):
         dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
     
-    fig = plt.figure(1, dpi=90)
-    ax = fig.add_subplot(111)
-    
     # Step 7: Create an instance of the DWA_algorithm class
     dwa = DWA.DWA_algorithm(paths, safety_init, width_init, height_init,
                         min_dist, paths, targets, dilated_traj, predicted_trajectory, ax)
@@ -99,12 +239,11 @@ def dwa_sim(seed):
         plt.cla()
         plt.gcf().canvas.mpl_connect('key_release_event', lambda event: [exit(0) if event.key == 'escape' else None])
         
-        if go_to_goal_bool:
-            x, u, break_flag = dwa.go_to_goal(x, u, break_flag)
-        else:
-            x, u, break_flag = dwa.run_dwa(x, u, break_flag)
-        trajectory = np.dstack([trajectory, np.concatenate((x,u))])
-            
+        x, u, break_flag = dwa.run_dwa(x, u, break_flag)
+        trajectory = np.dstack([trajectory, x])
+        dwa.targets[0] = (coords[-1][0], coords[-1][1])
+
+        plt.plot(coords[-1][0], coords[-1][1], 'k', marker='o', markersize=20)
         utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
         plt.grid(True)
@@ -112,8 +251,7 @@ def dwa_sim(seed):
 
         if break_flag:
             break
-    
-    # plt.close()
+
     print("Done")
     if show_animation:
         for i in range(robot_num):
@@ -124,9 +262,7 @@ def dwa_sim(seed):
         plt.pause(0.0001)
         plt.show()
 
-    return trajectory, dwa.computational_time 
-
-def mpc_sim(seed):
+def main_mpc(seed):
     """
     Main function for controlling multiple robots using Model Predictive Control (MPC).
 
@@ -146,9 +282,19 @@ def mpc_sim(seed):
         - Update the predicted trajectory.
         - Plot the map and pause for visualization.
     """
-    print("MPC start!!")
-    break_flag = False
+    print(__file__ + " start!!")
 
+    # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
+    iterations = 3000
+    break_flag = False
+    global coords
+    coords = [(0,0)]
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
+    ax = fig.add_subplot(111)
+
+    cid = fig.canvas.mpl_connect('button_press_event', onclick)
+    dl = 3
+    
     # MPC initialization
     mpc = MPC.ModelPredictiveControl([], [])
     
@@ -161,8 +307,8 @@ def mpc_sim(seed):
     num_inputs = 2
     u = np.zeros([mpc.horizon*num_inputs, robot_num])
 
-    trajectory = np.zeros((x.shape[0] + num_inputs, robot_num, 1))
-    trajectory[:, :, 0] = np.concatenate((x,u[:2]))
+    trajectory = np.zeros((x.shape[0], robot_num, 1))
+    trajectory[:, :, 0] = x
 
     # Generate reference trajectory
     traj = seed['trajectories']
@@ -186,10 +332,6 @@ def mpc_sim(seed):
     predicted_trajectory = dict.fromkeys(range(robot_num),np.zeros([mpc.horizon, x.shape[0]]))
     for i in range(robot_num):
         predicted_trajectory[i] = np.full((mpc.horizon, 4), x[:,i])
-    
-    # input [throttle, steer (delta)]
-    fig = plt.figure(1, dpi=90)
-    ax = fig.add_subplot(111)
 
     # mpc = MPC_algorithm(cx, cy, ref, mpc, bounds, constraints, predicted_trajectory)
     mpc.cx = cx
@@ -204,12 +346,13 @@ def mpc_sim(seed):
         plt.gcf().canvas.mpl_connect('key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
 
-        if go_to_goal_bool:
-            x, u, break_flag = mpc.go_to_goal(x, u, break_flag)
-        else:
-            x, u, break_flag = mpc.run_mpc(x, u, break_flag)
-        trajectory = np.dstack([trajectory, np.concatenate((x,u[:2]))])
+        x, u, break_flag = mpc.run_mpc(x, u, break_flag)
+        mpc.ref[0][0] = coords[-1][0]
+        mpc.ref[0][1] = coords[-1][1]
 
+        trajectory = np.dstack([trajectory, x])
+
+        plt.plot(coords[-1][0], coords[-1][1], 'k', marker='o', markersize=20)
         plt.title('MPC 2D')
         utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
@@ -218,7 +361,7 @@ def mpc_sim(seed):
 
         if break_flag:
             break
-    
+
     print("Done")
     if show_animation:
         for i in range(robot_num):
@@ -229,9 +372,7 @@ def mpc_sim(seed):
         plt.pause(0.0001)
         plt.show()
 
-    return trajectory, mpc.computational_time
-
-def c3bf_sim(seed):
+def main_c3bf(seed):
     """
     Main function for controlling multiple robots using Model Predictive Control (MPC).
 
@@ -252,7 +393,14 @@ def c3bf_sim(seed):
         - Plot the map and pause for visualization.
     """
     print("3CBF start!!")
+    iterations = 3000
     break_flag = False
+    global coords
+    coords = [(0,0)]
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
+    ax = fig.add_subplot(111)
+
+    cid = fig.canvas.mpl_connect('button_press_event', onclick)
 
     # Step 2: Sample initial values for x0, y, yaw, v, omega, and model_type
     initial_state = seed['initial_position']
@@ -283,12 +431,11 @@ def c3bf_sim(seed):
             'key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
         
-        if go_to_goal_bool:
-            x, u, break_flag = c3bf.go_to_goal(x, break_flag)
-        else:
-            x, u, break_flag = c3bf.run_3cbf(x, break_flag)
+        x, u, break_flag = c3bf.run_3cbf(x, break_flag)
         trajectory = np.dstack([trajectory, np.concatenate((x,u))])
-        
+        c3bf.targets[0] = (coords[-1][0], coords[-1][1])
+
+        plt.plot(coords[-1][0], coords[-1][1], 'k', marker='o', markersize=20)
         C3BF.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
         plt.grid(True)
@@ -307,9 +454,7 @@ def c3bf_sim(seed):
         plt.pause(0.0001)
         plt.show()
 
-    return trajectory, c3bf.computational_time
-
-def cbf_sim(seed):
+def main_cbf(seed):
     """
     Main function for controlling multiple robots using Model Predictive Control (MPC).
 
@@ -329,8 +474,15 @@ def cbf_sim(seed):
         - Update the predicted trajectory.
         - Plot the map and pause for visualization.
     """
-    print("CBF start!!")
+    print("3CBF start!!")
+    iterations = 3000
     break_flag = False
+    global coords
+    coords = [(0,0)]
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
+    ax = fig.add_subplot(111)
+
+    cid = fig.canvas.mpl_connect('button_press_event', onclick)
 
     # Step 2: Sample initial values for x0, y, yaw, v, omega, and model_type
     initial_state = seed['initial_position']
@@ -361,13 +513,11 @@ def cbf_sim(seed):
             'key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
         
-        if go_to_goal_bool:
-            x, u, break_flag = cbf.go_to_goal(x, break_flag)
-        else:
-            x, u, break_flag = cbf.run_cbf(x, break_flag) 
-            
+        x, u, break_flag = cbf.run_cbf(x, break_flag)
         trajectory = np.dstack([trajectory, np.concatenate((x,u))])
-        
+        cbf.targets[0] = (coords[-1][0], coords[-1][1])
+
+        plt.plot(coords[-1][0], coords[-1][1], 'k', marker='o', markersize=20)
         CBF.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
         plt.grid(True)
@@ -375,7 +525,7 @@ def cbf_sim(seed):
 
         if break_flag:
             break
-    
+
     print("Done")
     if show_animation:
         for i in range(robot_num):
@@ -386,115 +536,14 @@ def cbf_sim(seed):
         plt.pause(0.0001)
         plt.show()
 
-    return trajectory, cbf.computational_time
-
-def lbp_sim(seed):
-    dt = json_object["LBP"]["dt"] # [s] Time tick for motion prediction
-    predict_time = json_object["LBP"]["predict_time"] # [s]
-    dilation_factor = json_object["LBP"]["dilation_factor"]
-
-    """
-    This function runs the main loop for the LBP algorithm.
-    It initializes the necessary variables, updates the robot state, and plots the robot trajectory.
-
-    The simulation if this function has a variable amout of robots robot_num defined in the parameter file.
-    THis is the core a reference implementation of the LBP algorithm with random generation of goals that are updated when 
-    the robot reaches the current goal.
-    """
-    print("LBP start!!")
-
-    break_flag = False
-
-    # Step 2: Sample initial values for x0, y, yaw, v, omega, and model_type
-    initial_state = seed['initial_position']
-    x0 = initial_state['x']
-    y = initial_state['y']
-    yaw = initial_state['yaw']
-    v = initial_state['v']
-
-    # Step 3: Create an array x with the initial values
-    x = np.array([x0, y, yaw, v])
-    u = np.zeros((2, robot_num))
-
-    trajectory = np.zeros((x.shape[0]+u.shape[0], robot_num, 1))
-    trajectory[:, :, 0] = np.concatenate((x,u))
-
-    predicted_trajectory = dict.fromkeys(range(robot_num),np.zeros([int(predict_time/dt), 3]))
-    for i in range(robot_num):
-        predicted_trajectory[i] = np.full((int(predict_time/dt), 3), x[0:3,i])
-
-    # Step 4: Create paths for each robot
-    traj = seed['trajectories']
-    paths = [[Coordinate(x=traj[str(idx)][i][0], y=traj[str(idx)][i][1]) for i in range(len(traj[str(idx)]))] for idx in range(robot_num)]
-
-    # Step 5: Extract the target coordinates from the paths
-    targets = [[path[0].x, path[0].y] for path in paths]
-
-    # Step 6: Create dilated trajectories for each robot
-    dilated_traj = []
-    for i in range(robot_num):
-        dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
-
-    u_hist = dict.fromkeys(range(robot_num),[0]*int(predict_time/dt))
-    fig = plt.figure(1, dpi=90)
-    ax = fig.add_subplot(111)
-    
-    lbp = LBP.LBP_algorithm(x, predicted_trajectory, robot_num, safety_init, 
-                        width_init, height_init, min_dist, paths, targets, dilated_traj,
-                        predicted_trajectory, ax, u_hist)
-    
-    for z in range(iterations):
-        plt.cla()
-        plt.gcf().canvas.mpl_connect('key_release_event', lambda event: [exit(0) if event.key == 'escape' else None])
-        
-        if go_to_goal_bool:
-            x, u, break_flag = lbp.go_to_goal(x, u, break_flag)
-        else:
-            # add noise: gaussians zero mean different variances ~50cm for position and ~5deg for orientation
-            x, u, break_flag = lbp.run_lbp(x, u, break_flag)
-        trajectory = np.dstack([trajectory, np.concatenate((x,u))])
-
-        utils.plot_map(width=width_init, height=height_init)
-        plt.axis("equal")
-        plt.grid(True)
-        plt.pause(0.0001)
-
-        if break_flag:
-            break
-
-    print("Done")
-    if show_animation:
-        for i in range(robot_num):
-            LBP.plot_robot(x[0, i], x[1, i], x[2, i], i)
-            LBP.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
-            LBP.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
-            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
-        plt.pause(0.0001)
-        plt.show()
-    
-    return trajectory, lbp.computational_time
-
-def main():
-    # Load the seed from a file
-    # filename = '/home/giacomo/thesis_ws/src/seed_1.json'
-    filename = '/home/giacomo/thesis_ws/src/circular_seed_0.json'
+if __name__ == '__main__':
+     # Load the seed from a file
+    filename = '/home/giacomo/thesis_ws/src/seed_1.json'
+    # filename = '/home/giacomo/thesis_ws/src/circular_seed_0.json'
     with open(filename, 'r') as file:
         seed = json.load(file)
-
-    dwa_trajectory, dwa_computational_time = dwa_sim(seed)   
-    print(f"DWA average computational time: {sum(dwa_computational_time) / len(dwa_computational_time)}\n")
-
-    mpc_trajectory, mpc_computational_time = mpc_sim(seed)
-    print(f"MPC average computational time: {sum(mpc_computational_time) / len(mpc_computational_time)}\n")
-
-    c3bf_trajectory, c3bf_computational_time = c3bf_sim(seed)
-    print(f"C3BF average computational time: {sum(c3bf_computational_time) / len(c3bf_computational_time)}\n")
-
-    cbf_trajectory, cbf_computational_time = cbf_sim(seed)
-    print(f"CBF average computational time: {sum(cbf_computational_time) / len(cbf_computational_time)}\n")
-    
-    lbp_trajectory, lbp_computational_time = lbp_sim(seed)
-    print(f"LBP average computational time: {sum(lbp_computational_time) / len(lbp_computational_time)}\n")
-
-if __name__ == '__main__':
-    main()
+    # main_lbp(seed)
+    # main_dwa(seed)
+    # main_mpc(seed)
+    # main_c3bf(seed)
+    main_cbf(seed)  

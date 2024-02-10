@@ -36,6 +36,7 @@ width = json_object["width"]
 height = json_object["height"]
 boundary_points = np.array([-width/2, width/2, -height/2, height/2])
 check_collision_bool = False
+add_noise = True
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
 
@@ -68,7 +69,7 @@ def motion(x, u, dt):
 
     return x
 
-def CBF(x, u_ref):
+def CBF(i, x, u_ref):
     """
     Computes the control input for the C3BF (Collision Cone Control Barrier Function) algorithm.
 
@@ -86,100 +87,104 @@ def CBF(x, u_ref):
 
     u_ref[1,:] = delta_to_beta_array(u_ref[1,:])
 
-    for i in range(N):
-        count = 0
-        G = np.zeros([N-1,M])
-        H = np.zeros([N-1,1])
+    # for i in range(N):
+    count = 0
+    G = np.zeros([N-1,M])
+    H = np.zeros([N-1,1])
 
-        # when the car goes backwards the yaw angle should be flipped --> Why??
-        # x[2,i] = (1-np.sign(x[3,i]))*(np.pi/2) + x[2,i]
+    # when the car goes backwards the yaw angle should be flipped --> Why??
+    # x[2,i] = (1-np.sign(x[3,i]))*(np.pi/2) + x[2,i]
 
-        f = np.array([x[3,i]*np.cos(x[2,i]),
-                          x[3,i]*np.sin(x[2,i]), 
-                          0, 
-                          0]).reshape(4,1)
-        g = np.array([[0, -x[3,i]*np.sin(x[2,i])], 
-                        [0, x[3,i]*np.cos(x[2,i])], 
-                        [0, x[3,i]/Lr],
-                        [1, 0]]).reshape(4,2)
+    f = np.array([x[3,i]*np.cos(x[2,i]),
+                        x[3,i]*np.sin(x[2,i]), 
+                        0, 
+                        0]).reshape(4,1)
+    g = np.array([[0, -x[3,i]*np.sin(x[2,i])], 
+                    [0, x[3,i]*np.cos(x[2,i])], 
+                    [0, x[3,i]/Lr],
+                    [1, 0]]).reshape(4,2)
 
-        for j in range(N):
+    for j in range(N):
 
-            if j == i: continue
+        if j == i: continue
 
-            P = np.identity(2)*2
-            q = np.array([-2 * u_ref[0, i], - 2 * u_ref[1,i]])
+        P = np.identity(2)*2
+        q = np.array([-2 * u_ref[0, i], - 2 * u_ref[1,i]])
 
-            Lf_h = 2 * x[3,i] * (np.cos(x[2,i]) * (x[0,i]-x[0,j]) + np.sin(x[2,i]) * (x[1,i] - x[1,j]))
-            Lg_h = 2 * x[3,i] * (np.cos(x[2,i]) * (x[1,i]-x[1,j]) - np.sin(x[2,i]) * (x[0,i] - x[0,j]))
-            h = (x[0,i]-x[0,j]) * (x[0,i]-x[0,j]) + (x[1,i] - x[1,j]) * (x[1,i] - x[1,j]) - (safety_radius**2 + Kv * abs(x[3,i]))
+        Lf_h = 2 * x[3,i] * (np.cos(x[2,i]) * (x[0,i]-x[0,j]) + np.sin(x[2,i]) * (x[1,i] - x[1,j]))
+        Lg_h = 2 * x[3,i] * (np.cos(x[2,i]) * (x[1,i]-x[1,j]) - np.sin(x[2,i]) * (x[0,i] - x[0,j]))
+        h = (x[0,i]-x[0,j]) * (x[0,i]-x[0,j]) + (x[1,i] - x[1,j]) * (x[1,i] - x[1,j]) - (safety_radius**2 + Kv * abs(x[3,i]))
 
-            H[count] = np.array([barrier_gain*np.power(h, 3) + Lf_h])
+        H[count] = np.array([barrier_gain*np.power(h, 3) + Lf_h])
 
-            if x[3,i] >= 0:
-                G[count,:] = np.array([Kv, -Lg_h])
-            else:
-                G[count,:] = np.array([-Kv, -Lg_h])
-                
-            count+=1
-        
-        # Add the input constraint
-        G = np.vstack([G, [[0, 1], [0, -1]]])
-        H = np.vstack([H, delta_to_beta(max_steer), -delta_to_beta(-max_steer)])
-        G = np.vstack([G, [[1, 0], [-1, 0]]])
-        H = np.vstack([H, max_acc, -min_acc])
-
-        # Adding arena boundary constraints
-        # Pos Y
-        h = ((x[1,i] - boundary_points[3])**2 - safety_radius**2 - Kv * abs(x[3,i]))
         if x[3,i] >= 0:
-            gradH = np.array([0, 2*(x[1,i] - boundary_points[3]), 0, -Kv])
+            G[count,:] = np.array([Kv, -Lg_h])
         else:
-            gradH = np.array([0, 2*(x[1,i] - boundary_points[3]), 0, Kv])
+            G[count,:] = np.array([-Kv, -Lg_h])
+            
+        count+=1
+    
+    # Add the input constraint
+    G = np.vstack([G, [[0, 1], [0, -1]]])
+    H = np.vstack([H, delta_to_beta(max_steer), -delta_to_beta(-max_steer)])
+    G = np.vstack([G, [[1, 0], [-1, 0]]])
+    H = np.vstack([H, max_acc, -min_acc])
 
-        Lf_h = np.dot(gradH.T, f)
-        Lg_h = np.dot(gradH.T, g)
-        G = np.vstack([G, -Lg_h])
-        H = np.vstack([H, np.array([arena_gain*h**3 + Lf_h])])
+    # Adding arena boundary constraints
+    # Pos Y
+    h = ((x[1,i] - boundary_points[3])**2 - safety_radius**2 - Kv * abs(x[3,i]))
+    if x[3,i] >= 0:
+        gradH = np.array([0, 2*(x[1,i] - boundary_points[3]), 0, -Kv])
+    else:
+        gradH = np.array([0, 2*(x[1,i] - boundary_points[3]), 0, Kv])
 
-        # Neg Y
-        h = ((x[1,i] - boundary_points[2])**2 - safety_radius**2 - Kv * abs(x[3,i]))
-        if x[3,i] >= 0:
-            gradH = np.array([0, 2*(x[1,i] - boundary_points[2]), 0, -Kv])
-        else:
-            gradH = np.array([0, 2*(x[1,i] - boundary_points[2]), 0, Kv])
-        Lf_h = np.dot(gradH.T, f)
-        Lg_h = np.dot(gradH.T, g)
-        G = np.vstack([G, -Lg_h])
-        H = np.vstack([H, np.array([arena_gain*h**3 + Lf_h])])
+    Lf_h = np.dot(gradH.T, f)
+    Lg_h = np.dot(gradH.T, g)
+    G = np.vstack([G, -Lg_h])
+    H = np.vstack([H, np.array([arena_gain*h**3 + Lf_h])])
 
-        # Pos X
-        h = ((x[0,i] - boundary_points[1])**2 - safety_radius**2 - Kv * abs(x[3,i]))
-        if x[3,i] >= 0:
-            gradH = np.array([2*(x[0,i] - boundary_points[1]), 0, 0, -Kv])
-        else:
-            gradH = np.array([2*(x[0,i] - boundary_points[1]), 0, 0, Kv])
-        Lf_h = np.dot(gradH.T, f)
-        Lg_h = np.dot(gradH.T, g)
-        G = np.vstack([G, -Lg_h])
-        H = np.vstack([H, np.array([arena_gain*h**3 + Lf_h])])
+    # Neg Y
+    h = ((x[1,i] - boundary_points[2])**2 - safety_radius**2 - Kv * abs(x[3,i]))
+    if x[3,i] >= 0:
+        gradH = np.array([0, 2*(x[1,i] - boundary_points[2]), 0, -Kv])
+    else:
+        gradH = np.array([0, 2*(x[1,i] - boundary_points[2]), 0, Kv])
+    Lf_h = np.dot(gradH.T, f)
+    Lg_h = np.dot(gradH.T, g)
+    G = np.vstack([G, -Lg_h])
+    H = np.vstack([H, np.array([arena_gain*h**3 + Lf_h])])
 
-        # Neg X
-        h = ((x[0,i] - boundary_points[0])**2 - safety_radius**2 - Kv * abs(x[3,i]))
-        if x[3,i] >= 0:
-            gradH = np.array([2*(x[0,i] - boundary_points[0]), 0, 0, -Kv])
-        else:
-            gradH = np.array([2*(x[0,i] - boundary_points[0]), 0, 0, Kv])
-        Lf_h = np.dot(gradH.T, f)
-        Lg_h = np.dot(gradH.T, g)
-        G = np.vstack([G, -Lg_h])
-        H = np.vstack([H, np.array([arena_gain*h**3 + Lf_h])])
-        
-        solvers.options['show_progress'] = False
+    # Pos X
+    h = ((x[0,i] - boundary_points[1])**2 - safety_radius**2 - Kv * abs(x[3,i]))
+    if x[3,i] >= 0:
+        gradH = np.array([2*(x[0,i] - boundary_points[1]), 0, 0, -Kv])
+    else:
+        gradH = np.array([2*(x[0,i] - boundary_points[1]), 0, 0, Kv])
+    Lf_h = np.dot(gradH.T, f)
+    Lg_h = np.dot(gradH.T, g)
+    G = np.vstack([G, -Lg_h])
+    H = np.vstack([H, np.array([arena_gain*h**3 + Lf_h])])
+
+    # Neg X
+    h = ((x[0,i] - boundary_points[0])**2 - safety_radius**2 - Kv * abs(x[3,i]))
+    if x[3,i] >= 0:
+        gradH = np.array([2*(x[0,i] - boundary_points[0]), 0, 0, -Kv])
+    else:
+        gradH = np.array([2*(x[0,i] - boundary_points[0]), 0, 0, Kv])
+    Lf_h = np.dot(gradH.T, f)
+    Lg_h = np.dot(gradH.T, g)
+    G = np.vstack([G, -Lg_h])
+    H = np.vstack([H, np.array([arena_gain*h**3 + Lf_h])])
+    
+    solvers.options['show_progress'] = False
+    try:
         sol = solvers.qp(matrix(P), matrix(q), matrix(G), matrix(H))
         dxu[:,i] = np.reshape(np.array(sol['x']), (M,))
+    except:
+        print("QP solver failed")
+        dxu[:,i] = u_ref[:,i]
     
-    dxu[1,:] = beta_to_delta(dxu[1,:])
+    dxu[1,i] = beta_to_delta(dxu[1,i])
     return dxu
 
 def delta_to_beta(delta):
@@ -223,9 +228,12 @@ def beta_to_delta(beta):
         float: Steering angle in radians.
 
     """
-    delta = normalize_angle_array(np.arctan2(L*np.tan(beta)/Lr, 1.0))
+    try:
+        delta = normalize_angle_array(np.arctan2(L*np.tan(beta)/Lr, 1.0))
+    except:
+        delta = normalize_angle(np.arctan2(L*np.tan(beta)/Lr, 1.0))
 
-    return delta
+    return delta  
 
 def update_paths(paths):
     """
@@ -302,7 +310,7 @@ def plot_robot_and_arrows(i, x, multi_control, targets):
     plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
     plt.plot(targets[i][0], targets[i][1], "x"+color_dict[i])
 
-def update_robot_state(x, dxu, multi_control, targets):
+def update_robot_state(i, x, dxu, multi_control, targets):
     """
     Updates the state of all robots.
 
@@ -317,19 +325,19 @@ def update_robot_state(x, dxu, multi_control, targets):
         
     """
     cmd = ControlInputs()
-    for idx in range(robot_num):
-        x1 = array_to_state(x[:, idx])
-        cmd.throttle, cmd.delta = dxu[0, idx], dxu[1, idx]
-        x1 = linear_model_callback(x1, cmd)
-        x1 = state_to_array(x1).reshape(4)
-        x[:, idx] = x1
-        multi_control.multi_control[idx] = cmd
+    
+    x1 = array_to_state(x[:, i])
+    cmd.throttle, cmd.delta = dxu[0, i], dxu[1, i]
+    x1 = linear_model_callback(x1, cmd)
+    x1 = state_to_array(x1).reshape(4)
+    x[:, i] = x1
+    multi_control.multi_control[i] = cmd
 
-        plot_robot_and_arrows(idx, x, multi_control, targets)
+    plot_robot_and_arrows(i, x, multi_control, targets)
     
     return x, multi_control
 
-def control_robot(x, targets):
+def control_robot(i, x, targets):
     """
     Controls the movement of a robot based on its current state and target positions.
 
@@ -348,13 +356,12 @@ def control_robot(x, targets):
 
     cmd = ControlInputs()
     
-    for idx in range(robot_num):
-        check_collision(x, idx)
-        x1 = array_to_state(x[:, idx])
-        cmd.throttle, cmd.delta = pure_pursuit_steer_control(targets[idx], x1)
-        dxu[0, idx], dxu[1, idx] = cmd.throttle, cmd.delta
+    check_collision(x, i)
+    x1 = array_to_state(x[:, i])
+    cmd.throttle, cmd.delta = pure_pursuit_steer_control(targets[i], x1)
+    dxu[0, i], dxu[1, i] = cmd.throttle, cmd.delta
 
-    dxu = CBF(x, dxu)
+    dxu = CBF(i, x, dxu)
 
     return dxu
 
@@ -381,33 +388,42 @@ class CBF_algorithm():
         self.targets = targets
         self.paths = paths
         self.reached_goal = [False]*robot_num
+        self.computational_time = []
         
-    def run_cbf(self, x):
-        
+    def run_cbf(self, x, break_flag):
         for i in range(robot_num):
+            t_prev = time.time()
+            if add_noise:
+                noise = np.concatenate([np.random.normal(0, 0.3, 2).reshape(2, 1), np.random.normal(0, np.radians(5), 1).reshape(1,1), np.zeros((1,1))], axis=0)
+                noisy_pos = x + noise
+                dxu = control_robot(i, noisy_pos, self.targets)
+                plt.plot(noisy_pos[0,i], noisy_pos[1,i], "x"+color_dict[i], markersize=10)
+            else:
+                dxu = control_robot(i, x, self.targets)
+            self.computational_time.append((time.time() - t_prev))
             # Step 9: Check if the distance between the current position and the target is less than 5
-            if dist(point1=(x[0,i], x[1,i]), point2=self.targets[i]) < 5:
+            if dist(point1=(x[0,i], x[1,i]), point2=self.targets[i]) < 2:
                 # Perform some action when the condition is met
                 self.paths[i].pop(0)
                 if not self.paths[i]:
                     print("Path complete")
-                    return
+                    break_flag = True
+                    return x, dxu, break_flag
                 self.targets[i] = (self.paths[i][0].x, self.paths[i][0].y)
 
-        dxu = control_robot(x, self.targets)
-        for i in range(robot_num):
             x[:, i] = motion(x[:, i], dxu[:, i], dt)
             plot_robot(x[0, i], x[1, i], x[2, i], i)
             plot_arrow(x[0, i], x[1, i], x[2, i] + dxu[1, i], length=3, width=0.5)
             plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
-            plt.plot(self.targets[i][0], self.targets[i][1], "xg")
+            plt.plot(self.targets[i][0], self.targets[i][1], "x"+color_dict[i])
         
-        return x, dxu
+        return x, dxu, break_flag
     
     def go_to_goal(self, x, break_flag):
-        
-        dxu = control_robot(x, self.targets)
         for i in range(robot_num):
+            t_prev = time.time()
+            dxu = control_robot(i, x, self.targets)
+            self.computational_time.append((time.time() - t_prev))
             # Step 9: Check if the distance between the current position and the target is less than 5
             if not self.reached_goal[i]:                
                 # If goal is reached, stop the robot
@@ -481,8 +497,8 @@ def main(args=None):
                 paths[i] = update_path(paths[i])
                 targets[i] = (paths[i][0].x, paths[i][0].y)
 
-        dxu = control_robot(x, targets)
-        x, multi_control = update_robot_state(x, dxu, multi_control, targets)
+            dxu = control_robot(i, x, targets)
+            x, multi_control = update_robot_state(i, x, dxu, multi_control, targets)
         
         plot_map(width=width_init, height=height_init)
         plt.axis("equal")
@@ -551,8 +567,8 @@ def main1(args=None):
                     return
                 targets[i] = (paths[i][0].x, paths[i][0].y)
 
-        dxu = control_robot(x, targets)
-        x, multi_control = update_robot_state(x, dxu, multi_control, targets)
+            dxu = control_robot(i, x, targets)
+            x, multi_control = update_robot_state(i, x, dxu, multi_control, targets)
         
         plot_map(width=width_init, height=height_init)
         plt.axis("equal")
@@ -581,6 +597,7 @@ def main_seed(args=None):
     """
     # Step 1: Set the number of iterations
     iterations = 3000
+    break_flag = False
     
     # Step 2: Sample initial values for x0, y, yaw, v, omega, and model_type
     initial_state = data['initial_position']
@@ -607,13 +624,17 @@ def main_seed(args=None):
             'key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
         
-        x, dxu = cbf.run_cbf(x) 
+        x, dxu, break_flag = cbf.run_cbf(x, break_flag) 
         
         plot_map(width=width_init, height=height_init)
         plt.axis("equal")
         plt.grid(True)
         plt.pause(0.0001)
 
+        if break_flag:  
+            break
+
 if __name__=='__main__':
-    main1()
+    main_seed()
+    # main1()
         

@@ -57,6 +57,7 @@ N=3
 
 show_animation = True
 check_collision_bool = False
+add_noise = True
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
 
 
@@ -435,10 +436,16 @@ def update_robot_state(x, u, dt, targets, dilated_traj, u_hist, predicted_trajec
     """
     x1 = x[:, i]
     ob = [dilated_traj[idx] for idx in range(len(dilated_traj)) if idx != i]
-    u1, predicted_trajectory1, u_history = lbp_control(x1, targets[i], ob, u_hist[i], predicted_trajectory[i])
+    if add_noise:
+        noise = np.concatenate([np.random.normal(0, 0.21, 2).reshape(1, 2), np.random.normal(0, np.radians(5), 1).reshape(1,1), np.zeros((1,1))], axis=1)
+        noisy_pos = x1 + noise[0]
+        u1, predicted_trajectory1, u_history = lbp_control(noisy_pos, targets[i], ob, u_hist[i], predicted_trajectory[i])
+        plt.plot(noisy_pos[0], noisy_pos[1], "x"+color_dict[i], markersize=10)
+    else:
+        u1, predicted_trajectory1, u_history = lbp_control(x1, targets[i], ob, u_hist[i], predicted_trajectory[i])
     dilated_traj[i] = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1])).buffer(dilation_factor, cap_style=3)
-    
-    # Collision check
+   
+   # Collision check
     if check_collision_bool:
         if any([utils.dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < WB for idx in range(robot_num) if idx != i]): raise Exception('Collision')
     
@@ -504,13 +511,24 @@ class LBP_algorithm():
         self.ax = ax
         self.u_hist = u_hist
         self.reached_goal = [False]*robot_num
+        self.computational_time = []
 
     def run_lbp(self, x, u, break_flag):
         for i in range(robot_num):
             
-            self.paths, self.targets = update_targets(self.paths, self.targets, x, i)
+            # self.paths, self.targets = update_targets(self.paths, self.targets, x, i)
+            if utils.dist(point1=(x[0,i], x[1,i]), point2=self.targets[i]) < update_dist:
+                # Perform some action when the condition is met
+                self.paths[i].pop(0)
+                if not self.paths[i]:
+                    print("Path complete")
+                    return x, u, True
+                
+                self.targets[i] = (self.paths[i][0].x, self.paths[i][0].y)
 
+            t_prev = time.time()
             x, u, self.predicted_trajectory, self.u_hist = update_robot_state(x, u, dt, self.targets, self.dilated_traj, self.u_hist, self.predicted_trajectory, i)
+            self.computational_time.append(time.time()-t_prev)
 
             if check_goal_reached(x, self.targets, i):
                 break_flag = True
@@ -529,7 +547,9 @@ class LBP_algorithm():
                     x[3, i] = 0
                     self.reached_goal[i] = True
                 else:
+                    t_prev = time.time()
                     x, u, self.predicted_trajectory, self.u_hist = update_robot_state(x, u, dt, self.targets, self.dilated_traj, self.u_hist, self.predicted_trajectory, i)
+                    self.computational_time.append(time.time()-t_prev)
 
             # If we want the robot to disappear when it reaches the goal, indent one more time
             if all(self.reached_goal):
@@ -833,7 +853,7 @@ def main_seed():
         plt.show()
 
 if __name__ == '__main__':
-    main()
-    # main_seed()
+    # main()
+    main_seed()
 
     
