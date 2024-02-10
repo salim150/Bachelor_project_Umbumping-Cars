@@ -443,48 +443,6 @@ class DWA_algorithm():
                 break_flag = True
         return x, u, break_flag
     
-    def update_robot_state(self, x, u, dt, targets, dilated_traj, predicted_trajectory, i):
-        """
-        Update the state of a robot based on its current state, control input, and environment information.
-
-        Args:
-            x (numpy.ndarray): Current state of the robot.
-            u (numpy.ndarray): Control input for the robot.
-            dt (float): Time step.
-            targets (list): List of target positions for each robot.
-            dilated_traj (list): List of dilated trajectories for each robot.
-            predicted_trajectory (list): List of predicted trajectories for each robot.
-            i (int): Index of the robot.
-
-        Returns:
-            tuple: Updated state, control input, and predicted trajectory.
-
-        Raises:
-            Exception: If a collision is detected.
-
-        """
-        x1 = x[:, i]
-        ob = [dilated_traj[idx] for idx in range(len(dilated_traj)) if idx != i]
-        if add_noise:
-            noise = np.concatenate([np.random.normal(0, 0.21, 2).reshape(1, 2), np.random.normal(0, np.radians(5), 1).reshape(1,1), np.zeros((1,1))], axis=1)
-            noisy_pos = x1 + noise[0]
-            u1, predicted_trajectory1 = self.dwa_control(noisy_pos, targets[i], ob)
-            plt.plot(noisy_pos[0], noisy_pos[1], "x"+color_dict[i], markersize=10)
-        else:
-            u1, predicted_trajectory1 = self.dwa_control(x1, targets[i], ob)
-        dilated_traj[i] = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1])).buffer(dilation_factor, cap_style=3)
-
-        # Collision check
-        if check_collision_bool:
-            if any([utils.dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < WB for idx in range(robot_num) if idx != i]): raise Exception('Collision')
-
-        x1 = motion(x1, u1, dt)
-        x[:, i] = x1
-        u[:, i] = u1
-        predicted_trajectory[i] = predicted_trajectory1
-
-        return x, u, predicted_trajectory
-    
     def update_robot_state(self, x, u, dt, targets, dilated_traj, u_hist, predicted_trajectory, i):
         """
         Update the state of a robot based on its current state, control input, and environment information.
