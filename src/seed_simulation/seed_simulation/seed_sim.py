@@ -117,6 +117,9 @@ def dwa_sim(seed):
     print("Done")
     if show_animation:
         for i in range(robot_num):
+            DWA.plot_robot(x[0, i], x[1, i], x[2, i], i)
+            DWA.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
+            DWA.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
         plt.pause(0.0001)
         plt.show()
@@ -204,7 +207,7 @@ def mpc_sim(seed):
         if go_to_goal_bool:
             x, u, break_flag = mpc.go_to_goal(x, u, break_flag)
         else:
-            x, u = mpc.run_mpc(x, u)
+            x, u, break_flag = mpc.run_mpc(x, u, break_flag)
         trajectory = np.dstack([trajectory, np.concatenate((x,u[:2]))])
 
         plt.title('MPC 2D')
@@ -219,6 +222,9 @@ def mpc_sim(seed):
     print("Done")
     if show_animation:
         for i in range(robot_num):
+            MPC.plot_robot(x[0, i], x[1, i], x[2, i], i)
+            MPC.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
+            MPC.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
         plt.pause(0.0001)
         plt.show()
@@ -294,6 +300,9 @@ def c3bf_sim(seed):
     print("Done")
     if show_animation:
         for i in range(robot_num):
+            C3BF.plot_robot(x[0, i], x[1, i], x[2, i], i)
+            C3BF.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
+            C3BF.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
         plt.pause(0.0001)
         plt.show()
@@ -370,6 +379,9 @@ def cbf_sim(seed):
     print("Done")
     if show_animation:
         for i in range(robot_num):
+            CBF.plot_robot(x[0, i], x[1, i], x[2, i], i)
+            CBF.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
+            CBF.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
         plt.pause(0.0001)
         plt.show()
@@ -453,6 +465,9 @@ def lbp_sim(seed):
     print("Done")
     if show_animation:
         for i in range(robot_num):
+            LBP.plot_robot(x[0, i], x[1, i], x[2, i], i)
+            LBP.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
+            LBP.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
         plt.pause(0.0001)
         plt.show()
@@ -466,11 +481,11 @@ def main():
     with open(filename, 'r') as file:
         seed = json.load(file)
 
-    # dwa_trajectory, dwa_computational_time = dwa_sim(seed)   
-    # print(f"DWA average computational time: {sum(dwa_computational_time) / len(dwa_computational_time)}\n")
+    dwa_trajectory, dwa_computational_time = dwa_sim(seed)   
+    print(f"DWA average computational time: {sum(dwa_computational_time) / len(dwa_computational_time)}\n")
 
-    # mpc_trajectory, mpc_computational_time = mpc_sim(seed)
-    # print(f"MPC average computational time: {sum(mpc_computational_time) / len(mpc_computational_time)}\n")
+    mpc_trajectory, mpc_computational_time = mpc_sim(seed)
+    print(f"MPC average computational time: {sum(mpc_computational_time) / len(mpc_computational_time)}\n")
 
     c3bf_trajectory, c3bf_computational_time = c3bf_sim(seed)
     print(f"C3BF average computational time: {sum(c3bf_computational_time) / len(c3bf_computational_time)}\n")

@@ -516,7 +516,15 @@ class LBP_algorithm():
     def run_lbp(self, x, u, break_flag):
         for i in range(robot_num):
             
-            self.paths, self.targets = update_targets(self.paths, self.targets, x, i)
+            # self.paths, self.targets = update_targets(self.paths, self.targets, x, i)
+            if utils.dist(point1=(x[0,i], x[1,i]), point2=self.targets[i]) < update_dist:
+                # Perform some action when the condition is met
+                self.paths[i].pop(0)
+                if not self.paths[i]:
+                    print("Path complete")
+                    return x, u, True
+                
+                self.targets[i] = (self.paths[i][0].x, self.paths[i][0].y)
 
             t_prev = time.time()
             x, u, self.predicted_trajectory, self.u_hist = update_robot_state(x, u, dt, self.targets, self.dilated_traj, self.u_hist, self.predicted_trajectory, i)

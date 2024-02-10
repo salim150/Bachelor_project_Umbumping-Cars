@@ -402,7 +402,7 @@ class CBF_algorithm():
                 dxu = control_robot(i, x, self.targets)
             self.computational_time.append((time.time() - t_prev))
             # Step 9: Check if the distance between the current position and the target is less than 5
-            if dist(point1=(x[0,i], x[1,i]), point2=self.targets[i]) < 5:
+            if dist(point1=(x[0,i], x[1,i]), point2=self.targets[i]) < 2:
                 # Perform some action when the condition is met
                 self.paths[i].pop(0)
                 if not self.paths[i]:
