@@ -635,7 +635,7 @@ def main():
             
             paths, targets = update_targets(paths, targets, x, i)
 
-            x, u, predicted_trajectory = dwa.update_robot_state(x, u, dt, targets, dilated_traj, predicted_trajectory, i)
+            x, u = dwa.update_robot_state(x, u, dt, i)
 
             trajectory = np.dstack([trajectory, x])
 
@@ -643,7 +643,7 @@ def main():
                 break_flag = True
 
             if show_animation:
-                plot_robot_trajectory(x, u, predicted_trajectory, dilated_traj, targets, ax, i)
+                plot_robot_trajectory(x, u, dwa.predicted_trajectory, dilated_traj, targets, ax, i)
 
         utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
@@ -735,7 +735,7 @@ def main1():
                     return
                 targets[i] = (paths[i][0].x, paths[i][0].y)
 
-            x, u, predicted_trajectory = dwa.update_robot_state(x, u, dt, targets, dilated_traj, predicted_trajectory, i)
+            x, u = dwa.update_robot_state(x, u, dt, i)
 
             trajectory = np.dstack([trajectory, x])
 
@@ -743,7 +743,7 @@ def main1():
                 break_flag = True
 
             if show_animation:
-                plot_robot_trajectory(x, u, predicted_trajectory, dilated_traj, targets, ax, i)
+                plot_robot_trajectory(x, u, dwa.predicted_trajectory, dilated_traj, targets, ax, i)
 
         utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
