@@ -37,7 +37,8 @@ height_init = json_object["height"]
 min_dist = json_object["min_dist"]
 boundary_points = np.array([-width_init/2, width_init/2, -height_init/2, height_init/2])
 check_collision_bool = False
-add_noise = True
+add_noise = False
+np.random.seed(1)
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
 
@@ -425,7 +426,7 @@ class C3BF_algorithm():
 
             self.computational_time.append((time.time() - t_prev))
             # Step 9: Check if the distance between the current position and the target is less than 5
-            if dist(point1=(x[0,i], x[1,i]), point2=self.targets[i]) < 2:
+            if dist(point1=(x[0,i], x[1,i]), point2=self.targets[i]) < 4:
                 # Perform some action when the condition is met
                 self.paths[i].pop(0)
                 if not self.paths[i]:

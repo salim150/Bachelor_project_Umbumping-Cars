@@ -58,8 +58,9 @@ N=3
 show_animation = True
 check_collision_bool = False
 add_noise = True
-color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
+np.random.seed(1)
 
+color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
 
 with open('/home/giacomo/thesis_ws/src/lbp_dev/lbp_dev/LBP.json', 'r') as file:
     data = json.load(file)
@@ -217,7 +218,7 @@ def calc_control_and_trajectory(x, v_search, goal, ob, u_buf, trajectory_buf):
 
             # TODO: small bug when increasing the factor too much for the to_goal_cost_gain
             to_goal_cost = to_goal_cost_gain * calc_to_goal_cost(trajectory, goal)
-            # speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
+            # speed_cost = speed_cost_gain * np.sign(trajectory[-1, 3]) * trajectory[-1, 3]
             ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory, ob)
             heading_cost = heading_cost_gain * calc_to_goal_heading_cost(trajectory, goal)
             final_cost = to_goal_cost + ob_cost + heading_cost #+ speed_cost 
@@ -245,7 +246,7 @@ def calc_control_and_trajectory(x, v_search, goal, ob, u_buf, trajectory_buf):
         trajectory_buf = trajectory_buf[1:]
 
         to_goal_cost = to_goal_cost_gain * calc_to_goal_cost(trajectory_buf, goal)
-        # speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
+        # speed_cost = speed_cost_gain * np.sign(trajectory[-1, 3]) * trajectory[-1, 3]
         ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory_buf, ob)
         heading_cost = heading_cost_gain * calc_to_goal_heading_cost(trajectory_buf, goal)
         final_cost = to_goal_cost + ob_cost + heading_cost #+ speed_cost 

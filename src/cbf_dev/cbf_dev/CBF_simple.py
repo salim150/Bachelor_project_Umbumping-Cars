@@ -37,6 +37,7 @@ height = json_object["height"]
 boundary_points = np.array([-width/2, width/2, -height/2, height/2])
 check_collision_bool = False
 add_noise = True
+np.random.seed(1)
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
 

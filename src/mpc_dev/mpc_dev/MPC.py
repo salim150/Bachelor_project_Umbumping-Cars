@@ -60,6 +60,7 @@ show_animation = True
 debug = False
 check_collision_bool = False
 add_noise = True 
+np.random.seed(1)
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
 
@@ -1157,8 +1158,6 @@ def main_seed():
     mpc.bounds = bounds
     mpc.constraints = constraints
     mpc.predicted_trajectory = predicted_trajectory
-
-    np.random.seed(1)
 
     for z in range(iterations):
         plt.cla()

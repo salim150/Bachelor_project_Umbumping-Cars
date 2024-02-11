@@ -11,7 +11,7 @@ from shapely.plotting import plot_polygon, plot_line
 import csv
 import itertools
 import sys
-from DWA import dwa_control, plot_arrow, plot_robot
+from dwa_dev.DWA import DWA_algorithm, plot_arrow, plot_robot
 
 path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
 # Opening JSON file
@@ -109,7 +109,7 @@ def calc_trajectory(x_init, u, dt):
             print(x[3])
     return traj
 
-def calc_dynamic_window(x):
+def calc_dynamic_window():
     """
     calculation dynamic window based on current state x
     motion model
@@ -137,7 +137,7 @@ def generate_trajectories(x_init):
     """
     Generate trajectories
     """
-    dw = calc_dynamic_window(x_init)
+    dw = calc_dynamic_window()
     traj = []
     u_total = []
     for a in np.arange(dw[0], dw[1]+a_resolution, a_resolution):
@@ -252,7 +252,6 @@ def main():
     # goal = np.array([[30, 0, 15], [10, 10, 0]])
     x = np.array([[0, 20], [0, 0], [0, np.pi], [0, 0]])
     goal = np.array([[30, 0], [10, 10]])
-    
     u = np.zeros((2, N))
     
     # create a trajcetory array to store the trajectory of the N robots
@@ -269,6 +268,10 @@ def main():
     # input [throttle, steer (delta)]
     fig = plt.figure(1, dpi=90)
     ax = fig.add_subplot(111)
+
+    dwa = DWA_algorithm(paths, safety_init, width_init, height_init,
+                        min_dist, paths, targets, dilated_traj, predicted_trajectory, ax)
+    
 
     for z in range(iterations):
         for i in range(N):

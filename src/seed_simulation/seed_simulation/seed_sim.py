@@ -27,7 +27,7 @@ height_init = json_object["height"]
 min_dist = json_object["min_dist"]
 robot_num = json_object["robot_num"]
 show_animation = True
-go_to_goal_bool = False
+go_to_goal_bool = True
 iterations = 1000
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
@@ -91,9 +91,11 @@ def dwa_sim(seed):
     fig = plt.figure(1, dpi=90)
     ax = fig.add_subplot(111)
     
+    u_hist = dict.fromkeys(range(robot_num),[[0,0] for _ in range(int(predict_time/dt))])    
     # Step 7: Create an instance of the DWA_algorithm class
     dwa = DWA.DWA_algorithm(paths, safety_init, width_init, height_init,
-                        min_dist, paths, targets, dilated_traj, predicted_trajectory, ax)
+                        min_dist, paths, targets, dilated_traj, predicted_trajectory, ax, u_hist)
+    
     
     for z in range(iterations):
         plt.cla()
