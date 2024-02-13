@@ -14,7 +14,7 @@ os.path.abspath('..')
 # from planner.cubic_spline_planner import *
 # from planner.frenet import *
 from planner.predict_traj import *
-from dwa_dev.DWA import *
+from dwa_dev import DWA as DWA
 
 # for the CBF
 from cbf_dev.CBF_robotarium import *
@@ -77,7 +77,9 @@ class Controller(Node):
         v = self.get_parameter('v').get_parameter_value().double_array_value
         omega = self.get_parameter('omega').get_parameter_value().double_array_value
         model_type = self.get_parameter('model_type').get_parameter_value().string_array_value
-        
+        self.x = np.array([x0, y0, yaw, v])
+        self.u = np.zeros((2, robot_num))
+
         self.width = width
         self.heigth = height
             
@@ -114,49 +116,42 @@ class Controller(Node):
             self.paths = []
             self.targets = []
             self.dilated_traj = []
-            if plot_traj:
-                self.multi_traj = MultiplePaths()
             multi_control = MultiControl()
 
             for i in range(robot_num):
                 self.paths.append(self.create_path())
                 self.targets.append([self.paths[i][0].x, self.paths[i][0].y])
-                self.dilated_traj.append(Point(x0[i], y0[i]).buffer(dilation_factor, cap_style=3))
+                self.dilated_traj.append(DWA.Point(x0[i], y0[i]).buffer(DWA.dilation_factor, cap_style=3))
                 initial_state = State(x=x0[i], y=y0[i], yaw=yaw[i], v=v[i], omega=omega[i])
-                if plot_traj:
-                    self.multi_traj.multiple_path.append(predict_trajectory(initial_state, self.targets[i]))
+                predicted_trajectory = dict.fromkeys(range(robot_num),np.zeros([int(DWA.predict_time/dt), 3]))
+                for i in range(robot_num):
+                    predicted_trajectory[i] = np.full((int(DWA.predict_time/dt), 3), self.x[0:3,i])
+
                 # TODO initialize control
                 multi_control.multi_control.append(ControlInputs(delta=0.0, throttle=0.0))
             
-            ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 4, 0.3, allow_headerless=True)
-            ts.registerCallback(self.DWA_callback)
+            u_hist = dict.fromkeys(range(robot_num),[[0,0] for _ in range(int(DWA.predict_time/dt))])
+            self.dwa = DWA.DWA_algorithm(self.paths, safety_init, width_init, height_init,
+                        min_dist, self.paths, self.targets, self.dilated_traj, predicted_trajectory, None, u_hist)
     
-            if plot_traj:
-                self.multi_path_pub.publish(self.multi_traj)    
+            ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 4, 0.3, allow_headerless=True)
+            ts.registerCallback(self.DWA_callback)  
      
         else:
             # Initializing the robots
             self.paths = []
             self.targets = []
-            if plot_traj:
-                self.multi_traj = MultiplePaths()
             multi_control = MultiControl()
 
             for i in range(robot_num):
                 self.paths.append(self.create_path())
                 self.targets.append([self.paths[i][0].x, self.paths[i][0].y])
                 initial_state = State(x=x0[i], y=y0[i], yaw=yaw[i], v=v[i], omega=omega[i])
-                if plot_traj:
-                    self.multi_traj.multiple_path.append(predict_trajectory(initial_state, self.targets[i]))
                 # TODO initialize control
                 multi_control.multi_control.append(ControlInputs(delta=0.0, throttle=0.0))
             
             ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 4, 0.3, allow_headerless=True)
             ts.registerCallback(self.general_pose_callback)
-    
-            if plot_traj:
-                self.multi_path_pub = self.create_publisher(MultiplePaths, "/robot_multi_traj", 2)
-                self.multi_path_pub.publish(self.multi_traj)  
      
 
         # TODO initialize the initial control in the launch file
@@ -228,12 +223,7 @@ class Controller(Node):
         multi_control_buf = MultiControl()
         self.marker_array = MarkerArray()
         for i in range(robot_num):
-            if plot_traj:
-                cmd, self.paths[i], self.targets[i], self.multi_traj.multiple_path[i] = self.control_callback(multi_state.multiple_state[i], 
-                                                                                                            self.targets[i], self.paths[i], 
-                                                                                                            self.multi_traj.multiple_path[i])
-            else:
-                cmd, self.paths[i], self.targets[i] = self.control_callback(multi_state.multiple_state[i], self.targets[i], self.paths[i], None)
+            cmd, self.paths[i], self.targets[i] = self.control_callback(multi_state.multiple_state[i], self.targets[i], self.paths[i], None)
             multi_control.multi_control.append(cmd)
         
         # Applying the CBF
@@ -256,34 +246,24 @@ class Controller(Node):
         self.multi_control_pub.publish(multi_control)
         self.marker_array_pub.publish(self.marker_array)
 
-        if plot_traj:
-            self.multi_path_pub.publish(self.multi_traj)
-
     def DWA_callback(self, multi_state: MultiState):
         """
         DWA callback function, that uses the dynamic window approach algorithm. 
         """
         multi_control = MultiControl()
+
+        # change the followinf line and find a way to stop the simulation based on break_flag
+        break_flag = False
         
+        for i in range(robot_num): 
+            self.x[:,i] = state_to_array(multi_state.multiple_state[i]).reshape(4)
+        
+        self.x, self.u, break_flag = self.dwa.run_dwa(self.x, self.u, break_flag)
+
+        self.dilated_traj = self.dwa.dilated_traj
+
         for i in range(robot_num):
-            pose = multi_state.multiple_state[i]
-            if self.dist(point1=(pose.x, pose.y), point2=self.targets[i]) < L_d:
-                self.paths[i] = self.update_path(self.paths[i])
-                self.targets[i] = (self.paths[i][0].x, self.paths[i][0].y)
-
-            ob = []
-            for idx in range(robot_num):
-                if idx == i:
-                    continue
-                if self.dist(point1=(pose.x, pose.y), point2=(multi_state.multiple_state[idx].x, multi_state.multiple_state[idx].y)) < WB:
-                    raise Exception("Collision detected")
-                ob.append(self.dilated_traj[idx])
-
-            x1 = state_to_array(multi_state.multiple_state[i]).reshape(4)
-            u1, predicted_trajectory1 = dwa_control(x1, self.targets[i], ob)
-            self.dilated_traj[i] = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1])).buffer(dilation_factor, cap_style=3)
-            
-            multi_control.multi_control.append(ControlInputs(throttle=float(u1[0]), delta=float(u1[1])))
+            multi_control.multi_control.append(ControlInputs(throttle=float(self.u[0,i]), delta=float(self.u[1,i])))
         
         self.multi_control_pub.publish(multi_control)
         
@@ -298,8 +278,6 @@ class Controller(Node):
         if self.dist(point1=(pose.x, pose.y), point2=target) < L_d:
             path = self.update_path(path)
             target = (path[0].x, path[0].y)
-            if plot_traj:
-                trajectory = predict_trajectory(pose, target)
     
         cmd = ControlInputs()
         cmd.throttle, cmd.delta= self.pure_pursuit_steer_control(target, pose)
@@ -307,10 +285,7 @@ class Controller(Node):
         if debug:
             self.get_logger().info("Control input robot1, delta:" + str(cmd.delta) + " , throttle: " + str(cmd.throttle))
 
-        if plot_traj:
-            return cmd, path, target, trajectory
-        else:
-            return cmd, path, target
+        return cmd, path, target
     
     def apply_CBF(self, multi_control: MultiControl, multi_state: MultiState):
         """
