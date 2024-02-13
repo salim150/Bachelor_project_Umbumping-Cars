@@ -18,8 +18,8 @@ from dwa_dev import DWA as DWA
 
 # for the CBF
 from cbf_dev.CBF_robotarium import *
-from cbf_dev.CBF_simple import *
-from cbf_dev.C3BF import *
+from cbf_dev import CBF_simple as CBF
+from cbf_dev import C3BF as C3BF
 
 # For the parameter file
 import pathlib
@@ -150,6 +150,8 @@ class Controller(Node):
                 # TODO initialize control
                 multi_control.multi_control.append(ControlInputs(delta=0.0, throttle=0.0))
             
+            self.cbf = CBF.CBF_algorithm(self.targets, self.paths)
+            
             ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 4, 0.3, allow_headerless=True)
             ts.registerCallback(self.general_pose_callback)
      
@@ -222,22 +224,28 @@ class Controller(Node):
         multi_control = MultiControl()
         multi_control_buf = MultiControl()
         self.marker_array = MarkerArray()
+        dxu = np.zeros((2, robot_num))
+        
+        for i in range(robot_num):
+            self.x[:,i] = state_to_array(multi_state.multiple_state[i]).reshape(4)
+        
         for i in range(robot_num):
             cmd, self.paths[i], self.targets[i] = self.control_callback(multi_state.multiple_state[i], self.targets[i], self.paths[i], None)
-            multi_control.multi_control.append(cmd)
-        
-        # Applying the CBF
-        multi_control_buf = multi_control
-        multi_control = self.apply_CBF(multi_control=multi_control, multi_state=multi_state)
+            multi_control_buf.multi_control.append(cmd)
+            dxu[0, i], dxu[1, i] = cmd.throttle, cmd.delta
 
+            if cbf_type == "CBF":
+                dxu = CBF.CBF(i, self.x, dxu)
+            else:
+                dxu = C3BF.C3BF(i, self.x, dxu)
+
+            multi_control.multi_control.append(ControlInputs(throttle=dxu[0,i], delta=dxu[1,i]))
+        
         for i in range(robot_num):
+            
             if round(multi_control.multi_control[i].throttle, 2) != round(multi_control_buf.multi_control[i].throttle, 2) or round(multi_control.multi_control[i].delta,2) != round(multi_control_buf.multi_control[i].delta, 2):
-                # self.get_logger().info("CBF applied")
-                # self.get_logger().info("Throttle: " + str(multi_control.multi_control[i].throttle) + " Delta: " + str(multi_control.multi_control[i].delta))
-                # self.get_logger().info("Throttle buf: " + str(multi_control_buf.multi_control[i].throttle) + " Delta buf: " + str(multi_control_buf.multi_control[i].delta))
                 marker = self.convert_to_marker(multi_state.multiple_state[i], i, [0.0, 0.0, 1.0])
             else:
-                # self.get_logger().info("CBF not applied")
                 marker = self.convert_to_marker(multi_state.multiple_state[i], i, [1.0, 0.0, 0.0])
             
             self.marker_array.markers.append(marker)
@@ -254,7 +262,7 @@ class Controller(Node):
 
         # change the followinf line and find a way to stop the simulation based on break_flag
         break_flag = False
-        
+
         for i in range(robot_num): 
             self.x[:,i] = state_to_array(multi_state.multiple_state[i]).reshape(4)
         
@@ -286,36 +294,6 @@ class Controller(Node):
             self.get_logger().info("Control input robot1, delta:" + str(cmd.delta) + " , throttle: " + str(cmd.throttle))
 
         return cmd, path, target
-    
-    def apply_CBF(self, multi_control: MultiControl, multi_state: MultiState):
-        """
-        Applies control barrier function (CBF) to the control inputs.
-
-        Uses the current robot states and control inputs to calculate the modified control inputs
-        that satisfy the control barrier function constraints.
-        """
-        dxu = np.zeros((2,robot_num))
-        x = np.zeros((4,robot_num))
-
-        for i in range(robot_num):
-            for idx in range(robot_num):
-                if idx == i:
-                    continue
-                if self.dist(point1=(multi_state.multiple_state[i].x, multi_state.multiple_state[i].y), point2=(multi_state.multiple_state[idx].x, multi_state.multiple_state[idx].y)) < WB:
-                    raise Exception("Collision detected")
-            dxu[0,i], dxu[1,i] = multi_control.multi_control[i].throttle, multi_control.multi_control[i].delta
-            x[:,i] = state_to_array(multi_state.multiple_state[i]).reshape(4)
-        
-        if cbf_type == "CBF":
-            dxu = CBF(x, dxu)
-        else:
-            dxu = C3BF(x, dxu)
-
-        multi_control = MultiControl()
-        for i in range(robot_num):
-            multi_control.multi_control.append(ControlInputs(throttle=dxu[0,i], delta=dxu[1,i]))
-
-        return multi_control
     
     def update_targets(self, multi_state: MultiState):
         """
@@ -369,11 +347,11 @@ class Controller(Node):
         if delta > math.radians(10) or delta < -math.radians(10):
             desired_speed = 3
         else:
-            desired_speed = 6
+            desired_speed = max_speed
 
         # delta = 3 * delta
         delta = np.clip(delta, -max_steer, max_steer)
-        delta = delta
+        # delta = delta
         throttle = 3 * (desired_speed-pose.v)
 
         return throttle, delta

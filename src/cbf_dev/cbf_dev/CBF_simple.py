@@ -636,6 +636,6 @@ def main_seed(args=None):
             break
 
 if __name__=='__main__':
-    main_seed()
-    # main1()
+    # main_seed()
+    main1() 
         
