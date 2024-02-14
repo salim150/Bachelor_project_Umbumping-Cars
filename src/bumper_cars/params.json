@@ -91,7 +91,7 @@
             "min_acc": -5,
             "max_speed": 2,
             "min_speed": -1,
-            "controller_type": "goal_following",
+            "controller_type": "LBP",
             "cbf_type": "CBF"
         },
     "robot_num": 5,

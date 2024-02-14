@@ -20,6 +20,7 @@ from dwa_dev import DWA as DWA
 from cbf_dev.CBF_robotarium import *
 from cbf_dev import CBF_simple as CBF
 from cbf_dev import C3BF as C3BF
+from lbp_dev import LBP as LBP
 
 # For the parameter file
 import pathlib
@@ -135,7 +136,33 @@ class Controller(Node):
                         min_dist, self.paths, self.targets, self.dilated_traj, predicted_trajectory, None, u_hist)
     
             ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 4, 0.3, allow_headerless=True)
-            ts.registerCallback(self.DWA_callback)  
+            ts.registerCallback(self.DWA_callback) 
+
+        elif self.controller_type == "LBP":
+            # Initializing the robots
+            self.paths = []
+            self.targets = []
+            self.dilated_traj = []
+            multi_control = MultiControl()
+
+            for i in range(robot_num):
+                self.paths.append(self.create_path())
+                self.targets.append([self.paths[i][0].x, self.paths[i][0].y])
+                self.dilated_traj.append(LBP.Point(x0[i], y0[i]).buffer(LBP.dilation_factor, cap_style=3))
+                initial_state = State(x=x0[i], y=y0[i], yaw=yaw[i], v=v[i], omega=omega[i])
+                predicted_trajectory = dict.fromkeys(range(robot_num),np.zeros([int(LBP.predict_time/dt), 3]))
+                for i in range(robot_num):
+                    predicted_trajectory[i] = np.full((int(LBP.predict_time/dt), 3), self.x[0:3,i])
+
+                # TODO initialize control
+                multi_control.multi_control.append(ControlInputs(delta=0.0, throttle=0.0))
+            
+            u_hist = dict.fromkeys(range(robot_num),[[0,0] for _ in range(int(LBP.predict_time/dt))])
+            self.lbp = LBP.LBP_algorithm(predicted_trajectory, self.paths, self.targets, self.dilated_traj, predicted_trajectory,
+                                         None, u_hist)
+    
+            ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 4, 0.3, allow_headerless=True)
+            ts.registerCallback(self.LBP_callback)  
      
         else:
             # Initializing the robots
@@ -158,8 +185,6 @@ class Controller(Node):
 
         # TODO initialize the initial control in the launch file
         self.multi_control_pub.publish(multi_control)
-        # CBF
-        self.uni_barrier_cert = create_unicycle_barrier_certificate_with_boundary()
         self.get_logger().info("Controller has been started")
 
     def random_walk_controller(self, multi_state):
@@ -269,6 +294,27 @@ class Controller(Node):
         self.x, self.u, break_flag = self.dwa.run_dwa(self.x, self.u, break_flag)
 
         self.dilated_traj = self.dwa.dilated_traj
+
+        for i in range(robot_num):
+            multi_control.multi_control.append(ControlInputs(throttle=float(self.u[0,i]), delta=float(self.u[1,i])))
+        
+        self.multi_control_pub.publish(multi_control)
+    
+    def LBP_callback(self, multi_state: MultiState):
+        """
+        LBP callback function, that uses the dynamic window approach algorithm. 
+        """
+        multi_control = MultiControl()
+
+        # change the followinf line and find a way to stop the simulation based on break_flag
+        break_flag = False
+
+        for i in range(robot_num): 
+            self.x[:,i] = state_to_array(multi_state.multiple_state[i]).reshape(4)
+        
+        self.x, self.u, break_flag = self.lbp.run_lbp(self.x, self.u, break_flag)
+
+        self.dilated_traj = self.lbp.dilated_traj
 
         for i in range(robot_num):
             multi_control.multi_control.append(ControlInputs(throttle=float(self.u[0,i]), delta=float(self.u[1,i])))

@@ -121,7 +121,7 @@ class CarModel(Node):
             float: The current time.
         """
 
-        if controller_type == "DWA":
+        if controller_type == "DWA" or controller_type == "LBP":
             dt = 0.1
             # dt = time.time() - old_time
         else:
