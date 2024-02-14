@@ -136,8 +136,7 @@ def main_lbp(seed):
     # fig = plt.figure(1, dpi=90)
     # ax = fig.add_subplot(111)
     
-    lbp = LBP.LBP_algorithm(x, predicted_trajectory, robot_num, safety_init, 
-                        width_init, height_init, min_dist, paths, targets, dilated_traj,
+    lbp = LBP.LBP_algorithm(predicted_trajectory, paths, targets, dilated_traj,
                         predicted_trajectory, ax, u_hist)
     
     for z in range(iterations):
@@ -544,8 +543,8 @@ if __name__ == '__main__':
     # filename = '/home/giacomo/thesis_ws/src/circular_seed_0.json'
     with open(filename, 'r') as file:
         seed = json.load(file)
-    # main_lbp(seed)
-    main_dwa(seed)
+    main_lbp(seed)
+    # main_dwa(seed)
     # main_mpc(seed)
     # main_c3bf(seed)
     # main_cbf(seed)  

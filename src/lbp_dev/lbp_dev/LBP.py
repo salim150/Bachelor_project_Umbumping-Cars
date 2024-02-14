@@ -57,7 +57,7 @@ N=3
 
 show_animation = True
 check_collision_bool = False
-add_noise = True
+add_noise = False
 np.random.seed(1)
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
@@ -496,15 +496,8 @@ def check_goal_reached(x, targets, i, distance=0.5):
     return False
 
 class LBP_algorithm():
-    def __init__(self, initial_state, trajectories, robot_num, safety, width, height, min_dist,
-                paths, targets, dilated_traj, predicted_trajectory, ax, u_hist):
-        self.initial_state = initial_state
+    def __init__(self, trajectories, paths, targets, dilated_traj, predicted_trajectory, ax, u_hist):
         self.trajectories = trajectories
-        self.robot_num = robot_num
-        self.safety = safety
-        self.width = width
-        self.height = height
-        self.min_dist = min_dist
         self.paths = paths
         self.targets = targets
         self.dilated_traj = dilated_traj
@@ -826,8 +819,7 @@ def main_seed():
     fig = plt.figure(1, dpi=90)
     ax = fig.add_subplot(111)
     
-    lbp = LBP_algorithm(x, predicted_trajectory, robot_num, safety_init, 
-                        width_init, height_init, min_dist, paths, targets, dilated_traj,
+    lbp = LBP_algorithm(predicted_trajectory, paths, targets, dilated_traj,
                         predicted_trajectory, ax, u_hist)
     
     for z in range(iterations):
