@@ -21,6 +21,7 @@ from cbf_dev.CBF_robotarium import *
 from cbf_dev import CBF_simple as CBF
 from cbf_dev import C3BF as C3BF
 from lbp_dev import LBP as LBP
+from mpc_dev import MPC as MPC
 
 # For the parameter file
 import pathlib
@@ -79,7 +80,11 @@ class Controller(Node):
         omega = self.get_parameter('omega').get_parameter_value().double_array_value
         model_type = self.get_parameter('model_type').get_parameter_value().string_array_value
         self.x = np.array([x0, y0, yaw, v])
-        self.u = np.zeros((2, robot_num))
+        if controller_type == "MPC":
+            self.mpc = MPC.ModelPredictiveControl([], [])
+            self.u = np.zeros([self.mpc.horizon*2, robot_num])
+        else:
+            self.u = np.zeros((2, robot_num))
 
         self.width = width
         self.heigth = height
@@ -163,6 +168,27 @@ class Controller(Node):
     
             ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 4, 0.3, allow_headerless=True)
             ts.registerCallback(self.LBP_callback)  
+
+        elif self.controller_type == "MPC":
+            # Initializing the robots
+            self.paths = []
+            self.targets = []
+            self.dilated_traj = []
+            multi_control = MultiControl()
+            self.dl = 3
+
+            self.cx, self.cy, self.cyaw, self.ref, self.target_ind = MPC.generate_reference_trajectory(self.x, self.dl)
+            # Usage:
+            self.bounds, self.constraints = MPC.set_bounds_and_constraints(self.mpc)
+            self.predicted_trajectory = dict.fromkeys(range(robot_num),np.zeros([self.mpc.horizon, self.x.shape[0]]))
+    
+            for i in range(robot_num):
+                self.predicted_trajectory[i] = np.full((self.mpc.horizon, 4), self.x[:,i])
+                # TODO initialize control
+                multi_control.multi_control.append(ControlInputs(delta=0.0, throttle=0.0))
+                
+            ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 4, 0.3, allow_headerless=True)
+            ts.registerCallback(self.MPC_callback)  
      
         else:
             # Initializing the robots
@@ -317,6 +343,20 @@ class Controller(Node):
         self.dilated_traj = self.lbp.dilated_traj
 
         for i in range(robot_num):
+            multi_control.multi_control.append(ControlInputs(throttle=float(self.u[0,i]), delta=float(self.u[1,i])))
+        
+        self.multi_control_pub.publish(multi_control)
+    
+    def MPC_callback(self, multi_state: MultiState):
+        """
+        LBP callback function, that uses the dynamic window approach algorithm. 
+        """
+        multi_control = MultiControl()
+
+        for i in range(robot_num):
+            self.cx, self.cy, self.ref = MPC.update_paths(i, self.x, self.cx, self.cy, self.cyaw, self.target_ind, self.ref, self.dl)
+            self.x, self.u, self.predicted_trajectory = self.mpc.mpc_control(i, self.x, self.u, self.bounds, self.constraints, self.ref, self.predicted_trajectory, self.mpc.cost_function3)
+
             multi_control.multi_control.append(ControlInputs(throttle=float(self.u[0,i]), delta=float(self.u[1,i])))
         
         self.multi_control_pub.publish(multi_control)
