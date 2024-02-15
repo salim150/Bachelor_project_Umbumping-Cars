@@ -149,6 +149,12 @@ $$
 <img src="./Readme/MPC.gif" alt="Simulation GIF" width="50%">
 </p>
 
+## Lattice-based Control (LBP)
+
+<p align="center">
+<img src="./Readme/LBP.gif" alt="Simulation GIF" width="50%">
+</p>
+
 ## TODO
 - add a lot of function to make the code more readable. Preferrable: put all this functions in a utils.py file.
 
