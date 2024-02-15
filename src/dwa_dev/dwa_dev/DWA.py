@@ -619,7 +619,7 @@ def main():
 
     paths, targets, dilated_traj = initialize_paths_targets_dilated_traj(x)
     
-    fig = plt.figure(1, dpi=90)
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
     ax = fig.add_subplot(111)
 
     u_hist = dict.fromkeys(range(robot_num),[[0,0] for _ in range(int(predict_time/dt))])
@@ -713,7 +713,7 @@ def main1():
     for i in range(robot_num):
         dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
     
-    fig = plt.figure(1, dpi=90)
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
     ax = fig.add_subplot(111)
     u_hist = dict.fromkeys(range(robot_num),[[0,0] for _ in range(int(predict_time/dt))])
 
@@ -814,7 +814,7 @@ def main_seed():
         dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
     
     u_hist = dict.fromkeys(range(robot_num),[[0,0] for _ in range(int(predict_time/dt))])
-    fig = plt.figure(1, dpi=90)
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
     ax = fig.add_subplot(111)
     
     # Step 7: Create an instance of the DWA_algorithm class

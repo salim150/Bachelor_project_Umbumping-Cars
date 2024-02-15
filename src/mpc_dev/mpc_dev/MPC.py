@@ -59,7 +59,7 @@ timer_freq = json_object["timer_freq"]
 show_animation = True
 debug = False
 check_collision_bool = False
-add_noise = True 
+add_noise = False 
 np.random.seed(1)
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
@@ -779,7 +779,7 @@ def main():
         predicted_trajectory[i] = np.full((mpc.horizon, 4), x[:,i])
     
     # input [throttle, steer (delta)]
-    fig = plt.figure(1, dpi=90)
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
     ax = fig.add_subplot(111)
 
     for z in range(iterations):
@@ -968,7 +968,7 @@ def main2():
         predicted_trajectory[i] = np.full((mpc.horizon, 4), x[:,i])
     
     # input [throttle, steer (delta)]
-    fig = plt.figure(1, dpi=90)
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
     ax = fig.add_subplot(111)
 
     for z in range(iterations):
@@ -1050,7 +1050,7 @@ def main3():
         predicted_trajectory[i] = np.full((mpc.horizon, 4), x[:,i])
     
     # input [throttle, steer (delta)]
-    fig = plt.figure(1, dpi=90)
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
     ax = fig.add_subplot(111)
 
     for z in range(iterations):
@@ -1148,7 +1148,7 @@ def main_seed():
         predicted_trajectory[i] = np.full((mpc.horizon, 4), x[:,i])
     
     # input [throttle, steer (delta)]
-    fig = plt.figure(1, dpi=90)
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
     ax = fig.add_subplot(111)
 
     # mpc = MPC_algorithm(cx, cy, ref, mpc, bounds, constraints, predicted_trajectory)
@@ -1184,5 +1184,5 @@ def main_seed():
         plt.show()
 
 if __name__ == '__main__':
-    main_seed()
-    # main3()
+    # main_seed()
+    main()

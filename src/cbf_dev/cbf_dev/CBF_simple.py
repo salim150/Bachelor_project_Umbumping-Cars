@@ -36,7 +36,7 @@ width = json_object["width"]
 height = json_object["height"]
 boundary_points = np.array([-width/2, width/2, -height/2, height/2])
 check_collision_bool = False
-add_noise = True
+add_noise = False
 np.random.seed(1)
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
@@ -466,6 +466,8 @@ def main(args=None):
     """
     # Step 1: Set the number of iterations
     iterations = 3000
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
+    ax = fig.add_subplot(111)
     
     # Step 2: Sample initial values for x0, y, yaw, v, omega, and model_type
     x0, y, yaw, v, omega, model_type = samplegrid(width_init, height_init, min_dist, robot_num, safety_init)
@@ -528,6 +530,8 @@ def main1(args=None):
     """
     # Step 1: Set the number of iterations
     iterations = 3000
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
+    ax = fig.add_subplot(111)
     
     # Step 2: Sample initial values for x0, y, yaw, v, omega, and model_type
     initial_state = data['initial_position']
@@ -598,6 +602,8 @@ def main_seed(args=None):
     """
     # Step 1: Set the number of iterations
     iterations = 3000
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
+    ax = fig.add_subplot(111)
     break_flag = False
     
     # Step 2: Sample initial values for x0, y, yaw, v, omega, and model_type

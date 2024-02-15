@@ -588,7 +588,7 @@ def main():
     for i in range(N):
         dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
 
-    fig = plt.figure(1, dpi=90)
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
     ax = fig.add_subplot(111)
     for z in range(iterations):
         plt.cla()
@@ -649,7 +649,7 @@ def main1():
 
     paths, targets, dilated_traj = initialize_paths_targets_dilated_traj(x)
 
-    fig = plt.figure(1, dpi=90)
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
     ax = fig.add_subplot(111)
 
     for z in range(iterations):
@@ -729,7 +729,7 @@ def main2():
         dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
 
     u_hist = dict.fromkeys(range(robot_num),[0]*int(predict_time/dt))
-    fig = plt.figure(1, dpi=90)
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
     ax = fig.add_subplot(111)
 
     for z in range(iterations):
@@ -816,7 +816,7 @@ def main_seed():
         dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
 
     u_hist = dict.fromkeys(range(robot_num),[0]*int(predict_time/dt))
-    fig = plt.figure(1, dpi=90)
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
     ax = fig.add_subplot(111)
     
     lbp = LBP_algorithm(predicted_trajectory, paths, targets, dilated_traj,

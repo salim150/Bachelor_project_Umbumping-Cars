@@ -490,6 +490,8 @@ def main(args=None):
     """
     # Step 1: Set the number of iterations
     iterations = 3000
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
+    ax = fig.add_subplot(111)
     
     # Step 2: Sample initial values for x0, y, yaw, v, omega, and model_type
     x0, y, yaw, v, omega, model_type = samplegrid(width_init, height_init, min_dist, robot_num, safety_init)
@@ -534,6 +536,9 @@ def main1(args=None):
     # Instantiate Robotarium object
     # The robots will never reach their goal points so set iteration number
     iterations = 3000
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
+    ax = fig.add_subplot(111)
+
     # Define goal points outside of the arena
     x0, y, yaw, v, omega, model_type = samplegrid(width_init, height_init, min_dist, robot_num, safety_init)
     x = np.array([x0, y, yaw, v])
@@ -618,6 +623,8 @@ def main2(args=None):
     """
     # Step 1: Set the number of iterations
     iterations = 3000
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
+    ax = fig.add_subplot(111)
     
     # Step 2: Sample initial values for x0, y, yaw, v, omega, and model_type
     initial_state = data['initial_position']
@@ -688,6 +695,8 @@ def main_seed(args=None):
     """
     # Step 1: Set the number of iterations
     iterations = 3000
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
+    ax = fig.add_subplot(111)
     break_flag = False
     
     # Step 2: Sample initial values for x0, y, yaw, v, omega, and model_type
