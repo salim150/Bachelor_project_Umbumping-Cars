@@ -380,13 +380,9 @@ def check_goal_reached(x, targets, i, distance=0.5):
     return False
 
 class DWA_algorithm():
-    def __init__(self, trajectories, safety, width, height, min_dist,
-                paths, targets, dilated_traj, predicted_trajectory, ax, u_hist):
+    def __init__(self, robot_num, trajectories, paths, targets, dilated_traj, predicted_trajectory, ax, u_hist):
         self.trajectories = trajectories
-        self.safety = safety
-        self.width = width
-        self.height = height
-        self.min_dist = min_dist
+        self.robot_num = robot_num
         self.paths = paths
         self.targets = targets
         self.dilated_traj = dilated_traj
@@ -397,7 +393,7 @@ class DWA_algorithm():
         self.computational_time = []
 
     def run_dwa(self, x, u, break_flag):
-        for i in range(robot_num):
+        for i in range(self.robot_num):
             # Step 9: Check if the distance between the current position and the target is less than 5
             if utils.dist(point1=(x[0,i], x[1,i]), point2=self.targets[i]) < update_dist:
                 # Perform some action when the condition is met
@@ -420,7 +416,7 @@ class DWA_algorithm():
         return x, u, break_flag
     
     def go_to_goal(self, x, u, break_flag):
-        for i in range(robot_num):
+        for i in range(self.robot_num):
             # Step 9: Check if the distance between the current position and the target is less than 5
             if not self.reached_goal[i]:                
                 # If goal is reached, stop the robot
@@ -476,7 +472,7 @@ class DWA_algorithm():
 
         # Collision check
         if check_collision_bool:
-            if any([utils.dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < WB for idx in range(robot_num) if idx != i]): raise Exception('Collision')
+            if any([utils.dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < WB for idx in range(self.robot_num) if idx != i]): raise Exception('Collision')
         
         x1 = motion(x1, u1, dt)
         x[:, i] = x1
@@ -624,9 +620,8 @@ def main():
 
     u_hist = dict.fromkeys(range(robot_num),[[0,0] for _ in range(int(predict_time/dt))])
 
-    dwa = DWA_algorithm(paths, safety_init, width_init, height_init,
-                        min_dist, paths, targets, dilated_traj, predicted_trajectory, ax, u_hist)
-    
+    dwa = DWA_algorithm(robot_num, paths, paths, targets, dilated_traj, predicted_trajectory, ax, u_hist)
+        
     for z in range(iterations):
         plt.cla()
         plt.gcf().canvas.mpl_connect('key_release_event', lambda event: [exit(0) if event.key == 'escape' else None])
@@ -717,8 +712,7 @@ def main1():
     ax = fig.add_subplot(111)
     u_hist = dict.fromkeys(range(robot_num),[[0,0] for _ in range(int(predict_time/dt))])
 
-    dwa = DWA_algorithm(paths, safety_init, width_init, height_init,
-                        min_dist, paths, targets, dilated_traj, predicted_trajectory, ax, u_hist)
+    dwa = DWA_algorithm(robot_num, paths, paths, targets, dilated_traj, predicted_trajectory, ax, u_hist)
     
     for z in range(iterations):
         plt.cla()
@@ -818,8 +812,7 @@ def main_seed():
     ax = fig.add_subplot(111)
     
     # Step 7: Create an instance of the DWA_algorithm class
-    dwa = DWA_algorithm(paths, safety_init, width_init, height_init,
-                        min_dist, paths, targets, dilated_traj, predicted_trajectory, ax, u_hist)
+    dwa = DWA_algorithm(robot_num, paths, paths, targets, dilated_traj, predicted_trajectory, ax, u_hist)
     
     for z in range(iterations):
         plt.cla()

@@ -5,13 +5,12 @@ from enum import Enum
 # For the parameter file
 import pathlib
 import json
-from custom_message.msg import ControlInputs
-from shapely.geometry import Point, Polygon, LineString
+from shapely.geometry import Point, LineString
 from shapely.plotting import plot_polygon, plot_line
-import csv
-import itertools
-import sys
-from dwa_dev.DWA import DWA_algorithm, plot_arrow, plot_robot
+from dwa_dev import DWA as DWA
+import planner.utils as utils
+
+color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
 
 path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
 # Opening JSON file
@@ -50,10 +49,9 @@ safety_init = json_object["safety"]
 width_init = json_object["width"]
 height_init = json_object["height"]
 N=3
-save_flag = True
+save_flag = False
 show_animation = True
 plot_flag = True
-robot_num = json_object["robot_num"]
 timer_freq = json_object["timer_freq"]
 
 class RobotType(Enum):
@@ -222,7 +220,7 @@ def main():
     ax = fig.add_subplot(111)
     for v in np.arange(min_speed, max_speed, v_resolution):
         x_init = np.array([0.0, 0.0, np.radians(90.0), v])
-        dw = calc_dynamic_window(x_init)
+        dw = calc_dynamic_window()
         for a in np.arange(dw[0], dw[1]+a_resolution, a_resolution):
             for delta in np.arange(dw[2], dw[3]+delta_resolution, delta_resolution):
                 # print(v, a, delta)
@@ -250,8 +248,8 @@ def main():
 
     # x = np.array([[0, 20, 15], [0, 0, 20], [0, np.pi, -np.pi/2], [0, 0, 0]])
     # goal = np.array([[30, 0, 15], [10, 10, 0]])
-    x = np.array([[0, 20], [0, 0], [0, np.pi], [0, 0]])
-    goal = np.array([[30, 0], [10, 10]])
+    x = np.array([[0, 10], [0, 0], [0, np.pi], [0, 0]])
+    goal = np.array([[10, 0], [10, 10]])
     u = np.zeros((2, N))
     
     # create a trajcetory array to store the trajectory of the N robots
@@ -261,87 +259,45 @@ def main():
 
     predicted_trajectory = np.zeros((N, round(predict_time/dt)+1, x.shape[0]))
 
+    paths = [[goal[0,idx], goal[1,idx]] for idx in range(N)]
+
+    # Step 5: Extract the target coordinates from the paths
+    targets = [[goal[0,idx], goal[1,idx]] for idx in range(N)]
+
+    # Step 6: Create dilated trajectories for each robot
     dilated_traj = []
     for i in range(N):
         dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
-
-    # input [throttle, steer (delta)]
-    fig = plt.figure(1, dpi=90)
+    
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
     ax = fig.add_subplot(111)
 
-    dwa = DWA_algorithm(paths, safety_init, width_init, height_init,
-                        min_dist, paths, targets, dilated_traj, predicted_trajectory, ax)
+    u_hist = dict.fromkeys(range(N),[[0,0] for _ in range(int(predict_time/dt))])    
+    dwa = DWA.DWA_algorithm(N, paths, paths, targets, dilated_traj, predicted_trajectory, ax, u_hist)
     
-
     for z in range(iterations):
-        for i in range(N):
-            ob = []
-            for idx in range(N):
-                if idx == i:
-                    continue
-                # point = Point(x[0, idx], x[1, idx])
-                # point = point.buffer(dilation_factor, cap_style=3)
-                # ob.append(point)
-                ob.append(dilated_traj[idx])
-            
-            x1 = x[:, i]
-            u1, predicted_trajectory1 = dwa_control(x1, goal[:,i], ob)
-            line = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1]))
-            dilated = line.buffer(dilation_factor, cap_style=3)
-            dilated_traj[i] = dilated
-            x1 = motion(x1, u1, dt)
-            x[:, i] = x1
-            u[:, i] = u1
-            predicted_trajectory[i, :, :] = predicted_trajectory1
-
+        plt.cla()
+        plt.gcf().canvas.mpl_connect('key_release_event', lambda event: [exit(0) if event.key == 'escape' else None])
+        
+        x, u, break_flag = dwa.go_to_goal(x, u, break_flag)
         trajectory = np.dstack([trajectory, x])
-        
-        if show_animation:
-            nearest = find_nearest(v, x[3,0])
             
-            geom = data[str(nearest)][str(u[0,0])][str(u[1,0])]
-            geom = np.array(geom)
-            newgeom = (geom[:,0:2]) @ rotateMatrix(np.radians(90)-x[2,0]) + [x[0,0],x[1,0]]
-        
-            # geom = data[str(nearest)][str(u[0,0])][str(u[1,0])]
-            # geom = np.array(geom)
-            # newgeom = (geom) @ rotateMatrix(np.radians(90)-x[2,0]) + [x[0,0],x[1,0]]
+        utils.plot_map(width=width_init, height=height_init)
+        plt.axis("equal")
+        plt.grid(True)
+        plt.pause(0.0001)
 
-            plt.cla()
-            # for stopping simulation with the esc key.
-            plt.gcf().canvas.mpl_connect(
-                'key_release_event',
-                lambda event: [exit(0) if event.key == 'escape' else None])
-            
-            
-            plot_line(LineString(zip(newgeom[:, 0], newgeom[:, 1])), color='k', ax=ax, add_points=False, linewidth=3)
-            # plot_polygon(Polygon(newgeom), color='k', ax=ax, add_points=False, alpha=0.5)
-            for i in range(N):
-                plt.plot(predicted_trajectory[i, :, 0], predicted_trajectory[i, :, 1], "-g")
-                plot_polygon(dilated_traj[i], ax=ax, add_points=False, alpha=0.5)
-                plt.plot(x[0,i], x[1,i], "xr")
-                plt.plot(goal[0,i], goal[1,i], "xb")
-                plot_robot(x[0,i], x[1,i], x[2,i])
-                plot_arrow(x[0,i], x[1,i], x[2,i], length=2, width=1)
-
-           
-            plt.axis("equal")
-            plt.grid(True)
-            plt.pause(0.0001)
-       
-        for i in range(N):
-            dist_to_goal = math.hypot(x[0,i] - goal[0,i], x[1,i] - goal[1,i])
-            if dist_to_goal <= 5:
-                print("Goal!!")
-                break_flag = True
-        
         if break_flag:
             break
-        
+    
+    # plt.close()
     print("Done")
     if show_animation:
         for i in range(N):
-            plt.plot(trajectory[0,i,:], trajectory[1,i,:], "-r")
+            DWA.plot_robot(x[0, i], x[1, i], x[2, i], i)
+            DWA.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
+            DWA.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
+            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
         plt.pause(0.0001)
         plt.show()
 

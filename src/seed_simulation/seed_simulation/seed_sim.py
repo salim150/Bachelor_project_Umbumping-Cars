@@ -93,9 +93,7 @@ def dwa_sim(seed):
     
     u_hist = dict.fromkeys(range(robot_num),[[0,0] for _ in range(int(predict_time/dt))])    
     # Step 7: Create an instance of the DWA_algorithm class
-    dwa = DWA.DWA_algorithm(paths, safety_init, width_init, height_init,
-                        min_dist, paths, targets, dilated_traj, predicted_trajectory, ax, u_hist)
-    
+    dwa = DWA.DWA_algorithm(robot_num, paths, paths, targets, dilated_traj, predicted_trajectory, ax, u_hist)
     
     for z in range(iterations):
         plt.cla()
@@ -482,17 +480,17 @@ def main():
     with open(filename, 'r') as file:
         seed = json.load(file)
 
-    # dwa_trajectory, dwa_computational_time = dwa_sim(seed)   
-    # print(f"DWA average computational time: {sum(dwa_computational_time) / len(dwa_computational_time)}\n")
+    dwa_trajectory, dwa_computational_time = dwa_sim(seed)   
+    print(f"DWA average computational time: {sum(dwa_computational_time) / len(dwa_computational_time)}\n")
 
-    # mpc_trajectory, mpc_computational_time = mpc_sim(seed)
-    # print(f"MPC average computational time: {sum(mpc_computational_time) / len(mpc_computational_time)}\n")
+    mpc_trajectory, mpc_computational_time = mpc_sim(seed)
+    print(f"MPC average computational time: {sum(mpc_computational_time) / len(mpc_computational_time)}\n")
 
-    # c3bf_trajectory, c3bf_computational_time = c3bf_sim(seed)
-    # print(f"C3BF average computational time: {sum(c3bf_computational_time) / len(c3bf_computational_time)}\n")
+    c3bf_trajectory, c3bf_computational_time = c3bf_sim(seed)
+    print(f"C3BF average computational time: {sum(c3bf_computational_time) / len(c3bf_computational_time)}\n")
 
-    # cbf_trajectory, cbf_computational_time = cbf_sim(seed)
-    # print(f"CBF average computational time: {sum(cbf_computational_time) / len(cbf_computational_time)}\n")
+    cbf_trajectory, cbf_computational_time = cbf_sim(seed)
+    print(f"CBF average computational time: {sum(cbf_computational_time) / len(cbf_computational_time)}\n")
     
     lbp_trajectory, lbp_computational_time = lbp_sim(seed)
     print(f"LBP average computational time: {sum(lbp_computational_time) / len(lbp_computational_time)}\n")

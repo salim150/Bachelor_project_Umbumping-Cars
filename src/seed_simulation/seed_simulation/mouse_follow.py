@@ -233,8 +233,7 @@ def main_dwa(seed):
     u_hist = dict.fromkeys(range(robot_num),[[0,0] for _ in range(int(predict_time/dt))])
     
     # Step 7: Create an instance of the DWA_algorithm class
-    dwa = DWA.DWA_algorithm(initial_state, paths, safety_init, width_init, height_init,
-                        min_dist, paths, targets, dilated_traj, predicted_trajectory, ax, u_hist)
+    dwa = DWA.DWA_algorithm(robot_num, paths, paths, targets, dilated_traj, predicted_trajectory, ax, u_hist)
     
     for z in range(iterations):
         plt.cla()
@@ -543,8 +542,8 @@ if __name__ == '__main__':
     # filename = '/home/giacomo/thesis_ws/src/circular_seed_0.json'
     with open(filename, 'r') as file:
         seed = json.load(file)
-    main_lbp(seed)
-    # main_dwa(seed)
+    # main_lbp(seed)
+    main_dwa(seed)
     # main_mpc(seed)
     # main_c3bf(seed)
     # main_cbf(seed)  
