@@ -20,21 +20,16 @@ with open(path, 'r') as openfile:
     # Reading from json file
     json_object = json.load(openfile)
 
-max_steer = json_object["DWA"]["max_steer"] # [rad] max steering angle
-max_speed = json_object["DWA"]["max_speed"] # [m/s]
-min_speed = json_object["DWA"]["min_speed"] # [m/s]
-v_resolution = json_object["DWA"]["v_resolution"] # [m/s]
-delta_resolution = math.radians(json_object["DWA"]["delta_resolution"])# [rad/s]
-max_acc = json_object["DWA"]["max_acc"] # [m/ss]
-min_acc = json_object["DWA"]["min_acc"] # [m/ss]
-dt = json_object["DWA"]["dt"] # [s] Time tick for motion prediction
-predict_time = json_object["DWA"]["predict_time"] # [s]
-to_goal_cost_gain = json_object["DWA"]["to_goal_cost_gain"]
-speed_cost_gain = json_object["DWA"]["speed_cost_gain"]
-obstacle_cost_gain = json_object["DWA"]["obstacle_cost_gain"]
-heading_cost_gain = json_object["DWA"]["heading_cost_gain"]
-robot_stuck_flag_cons = json_object["DWA"]["robot_stuck_flag_cons"]
-dilation_factor = json_object["DWA"]["dilation_factor"]
+max_steer = json_object["MPC"]["max_steer"] # [rad] max steering angle
+max_speed = json_object["MPC"]["max_speed"] # [m/s]
+min_speed = json_object["MPC"]["min_speed"] # [m/s]
+max_acc = json_object["MPC"]["max_acc"] # [m/ss]
+min_acc = json_object["MPC"]["min_acc"] # [m/ss]
+dt = json_object["MPC"]["dt"] # [s] Time tick for motion prediction
+horizon = json_object["MPC"]["horizon"] # [s] Time horizon for motion prediction
+dt_pred = json_object["MPC"]["dt_pred"] # [s] Time tick for motion prediction
+safety_radius = json_object["MPC"]["safety_radius"] # [m] Safety radius for obstacle avoidance
+
 L = json_object["Car_model"]["L"]  # [m] Wheel base of vehicle
 Lr = L / 2.0  # [m]
 Lf = L - Lr
@@ -107,8 +102,8 @@ class ModelPredictiveControl:
     """
 
     def __init__(self, obs_x, obs_y,  cx=None, cy=None, ref=None, bounds=None, constraints=None, predicted_trajectory=None):
-        self.horizon = 8
-        self.dt = 0.2
+        self.horizon = horizon
+        self.dt = dt_pred
 
         # self.L = 2.5 # Car base [m]
 
@@ -120,7 +115,7 @@ class ModelPredictiveControl:
         self.y_obs = obs_y
 
         self.initial_state = None
-        self.safety_radius = 2
+        self.safety_radius = safety_radius
 
         self.cx = cx
         self.cy = cy
