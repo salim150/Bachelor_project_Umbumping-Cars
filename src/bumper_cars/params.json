@@ -91,8 +91,8 @@
             "min_acc": -5,
             "max_speed": 2,
             "min_speed": -1,
-            "controller_type": "DWA",
-            "cbf_type": "C3BF"
+            "controller_type": "MPC",
+            "cbf_type": "CBF"
         },
     "robot_num": 5,
     "safety": 10, 
