@@ -156,7 +156,16 @@ $$
 </p>
 
 ## TODO
-- add a lot of function to make the code more readable. Preferrable: put all this functions in a utils.py file.
+- Check if there are soem hardcoded constants in the files
+- Debug the ROS2 simulation, it starts but the resulting behaviour (mainly for MPC, LBP, DWA) differs from the python simulation.
+- consider yaw flipping when qp solver fails
+- penalize the backward motion --> in the lpb the trajectory doesn't contain any speed info, done
+- implement noise --> done, maybe kalman filter
+- start planning what to write in the report
+- solve problems in the dwa generate trajectories file
+- create e a follow_trajectory script also for dwa like I did for LBP
+- put an additional state in the trajectory as an information on whether the method (solver/ mpc) failed.
+- write the post processing (save/analyze the trajectories and data)
 
 ## ROS2 and Rviz2 Integration
 
