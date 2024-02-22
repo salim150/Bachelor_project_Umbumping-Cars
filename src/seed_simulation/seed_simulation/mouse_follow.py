@@ -295,15 +295,16 @@ def main_mpc(seed):
     cid = fig.canvas.mpl_connect('button_press_event', onclick)
     dl = 3
     
-    # MPC initialization
-    mpc = MPC.ModelPredictiveControl([], [])
-    
     initial_state = seed['initial_position']
     x0 = initial_state['x']
     y = initial_state['y']
     yaw = initial_state['yaw']
     v = initial_state['v']
     x = np.array([x0, y, yaw, v])
+
+    # MPC initialization
+    mpc = MPC.ModelPredictiveControl([], [], x=x)
+
     num_inputs = 2
     u = np.zeros([mpc.horizon*num_inputs, robot_num])
 
@@ -325,9 +326,6 @@ def main_mpc(seed):
         cx.append(x_buf)
         cy.append(y_buf)
         ref.append([cx[i][0], cy[i][0]])
-
-    # Usage:
-    bounds, constraints = MPC.set_bounds_and_constraints(mpc)
     
     predicted_trajectory = dict.fromkeys(range(robot_num),np.zeros([mpc.horizon, x.shape[0]]))
     for i in range(robot_num):
@@ -337,9 +335,6 @@ def main_mpc(seed):
     mpc.cx = cx
     mpc.cy = cy
     mpc.ref = ref
-    mpc.bounds = bounds
-    mpc.constraints = constraints
-    mpc.predicted_trajectory = predicted_trajectory
 
     for z in range(iterations):
         plt.cla()
@@ -543,7 +538,7 @@ if __name__ == '__main__':
     with open(filename, 'r') as file:
         seed = json.load(file)
     # main_lbp(seed)
-    main_dwa(seed)
-    # main_mpc(seed)
+    # main_dwa(seed)
+    main_mpc(seed)
     # main_c3bf(seed)
     # main_cbf(seed)  

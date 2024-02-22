@@ -101,7 +101,7 @@
             "L_d": 20,
             "max_acc": 5.0,
             "min_acc": -5.0,
-            "controller_type": "CBF",
+            "controller_type": "MPC",
             "cbf_type": "C3BF"
         },
     "robot_num": 5,

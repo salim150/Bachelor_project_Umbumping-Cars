@@ -148,9 +148,6 @@ def mpc_sim(seed):
     """
     print("MPC start!!")
     break_flag = False
-
-    # MPC initialization
-    mpc = MPC.ModelPredictiveControl([], [])
     
     initial_state = seed['initial_position']
     x0 = initial_state['x']
@@ -158,6 +155,9 @@ def mpc_sim(seed):
     yaw = initial_state['yaw']
     v = initial_state['v']
     x = np.array([x0, y, yaw, v])
+
+    mpc = MPC.ModelPredictiveControl(obs_x=[], obs_y=[], x=x)
+
     num_inputs = 2
     u = np.zeros([mpc.horizon*num_inputs, robot_num])
 
@@ -179,13 +179,6 @@ def mpc_sim(seed):
         cx.append(x_buf)
         cy.append(y_buf)
         ref.append([cx[i][0], cy[i][0]])
-
-    # Usage:
-    bounds, constraints = MPC.set_bounds_and_constraints(mpc)
-    
-    predicted_trajectory = dict.fromkeys(range(robot_num),np.zeros([mpc.horizon, x.shape[0]]))
-    for i in range(robot_num):
-        predicted_trajectory[i] = np.full((mpc.horizon, 4), x[:,i])
     
     # input [throttle, steer (delta)]
     fig = plt.figure(1, dpi=90)
@@ -195,9 +188,6 @@ def mpc_sim(seed):
     mpc.cx = cx
     mpc.cy = cy
     mpc.ref = ref
-    mpc.bounds = bounds
-    mpc.constraints = constraints
-    mpc.predicted_trajectory = predicted_trajectory
 
     for z in range(iterations):
         plt.cla()
