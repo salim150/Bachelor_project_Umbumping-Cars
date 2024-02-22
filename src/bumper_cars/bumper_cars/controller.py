@@ -203,8 +203,6 @@ class Controller(Node):
                 # TODO initialize control
                 multi_control.multi_control.append(ControlInputs(delta=0.0, throttle=0.0))
             
-            self.cbf = CBF.CBF_algorithm(self.targets, self.paths)
-            
             ts = message_filters.ApproximateTimeSynchronizer([multi_state_sub], 4, 0.3, allow_headerless=True)
             ts.registerCallback(self.general_pose_callback)
      

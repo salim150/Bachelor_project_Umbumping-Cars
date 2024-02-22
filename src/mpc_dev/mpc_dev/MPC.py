@@ -86,30 +86,38 @@ class ModelPredictiveControl:
     Attributes:
         horizon (int): The prediction horizon.
         dt (float): The time step.
-        reference1 (list): The reference or set point the controller will achieve.
-        reference2 (list): An optional second reference point.
         x_obs (list): The x-coordinates of the obstacles.
         y_obs (list): The y-coordinates of the obstacles.
         initial_state (list): The initial state of the system.
         safety_radius (float): The safety radius for obstacle avoidance.
+        cx (list): The x-coordinates of the path for each robot.
+        cy (list): The y-coordinates of the path for each robot.
+        ref (list): The reference points for each robot.
+        bounds (list): The bounds for the optimization problem.
+        constraints (list): The constraints for the optimization problem.
+        predicted_trajectory (list): The predicted trajectories of all robots.
+        reached_goal (list): A list of flags indicating whether each robot has reached the goal.
+        computational_time (list): The computational time for each iteration of the MPC controller.
 
     Methods:
         plant_model: Computes the next state of the system based on the current state and control inputs.
         cost_function: Computes the cost associated with a given control sequence.
+        cost_function2: Computes the cost associated with a given control sequence.
+        cost_function3: Computes the cost associated with a given control sequence.
+        seed_cost: Computes the cost associated with a given control sequence.
         propagation1: Propagates the system state in the x-direction based on a given control sequence.
         propagation2: Propagates the system state in the y-direction based on a given control sequence.
         propagation3: Computes the distance between the system state and the obstacles based on a given control sequence.
+        run_mpc: Runs the MPC controller for a given number of iterations.
+        go_to_goal: Moves the robot to the goal position.
+        mpc_control: Computes the control inputs for the MPC controller.
+        update_obstacles: Update the obstacles for the model predictive control (MPC) algorithm.
+
     """
 
     def __init__(self, obs_x, obs_y,  cx=None, cy=None, ref=None, bounds=None, constraints=None, predicted_trajectory=None):
         self.horizon = horizon
         self.dt = dt_pred
-
-        # self.L = 2.5 # Car base [m]
-
-        # Reference or set point the controller will achieve.
-        self.reference1 = [10, 0, 0]
-        self.reference2 = None
 
         self.x_obs = obs_x
         self.y_obs = obs_y
@@ -297,7 +305,7 @@ class ModelPredictiveControl:
         cost += 100*distance_to_goal
         return cost
     
-    def seed_cost(self,u, *args):
+    def seed_cost(self, u, *args):
         """
         Define the cost function for the MPC controller. Composed of a stage cost calculated in
         the for loop and a terminal cost, calculated at the end on the loop.
@@ -451,6 +459,23 @@ class ModelPredictiveControl:
         return x, u, break_flag
     
     def mpc_control(self, i, x, u, bounds, constraints, ref, predicted_trajectory, cost_function):
+        """
+        Perform model predictive control (MPC) for a given time step.
+
+        Args:
+            i (int): The current time step.
+            x (numpy.ndarray): The state vector.
+            u (numpy.ndarray): The control vector.
+            bounds (list): The bounds on the control inputs.
+            constraints (list): The constraints on the control inputs.
+            ref (numpy.ndarray): The reference trajectory.
+            predicted_trajectory (numpy.ndarray): The predicted trajectory.
+            cost_function (function): The cost function to be minimized.
+
+        Returns:
+            tuple: A tuple containing the updated state vector, control vector, and predicted trajectory.
+
+        """
         x1 = x[:, i]
         u1 = u[:,i]
         u1 = np.delete(u1,0)
@@ -670,18 +695,28 @@ def generate_reference_trajectory(x, dl):
     return cx, cy, cyaw, ref, target_ind
 
 def set_bounds_and_constraints(mpc):
-        bounds = []
-        # Set bounds for inputs bounded optimization.
-        for i in range(mpc.horizon):
-            bounds += [[min_acc, max_acc]]
-            bounds += [[-max_steer, max_steer]]
+    """
+    Set the bounds and constraints for the model predictive control (MPC) problem.
 
-        constraint1 = NonlinearConstraint(fun=mpc.propagation1, lb=-width_init/2 + mpc.safety_radius, ub=width_init/2 - mpc.safety_radius)
-        constraint2 = NonlinearConstraint(fun=mpc.propagation2, lb=-height_init/2 + mpc.safety_radius, ub=height_init/2 - mpc.safety_radius)
-        constraint3 = NonlinearConstraint(fun=mpc.propagation3, lb=0, ub=np.inf)
-        constraints = [constraint1, constraint2, constraint3]
+    Parameters:
+    mpc (object): The MPC object.
 
-        return bounds, constraints
+    Returns:
+    tuple: A tuple containing the bounds and constraints for the MPC problem.
+    """
+        
+    bounds = []
+    # Set bounds for inputs bounded optimization.
+    for i in range(mpc.horizon):
+        bounds += [[min_acc, max_acc]]
+        bounds += [[-max_steer, max_steer]]
+
+    constraint1 = NonlinearConstraint(fun=mpc.propagation1, lb=-width_init/2 + mpc.safety_radius, ub=width_init/2 - mpc.safety_radius)
+    constraint2 = NonlinearConstraint(fun=mpc.propagation2, lb=-height_init/2 + mpc.safety_radius, ub=height_init/2 - mpc.safety_radius)
+    constraint3 = NonlinearConstraint(fun=mpc.propagation3, lb=0, ub=np.inf)
+    constraints = [constraint1, constraint2, constraint3]
+
+    return bounds, constraints
 
 def plot_arrow(x, y, yaw, length=0.5, width=0.1):  # pragma: no cover
     plt.arrow(x, y, length * math.cos(yaw), length * math.sin(yaw),

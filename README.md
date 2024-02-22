@@ -162,10 +162,10 @@ $$
 - penalize the backward motion --> in the lpb the trajectory doesn't contain any speed info, done
 - implement noise --> done, maybe kalman filter
 - start planning what to write in the report
-- solve problems in the dwa generate trajectories file
 - create e a follow_trajectory script also for dwa like I did for LBP
 - put an additional state in the trajectory as an information on whether the method (solver/ mpc) failed.
 - write the post processing (save/analyze the trajectories and data)
+- fix random walk and random harem option on the controller node
 
 ## ROS2 and Rviz2 Integration
 

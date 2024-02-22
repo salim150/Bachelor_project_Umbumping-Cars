@@ -127,18 +127,18 @@ class CarModel(Node):
         else:
             dt = time.time() - old_time
         
-        self.get_logger().info("dt: " + str(dt))
+        self.get_logger().info("a: " + str(cmd.throttle) + " delta: " + str(cmd.delta))
             
         state = FullState()
         cmd.delta = np.clip(cmd.delta, -max_steer, max_steer)
 
         state.x = initial_state.x + initial_state.v * np.cos(initial_state.yaw) * dt
         state.y = initial_state.y + initial_state.v * np.sin(initial_state.yaw) * dt
-        state.yaw = initial_state.yaw + initial_state.v / L * np.tan(cmd.delta) * dt
-        state.yaw = self.normalize_angle(state.yaw)
+        
         state.v = initial_state.v + cmd.throttle * dt
         state.v = np.clip(state.v, min_speed, max_speed)
-
+        state.yaw = initial_state.yaw + initial_state.v / L * np.tan(cmd.delta) * dt
+        state.yaw = self.normalize_angle(state.yaw)
         state.delta = cmd.delta
         state.throttle = cmd.throttle
 

@@ -1,5 +1,5 @@
 {
-    "CBF_robotarium": 
+    "CBF_robotarium":
         {
             "max_steer": 0.523599,
             "max_speed": 6,
@@ -85,7 +85,7 @@
         {
             "max_steer": 0.785398,
             "max_speed": 2,
-            "min_speed": -2.0,
+            "min_speed": -1.0,
             "L": 1.0, 
             "Cf": 320.0,
             "Cr": 340.0, 
@@ -99,12 +99,10 @@
             "max_steer": 0.785398,
             "WB": 0.7,
             "L_d": 20,
-            "max_acc": 5,
-            "min_acc": -5,
-            "max_speed": 2,
-            "min_speed": -1,
-            "controller_type": "MPC",
-            "cbf_type": "CBF"
+            "max_acc": 5.0,
+            "min_acc": -5.0,
+            "controller_type": "CBF",
+            "cbf_type": "C3BF"
         },
     "robot_num": 5,
     "safety": 10, 

@@ -380,6 +380,39 @@ def check_goal_reached(x, targets, i, distance=0.5):
     return False
 
 class DWA_algorithm():
+    """
+    Class representing the Dynamic Window Approach algorithm.
+
+    Args:
+        robot_num (int): Number of robots.
+        trajectories (list): List of trajectories for each robot.
+        paths (list): List of paths for each robot.
+        targets (list): List of target positions for each robot.
+        dilated_traj (list): List of dilated trajectories for each robot.
+        predicted_trajectory (list): List of predicted trajectories for each robot.
+        ax (matplotlib.axes.Axes): Axes object for plotting.
+        u_hist (list): List of control inputs history for each robot.
+
+    Attributes:
+        trajectories (list): List of trajectories for each robot.
+        robot_num (int): Number of robots.
+        paths (list): List of paths for each robot.
+        targets (list): List of target positions for each robot.
+        dilated_traj (list): List of dilated trajectories for each robot.
+        predicted_trajectory (list): List of predicted trajectories for each robot.
+        ax (matplotlib.axes.Axes): Axes object for plotting.
+        u_hist (list): List of control inputs history for each robot.
+        reached_goal (list): List of flags indicating if each robot has reached its goal.
+        computational_time (list): List of computational times for each iteration.
+
+    Methods:
+        run_dwa: Runs the DWA algorithm.
+        go_to_goal: Moves the robots towards their respective goals.
+        update_robot_state: Updates the state of a robot based on its current state, control input, and environment information.
+        dwa_control: Dynamic Window Approach control.
+        calc_control_and_trajectory: Calculates the final input with the dynamic window.
+    """
+
     def __init__(self, robot_num, trajectories, paths, targets, dilated_traj, predicted_trajectory, ax, u_hist):
         self.trajectories = trajectories
         self.robot_num = robot_num
@@ -393,6 +426,18 @@ class DWA_algorithm():
         self.computational_time = []
 
     def run_dwa(self, x, u, break_flag):
+        """
+        Runs the DWA algorithm.
+
+        Args:
+            x (numpy.ndarray): Current state of the robots.
+            u (numpy.ndarray): Control input for the robots.
+            break_flag (bool): Flag indicating if the algorithm should stop.
+
+        Returns:
+            tuple: Updated state, control input, and break flag.
+
+        """
         for i in range(self.robot_num):
             # Step 9: Check if the distance between the current position and the target is less than 5
             if utils.dist(point1=(x[0,i], x[1,i]), point2=self.targets[i]) < update_dist:
@@ -416,6 +461,18 @@ class DWA_algorithm():
         return x, u, break_flag
     
     def go_to_goal(self, x, u, break_flag):
+        """
+        Moves the robots towards their respective goals.
+
+        Args:
+            x (numpy.ndarray): Current state of the robots.
+            u (numpy.ndarray): Control input for the robots.
+            break_flag (bool): Flag indicating if the algorithm should stop.
+
+        Returns:
+            tuple: Updated state, control input, and break flag.
+
+        """
         for i in range(self.robot_num):
             # Step 9: Check if the distance between the current position and the target is less than 5
             if not self.reached_goal[i]:                
@@ -483,101 +540,106 @@ class DWA_algorithm():
         return x, u
     
     def dwa_control(self, x, ob, i):
-        """
-        Dynamic Window Approach control.
+            """
+            Dynamic Window Approach control.
 
-        Args:
-            x (list): Current state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)].
-            goal (list): Goal position [x(m), y(m)].
-            ob (list): List of obstacles.
+            This method implements the Dynamic Window Approach control algorithm.
+            It takes the current state, obstacles, and the index of the current iteration as input.
+            It calculates the dynamic window, control inputs, trajectory, and control history.
+            The control inputs are returned as a tuple (throttle, delta), and the trajectory and control history are also returned.
 
-        Returns:
-            tuple: Tuple containing the control inputs (throttle, delta) and the trajectory.
-        """
-        dw = calc_dynamic_window()
-        u, trajectory, u_history = self.calc_control_and_trajectory(x, dw, ob, i)
-        return u, trajectory, u_history
+            Args:
+                x (list): Current state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)].
+                ob (list): List of obstacles.
+                i (int): Index of the current iteration.
+
+            Returns:
+                tuple: Tuple containing the control inputs (throttle, delta) and the trajectory.
+            """
+            dw = calc_dynamic_window()
+            u, trajectory, u_history = self.calc_control_and_trajectory(x, dw, ob, i)
+            return u, trajectory, u_history
     
     def calc_control_and_trajectory(self, x, dw, ob, i):
-        """
-        Calculate the final input with the dynamic window.
+            """
+            Calculate the final input with the dynamic window.
 
-        Args:
-            x (list): Current state [x(m), y(m), yaw(rad), v(m/s), delta(rad)].
-            dw (list): Dynamic window [min_throttle, max_throttle, min_steer, max_steer].
-            goal (list): Goal position [x(m), y(m)].
-            ob (list): List of obstacles.
+            Args:
+                x (list): Current state [x(m), y(m), yaw(rad), v(m/s), delta(rad)].
+                dw (list): Dynamic window [min_throttle, max_throttle, min_steer, max_steer].
+                ob (list): List of obstacles.
+                i (int): Index of the target.
 
-        Returns:
-            tuple: Tuple containing the control inputs (throttle, delta) and the trajectory.
-        """
-        min_cost = float("inf")
-        best_u = [0.0, 0.0]
-        best_trajectory = np.array([x])
-        u_buf = self.u_hist[i]
-        goal = self.targets[i] 
-        trajectory_buf = self.predicted_trajectory[i]
+            Returns:
+                tuple: Tuple containing the control inputs (throttle, delta) and the trajectory.
+            """
+            min_cost = float("inf")
+            best_u = [0.0, 0.0]
+            best_trajectory = np.array([x])
+            u_buf = self.u_hist[i]
+            goal = self.targets[i] 
+            trajectory_buf = self.predicted_trajectory[i]
 
-        # evaluate all trajectory with sampled input in dynamic window
-        nearest = find_nearest(np.arange(min_speed, max_speed, v_resolution), x[3])
+            # evaluate all trajectory with sampled input in dynamic window
+            nearest = find_nearest(np.arange(min_speed, max_speed, v_resolution), x[3])
 
-        for a in np.arange(dw[0], dw[1]+v_resolution, v_resolution):
-            for delta in np.arange(dw[2], dw[3]+delta_resolution, delta_resolution):
+            for a in np.arange(dw[0], dw[1]+v_resolution, v_resolution):
+                for delta in np.arange(dw[2], dw[3]+delta_resolution, delta_resolution):
 
-                # old_time = time.time()
-                geom = data[str(nearest)][str(a)][str(delta)]
-                geom = np.array(geom)
-                geom[:,0:2] = (geom[:,0:2]) @ rotateMatrix(np.radians(90)-x[2]) + [x[0],x[1]]
-                # print(time.time()-old_time)
-                geom[:,2] = geom[:,2] + x[2] - np.pi/2 #bringing also the yaw angle in the new frame
+                    # old_time = time.time()
+                    geom = data[str(nearest)][str(a)][str(delta)]
+                    geom = np.array(geom)
+                    geom[:,0:2] = (geom[:,0:2]) @ rotateMatrix(np.radians(90)-x[2]) + [x[0],x[1]]
+                    # print(time.time()-old_time)
+                    geom[:,2] = geom[:,2] + x[2] - np.pi/2 #bringing also the yaw angle in the new frame
 
-                # trajectory = predict_trajectory(x_init, a, delta)
-                trajectory = geom
-                # calc cost
+                    # trajectory = predict_trajectory(x_init, a, delta)
+                    trajectory = geom
+                    # calc cost
 
-                to_goal_cost = to_goal_cost_gain * calc_to_goal_cost(trajectory, goal)
-                speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
-                # if trajectory[-1, 3] != 0:
-                #     speed_cost = 2 * np.sign(trajectory[-1, 3]) * trajectory[-1, 3]
-                # else:
-                #     speed_cost = 5
-                ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory, ob)
-                # heading_cost = heading_cost_gain * calc_to_goal_heading_cost(trajectory, goal)
-                final_cost = to_goal_cost + ob_cost + speed_cost # + heading_cost #+ speed_cost 
-                
-                # search minimum trajectory
+                    to_goal_cost = to_goal_cost_gain * calc_to_goal_cost(trajectory, goal)
+                    speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
+                    # if trajectory[-1, 3] != 0:
+                    #     speed_cost = 2 * np.sign(trajectory[-1, 3]) * trajectory[-1, 3]
+                    # else:
+                    #     speed_cost = 5
+                    ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory, ob)
+                    # heading_cost = heading_cost_gain * calc_to_goal_heading_cost(trajectory, goal)
+                    final_cost = to_goal_cost + ob_cost + speed_cost # + heading_cost #+ speed_cost 
+                    
+                    # search minimum trajectory
+                    if min_cost >= final_cost:
+                        min_cost = final_cost
+                        best_u = [a, delta]
+                        best_trajectory = trajectory
+                        u_history = [[a, delta] for _ in range(len(trajectory-1))]
+                        if abs(best_u[0]) < robot_stuck_flag_cons \
+                                and abs(x[2]) < robot_stuck_flag_cons:
+                            # to ensure the robot do not get stuck in
+                            # best v=0 m/s (in front of an obstacle) and
+                            # best omega=0 rad/s (heading to the goal with
+                            # angle difference of 0)
+                            best_u[1] = -max_steer
+                            best_trajectory = trajectory
+                            u_history = [delta]*len(trajectory)
+            # print(time.time()-old_time)
+                          
+            u_buf.pop(0)
+            if len(u_buf) >= 2:
+                trajectory_buf = trajectory_buf[1:]
+
+                to_goal_cost = to_goal_cost_gain * calc_to_goal_cost(trajectory_buf, goal)
+                # speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
+                ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory_buf, ob)
+                heading_cost = heading_cost_gain * calc_to_goal_heading_cost(trajectory_buf, goal)
+                final_cost = to_goal_cost + ob_cost + heading_cost #+ speed_cost 
+
                 if min_cost >= final_cost:
                     min_cost = final_cost
-                    best_u = [a, delta]
-                    best_trajectory = trajectory
-                    u_history = [[a, delta] for _ in range(len(trajectory-1))]
-                    if abs(best_u[0]) < robot_stuck_flag_cons \
-                            and abs(x[2]) < robot_stuck_flag_cons:
-                        # to ensure the robot do not get stuck in
-                        # best v=0 m/s (in front of an obstacle) and
-                        # best omega=0 rad/s (heading to the goal with
-                        # angle difference of 0)
-                        best_u[1] = -max_steer
-                        best_trajectory = trajectory
-                        u_history = [delta]*len(trajectory)
-        # print(time.time()-old_time)
-                      
-        u_buf.pop(0)
-        if len(u_buf) >= 2:
-            trajectory_buf = trajectory_buf[1:]
-
-            to_goal_cost = to_goal_cost_gain * calc_to_goal_cost(trajectory_buf, goal)
-            # speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
-            ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory_buf, ob)
-            heading_cost = heading_cost_gain * calc_to_goal_heading_cost(trajectory_buf, goal)
-            final_cost = to_goal_cost + ob_cost + heading_cost #+ speed_cost 
-
-            if min_cost >= final_cost:
-                min_cost = final_cost
-                best_u = u_buf[0]
-                best_trajectory = trajectory_buf
-                u_history = u_buf
-        return best_u, best_trajectory, u_history
+                    best_u = u_buf[0]
+                    best_trajectory = trajectory_buf
+                    u_history = u_buf
+            return best_u, best_trajectory, u_history
 
 def main():
     """

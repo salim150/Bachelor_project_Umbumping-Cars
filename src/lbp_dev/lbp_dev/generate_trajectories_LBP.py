@@ -14,13 +14,9 @@ from matplotlib import pyplot as plt
 import numpy as np
 import math
 
-import lattice_planner as trajectory_generator,\
-    lattice_motion_model as motion_model
+import lattice_motion_model as motion_model
 
-from lattice import calc_uniform_polar_states, generate_path, show_animation
-
-from shapely.geometry import Point, Polygon, LineString
-from shapely.plotting import plot_polygon, plot_line
+from lattice import calc_uniform_polar_states, generate_path
 import json
 
 path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
@@ -236,7 +232,7 @@ def generate_lookup_table():
     with open('src/lbp_dev/lbp_dev/LBP.json', 'w') as file:
         json.dump(temp, file, indent=4)
 
-    print("\nThe JSON data has been written to 'data.json'")
+    print("\nThe JSON data has been written to 'src/lbp_dev/lbp_dev/LBP.json'")
 
     # states = calc_states_list(max_yaw=np.deg2rad(-35.0))
     # k0 = 0.0

@@ -406,6 +406,7 @@ def check_goal_reached(x, targets, i, distance=0.5):
     return False
 
 class C3BF_algorithm():
+    
     def __init__(self, targets, paths):
         self.targets = targets
         self.paths = paths
