@@ -218,10 +218,15 @@ def calc_control_and_trajectory(x, v_search, goal, ob, u_buf, trajectory_buf):
 
             # TODO: small bug when increasing the factor too much for the to_goal_cost_gain
             to_goal_cost = to_goal_cost_gain * calc_to_goal_cost(trajectory, goal)
-            # speed_cost = speed_cost_gain * np.sign(trajectory[-1, 3]) * trajectory[-1, 3]
+            
+            if v <= 0.0:
+                speed_cost = 10
+            else:
+                speed_cost = 0.0
+                
             ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory, ob)
             heading_cost = heading_cost_gain * calc_to_goal_heading_cost(trajectory, goal)
-            final_cost = to_goal_cost + ob_cost + heading_cost #+ speed_cost 
+            final_cost = to_goal_cost + ob_cost + heading_cost + speed_cost 
             
             # search minimum trajectory
             if min_cost >= final_cost:
@@ -241,8 +246,9 @@ def calc_control_and_trajectory(x, v_search, goal, ob, u_buf, trajectory_buf):
     
     #TODO: this section has a small bug due to popping elements from the buffer, it gets to a point where there 
     # are no more elements in the buffer to use
-    u_buf.pop(0)
-    if len(u_buf) >= 2:
+    if len(u_buf) > 2:
+        u_buf.pop(0)
+    
         trajectory_buf = trajectory_buf[1:]
 
         to_goal_cost = to_goal_cost_gain * calc_to_goal_cost(trajectory_buf, goal)

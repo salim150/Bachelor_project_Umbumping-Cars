@@ -599,10 +599,10 @@ class DWA_algorithm():
 
                     to_goal_cost = to_goal_cost_gain * calc_to_goal_cost(trajectory, goal)
                     speed_cost = speed_cost_gain * (max_speed - trajectory[-1, 3])
-                    # if trajectory[-1, 3] != 0:
-                    #     speed_cost = 2 * np.sign(trajectory[-1, 3]) * trajectory[-1, 3]
-                    # else:
-                    #     speed_cost = 5
+                    if trajectory[-1, 3] <= 0.0:
+                        speed_cost = 10
+                    else:
+                        speed_cost = 0.0
                     ob_cost = obstacle_cost_gain * calc_obstacle_cost(trajectory, ob)
                     # heading_cost = heading_cost_gain * calc_to_goal_heading_cost(trajectory, goal)
                     final_cost = to_goal_cost + ob_cost + speed_cost # + heading_cost #+ speed_cost 
@@ -623,9 +623,8 @@ class DWA_algorithm():
                             best_trajectory = trajectory
                             u_history = [delta]*len(trajectory)
             # print(time.time()-old_time)
-                          
-            u_buf.pop(0)
-            if len(u_buf) >= 2:
+            if len(u_buf) > 2:              
+                u_buf.pop(0)
                 trajectory_buf = trajectory_buf[1:]
 
                 to_goal_cost = to_goal_cost_gain * calc_to_goal_cost(trajectory_buf, goal)
