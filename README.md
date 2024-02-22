@@ -159,7 +159,6 @@ $$
 - Check if there are soem hardcoded constants in the files
 - Debug the ROS2 simulation, it starts but the resulting behaviour (mainly for MPC, LBP, DWA) differs from the python simulation.
 - consider yaw flipping when qp solver fails
-- penalize the backward motion --> in the lpb the trajectory doesn't contain any speed info, done
 - implement noise --> done, maybe kalman filter
 - start planning what to write in the report
 - create e a follow_trajectory script also for dwa like I did for LBP
