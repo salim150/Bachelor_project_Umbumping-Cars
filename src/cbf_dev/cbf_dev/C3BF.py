@@ -742,5 +742,5 @@ def main_seed(args=None):
         
 if __name__=='__main__':
     # main_seed()
-    main1()
+    main()
         

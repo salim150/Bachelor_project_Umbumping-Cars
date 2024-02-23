@@ -1190,5 +1190,5 @@ def main_seed():
         plt.show()
 
 if __name__ == '__main__':
-    main_seed()
-    # main()
+    # main_seed()
+    main()

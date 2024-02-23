@@ -24,6 +24,7 @@ with open(path, 'r') as openfile:
 max_steer = json_object["Car_model"]["max_steer"] # [rad] max steering angle
 max_speed = json_object["Car_model"]["max_speed"] # [m/s]
 min_speed = json_object["Car_model"]["min_speed"] # [m/s]
+dt = json_object["Controller"]["dt"]  # [s] Time step
 L = json_object["Car_model"]["L"]  # [m] Wheel base of vehicle
 Lr = L / 2.0  # [m]
 Lf = L - Lr
@@ -40,7 +41,7 @@ L_d = json_object["Controller"]["L_d"]
 
 debug = True
 
-def predict_trajectory(initial_state: State, target):
+def predict_trajectory(initial_state: State, target, linear=True):
     """
     Predicts the trajectory of a vehicle from an initial state to a target point.
 
@@ -63,17 +64,23 @@ def predict_trajectory(initial_state: State, target):
     cmd.throttle, cmd.delta = pure_pursuit_steer_control(target, initial_state)
 
     # Update the state using the linear model and append the new state coordinates to the trajectory
-    new_state, old_time = linear_model_callback(initial_state, cmd, old_time)
+    if linear:
+        new_state, old_time = linear_model_callback(initial_state, cmd)
+    else:
+        new_state, old_time = nonlinear_model_callback(initial_state, cmd)
     traj.append(Coordinate(x=new_state.x, y=new_state.y))
 
     # Continue predicting the trajectory until the distance between the last point and the target is less than 10
-    while dist(point1=(traj[-1].x, traj[-1].y), point2=target) > 10:
+    while dist(point1=(traj[-1].x, traj[-1].y), point2=target) > 1:
 
         # Calculate the control inputs for the new state
         cmd.throttle, cmd.delta = pure_pursuit_steer_control(target, new_state)
 
         # Update the state using the linear model and append the new state coordinates to the trajectory
-        new_state, old_time = linear_model_callback(new_state, cmd, old_time)
+        if linear:
+            new_state, old_time = linear_model_callback(new_state, cmd)
+        else:
+            new_state, old_time = nonlinear_model_callback(new_state, cmd)
         traj.append(Coordinate(x=new_state.x, y=new_state.y))
 
         if debug:
@@ -92,6 +99,7 @@ def predict_trajectory(initial_state: State, target):
     
     # Reduce the number of points in the trajectory for efficiency
     # traj = traj[0:-1:5]
+    plt.show()
 
     return Path(path=traj)
 
@@ -104,7 +112,7 @@ def plot_path(path: Path):
         plt.scatter(x, y, marker='.', s=10)
         plt.scatter(x[0], y[0], marker='x', s=20)
 
-def linear_model_callback(initial_state: State, cmd: ControlInputs, old_time: float):
+def linear_model_callback(initial_state: State, cmd: ControlInputs):
     """
     Calculates the next state based on the linear model.
 
@@ -116,7 +124,6 @@ def linear_model_callback(initial_state: State, cmd: ControlInputs, old_time: fl
     Returns:
         Tuple[State, float]: The next state and the current time.
     """
-    dt = 0.3
     state = State()
     cmd.delta = np.clip(cmd.delta, -max_steer, max_steer)
 
@@ -129,7 +136,7 @@ def linear_model_callback(initial_state: State, cmd: ControlInputs, old_time: fl
 
     return state, time.time()
 
-def nonlinear_model_callback(initial_state: State, cmd: ControlInputs, old_time: float):
+def nonlinear_model_callback(initial_state: State, cmd: ControlInputs):
     """
     Nonlinear model callback function.
 
@@ -142,7 +149,6 @@ def nonlinear_model_callback(initial_state: State, cmd: ControlInputs, old_time:
         Tuple[State, float]: The updated state and the current time.
     """
 
-    dt = 0.1
     state = State()
 
     cmd.delta = np.clip(cmd.delta, -max_steer, max_steer)
@@ -197,11 +203,11 @@ def pure_pursuit_steer_control(target, pose):
 
     # decreasing the desired speed when turning
     if delta > math.radians(10) or delta < -math.radians(10):
-        desired_speed = 3
+        desired_speed = 2
     else:
-        desired_speed = 6
+        desired_speed = max_speed
 
-    delta = delta
+    print(f'Steering angle: {delta} and desired speed: {desired_speed}')
     throttle = 3 * (desired_speed-pose.v)
     return throttle, delta
 
@@ -246,9 +252,28 @@ def normalize_angle(angle):
 def main():
     if debug:
         initial_state = State(x=0.0, y=0.0, yaw=0.0, v=0.0, omega=0.0)
-        target = [-50, -50]
+        target = [-10, -10]
         # trajectory, tx, ty = predict_trajectory(initial_state, target)
-        trajectory = predict_trajectory(initial_state, target)
+        trajectory = predict_trajectory(initial_state, target, True)
+        trajectory1 = predict_trajectory(initial_state, target, False)
+        print(len(trajectory.path))
+        x = []
+        y = []
+        for coord in trajectory.path:
+        
+            x.append(coord.x)
+            y.append(coord.y)
+        plt.plot(x, y, 'r', label='Linear model')
+
+        x = []
+        y = []
+        for coord in trajectory1.path:
+        
+            x.append(coord.x)
+            y.append(coord.y)
+        plt.plot(x, y, 'b', label='Nonlinear model')
+        plt.legend()
+        plt.show()
 
 if __name__ == "__main__":
     main()

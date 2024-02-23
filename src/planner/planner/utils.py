@@ -137,7 +137,7 @@ def pure_pursuit_steer_control(target, pose):
 
     # decreasing the desired speed when turning
     if delta > math.radians(10) or delta < -math.radians(10):
-        desired_speed = 3
+        desired_speed = 2
     else:
         desired_speed = max_speed
 
