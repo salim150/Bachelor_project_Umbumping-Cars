@@ -22,6 +22,8 @@ from matplotlib import pyplot as plt
 import numpy as np
 import math
 import pathlib
+from custom_message.msg import State, ControlInputs
+from planner import utils as utils
 sys.path.append(str(pathlib.Path(__file__).parent.parent))
 
 import lattice_planner as planner
@@ -29,7 +31,7 @@ import lattice_motion_model as motion_model
 
 TABLE_PATH = os.path.dirname(os.path.abspath(__file__)) + "/lookup_table.csv"
 
-show_animation = True
+show_animation = False
 
 
 def search_nearest_one_from_lookup_table(t_x, t_y, t_yaw, lookup_table):
@@ -52,20 +54,28 @@ def get_lookup_table(table_path):
     return np.loadtxt(table_path, delimiter=',', skiprows=1)
 
 
-def generate_path(target_states, k0, v):
+def generate_path(target_states, k0, v, k=False):
     # x, y, yaw, s, km, kf
     lookup_table = get_lookup_table(TABLE_PATH)
     result = []
 
     for state in target_states:
-        bestp = search_nearest_one_from_lookup_table(
-            state[0], state[1], state[2], lookup_table)
+        # bestp = search_nearest_one_from_lookup_table(
+        #     state[0], state[1], state[2], lookup_table)
 
         target = motion_model.State(x=state[0], y=state[1], yaw=state[2])
-        # init_p = np.array(
-        #     [np.hypot(state[0], state[1]), bestp[4], bestp[5]]).reshape(3, 1)
+        initial_state = State(x=0.0, y=0.0, yaw=0.0, v=0.0, omega=0.0)
+        cmd = ControlInputs()  # Create a ControlInputs object
+        cmd.throttle, cmd.delta = utils.pure_pursuit_steer_control([target.x,target.y], initial_state)
+        print(cmd.delta)
+        k0 = cmd.delta
+        if k:
+            print(target.x, target.y, target.yaw)
+            km = cmd.delta/2
+        else:
+            km = 0.0
         init_p = np.array(
-            [np.hypot(state[0], state[1]), 0.0, 0.0]).reshape(3, 1)
+            [np.hypot(state[0], state[1]), km, 0.0]).reshape(3, 1)
 
         x, y, yaw, p, kp = planner.optimize_trajectory(target, k0, init_p, v)
 

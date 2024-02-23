@@ -71,7 +71,7 @@ def predict_trajectory(initial_state: State, target, linear=True):
     traj.append(Coordinate(x=new_state.x, y=new_state.y))
 
     # Continue predicting the trajectory until the distance between the last point and the target is less than 10
-    while dist(point1=(traj[-1].x, traj[-1].y), point2=target) > 1:
+    while dist(point1=(traj[-1].x, traj[-1].y), point2=target) > 0.5:
 
         # Calculate the control inputs for the new state
         cmd.throttle, cmd.delta = pure_pursuit_steer_control(target, new_state)
@@ -250,30 +250,29 @@ def normalize_angle(angle):
 
 
 def main():
-    if debug:
-        initial_state = State(x=0.0, y=0.0, yaw=0.0, v=0.0, omega=0.0)
-        target = [-10, -10]
-        # trajectory, tx, ty = predict_trajectory(initial_state, target)
-        trajectory = predict_trajectory(initial_state, target, True)
-        trajectory1 = predict_trajectory(initial_state, target, False)
-        print(len(trajectory.path))
-        x = []
-        y = []
-        for coord in trajectory.path:
-        
-            x.append(coord.x)
-            y.append(coord.y)
-        plt.plot(x, y, 'r', label='Linear model')
+    initial_state = State(x=0.0, y=0.0, yaw=0.0, v=0.0, omega=0.0)
+    target = [1, 2]
+    # trajectory, tx, ty = predict_trajectory(initial_state, target)
+    trajectory = predict_trajectory(initial_state, target, True)
+    trajectory1 = predict_trajectory(initial_state, target, False)
+    print(len(trajectory.path))
+    x = []
+    y = []
+    for coord in trajectory.path:
+    
+        x.append(coord.x)
+        y.append(coord.y)
+    plt.plot(x, y, 'r', label='Linear model')
 
-        x = []
-        y = []
-        for coord in trajectory1.path:
-        
-            x.append(coord.x)
-            y.append(coord.y)
-        plt.plot(x, y, 'b', label='Nonlinear model')
-        plt.legend()
-        plt.show()
+    x = []
+    y = []
+    for coord in trajectory1.path:
+    
+        x.append(coord.x)
+        y.append(coord.y)
+    plt.plot(x, y, 'b', label='Nonlinear model')
+    plt.legend()
+    plt.show()
 
 if __name__ == "__main__":
     main()

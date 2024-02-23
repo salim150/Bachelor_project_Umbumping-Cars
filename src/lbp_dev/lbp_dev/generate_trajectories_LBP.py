@@ -159,15 +159,16 @@ def generate_lookup_table():
         nxy = 5
         nh = 3
         d = v*predict_time
+        print(f'distance: {d}')
 
         if v == 0.5:
-            angle = 30
+            angle = 45
             a_min = - np.deg2rad(angle)
             a_max = np.deg2rad(angle)
             p_min = - np.deg2rad(angle)
             p_max = np.deg2rad(angle)
         else:
-            angle = 45
+            angle = 60
             a_min = - np.deg2rad(angle)
             a_max = np.deg2rad(angle)
             p_min = - np.deg2rad(angle)
@@ -189,6 +190,27 @@ def generate_lookup_table():
 
             if show_animation:
                 plt.plot(xc, yc, "-r")
+        
+        if v==1.0:
+            target = [[1.0, 3.0, np.deg2rad(90.0)],
+                      [1.0, -3.0, np.deg2rad(-90.0)],
+                      [1.5, 3.0, np.deg2rad(90.0)],
+                      [1.5, -3.0, np.deg2rad(-90.0)]]
+            result = generate_path(target, k0, v, k=True)
+            i = 0
+            for table in result:
+                xc, yc, yawc, kp = motion_model.generate_trajectory(
+                    table[3], table[4], table[5], k0, v)
+                for id, element in enumerate(kp): kp[id] = np.clip(element, -max_steer, max_steer) # clipping elements withing feasible bounds
+                temp[v][i] = {}
+                temp[v][i]['ctrl'] = list(kp)
+                temp[v][i]['x'] = xc
+                temp[v][i]['y'] = yc
+                temp[v][i]['yaw'] = yawc
+                i +=1
+
+                if show_animation:
+                    plt.plot(xc, yc, "-r")
 
         if show_animation:
             plt.grid(True)

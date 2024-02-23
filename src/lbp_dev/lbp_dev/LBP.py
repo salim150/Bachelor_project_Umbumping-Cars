@@ -213,7 +213,7 @@ def calc_control_and_trajectory(x, v_search, goal, ob, u_buf, trajectory_buf):
             to_goal_cost = to_goal_cost_gain * calc_to_goal_cost(trajectory, goal)
             
             if v <= 0.0:
-                speed_cost = 10
+                speed_cost = 30
             else:
                 speed_cost = 0.0
                 

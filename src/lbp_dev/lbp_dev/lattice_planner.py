@@ -15,6 +15,8 @@ path_planning_dir = pathlib.Path(__file__).parent.parent
 sys.path.append(str(path_planning_dir))
 
 import lattice_motion_model as motion_model
+from custom_message.msg import State, ControlInputs
+from planner import utils as utils
 
 # optimization parameter
 max_iter = 100
@@ -22,7 +24,7 @@ max_iter = 100
 h = np.array([0.3, 0.02, 0.02]).T  # parameter sampling distance
 cost_th = 0.12
 
-show_animation = True
+show_animation = False
 
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):  # pragma: no cover
@@ -139,14 +141,20 @@ def optimize_trajectory(target, k0, p, v):
 def optimize_trajectory_demo():  # pragma: no cover
 
     # target = motion_model.State(x=5.0, y=2.0, yaw=np.deg2rad(00.0))
-    target = motion_model.State(x=1.5, y=1.0, yaw=np.deg2rad(90.0))
+    target = motion_model.State(x=1.0, y=-3.0, yaw=np.deg2rad(-90.0))
     # target = motion_model.State(19.87806172474534, 2.205144454953997, 0.4595476973074064)
     k0 = 0.0
     v  = 1.0
 
-    init_p = np.array([6.0, 0.0, 0.0]).reshape(3, 1)
+    initial_state = State(x=0.0, y=0.0, yaw=0.0, v=0.0, omega=0.0)
+    cmd = ControlInputs()  # Create a ControlInputs object
+    cmd.throttle, cmd.delta = utils.pure_pursuit_steer_control([target.x,target.y], initial_state)
+    print(cmd.delta)
+    k0 = cmd.delta
+    print(target.x, target.y, target.yaw)
+    # init_p = np.array([6.0, 0.0, 0.0]).reshape(3, 1)
     init_p = np.array(
-            [np.hypot(target.y, target.x), 0.0, 0.0]).reshape(3, 1)
+            [np.hypot(target.y, target.x), cmd.delta/2, 0.0]).reshape(3, 1)
     # init_p = np.array([5.84663478, 0.20309538, 0.68336985]).reshape(3, 1)
 
     x, y, yaw, p, kp = optimize_trajectory(target, k0, init_p, v)
