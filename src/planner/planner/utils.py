@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
 
-from custom_message.msg import ControlInputs, State
+from custom_message.msg import ControlInputs, State, FullState, Coordinate, Path
 import numpy as np
-from planner.cubic_spline_planner import *
-from planner.frenet import *
-from planner.predict_traj import *
+# from planner.cubic_spline_planner import *
+# from planner.frenet import *
+# from planner.predict_traj import *
 from scipy.spatial.transform import Rotation as Rot
 import random
 
 # For the parameter file
 import pathlib
 import json
+import time
+import matplotlib.pyplot as plt
+import math
+
 
 # TODO: import all this parameters from a config file so that we can easily change them in one place
 path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
@@ -22,7 +26,7 @@ with open(path, 'r') as openfile:
 max_steer = json_object["CBF_simple"]["max_steer"]   # [rad] max steering angle
 max_speed = json_object["Car_model"]["max_speed"] # [m/s]
 min_speed = json_object["Car_model"]["min_speed"]  # [m/s]
-dt = json_object["CBF_simple"]["dt"] 
+dt = json_object["Controller"]["dt"] 
 safety_init = json_object["safety"]
 width_init = json_object["width"]
 height_init = json_object["height"]
@@ -30,6 +34,14 @@ min_dist = json_object["min_dist"]
 L = json_object["Car_model"]["L"] # [m] Wheel base of vehicle
 Lr = L / 2.0  # [m]
 Lf = L - Lr
+Cf = json_object["Car_model"]["Cf"]  # N/rad
+Cr = json_object["Car_model"]["Cr"] # N/rad
+Iz = json_object["Car_model"]["Iz"]  # kg/m2
+m = json_object["Car_model"]["m"]  # kg
+# Aerodynamic and friction coefficients
+c_a = json_object["Car_model"]["c_a"]
+c_r1 = json_object["Car_model"]["c_r1"]
+WB = json_object["Controller"]["WB"]
 
 def linear_model_callback(initial_state: State, cmd: ControlInputs):
     """

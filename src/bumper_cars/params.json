@@ -4,7 +4,6 @@
             "max_steer": 0.523599,
             "max_speed": 6,
             "min_speed": -1.0,
-            "dt": 0.1,
             "safety_radius": 7,
             "barrier_gain": 0.05, 
             "magnitude_limit": 6
@@ -14,7 +13,6 @@
             "max_steer": 0.785398,
             "max_acc": 100,
             "min_acc": -100,
-            "dt": 0.1,
             "safety_radius": 2,
             "barrier_gain": 0.01, 
             "arena_gain": 0.01,
@@ -25,7 +23,6 @@
             "max_steer": 0.785398,
             "max_acc": 100,
             "min_acc": -100,
-            "dt": 0.1,
             "safety_radius": 1.5,
             "barrier_gain": 1, 
             "arena_gain": 0.01,
@@ -41,7 +38,6 @@
             "a_resolution": 0.5,
             "v_resolution": 0.5,
             "delta_resolution": 15,
-            "dt": 0.1,
             "predict_time": 2,
             "to_goal_cost_gain": 1,
             "speed_cost_gain": 1,
@@ -60,7 +56,6 @@
             "a_resolution": 0.5,
             "v_resolution": 0.5,
             "delta_resolution": 15,
-            "dt": 0.1,
             "predict_time": 2,
             "to_goal_cost_gain": 10,
             "speed_cost_gain": 1,
@@ -76,7 +71,6 @@
             "min_speed": -1.0,
             "max_acc": 2,
             "min_acc": -2,
-            "dt": 0.1,
             "horizon": 8,
             "dt_pred": 0.2,
             "safety_radius": 2
@@ -95,7 +89,8 @@
             "c_r1": 0.01
         },
     "Controller":
-        {
+        {   
+            "dt": 0.1,
             "max_steer": 0.785398,
             "WB": 0.7,
             "L_d": 20,

@@ -25,31 +25,20 @@ max_speed = json_object["MPC"]["max_speed"] # [m/s]
 min_speed = json_object["MPC"]["min_speed"] # [m/s]
 max_acc = json_object["MPC"]["max_acc"] # [m/ss]
 min_acc = json_object["MPC"]["min_acc"] # [m/ss]
-dt = json_object["MPC"]["dt"] # [s] Time tick for motion prediction
+dt = json_object["Controller"]["dt"] # [s] Time tick for motion prediction
 horizon = json_object["MPC"]["horizon"] # [s] Time horizon for motion prediction
 dt_pred = json_object["MPC"]["dt_pred"] # [s] Time tick for motion prediction
 safety_radius = json_object["MPC"]["safety_radius"] # [m] Safety radius for obstacle avoidance
 
 L = json_object["Car_model"]["L"]  # [m] Wheel base of vehicle
 Lr = L / 2.0  # [m]
-Lf = L - Lr
-Cf = json_object["Car_model"]["Cf"]  # N/rad
-Cr = json_object["Car_model"]["Cr"] # N/rad
-Iz = json_object["Car_model"]["Iz"]  # kg/m2
-m = json_object["Car_model"]["m"]  # kg
-# Aerodynamic and friction coefficients
-c_a = json_object["Car_model"]["c_a"]
-c_r1 = json_object["Car_model"]["c_r1"]
+Lf = L - Lr  # [m]
 WB = json_object["Controller"]["WB"] # Wheel base
-L_d = json_object["Controller"]["L_d"]  # [m] look-ahead distance
 robot_num = json_object["robot_num"]
 safety_init = json_object["safety"]
 width_init = json_object["width"]
 height_init = json_object["height"]
 min_dist = json_object["min_dist"]
-# N=3
-
-timer_freq = json_object["timer_freq"]
 
 show_animation = True
 debug = False

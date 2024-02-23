@@ -26,7 +26,7 @@ v_resolution = json_object["LBP"]["v_resolution"] # [m/s]
 delta_resolution = math.radians(json_object["LBP"]["delta_resolution"])# [rad/s]
 max_acc = 10 #json_object["LBP"]["max_acc"] # [m/ss]
 min_acc = -10 #json_object["LBP"]["min_acc"] # [m/ss]
-dt = json_object["LBP"]["dt"] # [s] Time tick for motion prediction
+dt = json_object["Controller"]["dt"] # [s] Time tick for motion prediction
 predict_time = json_object["LBP"]["predict_time"] # [s]
 to_goal_cost_gain = json_object["LBP"]["to_goal_cost_gain"]
 speed_cost_gain = json_object["LBP"]["speed_cost_gain"]
@@ -38,15 +38,8 @@ dilation_factor = json_object["LBP"]["dilation_factor"]
 L = json_object["Car_model"]["L"]  # [m] Wheel base of vehicle
 Lr = L / 2.0  # [m]
 Lf = L - Lr
-Cf = json_object["Car_model"]["Cf"]  # N/rad
-Cr = json_object["Car_model"]["Cr"] # N/rad
-Iz = json_object["Car_model"]["Iz"]  # kg/m2
-m = json_object["Car_model"]["m"]  # kg
-# Aerodynamic and friction coefficients
-c_a = json_object["Car_model"]["c_a"]
-c_r1 = json_object["Car_model"]["c_r1"]
+
 WB = json_object["Controller"]["WB"] # Wheel base
-L_d = json_object["Controller"]["L_d"]  # [m] look-ahead distance
 robot_num = json_object["robot_num"]
 safety_init = json_object["safety"]
 width_init = json_object["width"]

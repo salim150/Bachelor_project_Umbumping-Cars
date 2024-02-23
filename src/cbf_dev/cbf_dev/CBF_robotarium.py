@@ -6,12 +6,14 @@ from cvxopt import matrix
 from cvxopt.blas import dot
 from cvxopt.solvers import qp, options
 from cvxopt import matrix, sparse
-from planner.utils import *
+from planner import utils as utils
 from planner.predict_traj import predict_trajectory
+from custom_message.msg import ControlInputs
 
 # For the parameter file
 import pathlib
 import json
+import matplotlib.pyplot as plt
 
 path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
 # Opening JSON file
@@ -25,7 +27,7 @@ max_steer = json_object["CBF_robotarium"]["max_steer"]   # [rad] max steering an
 max_speed = json_object["CBF_robotarium"]["max_speed"]  # [m/s]
 min_speed = json_object["CBF_robotarium"]["min_speed"]  # [m/s]
 magnitude_limit= max_speed
-dt = json_object["CBF_robotarium"]["dt"] 
+dt = json_object["Controller"]["dt"] 
 safety_radius = json_object["CBF_robotarium"]["safety_radius"] 
 barrier_gain = json_object["CBF_robotarium"]["barrier_gain"] 
 robot_num = json_object["robot_num"]
@@ -231,7 +233,7 @@ def create_si_to_bi_mapping(projection_distance=0.05, angular_velocity_limit = n
         v[0, v[0,:]>max_speed] = max_speed
         v[0, v[0,:]<min_speed] = min_speed
         dxu[0, :] = (v[0, :] - poses[3, :])/dt
-        dxu[1, :] = normalize_angle_array(np.arctan2(normalize_angle_array(normalize_angle_array(np.arctan2(dxi[1, :] , dxi[0, :]))-poses[2, :])* L, (poses[3,:]+0.0001)*dt))
+        dxu[1, :] = utils.normalize_angle_array(np.arctan2(utils.normalize_angle_array(utils.normalize_angle_array(np.arctan2(dxi[1, :] , dxi[0, :]))-poses[2, :])* L, (poses[3,:]+0.0001)*dt))
 
         #Impose steering cap.
         dxu[1,dxu[1,:]>max_steer] = max_steer
@@ -346,8 +348,8 @@ def main(args=None):
     cmd1 = ControlInputs()
     cmd2 = ControlInputs()
 
-    trajectory, tx, ty = predict_trajectory(array_to_state(x[:,0]), goal1)
-    trajectory2, tx2, ty2 = predict_trajectory(array_to_state(x[:,1]), goal2)
+    trajectory = predict_trajectory(utils.array_to_state(x[:,0]), goal1)
+    trajectory2 = predict_trajectory(utils.array_to_state(x[:,1]), goal2)
 
     # While the number of robots at the required poses is less
     # than N...
@@ -356,12 +358,12 @@ def main(args=None):
         # Create single-integrator control inputs
         x1 = x[:,0]
         x2 = x[:, 1]
-        x1 = array_to_state(x1)
-        x2 = array_to_state(x2)
+        x1 = utils.array_to_state(x1)
+        x2 = utils.array_to_state(x2)
         
         dxu = np.zeros((2,N))
-        dxu[0,0], dxu[1,0] = pure_pursuit_steer_control(goal1, x1)
-        dxu[0,1], dxu[1,1] = pure_pursuit_steer_control(goal2, x2)
+        dxu[0,0], dxu[1,0] = utils.pure_pursuit_steer_control(goal1, x1)
+        dxu[0,1], dxu[1,1] = utils.pure_pursuit_steer_control(goal2, x2)
 
         # Create safe control inputs (i.e., no collisions)
         # print(dxu)
@@ -373,8 +375,8 @@ def main(args=None):
         cmd2.throttle, cmd2.delta = dxu[0,1], dxu[1,1]
 
         # Applying command and current state to the model
-        x1 = linear_model_callback(x1, cmd1)
-        x2 = linear_model_callback(x2, cmd2)
+        x1 = utils.linear_model_callback(x1, cmd1)
+        x2 = utils.linear_model_callback(x2, cmd2)
 
         plt.cla()
         # for stopping simulation with the esc key.
@@ -383,12 +385,12 @@ def main(args=None):
             lambda event: [exit(0) if event.key == 'escape' else None])
         plt.plot(x1.x, x1.y, 'xk')
         plt.plot(x2.x, x2.y, 'xb')
-        plot_arrow(x1.x, x1.y, x1.yaw)
-        plot_arrow(x1.x, x1.y, x1.yaw + cmd1.delta)
-        plot_arrow(x2.x, x2.y, x2.yaw)
-        plot_arrow(x2.x, x2.y, x2.yaw + cmd2.delta)
-        plot_path(trajectory)
-        plot_path(trajectory2)
+        utils.plot_arrow(x1.x, x1.y, x1.yaw)
+        utils.plot_arrow(x1.x, x1.y, x1.yaw + cmd1.delta)
+        utils.plot_arrow(x2.x, x2.y, x2.yaw)
+        utils.plot_arrow(x2.x, x2.y, x2.yaw + cmd2.delta)
+        utils.plot_path(trajectory)
+        utils.plot_path(trajectory2)
         plt.plot(goal1[0], goal1[1], '.k')
         plt.plot(goal2[0], goal2[1], '.b')
 
@@ -399,8 +401,8 @@ def main(args=None):
         plt.grid(True)
         plt.pause(0.000001)
 
-        x1 = state_to_array(x1)
-        x2 = state_to_array(x2)
+        x1 = utils.state_to_array(x1)
+        x2 = utils.state_to_array(x2)
         x = np.concatenate((x1, x2), axis=1)
 
 if __name__=='__main__':

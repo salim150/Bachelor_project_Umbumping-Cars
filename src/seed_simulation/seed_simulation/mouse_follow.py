@@ -24,41 +24,13 @@ with open(path, 'r') as openfile:
     # Reading from json file
     json_object = json.load(openfile)
 
-max_steer = json_object["LBP"]["max_steer"] # [rad] max steering angle
-max_speed = json_object["LBP"]["max_speed"] # [m/s]
-min_speed = json_object["LBP"]["min_speed"] # [m/s]
-v_resolution = json_object["LBP"]["v_resolution"] # [m/s]
-delta_resolution = math.radians(json_object["LBP"]["delta_resolution"])# [rad/s]
-max_acc = 10 #json_object["LBP"]["max_acc"] # [m/ss]
-min_acc = -10 #json_object["LBP"]["min_acc"] # [m/ss]
-dt = json_object["LBP"]["dt"] # [s] Time tick for motion prediction
+dt = json_object["Controller"]["dt"] # [s] Time tick for motion prediction
 predict_time = json_object["LBP"]["predict_time"] # [s]
-to_goal_cost_gain = json_object["LBP"]["to_goal_cost_gain"]
-speed_cost_gain = json_object["LBP"]["speed_cost_gain"]
-obstacle_cost_gain = json_object["LBP"]["obstacle_cost_gain"]
-heading_cost_gain = json_object["LBP"]["heading_cost_gain"]
-robot_stuck_flag_cons = json_object["LBP"]["robot_stuck_flag_cons"]
 dilation_factor = json_object["LBP"]["dilation_factor"]
 
-L = json_object["Car_model"]["L"]  # [m] Wheel base of vehicle
-Lr = L / 2.0  # [m]
-Lf = L - Lr
-Cf = json_object["Car_model"]["Cf"]  # N/rad
-Cr = json_object["Car_model"]["Cr"] # N/rad
-Iz = json_object["Car_model"]["Iz"]  # kg/m2
-m = json_object["Car_model"]["m"]  # kg
-# Aerodynamic and friction coefficients
-c_a = json_object["Car_model"]["c_a"]
-c_r1 = json_object["Car_model"]["c_r1"]
-WB = json_object["Controller"]["WB"] # Wheel base
-L_d = json_object["Controller"]["L_d"]  # [m] look-ahead distance
 robot_num = json_object["robot_num"]
-safety_init = json_object["safety"]
 width_init = json_object["width"]
 height_init = json_object["height"]
-min_dist = json_object["min_dist"]
-update_dist = 2
-N=3
 
 show_animation = True
 check_collision_bool = False

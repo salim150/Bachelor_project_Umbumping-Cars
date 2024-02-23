@@ -2,14 +2,18 @@ import numpy as np
 
 from cvxopt import matrix, solvers
 from cvxopt import matrix
-from planner.utils import *
+from planner import utils as utils
 # import planner.utils as utils
 
-from custom_message.msg import ControlInputs, State, MultiControl
+from custom_message.msg import ControlInputs, State, MultiControl, Coordinate
 
 # For the parameter file
 import pathlib
 import json
+import math
+import matplotlib.pyplot as plt 
+import time
+
 
 path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
 # Opening JSON file
@@ -23,13 +27,14 @@ max_speed = json_object["Car_model"]["max_speed"] # [m/s]
 min_speed = json_object["Car_model"]["min_speed"] # [m/s]
 max_acc = json_object["C3BF"]["max_acc"] 
 min_acc = json_object["C3BF"]["min_acc"] 
-dt = json_object["C3BF"]["dt"]
+dt = json_object["Controller"]["dt"]
 safety_radius = json_object["C3BF"]["safety_radius"]
 barrier_gain = json_object["C3BF"]["barrier_gain"]
 arena_gain = json_object["C3BF"]["arena_gain"]
 Kv = json_object["C3BF"]["Kv"] # interval [0.5-1]
 Lr = L / 2.0  # [m]
 Lf = L - Lr
+WB = json_object["Controller"]["WB"]
 robot_num = json_object["robot_num"]
 safety_init = json_object["safety"]
 width_init = json_object["width"]
@@ -65,7 +70,7 @@ def motion(x, u, dt):
     x[0] = x[0] + x[3] * math.cos(x[2]) * dt
     x[1] = x[1] + x[3] * math.sin(x[2]) * dt
     x[2] = x[2] + x[3] / L * math.tan(delta) * dt
-    x[2] = normalize_angle(x[2])
+    x[2] = utils.normalize_angle(x[2])
     x[3] = x[3] + throttle * dt
     x[3] = np.clip(x[3], min_speed, max_speed)
 
@@ -220,7 +225,7 @@ def delta_to_beta(delta):
         float: Slip angle in radians.
 
     """
-    beta = normalize_angle(np.arctan2(Lr*np.tan(delta)/L, 1.0))
+    beta = utils.normalize_angle(np.arctan2(Lr*np.tan(delta)/L, 1.0))
 
     return beta
 
@@ -235,7 +240,7 @@ def delta_to_beta_array(delta):
         numpy.ndarray: Array of slip angles in radians.
 
     """
-    beta = normalize_angle_array(np.arctan2(Lr*np.tan(delta)/L, 1.0))
+    beta = utils.normalize_angle_array(np.arctan2(Lr*np.tan(delta)/L, 1.0))
 
     return beta
 
@@ -251,9 +256,9 @@ def beta_to_delta(beta):
 
     """
     try:
-        delta = normalize_angle_array(np.arctan2(L*np.tan(beta)/Lr, 1.0))
+        delta = utils.normalize_angle_array(np.arctan2(L*np.tan(beta)/Lr, 1.0))
     except:
-        delta = normalize_angle(np.arctan2(L*np.tan(beta)/Lr, 1.0))
+        delta = utils.normalize_angle(np.arctan2(L*np.tan(beta)/Lr, 1.0))
 
     return delta           
    
@@ -270,7 +275,7 @@ def update_paths(paths):
     """
     updated_paths = []
     for path in paths:
-        updated_paths.append(update_path(path))
+        updated_paths.append(utils.update_path(path))
     return updated_paths
 
 def check_collision(x,i):
@@ -289,7 +294,7 @@ def check_collision(x,i):
         if idx == i:
             continue
         if check_collision_bool:
-            if dist([x[0,i], x[1,i]], [x[0, idx], x[1, idx]]) < WB:
+            if utils.dist([x[0,i], x[1,i]], [x[0, idx], x[1, idx]]) < WB:
                 raise Exception('Collision')
 
 def plot_robot(x, y, yaw, i): 
@@ -328,8 +333,8 @@ def plot_robot_and_arrows(i, x, multi_control, targets):
 
     """
     plot_robot(x[0, i], x[1, i], x[2, i], i)
-    plot_arrow(x[0, i], x[1, i], x[2, i] + multi_control.multi_control[i].delta, length=3, width=0.5)
-    plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
+    utils.plot_arrow(x[0, i], x[1, i], x[2, i] + multi_control.multi_control[i].delta, length=3, width=0.5)
+    utils.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
     plt.plot(targets[i][0], targets[i][1], "x"+color_dict[i])
 
 def update_robot_state(i, x, dxu, multi_control, targets):
@@ -348,10 +353,10 @@ def update_robot_state(i, x, dxu, multi_control, targets):
     """
     cmd = ControlInputs()
 
-    x1 = array_to_state(x[:, i])
+    x1 = utils.array_to_state(x[:, i])
     cmd.throttle, cmd.delta = dxu[0, i], dxu[1, i]
-    x1 = linear_model_callback(x1, cmd)
-    x1 = state_to_array(x1).reshape(4)
+    x1 = utils.linear_model_callback(x1, cmd)
+    x1 = utils.state_to_array(x1).reshape(4)
     x[:, i] = x1
     multi_control.multi_control[i] = cmd
 
@@ -379,8 +384,8 @@ def control_robot(i, x, targets):
     cmd = ControlInputs()
     
     check_collision(x, i)
-    x1 = array_to_state(x[:, i])
-    cmd.throttle, cmd.delta = pure_pursuit_steer_control(targets[i], x1)
+    x1 = utils.array_to_state(x[:, i])
+    cmd.throttle, cmd.delta = utils.pure_pursuit_steer_control(targets[i], x1)
     dxu[0, i], dxu[1, i] = cmd.throttle, cmd.delta
 
     dxu = C3BF(i, x, dxu)
@@ -427,7 +432,7 @@ class C3BF_algorithm():
 
             self.computational_time.append((time.time() - t_prev))
             # Step 9: Check if the distance between the current position and the target is less than 5
-            if dist(point1=(x[0,i], x[1,i]), point2=self.targets[i]) < 4:
+            if utils.dist(point1=(x[0,i], x[1,i]), point2=self.targets[i]) < 4:
                 # Perform some action when the condition is met
                 self.paths[i].pop(0)
                 if not self.paths[i]:
@@ -438,8 +443,8 @@ class C3BF_algorithm():
 
             x[:, i] = motion(x[:, i], dxu[:, i], dt)
             plot_robot(x[0, i], x[1, i], x[2, i], i)
-            plot_arrow(x[0, i], x[1, i], x[2, i] + dxu[1, i], length=3, width=0.5)
-            plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
+            utils.plot_arrow(x[0, i], x[1, i], x[2, i] + dxu[1, i], length=3, width=0.5)
+            utils.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(self.targets[i][0], self.targets[i][1], "x" + color_dict[i])
         
         return x, dxu, break_flag
@@ -462,8 +467,8 @@ class C3BF_algorithm():
                 break_flag = True
 
             plot_robot(x[0, i], x[1, i], x[2, i], i)
-            plot_arrow(x[0, i], x[1, i], x[2, i] + dxu[1, i], length=3, width=0.5)
-            plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
+            utils.plot_arrow(x[0, i], x[1, i], x[2, i] + dxu[1, i], length=3, width=0.5)
+            utils.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(self.targets[i][0], self.targets[i][1], "x"+color_dict[i])
             # print(f"Speed of robot {i}: {x[3, i]}")
         
@@ -495,13 +500,13 @@ def main(args=None):
     ax = fig.add_subplot(111)
     
     # Step 2: Sample initial values for x0, y, yaw, v, omega, and model_type
-    x0, y, yaw, v, omega, model_type = samplegrid(width_init, height_init, min_dist, robot_num, safety_init)
+    x0, y, yaw, v, omega, model_type = utils.samplegrid(width_init, height_init, min_dist, robot_num, safety_init)
 
     # Step 3: Create an array x with the initial values
     x = np.array([x0, y, yaw, v])
     
     # Step 4: Create paths for each robot
-    paths = [create_path() for _ in range(robot_num)]
+    paths = [utils.create_path() for _ in range(robot_num)]
 
     # Step 5: Extract the target coordinates from the paths
     targets = [[path[0].x, path[0].y] for path in paths]
@@ -520,15 +525,15 @@ def main(args=None):
             lambda event: [exit(0) if event.key == 'escape' else None])
         for i in range(robot_num):
             # Step 9: Check if the distance between the current position and the target is less than 5
-            if dist(point1=(x[0,i], x[1,i]), point2=targets[i]) < 2:
+            if utils.dist(point1=(x[0,i], x[1,i]), point2=targets[i]) < 2:
                 # Perform some action when the condition is met
-                paths[i] = update_path(paths[i])
+                paths[i] = utils.update_path(paths[i])
                 targets[i] = (paths[i][0].x, paths[i][0].y)
 
             dxu = control_robot(i, x, targets)
             x, multi_control = update_robot_state(i, x, dxu, multi_control, targets)
         
-        plot_map(width=width_init, height=height_init)
+        utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
         plt.grid(True)
         plt.pause(0.0001)
@@ -541,7 +546,7 @@ def main1(args=None):
     ax = fig.add_subplot(111)
 
     # Define goal points outside of the arena
-    x0, y, yaw, v, omega, model_type = samplegrid(width_init, height_init, min_dist, robot_num, safety_init)
+    x0, y, yaw, v, omega, model_type = utils.samplegrid(width_init, height_init, min_dist, robot_num, safety_init)
     x = np.array([x0, y, yaw, v])
 
     paths = []
@@ -550,7 +555,7 @@ def main1(args=None):
     multi_control = MultiControl()
     dxu = np.zeros((2,robot_num))
     for i in range(robot_num):
-        paths.append(create_path())
+        paths.append(utils.create_path())
         targets.append([paths[i][0].x, paths[i][0].y])
         initial_state = State(x=x0[i], y=y[i], yaw=yaw[i], v=v[i], omega=omega[i])
         # multi_traj.multiple_path.append(predict_trajectory(initial_state, targets[i]))
@@ -567,37 +572,37 @@ def main1(args=None):
         
         # Create single-integrator control inputs
         for i in range(robot_num):
-            x1 = array_to_state(x[:,i])
-            if dist(point1=(x[0,i], x[1,i]), point2=targets[i]) < 5:
-                paths[i] = update_path(paths[i])
+            x1 = utils.array_to_state(x[:,i])
+            if utils.dist(point1=(x[0,i], x[1,i]), point2=targets[i]) < 5:
+                paths[i] = utils.update_path(paths[i])
                 targets[i] = (paths[i][0].x, paths[i][0].y)
                 # multi_traj.multiple_path[i] = predict_trajectory(x1, targets[i])
 
             for idx in range(robot_num):
                 if idx == i:
                     continue
-                if dist([x1.x, x1.y], [x[0, idx], x[1, idx]]) < WB: raise Exception('Collision')
+                if utils.dist([x1.x, x1.y], [x[0, idx], x[1, idx]]) < WB: raise Exception('Collision')
             
             cmd = ControlInputs()
-            cmd.throttle, cmd.delta= pure_pursuit_steer_control(targets[i], x1)
+            cmd.throttle, cmd.delta= utils.pure_pursuit_steer_control(targets[i], x1)
 
             dxu[0,i], dxu[1,i] = cmd.throttle, cmd.delta            
             dxu = C3BF(i, x, dxu)
             cmd.throttle, cmd.delta = dxu[0,i], dxu[1,i]
-            x1 = linear_model_callback(x1, cmd)
-            x1 = state_to_array(x1).reshape(4)
+            x1 = utils.linear_model_callback(x1, cmd)
+            x1 = utils.state_to_array(x1).reshape(4)
             x[:, i] = x1
             multi_control.multi_control[i] = cmd
     
             # plt.plot(x[0,i], x[1,i], "xr")
-            # plt.plot(goal[0,i], goal[1,i], "xb")plot_arrow(x1.x, x1.y, x1.yaw)
+            # plt.plot(goal[0,i], goal[1,i], "xb")utils.plot_arrow(x1.x, x1.y, x1.yaw)
             plot_robot(x[0,i], x[1,i], x[2,i], i)
-            plot_arrow(x[0,i], x[1,i], x[2,i] + multi_control.multi_control[i].delta, length=3, width=0.5)
-            plot_arrow(x[0,i], x[1,i], x[2,i], length=1, width=0.5)
+            utils.plot_arrow(x[0,i], x[1,i], x[2,i] + multi_control.multi_control[i].delta, length=3, width=0.5)
+            utils.plot_arrow(x[0,i], x[1,i], x[2,i], length=1, width=0.5)
             plt.plot(targets[i][0], targets[i][1], "x"+color_dict[i])
             # plot_path(multi_traj.multiple_path[i])
 
-        plot_map(width=width_init, height=height_init)
+        utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
         plt.grid(True)
         plt.pause(0.0001)
@@ -658,7 +663,7 @@ def main2(args=None):
             lambda event: [exit(0) if event.key == 'escape' else None])
         for i in range(robot_num):
             # Step 9: Check if the distance between the current position and the target is less than 5
-            if dist(point1=(x[0,i], x[1,i]), point2=targets[i]) < 5:
+            if utils.dist(point1=(x[0,i], x[1,i]), point2=targets[i]) < 5:
                 # Perform some action when the condition is met
                 paths[i].pop(0)
                 if not paths[i]:
@@ -669,7 +674,7 @@ def main2(args=None):
             dxu = control_robot(i, x, targets)
             x, multi_control = update_robot_state(i, x, dxu, multi_control, targets)
         
-        plot_map(width=width_init, height=height_init)
+        utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
         plt.grid(True)
         plt.pause(0.0001)
@@ -727,7 +732,7 @@ def main_seed(args=None):
         
         x, dxu, break_flag = c3bf.run_3cbf(x, break_flag) 
         
-        plot_map(width=width_init, height=height_init)
+        utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
         plt.grid(True)
         plt.pause(0.0001)
@@ -736,6 +741,6 @@ def main_seed(args=None):
             break
         
 if __name__=='__main__':
-    main_seed()
-    # main()
+    # main_seed()
+    main1()
         

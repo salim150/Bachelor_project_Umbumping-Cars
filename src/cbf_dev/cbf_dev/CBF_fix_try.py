@@ -8,7 +8,7 @@ from cvxopt import matrix, solvers
 from cvxopt.blas import dot
 from cvxopt.solvers import qp, options
 from cvxopt import matrix, sparse
-from planner.utils import *
+from planner import utils as utils
 from planner.predict_traj import predict_trajectory
 import planner.utils as utils
 
@@ -17,6 +17,8 @@ from custom_message.msg import ControlInputs, State, Path, Coordinate, MultipleP
 # For the parameter file
 import pathlib
 import json
+import math
+import matplotlib.pyplot as plt
 
 # TODO: import all this parameters from a config file so that we can easily change them in one place
 path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
@@ -38,6 +40,7 @@ arena_gain = 0.01 #json_object["C3BF"]["arena_gain"]
 Kv = 0.1 #json_object["C3BF"]["Kv"] # interval [0.5-1]
 Lr = L / 2.0  # [m]
 Lf = L - Lr
+WB = json_object["Controller"]["WB"]
 robot_num = json_object["robot_num"]
 safety_init = json_object["safety"]
 width_init = json_object["width"]
@@ -57,7 +60,7 @@ def motion(x, u, dt):
     x[0] = x[0] + x[3] * math.cos(x[2]) * dt
     x[1] = x[1] + x[3] * math.sin(x[2]) * dt
     x[2] = x[2] + x[3] / L * math.tan(delta) * dt
-    x[2] = normalize_angle(x[2])
+    x[2] = utils.normalize_angle(x[2])
     x[3] = x[3] + throttle * dt
     x[3] = np.clip(x[3], min_speed, max_speed)
 
@@ -232,17 +235,17 @@ def C3BF(x, u_ref):
     return dxu
             
 def delta_to_beta(delta):
-    beta = normalize_angle(np.arctan2(Lr*np.tan(delta)/L, 1.0))
+    beta = utils.normalize_angle(np.arctan2(Lr*np.tan(delta)/L, 1.0))
 
     return beta
 
 def delta_to_beta_array(delta):
-    beta = normalize_angle_array(np.arctan2(Lr*np.tan(delta)/L, 1.0))
+    beta = utils.normalize_angle_array(np.arctan2(Lr*np.tan(delta)/L, 1.0))
 
     return beta
 
 def beta_to_delta(beta):
-    delta = normalize_angle_array(np.arctan2(L*np.tan(beta)/Lr, 1.0))
+    delta = utils.normalize_angle_array(np.arctan2(L*np.tan(beta)/Lr, 1.0))
 
     return delta           
 
@@ -308,7 +311,7 @@ def main(args=None):
         
         # Create single-integrator control inputs
         for i in range(robot_num):
-            x1 = array_to_state(x[:,i])
+            x1 = utils.array_to_state(x[:,i])
             if utils.dist(point1=(x[0,i], x[1,i]), point2=targets[i]) < 5:
                 paths[i] = utils.update_path(paths[i])
                 targets[i] = (paths[i][0].x, paths[i][0].y)
@@ -320,17 +323,17 @@ def main(args=None):
             dxu[0,i], dxu[1,i] = cmd.throttle, cmd.delta            
             dxu = C3BF(x, dxu)
             cmd.throttle, cmd.delta = dxu[0,i], dxu[1,i]
-            x1 = linear_model_callback(x1, cmd)
-            x1 = state_to_array(x1).reshape(4)
+            x1 = utils.linear_model_callback(x1, cmd)
+            x1 = utils.state_to_array(x1).reshape(4)
             x[:, i] = x1
             multi_control.multi_control[i] = cmd
     
             # plt.plot(x[0,i], x[1,i], "xr")
-            # plt.plot(goal[0,i], goal[1,i], "xb")plot_arrow(x1.x, x1.y, x1.yaw)
+            # plt.plot(goal[0,i], goal[1,i], "xb")utils.plot_arrow(x1.x, x1.y, x1.yaw)
             plot_robot(x[0,i], x[1,i], x[2,i])
             # plot_rect(x[0,i], x[1,i], x[2,i], safety_radius)
-            plot_arrow(x[0,i], x[1,i], x[2,i] + multi_control.multi_control[i].delta, length=2, width=1)
-            plot_arrow(x[0,i], x[1,i], x[2,i], length=2, width=1)
+            utils.plot_arrow(x[0,i], x[1,i], x[2,i] + multi_control.multi_control[i].delta, length=2, width=1)
+            utils.plot_arrow(x[0,i], x[1,i], x[2,i], length=2, width=1)
             plt.plot(targets[i][0], targets[i][1], "xg")
             # plot_path(multi_traj.multiple_path[i])
 

@@ -1,8 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import math
-import time
-import os
 import json
 import pathlib
 import dwa_dev.DWA as DWA
@@ -21,11 +18,8 @@ with open(path, 'r') as openfile:
     json_object = json.load(openfile)
 
 robot_num = json_object["robot_num"]
-safety_init = json_object["safety"]
 width_init = json_object["width"]
 height_init = json_object["height"]
-min_dist = json_object["min_dist"]
-robot_num = json_object["robot_num"]
 show_animation = True
 go_to_goal_bool = True
 iterations = 1000
@@ -34,7 +28,7 @@ color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
 
 def dwa_sim(seed):
 
-    dt = json_object["DWA"]["dt"] # [s] Time tick for motion prediction
+    dt = json_object["Controller"]["dt"] # [s] Time tick for motion prediction
     predict_time = json_object["DWA"]["predict_time"] # [s]
     dilation_factor = json_object["DWA"]["dilation_factor"]
 
@@ -279,7 +273,7 @@ def c3bf_sim(seed):
             x, u, break_flag = c3bf.run_3cbf(x, break_flag)
         trajectory = np.dstack([trajectory, np.concatenate((x,u))])
         
-        C3BF.plot_map(width=width_init, height=height_init)
+        utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
         plt.grid(True)
         plt.pause(0.0001)
@@ -358,7 +352,7 @@ def cbf_sim(seed):
             
         trajectory = np.dstack([trajectory, np.concatenate((x,u))])
         
-        CBF.plot_map(width=width_init, height=height_init)
+        utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
         plt.grid(True)
         plt.pause(0.0001)
@@ -379,7 +373,7 @@ def cbf_sim(seed):
     return trajectory, cbf.computational_time
 
 def lbp_sim(seed):
-    dt = json_object["LBP"]["dt"] # [s] Time tick for motion prediction
+    dt = json_object["Controller"]["dt"]
     predict_time = json_object["LBP"]["predict_time"] # [s]
     dilation_factor = json_object["LBP"]["dilation_factor"]
 

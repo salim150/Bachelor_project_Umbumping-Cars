@@ -38,7 +38,7 @@ c_r1 = json_object["Car_model"]["c_r1"]
 WB = json_object["Controller"]["WB"] 
 L_d = json_object["Controller"]["L_d"] 
 
-debug = False
+debug = True
 
 def predict_trajectory(initial_state: State, target):
     """
@@ -242,11 +242,16 @@ def normalize_angle(angle):
 
     return angle
 
-if debug:
-    initial_state = State(x=0.0, y=0.0, yaw=0.0, v=0.0, omega=0.0)
-    target = [-50, -50]
-    # trajectory, tx, ty = predict_trajectory(initial_state, target)
-    trajectory = predict_trajectory(initial_state, target)
+
+def main():
+    if debug:
+        initial_state = State(x=0.0, y=0.0, yaw=0.0, v=0.0, omega=0.0)
+        target = [-50, -50]
+        # trajectory, tx, ty = predict_trajectory(initial_state, target)
+        trajectory = predict_trajectory(initial_state, target)
+
+if __name__ == "__main__":
+    main()
 
 
 

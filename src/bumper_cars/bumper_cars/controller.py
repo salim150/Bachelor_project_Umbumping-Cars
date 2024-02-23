@@ -2,9 +2,9 @@
 
 import rclpy
 from rclpy.node import Node
-from custom_message.msg import ControlInputs, State, Path, Coordinate, MultiplePaths, MultiState, MultiControl
+from custom_message.msg import ControlInputs, State, Path, Coordinate, FullState, MultiState, MultiControl
 from visualization_msgs.msg import Marker, MarkerArray
-from geometry_msgs.msg import Pose, PoseArray, Point32
+from geometry_msgs.msg import Pose
 import message_filters
 import random
 import math
@@ -13,11 +13,12 @@ import os
 os.path.abspath('..')
 # from planner.cubic_spline_planner import *
 # from planner.frenet import *
-from planner.predict_traj import *
-from dwa_dev import DWA as DWA
+# from planner import predict_traj as predict_traj
 
 # for the CBF
-from cbf_dev.CBF_robotarium import *
+from planner import utils as utils
+from dwa_dev import DWA as DWA
+from cbf_dev import CBF_robotarium as CBF_robotarium
 from cbf_dev import CBF_simple as CBF
 from cbf_dev import C3BF as C3BF
 from lbp_dev import LBP as LBP
@@ -26,6 +27,7 @@ from mpc_dev import MPC as MPC
 # For the parameter file
 import pathlib
 import json
+import time
 
 path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
 # Opening JSON file
@@ -33,6 +35,7 @@ with open(path, 'r') as openfile:
     # Reading from json file
     json_object = json.load(openfile)
 
+L = json_object["Car_model"]["L"]  # [m] Wheel base of vehicle
 WB = json_object["Controller"]["WB"] # Wheel base
 L_d = json_object["Controller"]["L_d"]  # [m] look-ahead distance
 max_steer = json_object["Controller"]["max_steer"]  # [rad] max steering angle
@@ -42,12 +45,15 @@ max_speed = json_object["Car_model"]["max_speed"]  # [rad] max speed
 min_speed = json_object["Car_model"]["min_speed"]  # [rad] min speed
 controller_type = json_object["Controller"]["controller_type"]
 cbf_type = json_object["Controller"]["cbf_type"]
+dt = json_object["Controller"]["dt"]
 debug = False
 robot_num = json_object["robot_num"]
-safety = json_object["safety"]
-width = json_object["width"]
-height = json_object["height"]
+min_dist = json_object["min_dist"]
+safety_init = json_object["safety"]
+width_init = json_object["width"]
+height_init = json_object["height"]
 plot_traj = json_object["plot_traj"]    
+
 
 class Controller(Node):
     """
@@ -86,8 +92,8 @@ class Controller(Node):
         else:
             self.u = np.zeros((2, robot_num))
 
-        self.width = width
-        self.heigth = height
+        self.width = width_init
+        self.heigth = height_init
             
         self.multi_control_pub = self.create_publisher(MultiControl, '/multi_control', 20)
         self.marker_array_pub = self.create_publisher(MarkerArray, "/marker_array", 2)
@@ -271,7 +277,7 @@ class Controller(Node):
         dxu = np.zeros((2, robot_num))
         
         for i in range(robot_num):
-            self.x[:,i] = state_to_array(multi_state.multiple_state[i]).reshape(4)
+            self.x[:,i] = utils.state_to_array(multi_state.multiple_state[i]).reshape(4)
         
         for i in range(robot_num):
             cmd, self.paths[i], self.targets[i] = self.control_callback(multi_state.multiple_state[i], self.targets[i], self.paths[i], None)
@@ -308,7 +314,7 @@ class Controller(Node):
         break_flag = False
 
         for i in range(robot_num): 
-            self.x[:,i] = state_to_array(multi_state.multiple_state[i]).reshape(4)
+            self.x[:,i] = utils.state_to_array(multi_state.multiple_state[i]).reshape(4)
         
         self.x, self.u, break_flag = self.dwa.run_dwa(self.x, self.u, break_flag)
 
@@ -329,7 +335,7 @@ class Controller(Node):
         break_flag = False
 
         for i in range(robot_num): 
-            self.x[:,i] = state_to_array(multi_state.multiple_state[i]).reshape(4)
+            self.x[:,i] = utils.state_to_array(multi_state.multiple_state[i]).reshape(4)
         
         self.x, self.u, break_flag = self.lbp.run_lbp(self.x, self.u, break_flag)
 
