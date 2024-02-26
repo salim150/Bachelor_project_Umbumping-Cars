@@ -55,17 +55,26 @@ def get_lookup_table(table_path):
 
 
 def generate_path(target_states, k0, v, k=False):
-    # x, y, yaw, s, km, kf
+    """
+    Generates a path based on the given target states, initial steering angle, velocity, and a flag indicating whether to use a specific value for k.
+
+    Args:
+        target_states (list): List of target states [x, y, yaw].
+        k0 (float): Initial steering angle.
+        v (float): Velocity.
+        k (bool, optional): Flag indicating whether to use a specific value for k. Defaults to False.
+
+    Returns:
+        list: List of generated paths [x, y, yaw, p, kp].
+    """
+    
     lookup_table = get_lookup_table(TABLE_PATH)
     result = []
 
     for state in target_states:
-        # bestp = search_nearest_one_from_lookup_table(
-        #     state[0], state[1], state[2], lookup_table)
-
         target = motion_model.State(x=state[0], y=state[1], yaw=state[2])
         initial_state = State(x=0.0, y=0.0, yaw=0.0, v=0.0, omega=0.0)
-        cmd = ControlInputs()  # Create a ControlInputs object
+        cmd = ControlInputs()
         cmd.throttle, cmd.delta = utils.pure_pursuit_steer_control([target.x,target.y], initial_state)
         print(cmd.delta)
         k0 = cmd.delta
@@ -90,26 +99,29 @@ def generate_path(target_states, k0, v, k=False):
 
 def calc_uniform_polar_states(nxy, nh, d, a_min, a_max, p_min, p_max):
     """
+    Calculate the uniform polar states based on the given parameters.
 
     Parameters
     ----------
-    nxy :
-        number of position sampling
-    nh :
-        number of heading sampleing
-    d :
-        distance of terminal state
-    a_min :
-        position sampling min angle
-    a_max :
-        position sampling max angle
-    p_min :
-        heading sampling min angle
-    p_max :
-        heading sampling max angle
+    nxy : int
+        Number of position sampling.
+    nh : int
+        Number of heading sampling.
+    d : float
+        Distance of terminal state.
+    a_min : float
+        Position sampling min angle.
+    a_max : float
+        Position sampling max angle.
+    p_min : float
+        Heading sampling min angle.
+    p_max : float
+        Heading sampling max angle.
 
     Returns
     -------
+    list
+        List of uniform polar states.
 
     """
     angle_samples = [i / (nxy - 1) for i in range(nxy)]
@@ -193,6 +205,21 @@ def calc_lane_states(l_center, l_heading, l_width, v_width, d, nxy):
 
 
 def sample_states(angle_samples, a_min, a_max, d, p_max, p_min, nh):
+    """
+    Generate a list of states based on the given parameters.
+
+    Args:
+        angle_samples (list): List of angle samples.
+        a_min (float): Minimum angle value.
+        a_max (float): Maximum angle value.
+        d (float): Distance value.
+        p_max (float): Maximum yaw value.
+        p_min (float): Minimum yaw value.
+        nh (int): Number of yaw samples.
+
+    Returns:
+        list: List of states, each represented as [xf, yf, yawf].
+    """
     states = []
     for i in angle_samples:
         a = a_min + (a_max - a_min) * i

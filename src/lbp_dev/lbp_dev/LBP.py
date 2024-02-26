@@ -269,11 +269,16 @@ def calc_obstacle_cost(trajectory, ob):
     Returns:
     float: The obstacle cost for the trajectory.
     """
+    min_distance = np.inf
 
     line = LineString(zip(trajectory[:, 0], trajectory[:, 1]))
+    
+    minxp = min(abs(width_init/2-trajectory[:, 0]))
+    minxn = min(abs(-width_init/2-trajectory[:, 0]))
+    minyp = min(abs(height_init/2-trajectory[:, 1]))
+    minyn = min(abs(-height_init/2-trajectory[:, 1]))
+    min_distance = min(minxp, minxn, minyp, minyn)
     dilated = line.buffer(dilation_factor, cap_style=3)
-
-    min_distance = np.inf
 
     x = trajectory[:, 0]
     y = trajectory[:, 1]

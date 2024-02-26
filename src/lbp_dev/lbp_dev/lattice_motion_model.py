@@ -36,6 +36,20 @@ def update(state, v, delta, dt):
     return state
 
 def generate_trajectory(s, km, kf, k0, v):
+    """
+    Generate a trajectory based on the given parameters.
+
+    Args:
+        s (float): The distance to be covered.
+        km (float): The middle curvature.
+        kf (float): The final curvature.
+        k0 (float): The initial curvature.
+        v (float): The velocity.
+
+    Returns:
+        tuple: A tuple containing the x-coordinates, y-coordinates, yaw angles, and curvature values of the generated trajectory.
+    """
+
     # n = s / ds
     time = s / v  # [s]
     n = time / dt
@@ -71,6 +85,20 @@ def generate_trajectory(s, km, kf, k0, v):
 
 
 def generate_last_state(s, km, kf, k0, v):
+    """
+    Generates the last state of the motion model based on the given parameters.
+
+    Args:
+        s (float): The distance traveled.
+        km (float): The middle curvature.
+        kf (float): The final curvature.
+        k0 (float): The initial curvature.
+        v (float): The velocity.
+
+    Returns:
+        tuple: A tuple containing the x-coordinate, y-coordinate, and yaw angle of the last state.
+    """
+
     n = s / ds
     time = abs(s / v)  # [s]
 

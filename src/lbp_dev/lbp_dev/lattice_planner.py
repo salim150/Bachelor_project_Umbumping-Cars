@@ -46,6 +46,20 @@ def calc_diff(target, x, y, yaw):
 
 
 def calc_j(target, p, h, k0, v):
+    """
+    Calculate the Jacobian matrix J for a given target and state vector p.
+
+    Args:
+        target (list): List of target coordinates [x, y, yaw].
+        p (numpy.ndarray): State vector [x, y, yaw].
+        h (numpy.ndarray): Step sizes for numerical differentiation.
+        k0 (float): Curvature of the motion model.
+        v (float): Velocity of the motion model.
+
+    Returns:
+        numpy.ndarray: Jacobian matrix J.
+
+    """
     xp, yp, yawp = motion_model.generate_last_state(
         p[0, 0] + h[0], p[1, 0], p[2, 0], k0, v)
     dp = calc_diff(target, [xp], [yp], [yawp])
@@ -76,6 +90,20 @@ def calc_j(target, p, h, k0, v):
 
 
 def selection_learning_param(dp, p, k0, target, v):
+    """
+    Selects the learning parameter 'a' that minimizes the cost function.
+
+    Args:
+        dp (float): The change in parameter 'p'.
+        p (float): The current value of parameter 'p'.
+        k0 (float): The value of parameter 'k0'.
+        target (float): The target value.
+        v (float): The value of parameter 'v'.
+
+    Returns:
+        float: The selected value of parameter 'a'.
+    """
+
     mincost = float("inf")
     mina = 1.0
     maxa = 2.0
@@ -108,6 +136,22 @@ def show_trajectory(target, xc, yc):  # pragma: no cover
 
 
 def optimize_trajectory(target, k0, p, v):
+    """
+    Optimize the trajectory to reach the target position.
+
+    Args:
+        target (tuple): The target position (x, y, yaw).
+        k0 (float): The initial curvature.
+        p (numpy.ndarray): The initial trajectory parameters.
+        v (float): The velocity.
+
+    Returns:
+        tuple: The optimized trajectory (xc, yc, yawc, p, kp).
+
+    Raises:
+        LinAlgError: If the path calculation encounters a linear algebra error.
+    """
+    
     for i in range(max_iter):
         xc, yc, yawc, kp = motion_model.generate_trajectory(p[0, 0], p[1, 0], p[2, 0], k0, v)
         dc = np.array(calc_diff(target, xc, yc, yawc)).reshape(3, 1)
