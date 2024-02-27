@@ -648,6 +648,6 @@ def main_seed(args=None):
             break
 
 if __name__=='__main__':
-    main_seed()
-    # main() 
+    # main_seed()
+    main() 
         

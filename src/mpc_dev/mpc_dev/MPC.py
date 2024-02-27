@@ -456,7 +456,7 @@ class ModelPredictiveControl:
         for i in range(robot_num):
             if not self.reached_goal[i]:                
                 # If goal is reached, stop the robot
-                if check_goal_reached(x, self.ref, i, distance=1):
+                if check_goal_reached(x, self.ref, i, distance=1.5):
                     # u[:, i] = np.zeros(2)
                     x[3, i] = 0
                     self.reached_goal[i] = True

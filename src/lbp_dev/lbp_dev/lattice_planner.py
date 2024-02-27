@@ -51,7 +51,7 @@ def calc_j(target, p, h, k0, v):
 
     Args:
         target (list): List of target coordinates [x, y, yaw].
-        p (numpy.ndarray): State vector [x, y, yaw].
+        p (numpy.ndarray): Optimization parameters vector [s, km, kf].
         h (numpy.ndarray): Step sizes for numerical differentiation.
         k0 (float): Curvature of the motion model.
         v (float): Velocity of the motion model.

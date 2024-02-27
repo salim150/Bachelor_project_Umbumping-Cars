@@ -45,8 +45,7 @@ check_collision_bool = False
 add_noise = False
 np.random.seed(1)
 
-color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
-
+color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k', 7: 'tab:orange', 8: 'tab:brown', 9: 'tab:gray', 10: 'tab:olive'}
 with open('/home/giacomo/thesis_ws/src/seed_1.json', 'r') as file:
     data = json.load(file)
 
@@ -147,7 +146,7 @@ def C3BF(i, x, u_ref):
         Lf_h = np.dot(gradH.T, f)
         Lg_h = np.dot(gradH.T, g)
 
-        H[count] = np.array([barrier_gain*np.power(h, 1) + Lf_h])
+        H[count] = np.array([barrier_gain*np.power(h, 3) + Lf_h])
         G[count,:] = -Lg_h
         count+=1
 
@@ -335,7 +334,7 @@ def plot_robot_and_arrows(i, x, multi_control, targets):
     plot_robot(x[0, i], x[1, i], x[2, i], i)
     utils.plot_arrow(x[0, i], x[1, i], x[2, i] + multi_control.multi_control[i].delta, length=3, width=0.5)
     utils.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
-    plt.plot(targets[i][0], targets[i][1], "x"+color_dict[i])
+    plt.plot(targets[i][0], targets[i][1], "x", color = color_dict[i])
 
 def update_robot_state(i, x, dxu, multi_control, targets):
     """

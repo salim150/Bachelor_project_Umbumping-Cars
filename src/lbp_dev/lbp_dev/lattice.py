@@ -31,7 +31,7 @@ import lattice_motion_model as motion_model
 
 TABLE_PATH = os.path.dirname(os.path.abspath(__file__)) + "/lookup_table.csv"
 
-show_animation = False
+show_animation = True
 
 
 def search_nearest_one_from_lookup_table(t_x, t_y, t_yaw, lookup_table):
@@ -237,6 +237,7 @@ def sample_states(angle_samples, a_min, a_max, d, p_max, p_min, nh):
 
 
 def uniform_terminal_state_sampling_test1():
+    v = 1.0
     k0 = 0.0
     nxy = 5
     nh = 3
@@ -246,11 +247,11 @@ def uniform_terminal_state_sampling_test1():
     p_min = - np.deg2rad(45.0)
     p_max = np.deg2rad(45.0)
     states = calc_uniform_polar_states(nxy, nh, d, a_min, a_max, p_min, p_max)
-    result = generate_path(states, k0)
+    result = generate_path(states, k0, v)
 
     for table in result:
         xc, yc, yawc, kp = motion_model.generate_trajectory(
-            table[3], table[4], table[5], k0)
+            table[3], table[4], table[5], k0, v)
 
         if show_animation:
             plt.plot(xc, yc, "-r")
@@ -264,6 +265,7 @@ def uniform_terminal_state_sampling_test1():
 
 
 def uniform_terminal_state_sampling_test2():
+    v = 1.0
     k0 = 0.1
     nxy = 6
     nh = 3
@@ -273,11 +275,11 @@ def uniform_terminal_state_sampling_test2():
     p_min = - np.deg2rad(20.0)
     p_max = np.deg2rad(20.0)
     states = calc_uniform_polar_states(nxy, nh, d, a_min, a_max, p_min, p_max)
-    result = generate_path(states, k0)
+    result = generate_path(states, k0,v)
 
     for table in result:
         xc, yc, yawc, kp = motion_model.generate_trajectory(
-            table[3], table[4], table[5], k0)
+            table[3], table[4], table[5], k0,v)
 
         if show_animation:
             plt.plot(xc, yc, "-r")

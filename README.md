@@ -156,6 +156,7 @@ $$
 </p>
 
 ## TODO
+- Implement safety routines in case the method fails (solver fails, trajectory cost is infinite,...)
 - Check if there are soem hardcoded constants in the files
 - Debug the ROS2 simulation, it starts but the resulting behaviour (mainly for MPC, LBP, DWA) differs from the python simulation.
 - consider yaw flipping when qp solver fails

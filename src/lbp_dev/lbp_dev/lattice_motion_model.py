@@ -2,6 +2,7 @@ import math
 import numpy as np
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
+from planner import utils as utils  
 
 # motion parameter
 L = 1.0  # wheel base
@@ -31,7 +32,8 @@ def update(state, v, delta, dt):
     state.x = state.x + state.v * math.cos(state.yaw) * dt
     state.y = state.y + state.v * math.sin(state.yaw) * dt
     state.yaw = state.yaw + state.v / L * math.tan(delta) * dt
-    state.yaw = pi_2_pi(state.yaw)
+    state.yaw = utils.normalize_angle(state.yaw)
+    # state.yaw = pi_2_pi(state.yaw)
 
     return state
 

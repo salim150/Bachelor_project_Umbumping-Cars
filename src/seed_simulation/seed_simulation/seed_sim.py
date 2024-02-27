@@ -285,8 +285,8 @@ def c3bf_sim(seed):
     if show_animation:
         for i in range(robot_num):
             C3BF.plot_robot(x[0, i], x[1, i], x[2, i], i)
-            C3BF.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
-            C3BF.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
+            utils.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
+            utils.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
         plt.pause(0.0001)
         plt.show()
@@ -364,8 +364,8 @@ def cbf_sim(seed):
     if show_animation:
         for i in range(robot_num):
             CBF.plot_robot(x[0, i], x[1, i], x[2, i], i)
-            CBF.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
-            CBF.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
+            utils.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
+            utils.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
         plt.pause(0.0001)
         plt.show()
