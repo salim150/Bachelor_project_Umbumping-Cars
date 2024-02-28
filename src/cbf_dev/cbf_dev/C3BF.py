@@ -381,6 +381,7 @@ class C3BF_algorithm():
         self.targets = targets
         self.paths = paths
         self.robot_num = robot_num
+        self.dxu = np.zeros((2, self.robot_num))
         self.reached_goal = [False]*robot_num
         self.computational_time = []
 
@@ -391,10 +392,10 @@ class C3BF_algorithm():
             if add_noise: 
                 noise = np.concatenate([np.random.normal(0, 0.3, 2).reshape(2, 1), np.random.normal(0, np.radians(5), 1).reshape(1,1), np.zeros((1,1))], axis=0)
                 noisy_pos = x + noise
-                dxu = self.control_robot(i, noisy_pos)
+                self.control_robot(i, noisy_pos)
                 plt.plot(noisy_pos[0,i], noisy_pos[1,i], "x"+color_dict[i], markersize=10)
             else:
-                dxu = self.control_robot(i, x)
+                self.control_robot(i, x)
 
             self.computational_time.append((time.time() - t_prev))
             # Step 9: Check if the distance between the current position and the target is less than 5
@@ -404,21 +405,22 @@ class C3BF_algorithm():
                 if not self.paths[i]:
                     print("Path complete")
                     break_flag = True
-                    return x, dxu, break_flag
+                    return x, break_flag
                 self.targets[i] = (self.paths[i][0].x, self.paths[i][0].y)
 
-            x[:, i] = motion(x[:, i], dxu[:, i], dt)
+            x[:, i] = motion(x[:, i], self.dxu[:, i], dt)
             plot_robot(x[0, i], x[1, i], x[2, i], i)
-            utils.plot_arrow(x[0, i], x[1, i], x[2, i] + dxu[1, i], length=3, width=0.5)
+            utils.plot_arrow(x[0, i], x[1, i], x[2, i] + self.dxu[1, i], length=3, width=0.5)
             utils.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(self.targets[i][0], self.targets[i][1], "x" + color_dict[i])
         
-        return x, dxu, break_flag
+        return x, break_flag
     
     def go_to_goal(self, x, break_flag):
+
         for i in range(self.robot_num):
             t_prev = time.time()
-            dxu = self.control_robot(i, x)
+            self.control_robot(i, x)
             self.computational_time.append((time.time() - t_prev))
             # Step 9: Check if the distance between the current position and the target is less than 5
             if not self.reached_goal[i]:                
@@ -426,19 +428,19 @@ class C3BF_algorithm():
                 if check_goal_reached(x, self.targets, i, distance=2):
                     self.reached_goal[i] = True
                 else:
-                    x[:, i] = motion(x[:, i], dxu[:, i], dt)
+                    x[:, i] = motion(x[:, i], self.dxu[:, i], dt)
                     
             # If we want the robot to disappear when it reaches the goal, indent one more time
             if all(self.reached_goal):
                 break_flag = True
 
             plot_robot(x[0, i], x[1, i], x[2, i], i)
-            utils.plot_arrow(x[0, i], x[1, i], x[2, i] + dxu[1, i], length=3, width=0.5)
+            utils.plot_arrow(x[0, i], x[1, i], x[2, i] + self.dxu[1, i], length=3, width=0.5)
             utils.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(self.targets[i][0], self.targets[i][1], "x"+color_dict[i])
             # print(f"Speed of robot {i}: {x[3, i]}")
         
-        return x, dxu, break_flag
+        return x, break_flag
     
     def control_robot(self, i, x):
         """
@@ -455,18 +457,19 @@ class C3BF_algorithm():
         Returns:
             tuple: Updated state of all robots, updated target positions, and updated multi_control object.
         """
-        dxu = np.zeros((2, self.robot_num))
+        # dxu = np.zeros((2, self.robot_num))
 
         cmd = ControlInputs()
         
         self.check_collision(x, i)
         x1 = utils.array_to_state(x[:, i])
         cmd.throttle, cmd.delta = utils.pure_pursuit_steer_control(self.targets[i], x1)
-        dxu[0, i], dxu[1, i] = cmd.throttle, cmd.delta
+        self.dxu[0, i], self.dxu[1, i] = cmd.throttle, cmd.delta
 
-        dxu = C3BF(i, x, dxu)
+        dxu = C3BF(i, x, self.dxu)
+        self.dxu[:, i] = dxu[:, i]
 
-        return dxu
+        # return dxu
     
     def check_collision(self, x, i):
         """
@@ -545,8 +548,8 @@ def main(args=None):
                 c3bf.paths[i] = utils.update_path(paths[i])
                 c3bf.targets[i] = (paths[i][0].x, paths[i][0].y)
 
-            dxu = c3bf.control_robot(i, x)
-            x, multi_control = update_robot_state(i, x, dxu, multi_control, targets)
+            c3bf.control_robot(i, x)
+            x, multi_control = update_robot_state(i, x, c3bf.dxu, multi_control, targets)
         
         utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
@@ -606,7 +609,7 @@ def main1(args=None):
             'key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
         
-        x, dxu, break_flag = c3bf.go_to_goal(x, break_flag) 
+        x, break_flag = c3bf.go_to_goal(x, break_flag) 
         
         utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
@@ -682,8 +685,8 @@ def main2(args=None):
                     return
                 c3bf.targets[i] = (paths[i][0].x, paths[i][0].y)
 
-            dxu = c3bf.control_robot(i, x)
-            x, multi_control = update_robot_state(i, x, dxu, multi_control, targets)
+            c3bf.control_robot(i, x)
+            x, multi_control = update_robot_state(i, x, c3bf.dxu, multi_control, targets)
         
         utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
@@ -741,7 +744,7 @@ def main_seed(args=None):
             'key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
         
-        x, dxu, break_flag = c3bf.run_3cbf(x, break_flag) 
+        x, break_flag = c3bf.run_3cbf(x, break_flag) 
         
         utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
@@ -752,6 +755,6 @@ def main_seed(args=None):
             break
         
 if __name__=='__main__':
-    # main_seed()
-    main1()
+    main_seed()
+    # main2()
         

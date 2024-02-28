@@ -398,12 +398,12 @@ def main_c3bf(seed):
             'key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
         
-        x, u, break_flag = c3bf.run_3cbf(x, break_flag)
-        trajectory = np.dstack([trajectory, np.concatenate((x,u))])
+        x, break_flag = c3bf.run_3cbf(x, break_flag)
+        trajectory = np.dstack([trajectory, np.concatenate((x,c3bf.dxu))])
         c3bf.targets[0] = (coords[-1][0], coords[-1][1])
 
         plt.plot(coords[-1][0], coords[-1][1], 'k', marker='o', markersize=20)
-        C3BF.plot_map(width=width_init, height=height_init)
+        utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
         plt.grid(True)
         plt.pause(0.0001)
@@ -415,8 +415,8 @@ def main_c3bf(seed):
     if show_animation:
         for i in range(robot_num):
             C3BF.plot_robot(x[0, i], x[1, i], x[2, i], i)
-            C3BF.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
-            C3BF.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
+            utils.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
+            utils.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
         plt.pause(0.0001)
         plt.show()
@@ -485,7 +485,7 @@ def main_cbf(seed):
         cbf.targets[0] = (coords[-1][0], coords[-1][1])
 
         plt.plot(coords[-1][0], coords[-1][1], 'k', marker='o', markersize=20)
-        CBF.plot_map(width=width_init, height=height_init)
+        utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
         plt.grid(True)
         plt.pause(0.0001)
@@ -497,8 +497,8 @@ def main_cbf(seed):
     if show_animation:
         for i in range(robot_num):
             CBF.plot_robot(x[0, i], x[1, i], x[2, i], i)
-            CBF.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
-            CBF.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
+            utils.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
+            utils.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
         plt.pause(0.0001)
         plt.show()
@@ -511,6 +511,6 @@ if __name__ == '__main__':
         seed = json.load(file)
     # main_lbp(seed)
     # main_dwa(seed)
-    main_mpc(seed)
-    # main_c3bf(seed)
+    # main_mpc(seed)
+    main_c3bf(seed)
     # main_cbf(seed)  

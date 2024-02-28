@@ -21,7 +21,7 @@ robot_num = json_object["robot_num"]
 width_init = json_object["width"]
 height_init = json_object["height"]
 show_animation = True
-go_to_goal_bool = True
+go_to_goal_bool = False
 iterations = 1000
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
@@ -268,10 +268,10 @@ def c3bf_sim(seed):
             lambda event: [exit(0) if event.key == 'escape' else None])
         
         if go_to_goal_bool:
-            x, u, break_flag = c3bf.go_to_goal(x, break_flag)
+            x, break_flag = c3bf.go_to_goal(x, break_flag)
         else:
-            x, u, break_flag = c3bf.run_3cbf(x, break_flag)
-        trajectory = np.dstack([trajectory, np.concatenate((x,u))])
+            x, break_flag = c3bf.run_3cbf(x, break_flag)
+        trajectory = np.dstack([trajectory, np.concatenate((x, c3bf.dxu))])
         
         utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
@@ -464,11 +464,11 @@ def main():
     with open(filename, 'r') as file:
         seed = json.load(file)
 
-    dwa_trajectory, dwa_computational_time = dwa_sim(seed)   
-    print(f"DWA average computational time: {sum(dwa_computational_time) / len(dwa_computational_time)}\n")
+    # dwa_trajectory, dwa_computational_time = dwa_sim(seed)   
+    # print(f"DWA average computational time: {sum(dwa_computational_time) / len(dwa_computational_time)}\n")
 
-    mpc_trajectory, mpc_computational_time = mpc_sim(seed)
-    print(f"MPC average computational time: {sum(mpc_computational_time) / len(mpc_computational_time)}\n")
+    # mpc_trajectory, mpc_computational_time = mpc_sim(seed)
+    # print(f"MPC average computational time: {sum(mpc_computational_time) / len(mpc_computational_time)}\n")
 
     c3bf_trajectory, c3bf_computational_time = c3bf_sim(seed)
     print(f"C3BF average computational time: {sum(c3bf_computational_time) / len(c3bf_computational_time)}\n")
