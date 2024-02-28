@@ -152,44 +152,57 @@ def C3BF(i, x, u_ref):
 
     # Adding arena boundary constraints
     # Pos Y
-    h = ((x[1,i] - boundary_points[3])**2 - safety_radius**2 - Kv * abs(x[3,i]))
-    if x[3,i] >= 0:
-        gradH = np.array([0, 2*(x[1,i] - boundary_points[3]), 0, -Kv])
-    else:
-        gradH = np.array([0, 2*(x[1,i] - boundary_points[3]), 0, Kv])
+    h = (x[1,i] - boundary_points[3])**2 - safety_radius**2 - Kv * abs(x[3,i]*np.sin(x[2,i]))
+    # if x[3,i] >= 0:
+    #     gradH = np.array([0, 2*(x[1,i] - boundary_points[3]), 0, -Kv])
+    # else:
+    #     gradH = np.array([0, 2*(x[1,i] - boundary_points[3]), 0, Kv])
+    gradH = np.array([2*(x[1,i] - boundary_points[3]), 0, 
+                      -Kv*np.abs(x[3,i])*np.sign(np.sin(x[2,i]))*np.cos(x[2,i]), 
+                      -Kv*np.abs(np.sin(x[2,i]))*np.sign(x[3,i])])
     Lf_h = np.dot(gradH.T, f)
     Lg_h = np.dot(gradH.T, g)
     G = np.vstack([G, -Lg_h])
     H = np.vstack([H, np.array([arena_gain*h**3 + Lf_h])])
     
     # Neg Y
-    h = ((x[1,i] - boundary_points[2])**2 - safety_radius**2 - Kv * abs(x[3,i]))
-    if x[3,i] >= 0:
-        gradH = np.array([0, 2*(x[1,i] - boundary_points[2]), 0, -Kv])
-    else:
-        gradH = np.array([0, 2*(x[1,i] - boundary_points[2]), 0, Kv])
+    h = (x[1,i] - boundary_points[2])**2 - safety_radius**2 - Kv * abs(x[3,i]*np.sin(x[2,i]))
+    # if x[3,i] >= 0:
+    #     gradH = np.array([0, 2*(x[1,i] - boundary_points[2]), 0, -Kv])
+    # else:
+    #     gradH = np.array([0, 2*(x[1,i] - boundary_points[2]), 0, Kv])
+    
+    gradH = np.array([2*(x[1,i] - boundary_points[2]), 0, 
+                      -Kv*np.abs(x[3,i])*np.sign(np.sin(x[2,i]))*np.cos(x[2,i]), 
+                      -Kv*np.abs(np.sin(x[2,i]))*np.sign(x[3,i])])
     Lf_h = np.dot(gradH.T, f)
     Lg_h = np.dot(gradH.T, g)
     G = np.vstack([G, -Lg_h])
     H = np.vstack([H, np.array([arena_gain*h**3 + Lf_h])])
     
     # Pos X
-    h = ((x[0,i] - boundary_points[1])**2 - safety_radius**2 - Kv * abs(x[3,i]))
-    if x[3,i] >= 0:
-        gradH = np.array([2*(x[0,i] - boundary_points[1]), 0, 0, -Kv])
-    else:
-        gradH = np.array([2*(x[0,i] - boundary_points[1]), 0, 0, Kv])
+    h = (x[0,i] - boundary_points[1])**2 - safety_radius**2 - Kv * abs(x[3,i]*np.cos(x[2,i]))
+    # if x[3,i] >= 0:
+    #     gradH = np.array([2*(x[0,i] - boundary_points[1]), 0, 0, -Kv])
+    # else:
+    #     gradH = np.array([2*(x[0,i] - boundary_points[1]), 0, 0, Kv])
+    gradH = np.array([2*(x[0,i] - boundary_points[1]), 0, 
+                      Kv*np.abs(x[3,i])*np.sign(np.cos(x[2,i]))*np.sin(x[2,i]), 
+                      -Kv*np.abs(np.cos(x[2,i]))*np.sign(x[3,i])])
     Lf_h = np.dot(gradH.T, f)
     Lg_h = np.dot(gradH.T, g)
     G = np.vstack([G, -Lg_h])
     H = np.vstack([H, np.array([arena_gain*h**3 + Lf_h])])
 
     # Neg X
-    h = ((x[0,i] - boundary_points[0])**2 - safety_radius**2 - Kv * abs(x[3,i]))
-    if x[3,i] >= 0:
-        gradH = np.array([2*(x[0,i] - boundary_points[0]), 0, 0, -Kv])
-    else:
-        gradH = np.array([2*(x[0,i] - boundary_points[0]), 0, 0, Kv])
+    h = (x[0,i] - boundary_points[0])**2 - safety_radius**2 - Kv * abs(x[3,i]*np.cos(x[2,i]))
+    # if x[3,i] >= 0:
+    #     gradH = np.array([2*(x[0,i] - boundary_points[0]), 0, 0, -Kv])
+    # else:
+    #     gradH = np.array([2*(x[0,i] - boundary_points[0]), 0, 0, Kv])
+    gradH = np.array([2*(x[0,i] - boundary_points[0]), 0, 
+                      Kv*np.abs(x[3,i])*np.sign(np.cos(x[2,i]))*np.sin(x[2,i]), 
+                      -Kv*np.abs(np.cos(x[2,i]))*np.sign(x[3,i])])
     Lf_h = np.dot(gradH.T, f)
     Lg_h = np.dot(gradH.T, g)
     G = np.vstack([G, -Lg_h])
@@ -277,25 +290,6 @@ def update_paths(paths):
         updated_paths.append(utils.update_path(path))
     return updated_paths
 
-def check_collision(x,i):
-    """
-    Checks for collision between the robot at index i and other robots.
-
-    Args:
-        x (numpy.ndarray): State vector of shape (4, N), where N is the number of time steps.
-        i (int): Index of the robot to check collision for.
-
-    Raises:
-        Exception: If collision is detected.
-
-    """
-    for idx in range(robot_num):
-        if idx == i:
-            continue
-        if check_collision_bool:
-            if utils.dist([x[0,i], x[1,i]], [x[0, idx], x[1, idx]]) < WB:
-                raise Exception('Collision')
-
 def plot_robot(x, y, yaw, i): 
     """
     Plot the robot.
@@ -363,34 +357,6 @@ def update_robot_state(i, x, dxu, multi_control, targets):
     
     return x, multi_control
 
-def control_robot(i, x, targets):
-    """
-    Controls the movement of a robot based on its current state and target positions.
-
-    Args:
-        i (int): Index of the robot.
-        x (numpy.ndarray): Array representing the current state of all robots.
-        targets (list): List of target positions for each robot.
-        robot_num (int): Total number of robots.
-        multi_control (MultiControl): Object for storing control inputs for all robots.
-        paths (list): List of paths for each robot.
-
-    Returns:
-        tuple: Updated state of all robots, updated target positions, and updated multi_control object.
-    """
-    dxu = np.zeros((2, robot_num))
-
-    cmd = ControlInputs()
-    
-    check_collision(x, i)
-    x1 = utils.array_to_state(x[:, i])
-    cmd.throttle, cmd.delta = utils.pure_pursuit_steer_control(targets[i], x1)
-    dxu[0, i], dxu[1, i] = cmd.throttle, cmd.delta
-
-    dxu = C3BF(i, x, dxu)
-
-    return dxu
-
 def check_goal_reached(x, targets, i, distance=0.5):
     """
     Check if the robot has reached the goal.
@@ -411,23 +377,24 @@ def check_goal_reached(x, targets, i, distance=0.5):
 
 class C3BF_algorithm():
     
-    def __init__(self, targets, paths):
+    def __init__(self, targets, paths, robot_num=robot_num):
         self.targets = targets
         self.paths = paths
+        self.robot_num = robot_num
         self.reached_goal = [False]*robot_num
         self.computational_time = []
 
     def run_3cbf(self, x, break_flag):
-        for i in range(robot_num):
+        for i in range(self.robot_num):
             t_prev = time.time()
 
             if add_noise: 
                 noise = np.concatenate([np.random.normal(0, 0.3, 2).reshape(2, 1), np.random.normal(0, np.radians(5), 1).reshape(1,1), np.zeros((1,1))], axis=0)
                 noisy_pos = x + noise
-                dxu = control_robot(i, noisy_pos, self.targets)
+                dxu = self.control_robot(i, noisy_pos)
                 plt.plot(noisy_pos[0,i], noisy_pos[1,i], "x"+color_dict[i], markersize=10)
             else:
-                dxu = control_robot(i, x, self.targets)
+                dxu = self.control_robot(i, x)
 
             self.computational_time.append((time.time() - t_prev))
             # Step 9: Check if the distance between the current position and the target is less than 5
@@ -449,9 +416,9 @@ class C3BF_algorithm():
         return x, dxu, break_flag
     
     def go_to_goal(self, x, break_flag):
-        for i in range(robot_num):
+        for i in range(self.robot_num):
             t_prev = time.time()
-            dxu = control_robot(i, x, self.targets)
+            dxu = self.control_robot(i, x)
             self.computational_time.append((time.time() - t_prev))
             # Step 9: Check if the distance between the current position and the target is less than 5
             if not self.reached_goal[i]:                
@@ -472,6 +439,53 @@ class C3BF_algorithm():
             # print(f"Speed of robot {i}: {x[3, i]}")
         
         return x, dxu, break_flag
+    
+    def control_robot(self, i, x):
+        """
+        Controls the movement of a robot based on its current state and target positions.
+
+        Args:
+            i (int): Index of the robot.
+            x (numpy.ndarray): Array representing the current state of all robots.
+            targets (list): List of target positions for each robot.
+            robot_num (int): Total number of robots.
+            multi_control (MultiControl): Object for storing control inputs for all robots.
+            paths (list): List of paths for each robot.
+
+        Returns:
+            tuple: Updated state of all robots, updated target positions, and updated multi_control object.
+        """
+        dxu = np.zeros((2, self.robot_num))
+
+        cmd = ControlInputs()
+        
+        self.check_collision(x, i)
+        x1 = utils.array_to_state(x[:, i])
+        cmd.throttle, cmd.delta = utils.pure_pursuit_steer_control(self.targets[i], x1)
+        dxu[0, i], dxu[1, i] = cmd.throttle, cmd.delta
+
+        dxu = C3BF(i, x, dxu)
+
+        return dxu
+    
+    def check_collision(self, x, i):
+        """
+        Checks for collision between the robot at index i and other robots.
+
+        Args:
+            x (numpy.ndarray): State vector of shape (4, N), where N is the number of time steps.
+            i (int): Index of the robot to check collision for.
+
+        Raises:
+            Exception: If collision is detected.
+
+        """
+        for idx in range(self.robot_num):
+            if idx == i:
+                continue
+            if check_collision_bool:
+                if utils.dist([x[0,i], x[1,i]], [x[0, idx], x[1, idx]]) < WB:
+                    raise Exception('Collision')
 
 def main(args=None):
     """
@@ -509,6 +523,8 @@ def main(args=None):
 
     # Step 5: Extract the target coordinates from the paths
     targets = [[path[0].x, path[0].y] for path in paths]
+
+    c3bf = C3BF_algorithm(targets, paths, robot_num) 
     
     # Step 6: Create a MultiControl object
     multi_control = MultiControl()
@@ -526,10 +542,10 @@ def main(args=None):
             # Step 9: Check if the distance between the current position and the target is less than 5
             if utils.dist(point1=(x[0,i], x[1,i]), point2=targets[i]) < 2:
                 # Perform some action when the condition is met
-                paths[i] = utils.update_path(paths[i])
-                targets[i] = (paths[i][0].x, paths[i][0].y)
+                c3bf.paths[i] = utils.update_path(paths[i])
+                c3bf.targets[i] = (paths[i][0].x, paths[i][0].y)
 
-            dxu = control_robot(i, x, targets)
+            dxu = c3bf.control_robot(i, x)
             x, multi_control = update_robot_state(i, x, dxu, multi_control, targets)
         
         utils.plot_map(width=width_init, height=height_init)
@@ -538,73 +554,67 @@ def main(args=None):
         plt.pause(0.0001)
 
 def main1(args=None):
-    # Instantiate Robotarium object
-    # The robots will never reach their goal points so set iteration number
+    """
+    Main function for controlling multiple robots using Model Predictive Control (MPC).
+
+    Steps:
+    1. Initialize the necessary variables and parameters.
+    2. Create an instance of the ModelPredictiveControl class.
+    3. Set the initial state and control inputs.
+    4. Generate the reference trajectory for each robot.
+    5. Plot the initial positions and reference trajectory.
+    6. Set the bounds and constraints for the MPC.
+    7. Initialize the predicted trajectory for each robot.
+    8. Enter the main control loop:
+        - Check if the distance between the current position and the target is less than 5.
+            - If yes, update the path and target.
+        - Perform 3CBF control for each robot.
+        - Plot the robot trajectory.
+        - Update the predicted trajectory.
+        - Plot the map and pause for visualization.
+    """
+    # Step 1: Set the number of iterations
     iterations = 3000
     fig = plt.figure(1, dpi=90, figsize=(10,10))
     ax = fig.add_subplot(111)
+    break_flag = False
+    
+    # Step 2: Sample initial values for x0, y, yaw, v, omega, and model_type
+    initial_state = data['initial_position']
+    x0 = initial_state['x']
+    y = initial_state['y']
+    yaw = initial_state['yaw']
+    v = initial_state['v']
 
-    # Define goal points outside of the arena
-    x0, y, yaw, v, omega, model_type = utils.samplegrid(width_init, height_init, min_dist, robot_num, safety_init)
-    x = np.array([x0, y, yaw, v])
+    # Step 3: Create an array x with the initial values
+    x = np.array([[-7, 7], [0, 0], [0, np.pi], [0, 0]])
+    u = np.array([[0, 0], [0, 0]])
+    targets = [[7,7],[-7,7]]
+    
+    # Step 4: Create paths for each robot
+    traj = data['trajectories']
+    paths = [[Coordinate(x=traj[str(idx)][i][0], y=traj[str(idx)][i][1]) for i in range(len(traj[str(idx)]))] for idx in range(robot_num)]
 
-    paths = []
-    targets = []
-    # multi_traj = MultiplePaths()
-    multi_control = MultiControl()
-    dxu = np.zeros((2,robot_num))
-    for i in range(robot_num):
-        paths.append(utils.create_path())
-        targets.append([paths[i][0].x, paths[i][0].y])
-        initial_state = State(x=x0[i], y=y[i], yaw=yaw[i], v=v[i], omega=omega[i])
-        # multi_traj.multiple_path.append(predict_trajectory(initial_state, targets[i]))
-        multi_control.multi_control.append(ControlInputs(delta=0.0, throttle=0.0))
-        
-    # While the number of robots at the required poses is less
-    # than N...
+    # Step 5: Extract the target coordinates from the paths
+    # targets = [[path[0].x, path[0].y] for path in paths]
+
+    c3bf = C3BF_algorithm(targets, paths, robot_num=x.shape[1])
+    # Step 8: Perform the simulation for the specified number of iterations
     for z in range(iterations):
         plt.cla()
-        # for stopping simulation with the esc key.
         plt.gcf().canvas.mpl_connect(
             'key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
         
-        # Create single-integrator control inputs
-        for i in range(robot_num):
-            x1 = utils.array_to_state(x[:,i])
-            if utils.dist(point1=(x[0,i], x[1,i]), point2=targets[i]) < 5:
-                paths[i] = utils.update_path(paths[i])
-                targets[i] = (paths[i][0].x, paths[i][0].y)
-                # multi_traj.multiple_path[i] = predict_trajectory(x1, targets[i])
-
-            for idx in range(robot_num):
-                if idx == i:
-                    continue
-                if utils.dist([x1.x, x1.y], [x[0, idx], x[1, idx]]) < WB: raise Exception('Collision')
-            
-            cmd = ControlInputs()
-            cmd.throttle, cmd.delta= utils.pure_pursuit_steer_control(targets[i], x1)
-
-            dxu[0,i], dxu[1,i] = cmd.throttle, cmd.delta            
-            dxu = C3BF(i, x, dxu)
-            cmd.throttle, cmd.delta = dxu[0,i], dxu[1,i]
-            x1 = utils.linear_model_callback(x1, cmd)
-            x1 = utils.state_to_array(x1).reshape(4)
-            x[:, i] = x1
-            multi_control.multi_control[i] = cmd
-    
-            # plt.plot(x[0,i], x[1,i], "xr")
-            # plt.plot(goal[0,i], goal[1,i], "xb")utils.plot_arrow(x1.x, x1.y, x1.yaw)
-            plot_robot(x[0,i], x[1,i], x[2,i], i)
-            utils.plot_arrow(x[0,i], x[1,i], x[2,i] + multi_control.multi_control[i].delta, length=3, width=0.5)
-            utils.plot_arrow(x[0,i], x[1,i], x[2,i], length=1, width=0.5)
-            plt.plot(targets[i][0], targets[i][1], "x"+color_dict[i])
-            # plot_path(multi_traj.multiple_path[i])
-
+        x, dxu, break_flag = c3bf.go_to_goal(x, break_flag) 
+        
         utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
         plt.grid(True)
         plt.pause(0.0001)
+
+        if break_flag:
+            break
 
 def main2(args=None):
     """
@@ -647,6 +657,8 @@ def main2(args=None):
 
     # Step 5: Extract the target coordinates from the paths
     targets = [[path[0].x, path[0].y] for path in paths]
+
+    c3bf = C3BF_algorithm(targets, paths, robot_num)
     
     # Step 6: Create a MultiControl object
     multi_control = MultiControl()
@@ -668,9 +680,9 @@ def main2(args=None):
                 if not paths[i]:
                     print("Path complete")
                     return
-                targets[i] = (paths[i][0].x, paths[i][0].y)
+                c3bf.targets[i] = (paths[i][0].x, paths[i][0].y)
 
-            dxu = control_robot(i, x, targets)
+            dxu = c3bf.control_robot(i, x)
             x, multi_control = update_robot_state(i, x, dxu, multi_control, targets)
         
         utils.plot_map(width=width_init, height=height_init)
@@ -741,5 +753,5 @@ def main_seed(args=None):
         
 if __name__=='__main__':
     # main_seed()
-    main()
+    main1()
         
