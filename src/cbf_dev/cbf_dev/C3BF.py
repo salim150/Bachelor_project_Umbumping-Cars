@@ -439,7 +439,7 @@ class C3BF_algorithm():
             utils.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(self.targets[i][0], self.targets[i][1], "x"+color_dict[i])
             # print(f"Speed of robot {i}: {x[3, i]}")
-        
+
         return x, break_flag
     
     def control_robot(self, i, x):
@@ -592,7 +592,7 @@ def main1(args=None):
     # Step 3: Create an array x with the initial values
     x = np.array([[-7, 7], [0, 0], [0, np.pi], [0, 0]])
     u = np.array([[0, 0], [0, 0]])
-    targets = [[7,7],[-7,7]]
+    targets = [[7, 0], [-7, 0]]
     
     # Step 4: Create paths for each robot
     traj = data['trajectories']
@@ -755,6 +755,6 @@ def main_seed(args=None):
             break
         
 if __name__=='__main__':
-    main_seed()
-    # main2()
+    # main_seed()
+    main1()
         

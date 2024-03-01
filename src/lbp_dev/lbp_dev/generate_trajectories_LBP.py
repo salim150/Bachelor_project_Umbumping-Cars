@@ -152,7 +152,9 @@ def normalize_angle(angle):
 
 def generate_lookup_table():
     temp = {}
-
+    plt.rcParams['font.family'] = ['serif']
+    plt.rcParams['font.serif'] = ['Times New Roman']
+    plt.rcParams['font.size'] = 11
     for v in np.arange(0.5, 2.0+0.5, 0.5):
         temp[v] = {}
         k0 = 0.0
@@ -213,6 +215,9 @@ def generate_lookup_table():
                     plt.plot(xc, yc, "-r")
 
         if show_animation:
+            plt.xlabel("x [m]", fontdict={'size': 11, 'family': 'serif'})
+            plt.ylabel("y [m]", fontdict={'size': 11, 'family': 'serif'})
+            plt.title('LBP Trajectory Generation')
             plt.grid(True)
             plt.axis("equal")
             plt.show()

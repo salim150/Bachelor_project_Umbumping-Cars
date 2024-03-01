@@ -24,8 +24,8 @@ max_speed = json_object["LBP"]["max_speed"] # [m/s]
 min_speed = json_object["LBP"]["min_speed"] # [m/s]
 v_resolution = json_object["LBP"]["v_resolution"] # [m/s]
 delta_resolution = math.radians(json_object["LBP"]["delta_resolution"])# [rad/s]
-max_acc = 10 #json_object["LBP"]["max_acc"] # [m/ss]
-min_acc = -10 #json_object["LBP"]["min_acc"] # [m/ss]
+max_acc = json_object["LBP"]["max_acc"] # [m/ss]
+min_acc = json_object["LBP"]["min_acc"] # [m/ss]
 dt = json_object["Controller"]["dt"] # [s] Time tick for motion prediction
 predict_time = json_object["LBP"]["predict_time"] # [s]
 to_goal_cost_gain = json_object["LBP"]["to_goal_cost_gain"]
@@ -76,6 +76,7 @@ def motion(x, u, dt):
     delta = u[1]
     delta = np.clip(delta, -max_steer, max_steer)
     throttle = u[0]
+    throttle = np.clip(throttle, -max_acc, max_acc)
 
     x[0] = x[0] + x[3] * math.cos(x[2]) * dt
     x[1] = x[1] + x[3] * math.sin(x[2]) * dt
