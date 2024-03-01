@@ -25,7 +25,7 @@
             "min_acc": -100,
             "safety_radius": 1.5,
             "barrier_gain": 1, 
-            "arena_gain": 10,
+            "arena_gain": 50,
             "Kv": 0.1
         },
     "DWA":
