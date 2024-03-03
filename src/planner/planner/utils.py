@@ -226,7 +226,7 @@ def plot_map(width=100, height=100):
         corner_x = [-width/2.0, width/2.0, width/2.0, -width/2.0, -width/2.0]
         corner_y = [height/2.0, height/2.0, -height/2.0, -height/2.0, height/2.0]
 
-        plt.plot(corner_x, corner_y)
+        plt.plot(corner_x, corner_y, label="map", linewidth=4)
 
 def plot_path(path: Path):
         x = []
