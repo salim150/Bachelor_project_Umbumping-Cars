@@ -10,6 +10,8 @@ import mpc_dev.MPC as MPC
 import planner.utils as utils
 from custom_message.msg import Coordinate
 from shapely.geometry import Point, LineString
+import pandas as pd
+from data_process import DataProcessor
 
 path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
 # Opening JSON file
@@ -21,7 +23,7 @@ robot_num = json_object["robot_num"]
 width_init = json_object["width"]
 height_init = json_object["height"]
 show_animation = True
-go_to_goal_bool = False
+go_to_goal_bool = True
 iterations = 1000
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
@@ -116,7 +118,9 @@ def dwa_sim(seed):
             DWA.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
         plt.pause(0.0001)
-        plt.show()
+        plt.show(block=False)
+        plt.pause(3)
+        plt.close()
 
     return trajectory, dwa.computational_time 
 
@@ -211,7 +215,9 @@ def mpc_sim(seed):
             MPC.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
         plt.pause(0.0001)
-        plt.show()
+        plt.show(block=False)
+        plt.pause(3)
+        plt.close()
 
     return trajectory, mpc.computational_time
 
@@ -289,7 +295,9 @@ def c3bf_sim(seed):
             utils.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
         plt.pause(0.0001)
-        plt.show()
+        plt.show(block=False)
+        plt.pause(3)
+        plt.close()
 
     return trajectory, c3bf.computational_time
 
@@ -346,11 +354,11 @@ def cbf_sim(seed):
             lambda event: [exit(0) if event.key == 'escape' else None])
         
         if go_to_goal_bool:
-            x, u, break_flag = cbf.go_to_goal(x, break_flag)
+            x, break_flag = cbf.go_to_goal(x, break_flag)
         else:
-            x, u, break_flag = cbf.run_cbf(x, break_flag) 
+            x, break_flag = cbf.run_cbf(x, break_flag) 
             
-        trajectory = np.dstack([trajectory, np.concatenate((x,u))])
+        trajectory = np.dstack([trajectory, np.concatenate((x, cbf.dxu))])
         
         utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
@@ -368,7 +376,9 @@ def cbf_sim(seed):
             utils.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
         plt.pause(0.0001)
-        plt.show()
+        plt.show(block=False)
+        plt.pause(3)
+        plt.close()
 
     return trajectory, cbf.computational_time
 
@@ -453,31 +463,59 @@ def lbp_sim(seed):
             LBP.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
         plt.pause(0.0001)
-        plt.show()
+        plt.show(block=False)
+        plt.pause(3)
+        plt.close()
     
     return trajectory, lbp.computational_time
 
 def main():
     # Load the seed from a file
     # filename = '/home/giacomo/thesis_ws/src/seed_1.json'
-    filename = '/home/giacomo/thesis_ws/src/circular_seed_0.json'
-    with open(filename, 'r') as file:
+    path = pathlib.Path('/home/giacomo/thesis_ws/src/seeds/')
+    filename = 'circular_seed_0.json'
+    seed_path = path / filename
+    with open(seed_path, 'r') as file:
         seed = json.load(file)
 
-    # dwa_trajectory, dwa_computational_time = dwa_sim(seed)   
-    # print(f"DWA average computational time: {sum(dwa_computational_time) / len(dwa_computational_time)}\n")
+    csv_file = '/home/giacomo/thesis_ws/src/seed_simulation/seed_simulation/seed_sim.csv'
+    df = pd.read_csv(csv_file, index_col=0)
+    df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
 
-    # mpc_trajectory, mpc_computational_time = mpc_sim(seed)
-    # print(f"MPC average computational time: {sum(mpc_computational_time) / len(mpc_computational_time)}\n")
+    # Analyze the results
+    data_process = DataProcessor(robot_num, file_name=filename)
+
+    dwa_trajectory, dwa_computational_time = dwa_sim(seed)   
+    print(f"DWA average computational time: {sum(dwa_computational_time) / len(dwa_computational_time)}\n")
+    dwa_data = data_process.post_process_simultation(dwa_trajectory, dwa_computational_time, method='DWA')
+
+    mpc_trajectory, mpc_computational_time = mpc_sim(seed)
+    print(f"MPC average computational time: {sum(mpc_computational_time) / len(mpc_computational_time)}\n")
+    mpc_data = data_process.post_process_simultation(mpc_trajectory, mpc_computational_time, method="MPC")
 
     c3bf_trajectory, c3bf_computational_time = c3bf_sim(seed)
     print(f"C3BF average computational time: {sum(c3bf_computational_time) / len(c3bf_computational_time)}\n")
+    c3bf_data = data_process.post_process_simultation(c3bf_trajectory, c3bf_computational_time, method='C3BF')
 
     cbf_trajectory, cbf_computational_time = cbf_sim(seed)
     print(f"CBF average computational time: {sum(cbf_computational_time) / len(cbf_computational_time)}\n")
+    cbf_data = data_process.post_process_simultation(cbf_trajectory, cbf_computational_time, method="CBF")
     
     lbp_trajectory, lbp_computational_time = lbp_sim(seed)
     print(f"LBP average computational time: {sum(lbp_computational_time) / len(lbp_computational_time)}\n")
+    lbp_data = data_process.post_process_simultation(lbp_trajectory, lbp_computational_time, method="LBP")
+
+    data = [dwa_data, mpc_data, c3bf_data, cbf_data, lbp_data]
+    df1 = pd.DataFrame(data)
+    frames = [df, df1]
+
+    # Save the results to a csv file
+    df = pd.concat(frames, ignore_index=True)
+    df = data_process.remove_df_duplicates(df)
+    # df = pd.DataFrame(data)
+    df.to_csv(csv_file)
+
+    print(f"Data saved to csv file: {csv_file}")
 
 if __name__ == '__main__':
     main()

@@ -24,7 +24,7 @@ min_dist = json_object["min_dist"]
 
 # write a main function that generates a path for robot_num robots using the function create_path and saves the the generated trajectories to a dictionary.
 # The dictionary is then saved to a file using the function save_dict_to_file
-def save_dict_to_file(dict, filename= 'src/seed_'):
+def save_dict_to_file(dict, filename= 'src/seeds/seed_'):
     # save the dictionary to a file
     i = 0
     while os.path.exists(f"{filename}{i}.json"):

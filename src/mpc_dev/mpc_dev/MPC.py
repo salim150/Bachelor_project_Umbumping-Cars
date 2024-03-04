@@ -105,8 +105,8 @@ class ModelPredictiveControl:
     """
 
     def __init__(self, obs_x, obs_y, x, robot_num=robot_num, cx=None, cy=None, ref=None, bounds=None, constraints=None):
-        self.horizon = 40 #horizon
-        self.dt = 0.1 #dt_pred
+        self.horizon = horizon
+        self.dt = dt_pred
 
         self.x_obs = obs_x
         self.y_obs = obs_y
@@ -416,6 +416,7 @@ class ModelPredictiveControl:
             """
                 
             bounds = []
+            constraints = []
             # Set bounds for inputs bounded optimization.
             for i in range(self.horizon):
                 bounds += [[min_acc, max_acc]]
@@ -516,6 +517,7 @@ class ModelPredictiveControl:
                             tol = 1e-1)
         else:
             self.update_obstacles(i, x1, x, self.predicted_trajectory) 
+            self.bounds, self.constraints = self.set_bounds_and_constraints()
             self.initial_state = x1
             u_solution = minimize(cost_function, u1, (x1, ref[i]),
                             method='SLSQP',
@@ -1187,4 +1189,4 @@ def main_seed():
 
 if __name__ == '__main__':
     # main_seed()
-    main1()
+    main()
