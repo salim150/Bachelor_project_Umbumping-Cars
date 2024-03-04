@@ -373,7 +373,7 @@ def samplegrid(width_init, height_init, min_dist, robot_num, safety_init):
     model_type = robot_num * ['linear']
     return x.tolist(), y.tolist(), yaw, v, omega, model_type
 
-def circular_samples(width_init, height_init, min_dist, robot_num, safety_init):
+def circular_samples(width_init, height_init, R, robot_num, safety_init):
     """
     Generate random grid coordinates for robots in a given map.
 
@@ -395,13 +395,15 @@ def circular_samples(width_init, height_init, min_dist, robot_num, safety_init):
 
     radius = np.sqrt(width**2 + height**2)/2
 
+    assert R < radius and R>=0, "The radius is too large for the map"
+
     # create robot_num points on a circle and save the angles as yaw
     x = []
     y = []
     yaw = []
     for i in range(robot_num):
-        x.append(radius*np.cos(2*np.pi*i/robot_num))
-        y.append(radius*np.sin(2*np.pi*i/robot_num))
+        x.append(R*np.cos(2*np.pi*i/robot_num))
+        y.append(R*np.sin(2*np.pi*i/robot_num))
         yaw.append(2*np.pi*i/robot_num+np.pi)
 
     v = robot_num * [0.0]

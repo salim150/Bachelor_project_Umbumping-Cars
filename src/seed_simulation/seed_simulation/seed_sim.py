@@ -12,6 +12,7 @@ from custom_message.msg import Coordinate
 from shapely.geometry import Point, LineString
 import pandas as pd
 from data_process import DataProcessor
+import os
 
 path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
 # Opening JSON file
@@ -471,46 +472,56 @@ def lbp_sim(seed):
 
 def main():
     # Load the seed from a file
-    # filename = '/home/giacomo/thesis_ws/src/seed_1.json'
     path = pathlib.Path('/home/giacomo/thesis_ws/src/seeds/')
-    filename = 'circular_seed_0.json'
-    seed_path = path / filename
-    with open(seed_path, 'r') as file:
-        seed = json.load(file)
+    dir_list = os.listdir(path)
 
     csv_file = '/home/giacomo/thesis_ws/src/seed_simulation/seed_simulation/seed_sim.csv'
     df = pd.read_csv(csv_file, index_col=0)
     df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
 
     # Analyze the results
-    data_process = DataProcessor(robot_num, file_name=filename)
+    for filename in dir_list:
 
-    dwa_trajectory, dwa_computational_time = dwa_sim(seed)   
-    print(f"DWA average computational time: {sum(dwa_computational_time) / len(dwa_computational_time)}\n")
-    dwa_data = data_process.post_process_simultation(dwa_trajectory, dwa_computational_time, method='DWA')
+        if filename in list(df["File Name"]):
+            print(f"Skipping {filename} as it already exists in the csv file\n")
+            continue
 
-    mpc_trajectory, mpc_computational_time = mpc_sim(seed)
-    print(f"MPC average computational time: {sum(mpc_computational_time) / len(mpc_computational_time)}\n")
-    mpc_data = data_process.post_process_simultation(mpc_trajectory, mpc_computational_time, method="MPC")
+        if 'circular' not in filename:
+            continue
 
-    c3bf_trajectory, c3bf_computational_time = c3bf_sim(seed)
-    print(f"C3BF average computational time: {sum(c3bf_computational_time) / len(c3bf_computational_time)}\n")
-    c3bf_data = data_process.post_process_simultation(c3bf_trajectory, c3bf_computational_time, method='C3BF')
+        seed_path = path / filename
+        with open(seed_path, 'r') as file:
+            print(f"Loading seed from {seed_path}\n")
+            seed = json.load(file)
 
-    cbf_trajectory, cbf_computational_time = cbf_sim(seed)
-    print(f"CBF average computational time: {sum(cbf_computational_time) / len(cbf_computational_time)}\n")
-    cbf_data = data_process.post_process_simultation(cbf_trajectory, cbf_computational_time, method="CBF")
-    
-    lbp_trajectory, lbp_computational_time = lbp_sim(seed)
-    print(f"LBP average computational time: {sum(lbp_computational_time) / len(lbp_computational_time)}\n")
-    lbp_data = data_process.post_process_simultation(lbp_trajectory, lbp_computational_time, method="LBP")
+        data_process = DataProcessor(robot_num, file_name=filename)
 
-    data = [dwa_data, mpc_data, c3bf_data, cbf_data, lbp_data]
-    df1 = pd.DataFrame(data)
-    frames = [df, df1]
+        dwa_trajectory, dwa_computational_time = dwa_sim(seed)   
+        print(f"DWA average computational time: {sum(dwa_computational_time) / len(dwa_computational_time)}\n")
+        dwa_data = data_process.post_process_simultation(dwa_trajectory, dwa_computational_time, method='DWA')
+
+        mpc_trajectory, mpc_computational_time = mpc_sim(seed)
+        print(f"MPC average computational time: {sum(mpc_computational_time) / len(mpc_computational_time)}\n")
+        mpc_data = data_process.post_process_simultation(mpc_trajectory, mpc_computational_time, method="MPC")
+
+        c3bf_trajectory, c3bf_computational_time = c3bf_sim(seed)
+        print(f"C3BF average computational time: {sum(c3bf_computational_time) / len(c3bf_computational_time)}\n")
+        c3bf_data = data_process.post_process_simultation(c3bf_trajectory, c3bf_computational_time, method='C3BF')
+
+        cbf_trajectory, cbf_computational_time = cbf_sim(seed)
+        print(f"CBF average computational time: {sum(cbf_computational_time) / len(cbf_computational_time)}\n")
+        cbf_data = data_process.post_process_simultation(cbf_trajectory, cbf_computational_time, method="CBF")
+        
+        lbp_trajectory, lbp_computational_time = lbp_sim(seed)
+        print(f"LBP average computational time: {sum(lbp_computational_time) / len(lbp_computational_time)}\n")
+        lbp_data = data_process.post_process_simultation(lbp_trajectory, lbp_computational_time, method="LBP")
+
+        data = [dwa_data, mpc_data, c3bf_data, cbf_data, lbp_data]
+        df1 = pd.DataFrame(data)
+        frames = [df, df1]
+        df = pd.concat(frames, ignore_index=True)
 
     # Save the results to a csv file
-    df = pd.concat(frames, ignore_index=True)
     df = data_process.remove_df_duplicates(df)
     # df = pd.DataFrame(data)
     df.to_csv(csv_file)

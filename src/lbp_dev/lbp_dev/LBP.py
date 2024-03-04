@@ -58,7 +58,7 @@ color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
 with open('/home/giacomo/thesis_ws/src/lbp_dev/lbp_dev/LBP.json', 'r') as file:
     data = json.load(file)
 
-with open('/home/giacomo/thesis_ws/src/seed_1.json', 'r') as file:
+with open('/home/giacomo/thesis_ws/src/seeds/seed_1.json', 'r') as file:
     seed = json.load(file)
 
 def motion(x, u, dt):

@@ -46,7 +46,7 @@ add_noise = False
 np.random.seed(1)
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k', 7: 'tab:orange', 8: 'tab:brown', 9: 'tab:gray', 10: 'tab:olive'}
-with open('/home/giacomo/thesis_ws/src/circular_seed_1.json', 'r') as file:
+with open('/home/giacomo/thesis_ws/src/seeds/circular_seed_1.json', 'r') as file:
     data = json.load(file)
 
 def motion(x, u, dt):

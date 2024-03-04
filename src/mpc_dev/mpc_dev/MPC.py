@@ -53,7 +53,7 @@ options = {}
 options['FIG_SIZE'] = [8,8]
 options['OBSTACLES'] = True
 
-with open('/home/giacomo/thesis_ws/src/seed_1.json', 'r') as file:
+with open('/home/giacomo/thesis_ws/src/seeds/seed_1.json', 'r') as file:
     seed = json.load(file)
 
 def normalize_angle(angle):

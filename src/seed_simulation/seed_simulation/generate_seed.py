@@ -24,7 +24,7 @@ min_dist = json_object["min_dist"]
 
 # write a main function that generates a path for robot_num robots using the function create_path and saves the the generated trajectories to a dictionary.
 # The dictionary is then saved to a file using the function save_dict_to_file
-def save_dict_to_file(dict, filename= 'src/seeds/seed_'):
+def save_dict_to_file(dict, filename='src/seeds/seed_'):
     # save the dictionary to a file
     i = 0
     while os.path.exists(f"{filename}{i}.json"):
@@ -33,7 +33,7 @@ def save_dict_to_file(dict, filename= 'src/seeds/seed_'):
     with open(f'{filename}{i}.json', 'w') as fp:
         json.dump(dict, fp, indent=3)
 
-def main():
+def random_seed():
     # generate a path for robot_num robots
     # save the generated trajectories to a dictionary
     # save the dictionary to a file
@@ -55,19 +55,20 @@ def main():
     seed = {}
     seed['initial_position'] = initial_position
     seed['trajectories'] = trajectories
-    save_dict_to_file(seed)
+    save_dict_to_file(seed, filename='src/seeds/seed_')
 
-def main2():
+def circular_seed(R=10.0):
     # generate a path for robot_num robots
     # save the generated trajectories to a dictionary
     # save the dictionary to a file
     # create a dictionary to save the generated trajectories
     initial_position = {}
-    x0, y, yaw, v, omega, model_type = utils.circular_samples(width_init, height_init, min_dist, robot_num, safety_init)
+    x0, y, yaw, v, omega, model_type = utils.circular_samples(width_init, height_init, R, robot_num, safety_init)
     
     plt.plot(x0, y, 'ro')
     for i in range(len(x0)):
         utils.plot_arrow(x0[i], y[i], yaw[i], length=2.5, width=1.0)
+        utils.plot_map(width_init, height_init)
     plt.show()
     initial_position['x'] = x0
     initial_position['y'] = y
@@ -88,7 +89,9 @@ def main2():
     seed = {}
     seed['initial_position'] = initial_position
     seed['trajectories'] = trajectories
-    save_dict_to_file(seed, filename='src/circular_seed_')
+    save_dict_to_file(seed, filename='src/seeds/circular_seed_')
 
 if __name__ == "__main__":
-    main2()
+
+    circular_seed(R=8.0)
+    # random_seed()
