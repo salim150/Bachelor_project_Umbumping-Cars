@@ -4,7 +4,23 @@ import numpy as np
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
+import json
+import pathlib
 
+# TODO: import all this parameters from a config file so that we can easily change them in one place
+path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
+# Opening JSON file
+with open(path, 'r') as openfile:
+    # Reading from json file
+    json_object = json.load(openfile)
+
+
+L = json_object["Car_model"]["L"] # [m] Wheel base of vehicle
+WB = json_object["Controller"]["WB"] # Wheel base
+safety_init = json_object["safety"]
+width_init = json_object["width"]
+height_init = json_object["height"]
+min_dist = json_object["min_dist"]
 
 class DataProcessor:
     def __init__(self, robot_num, file_name):
@@ -147,8 +163,30 @@ class DataProcessor:
         for i in range(self.robot_num):
             initial_dist += self.calculate_initial_dist(trajectory, i)
         return initial_dist / self.robot_num
+    
+    def count_collision(self, trajectory):
+        """
+        Count the number of collisions in the trajectory
+        :param trajectory: the trajectory
+        :return: the number of collisions
+        """
+        print("Counting Collisions...")
+        collision = 0
+        for i in range(self.robot_num):
+            x = trajectory[0, i, :]
+            y = trajectory[1, i, :]
+            for j in range(i + 1, self.robot_num):
+                x2 = trajectory[0, j, :]
+                y2 = trajectory[1, j, :]
+                for k in range(len(x)):
+                    if np.sqrt((x[k] - x2[k]) ** 2 + (y[k] - y2[k]) ** 2) < WB:
+                        collision += 1
+            
+            if (x>width_init/2-WB).any() or (x<-width_init/2+WB).any() or (y>height_init/2-WB).any() or (y<-height_init/2+WB).any():
+                collision += 1
+        return collision
 
-    def post_process_simultation(self, trajectory, computational_time, method):
+    def post_process_simultation(self, trajectory, computational_time, method, solver_failure=0):
         """
         Post process the simulation
         :param trajectory: the trajectory
@@ -161,6 +199,7 @@ class DataProcessor:
         avg_speed = self.calculate_avg_speed(trajectory)
         avg_computational_time = self.calculate_avg_computational_time(computational_time)
         avg_initial_dist = self.calculate_avg_initial_dist(trajectory)
+        collision_number = self.count_collision(trajectory)
 
         data = {
             "Path Length": avg_path_length,
@@ -169,9 +208,11 @@ class DataProcessor:
             "Average Speed": avg_speed,
             "Avg Computational Time": avg_computational_time,
             "Initial Distance": avg_initial_dist,
+            "Solver Failure": solver_failure,
             "Robot Number": self.robot_num,
             "File Name": self.file_name,
-            "Method": method
+            "Method": method,
+            "Collision Number": collision_number
         }
 
         print("Data Processed Successfully!\n")

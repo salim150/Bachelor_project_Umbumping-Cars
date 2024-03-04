@@ -233,6 +233,7 @@ class CBF_algorithm():
         self.dxu = np.zeros((2, self.robot_num))
         self.reached_goal = [False]*robot_num
         self.computational_time = []
+        self.solver_failure = 0
         
     def run_cbf(self, x, break_flag):
         for i in range(self.robot_num):
@@ -426,6 +427,7 @@ class CBF_algorithm():
             self.dxu[:,i] = np.reshape(np.array(sol['x']), (M,))
         except:
             print("QP solver failed")
+            self.solver_failure += 1
 
         if self.dxu[0,i] > max_acc or self.dxu[0,i] < min_acc:
             print("Throttle out of bounds: ")

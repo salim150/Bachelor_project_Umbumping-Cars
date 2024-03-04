@@ -123,7 +123,7 @@ def dwa_sim(seed):
         plt.pause(3)
         plt.close()
 
-    return trajectory, dwa.computational_time 
+    return trajectory, dwa.computational_time
 
 def mpc_sim(seed):
     """
@@ -300,7 +300,7 @@ def c3bf_sim(seed):
         plt.pause(3)
         plt.close()
 
-    return trajectory, c3bf.computational_time
+    return trajectory, c3bf.computational_time, c3bf.solver_failure
 
 def cbf_sim(seed):
     """
@@ -381,7 +381,7 @@ def cbf_sim(seed):
         plt.pause(3)
         plt.close()
 
-    return trajectory, cbf.computational_time
+    return trajectory, cbf.computational_time, cbf.solver_failure
 
 def lbp_sim(seed):
     dt = json_object["Controller"]["dt"]
@@ -476,15 +476,15 @@ def main():
     dir_list = os.listdir(path)
 
     csv_file = '/home/giacomo/thesis_ws/src/seed_simulation/seed_simulation/seed_sim.csv'
-    df = pd.read_csv(csv_file, index_col=0)
+    df = pd.read_csv(csv_file)
     df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
 
     # Analyze the results
     for filename in dir_list:
 
-        if filename in list(df["File Name"]):
-            print(f"Skipping {filename} as it already exists in the csv file\n")
-            continue
+        # if filename in list(df["File Name"]):
+        #     print(f"Skipping {filename} as it already exists in the csv file\n")
+        #     continue
 
         if 'circular' not in filename:
             continue
@@ -504,13 +504,15 @@ def main():
         print(f"MPC average computational time: {sum(mpc_computational_time) / len(mpc_computational_time)}\n")
         mpc_data = data_process.post_process_simultation(mpc_trajectory, mpc_computational_time, method="MPC")
 
-        c3bf_trajectory, c3bf_computational_time = c3bf_sim(seed)
+        c3bf_trajectory, c3bf_computational_time, c3bf_solver_failure = c3bf_sim(seed)
         print(f"C3BF average computational time: {sum(c3bf_computational_time) / len(c3bf_computational_time)}\n")
-        c3bf_data = data_process.post_process_simultation(c3bf_trajectory, c3bf_computational_time, method='C3BF')
+        c3bf_data = data_process.post_process_simultation(c3bf_trajectory, c3bf_computational_time, method='C3BF', 
+                                                          solver_failure=c3bf_solver_failure)
 
-        cbf_trajectory, cbf_computational_time = cbf_sim(seed)
+        cbf_trajectory, cbf_computational_time, cbf_solver_failure = cbf_sim(seed)
         print(f"CBF average computational time: {sum(cbf_computational_time) / len(cbf_computational_time)}\n")
-        cbf_data = data_process.post_process_simultation(cbf_trajectory, cbf_computational_time, method="CBF")
+        cbf_data = data_process.post_process_simultation(cbf_trajectory, cbf_computational_time, method="CBF", 
+                                                         solver_failure=cbf_solver_failure)
         
         lbp_trajectory, lbp_computational_time = lbp_sim(seed)
         print(f"LBP average computational time: {sum(lbp_computational_time) / len(lbp_computational_time)}\n")
