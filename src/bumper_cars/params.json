@@ -21,8 +21,8 @@
     "C3BF":
         {
             "max_steer": 0.785398,
-            "max_acc": 100,
-            "min_acc": -100,
+            "max_acc": 5,
+            "min_acc": -5,
             "safety_radius": 1.5,
             "barrier_gain": 1, 
             "arena_gain": 50,

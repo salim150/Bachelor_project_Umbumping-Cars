@@ -141,6 +141,7 @@ class ModelPredictiveControl:
         Returns:
             list: The next state of the system.
         """
+        pedal = np.clip(pedal, min_acc, max_acc)
         x_t = prev_state[0]
         y_t = prev_state[1]
         psi_t = prev_state[2]
@@ -526,6 +527,9 @@ class ModelPredictiveControl:
                             tol = 1e-1)
                
         u1 = u_solution.x
+        if u1[0]>max_acc or u1[0]<min_acc:
+            print(f'Acceleration out of bounds: {u1[0]}')
+            u1[0] = np.clip(u1[0], min_acc, max_acc)
         x1 = self.plant_model(x1, dt, u1[0], u1[1])
         x[:, i] = x1
         u[:, i] = u1

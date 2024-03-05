@@ -26,6 +26,8 @@ max_speed = json_object["Car_model"]["max_speed"] # [m/s]
 min_speed = json_object["Car_model"]["min_speed"] # [m/s]
 max_acc = json_object["CBF_simple"]["max_acc"] 
 min_acc = json_object["CBF_simple"]["min_acc"] 
+car_max_acc = json_object["Controller"]["max_acc"]
+car_min_acc = json_object["Controller"]["min_acc"]
 dt = json_object["Controller"]["dt"]
 safety_radius = json_object["CBF_simple"]["safety_radius"]
 barrier_gain = json_object["CBF_simple"]["barrier_gain"]
@@ -65,7 +67,7 @@ def motion(x, u, dt):
     delta = u[1]
     delta = np.clip(delta, -max_steer, max_steer)
     throttle = u[0]
-    throttle = np.clip(throttle, -max_acc, max_acc)
+    throttle = np.clip(throttle, car_min_acc, car_max_acc)
 
     x[0] = x[0] + x[3] * math.cos(x[2]) * dt
     x[1] = x[1] + x[3] * math.sin(x[2]) * dt

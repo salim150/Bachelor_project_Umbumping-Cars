@@ -76,7 +76,7 @@ def motion(x, u, dt):
     delta = u[1]
     delta = np.clip(delta, -max_steer, max_steer)
     throttle = u[0]
-    throttle = np.clip(throttle, -max_acc, max_acc)
+    throttle = np.clip(throttle, min_acc, max_acc)
 
     x[0] = x[0] + x[3] * math.cos(x[2]) * dt
     x[1] = x[1] + x[3] * math.sin(x[2]) * dt
