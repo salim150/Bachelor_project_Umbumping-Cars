@@ -13,6 +13,14 @@ from shapely.geometry import Point, LineString
 import pandas as pd
 from data_process import DataProcessor
 import os
+import matplotlib
+
+matplotlib.use("Qt5Agg")
+mgr = plt.get_current_fig_manager()
+mgr.full_screen_toggle()
+py = mgr.canvas.height()
+px = mgr.canvas.width()+1000
+mgr.window.close()
 
 path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
 # Opening JSON file
@@ -86,6 +94,10 @@ def dwa_sim(seed, robot_num):
         dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
     
     fig = plt.figure(1, dpi=90)
+    figManager = plt.get_current_fig_manager()
+    figManager.window.move(px, 0)
+    figManager.window.showMaximized()
+    figManager.window.setFocus()
     ax = fig.add_subplot(111)
     
     u_hist = dict.fromkeys(range(robot_num),[[0,0] for _ in range(int(predict_time/dt))])    
@@ -181,6 +193,10 @@ def mpc_sim(seed, robot_num):
     
     # input [throttle, steer (delta)]
     fig = plt.figure(1, dpi=90)
+    figManager = plt.get_current_fig_manager()
+    figManager.window.move(px, 0)
+    figManager.window.showMaximized()
+    figManager.window.setFocus()
     ax = fig.add_subplot(111)
 
     # mpc = MPC_algorithm(cx, cy, ref, mpc, bounds, constraints, predicted_trajectory)
@@ -255,6 +271,13 @@ def c3bf_sim(seed, robot_num):
     # Step 3: Create an array x with the initial values
     x = np.array([x0, y, yaw, v])
     u = np.zeros((2, robot_num))
+    
+    fig = plt.figure(1, dpi=90)
+    figManager = plt.get_current_fig_manager()
+    figManager.window.move(px, 0)
+    figManager.window.showMaximized()
+    figManager.window.setFocus()
+    ax = fig.add_subplot(111)
 
     trajectory = np.zeros((x.shape[0]+u.shape[0], robot_num, 1))
     trajectory[:, :, 0] = np.concatenate((x,u))
@@ -335,6 +358,13 @@ def cbf_sim(seed, robot_num):
     # Step 3: Create an array x with the initial values
     x = np.array([x0, y, yaw, v])
     u = np.zeros((2, robot_num))
+
+    fig = plt.figure(1, dpi=90)
+    figManager = plt.get_current_fig_manager()
+    figManager.window.move(px, 0)
+    figManager.window.showMaximized()
+    figManager.window.setFocus()
+    ax = fig.add_subplot(111)
 
     trajectory = np.zeros((x.shape[0]+u.shape[0], robot_num, 1))
     trajectory[:, :, 0] = np.concatenate((x,u))
@@ -432,6 +462,10 @@ def lbp_sim(seed, robot_num):
 
     u_hist = dict.fromkeys(range(robot_num),[0]*int(predict_time/dt))
     fig = plt.figure(1, dpi=90)
+    figManager = plt.get_current_fig_manager()
+    figManager.window.move(px, 0)
+    figManager.window.showMaximized()
+    figManager.window.setFocus()
     ax = fig.add_subplot(111)
     
     lbp = LBP.LBP_algorithm(predicted_trajectory, paths, targets, dilated_traj,
@@ -500,30 +534,35 @@ def main():
         assert robot_num == len(seed['initial_position']['x']), "The number of robots in the seed file does not match the number of robots in the seed file"
         
         data_process = DataProcessor(robot_num, file_name=filename)
+        data = []
 
         dwa_trajectory, dwa_computational_time = dwa_sim(seed, robot_num)   
         print(f"DWA average computational time: {sum(dwa_computational_time) / len(dwa_computational_time)}\n")
         dwa_data = data_process.post_process_simultation(dwa_trajectory, dwa_computational_time, method='DWA')
+        data.append(dwa_data)
 
         mpc_trajectory, mpc_computational_time = mpc_sim(seed, robot_num)
         print(f"MPC average computational time: {sum(mpc_computational_time) / len(mpc_computational_time)}\n")
         mpc_data = data_process.post_process_simultation(mpc_trajectory, mpc_computational_time, method="MPC")
+        data.append(mpc_data)
 
         c3bf_trajectory, c3bf_computational_time, c3bf_solver_failure = c3bf_sim(seed, robot_num)
         print(f"C3BF average computational time: {sum(c3bf_computational_time) / len(c3bf_computational_time)}\n")
         c3bf_data = data_process.post_process_simultation(c3bf_trajectory, c3bf_computational_time, method='C3BF', 
                                                           solver_failure=c3bf_solver_failure)
+        data.append(c3bf_data)
 
         cbf_trajectory, cbf_computational_time, cbf_solver_failure = cbf_sim(seed, robot_num)
         print(f"CBF average computational time: {sum(cbf_computational_time) / len(cbf_computational_time)}\n")
         cbf_data = data_process.post_process_simultation(cbf_trajectory, cbf_computational_time, method="CBF", 
                                                          solver_failure=cbf_solver_failure)
-        
+        data.append(cbf_data)
+
         lbp_trajectory, lbp_computational_time = lbp_sim(seed, robot_num)
         print(f"LBP average computational time: {sum(lbp_computational_time) / len(lbp_computational_time)}\n")
         lbp_data = data_process.post_process_simultation(lbp_trajectory, lbp_computational_time, method="LBP")
+        data.append(lbp_data)
 
-        data = [dwa_data, mpc_data, c3bf_data, cbf_data, lbp_data]
         df1 = pd.DataFrame(data)
         frames = [df, df1]
         df = pd.concat(frames, ignore_index=True)

@@ -573,7 +573,7 @@ class ModelPredictiveControl:
             if idx == i:
                 continue
             if check_collision_bool:
-                if dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < 1:
+                if dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < (L+WB)/2.0:
                     # if dist([x1[0], x1[1]], [predicted_trajectory[idx][0,0], predicted_trajectory[idx][0,1]]) < 1:
                     raise Exception('Collision')
             
