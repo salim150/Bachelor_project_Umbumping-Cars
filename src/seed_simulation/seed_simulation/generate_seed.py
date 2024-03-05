@@ -55,6 +55,7 @@ def random_seed():
     seed = {}
     seed['initial_position'] = initial_position
     seed['trajectories'] = trajectories
+    seed['robot_num'] = robot_num
     save_dict_to_file(seed, filename='src/seeds/seed_')
 
 def circular_seed(R=10.0):
@@ -89,6 +90,7 @@ def circular_seed(R=10.0):
     seed = {}
     seed['initial_position'] = initial_position
     seed['trajectories'] = trajectories
+    seed['robot_num'] = robot_num
     save_dict_to_file(seed, filename='src/seeds/circular_seed_')
 
 if __name__ == "__main__":

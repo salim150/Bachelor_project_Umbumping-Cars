@@ -501,7 +501,7 @@ def check_goal_reached(x, targets, i, distance=0.5):
     return False
 
 class LBP_algorithm():
-    def __init__(self, trajectories, paths, targets, dilated_traj, predicted_trajectory, ax, u_hist):
+    def __init__(self, trajectories, paths, targets, dilated_traj, predicted_trajectory, ax, u_hist, robot_num=robot_num):
         self.trajectories = trajectories
         self.paths = paths
         self.targets = targets
@@ -509,11 +509,12 @@ class LBP_algorithm():
         self.predicted_trajectory = predicted_trajectory
         self.ax = ax
         self.u_hist = u_hist
+        self.robot_num = robot_num
         self.reached_goal = [False]*robot_num
         self.computational_time = []
 
     def run_lbp(self, x, u, break_flag):
-        for i in range(robot_num):
+        for i in range(self.robot_num):
             
             # self.paths, self.targets = update_targets(self.paths, self.targets, x, i)
             if utils.dist(point1=(x[0,i], x[1,i]), point2=self.targets[i]) < update_dist:
@@ -537,7 +538,7 @@ class LBP_algorithm():
         return x, u, break_flag
     
     def go_to_goal(self, x, u, break_flag):
-        for i in range(robot_num):
+        for i in range(self.robot_num):
             # Step 9: Check if the distance between the current position and the target is less than 5
             if not self.reached_goal[i]:                
                 # If goal is reached, stop the robot
@@ -797,6 +798,7 @@ def main_seed():
     yaw = initial_state['yaw']
     v = initial_state['v']
 
+    assert robot_num == len(seed['initial_position']['x']), "The number of robots in the seed file does not match the number of robots in the seed file"
     # Step 3: Create an array x with the initial values
     x = np.array([x0, y, yaw, v])
     u = np.zeros((2, robot_num))
@@ -851,7 +853,7 @@ def main_seed():
         plt.show()
 
 if __name__ == '__main__':
-    main1()
-    # main_seed()
+    # main()
+    main_seed()
 
     

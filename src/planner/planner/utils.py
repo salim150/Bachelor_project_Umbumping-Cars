@@ -14,7 +14,7 @@ import json
 import time
 import matplotlib.pyplot as plt
 import math
-
+color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k', 7: 'tab:orange', 8: 'tab:brown', 9: 'tab:gray', 10: 'tab:olive'}
 
 # TODO: import all this parameters from a config file so that we can easily change them in one place
 path = pathlib.Path('/home/giacomo/thesis_ws/src/bumper_cars/params.json')
@@ -464,7 +464,16 @@ def create_seed(len_path=5):
         path.append([float(random.randint(-width_init/2, width_init/2)), float(random.randint(-height_init/2, height_init/2))])
     return path
     
-def plot_robot(x, y, yaw):  # pragma: no cover
+def plot_robot(x, y, yaw, i): 
+    """
+    Plot the robot.
+
+    Args:
+        x (float): X-coordinate of the robot.
+        y (float): Y-coordinate of the robot.
+        yaw (float): Yaw angle of the robot.
+        i (int): Index of the robot.
+    """
     outline = np.array([[-L / 2, L / 2,
                             (L / 2), -L / 2,
                             -L / 2],
@@ -477,4 +486,4 @@ def plot_robot(x, y, yaw):  # pragma: no cover
     outline[0, :] += x
     outline[1, :] += y
     plt.plot(np.array(outline[0, :]).flatten(),
-                np.array(outline[1, :]).flatten(), "-k")
+                np.array(outline[1, :]).flatten(), color_dict[i], label="Robot " + str(i))

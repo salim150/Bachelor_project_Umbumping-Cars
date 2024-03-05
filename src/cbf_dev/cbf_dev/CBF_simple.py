@@ -545,7 +545,7 @@ def main1(args=None):
     """
     # Step 1: Set the number of iterations
     iterations = 3000
-    fig = plt.figure(1, dpi=90, figsize=(20,10))
+    fig = plt.figure(1, dpi=90, figsize=(10,10))
     ax = fig.add_subplot(111)
     fontsize = 40
     plt.rcParams['font.family'] = ['serif']
@@ -561,9 +561,9 @@ def main1(args=None):
     v = initial_state['v']
 
     # Step 3: Create an array x with the initial values
-    x = np.array([[5.0, 5.0], [-2.0, 2.0], [0.0, 0.0], [0.0, 0.0]])
+    x = np.array([[-5.0, 5.0], [0.0, 0.0], [0.0, -np.pi], [0.0, 0.0]])
     u = np.array([[0, 0], [0, 0]])
-    targets = [[10, 2], [10, -2]]
+    targets = [[5.0, 0.0], [-5.0, 0.0]]
 
     # Step 4: Create paths for each robot
     traj = data['trajectories']
@@ -586,10 +586,10 @@ def main1(args=None):
         # plt.axis("equal")
         plt.xlabel("x [m]", fontdict={'size': fontsize, 'family': 'serif'})
         plt.ylabel("y [m]", fontdict={'size': fontsize, 'family': 'serif'})
-        plt.title('C3BF Corner Case', fontdict={'size': fontsize, 'family': 'serif'})
+        plt.title('CBF Corner Case', fontdict={'size': fontsize, 'family': 'serif'})
 
-        plt.xlim(0, 20)
-        plt.ylim(-5, 5)
+        # plt.xlim(0, 20)
+        # plt.ylim(-5, 5)
         plt.legend()
         plt.grid(True)
         plt.pause(0.0001)
@@ -733,6 +733,6 @@ def main_seed(args=None):
             break
 
 if __name__=='__main__':
-    main_seed()
-    # main1() 
+    # main_seed()
+    main1() 
         

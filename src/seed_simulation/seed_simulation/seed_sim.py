@@ -20,7 +20,7 @@ with open(path, 'r') as openfile:
     # Reading from json file
     json_object = json.load(openfile)
 
-robot_num = json_object["robot_num"]
+# robot_num = json_object["robot_num"]
 width_init = json_object["width"]
 height_init = json_object["height"]
 show_animation = True
@@ -29,7 +29,7 @@ iterations = 1000
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
 
-def dwa_sim(seed):
+def dwa_sim(seed, robot_num):
 
     dt = json_object["Controller"]["dt"] # [s] Time tick for motion prediction
     predict_time = json_object["DWA"]["predict_time"] # [s]
@@ -125,7 +125,7 @@ def dwa_sim(seed):
 
     return trajectory, dwa.computational_time
 
-def mpc_sim(seed):
+def mpc_sim(seed, robot_num):
     """
     Main function for controlling multiple robots using Model Predictive Control (MPC).
 
@@ -155,7 +155,7 @@ def mpc_sim(seed):
     v = initial_state['v']
     x = np.array([x0, y, yaw, v])
 
-    mpc = MPC.ModelPredictiveControl(obs_x=[], obs_y=[], x=x)
+    mpc = MPC.ModelPredictiveControl(obs_x=[], obs_y=[], x=x, robot_num=robot_num)
 
     num_inputs = 2
     u = np.zeros([mpc.horizon*num_inputs, robot_num])
@@ -222,7 +222,7 @@ def mpc_sim(seed):
 
     return trajectory, mpc.computational_time
 
-def c3bf_sim(seed):
+def c3bf_sim(seed, robot_num):
     """
     Main function for controlling multiple robots using Model Predictive Control (MPC).
 
@@ -266,7 +266,7 @@ def c3bf_sim(seed):
     # Step 5: Extract the target coordinates from the paths
     targets = [[path[0].x, path[0].y] for path in paths]
 
-    c3bf = C3BF.C3BF_algorithm(targets, paths)
+    c3bf = C3BF.C3BF_algorithm(targets, paths, robot_num=robot_num)
     # Step 8: Perform the simulation for the specified number of iterations
     for z in range(iterations):
         plt.cla()
@@ -302,7 +302,7 @@ def c3bf_sim(seed):
 
     return trajectory, c3bf.computational_time, c3bf.solver_failure
 
-def cbf_sim(seed):
+def cbf_sim(seed, robot_num):
     """
     Main function for controlling multiple robots using Model Predictive Control (MPC).
 
@@ -346,7 +346,7 @@ def cbf_sim(seed):
     # Step 5: Extract the target coordinates from the paths
     targets = [[path[0].x, path[0].y] for path in paths]
 
-    cbf = CBF.CBF_algorithm(targets, paths)
+    cbf = CBF.CBF_algorithm(targets, paths, robot_num=robot_num)
     # Step 8: Perform the simulation for the specified number of iterations
     for z in range(iterations):
         plt.cla()
@@ -383,7 +383,7 @@ def cbf_sim(seed):
 
     return trajectory, cbf.computational_time, cbf.solver_failure
 
-def lbp_sim(seed):
+def lbp_sim(seed, robot_num):
     dt = json_object["Controller"]["dt"]
     predict_time = json_object["LBP"]["predict_time"] # [s]
     dilation_factor = json_object["LBP"]["dilation_factor"]
@@ -435,7 +435,7 @@ def lbp_sim(seed):
     ax = fig.add_subplot(111)
     
     lbp = LBP.LBP_algorithm(predicted_trajectory, paths, targets, dilated_traj,
-                        predicted_trajectory, ax, u_hist)
+                        predicted_trajectory, ax, u_hist, robot_num=robot_num)
     
     for z in range(iterations):
         plt.cla()
@@ -474,6 +474,7 @@ def main():
     # Load the seed from a file
     path = pathlib.Path('/home/giacomo/thesis_ws/src/seeds/')
     dir_list = os.listdir(path)
+    dir_list = ['circular_seed_10.json']
 
     csv_file = '/home/giacomo/thesis_ws/src/seed_simulation/seed_simulation/seed_sim.csv'
     df = pd.read_csv(csv_file)
@@ -494,27 +495,31 @@ def main():
             print(f"Loading seed from {seed_path}\n")
             seed = json.load(file)
 
+        robot_num = seed['robot_num']
+
+        assert robot_num == len(seed['initial_position']['x']), "The number of robots in the seed file does not match the number of robots in the seed file"
+        
         data_process = DataProcessor(robot_num, file_name=filename)
 
-        dwa_trajectory, dwa_computational_time = dwa_sim(seed)   
+        dwa_trajectory, dwa_computational_time = dwa_sim(seed, robot_num)   
         print(f"DWA average computational time: {sum(dwa_computational_time) / len(dwa_computational_time)}\n")
         dwa_data = data_process.post_process_simultation(dwa_trajectory, dwa_computational_time, method='DWA')
 
-        mpc_trajectory, mpc_computational_time = mpc_sim(seed)
+        mpc_trajectory, mpc_computational_time = mpc_sim(seed, robot_num)
         print(f"MPC average computational time: {sum(mpc_computational_time) / len(mpc_computational_time)}\n")
         mpc_data = data_process.post_process_simultation(mpc_trajectory, mpc_computational_time, method="MPC")
 
-        c3bf_trajectory, c3bf_computational_time, c3bf_solver_failure = c3bf_sim(seed)
+        c3bf_trajectory, c3bf_computational_time, c3bf_solver_failure = c3bf_sim(seed, robot_num)
         print(f"C3BF average computational time: {sum(c3bf_computational_time) / len(c3bf_computational_time)}\n")
         c3bf_data = data_process.post_process_simultation(c3bf_trajectory, c3bf_computational_time, method='C3BF', 
                                                           solver_failure=c3bf_solver_failure)
 
-        cbf_trajectory, cbf_computational_time, cbf_solver_failure = cbf_sim(seed)
+        cbf_trajectory, cbf_computational_time, cbf_solver_failure = cbf_sim(seed, robot_num)
         print(f"CBF average computational time: {sum(cbf_computational_time) / len(cbf_computational_time)}\n")
         cbf_data = data_process.post_process_simultation(cbf_trajectory, cbf_computational_time, method="CBF", 
                                                          solver_failure=cbf_solver_failure)
         
-        lbp_trajectory, lbp_computational_time = lbp_sim(seed)
+        lbp_trajectory, lbp_computational_time = lbp_sim(seed, robot_num)
         print(f"LBP average computational time: {sum(lbp_computational_time) / len(lbp_computational_time)}\n")
         lbp_data = data_process.post_process_simultation(lbp_trajectory, lbp_computational_time, method="LBP")
 

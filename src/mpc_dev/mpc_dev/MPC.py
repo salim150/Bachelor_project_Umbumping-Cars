@@ -1193,4 +1193,4 @@ def main_seed():
 
 if __name__ == '__main__':
     # main_seed()
-    main()
+    main2()
