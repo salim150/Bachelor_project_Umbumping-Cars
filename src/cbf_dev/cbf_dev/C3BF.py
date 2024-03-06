@@ -280,6 +280,7 @@ class C3BF_algorithm():
                 if check_goal_reached(x, self.targets, i, distance=2):
                     self.reached_goal[i] = True
                     self.dxu[:,i]= 0
+                    x[3,i] = 0
                 else:
                     x[:, i] = motion(x[:, i], self.dxu[:, i], dt)
                   
@@ -314,7 +315,7 @@ class C3BF_algorithm():
 
         cmd = ControlInputs()
         
-        self.check_collision(x, i)
+        x = self.check_collision(x, i)
         x1 = utils.array_to_state(x[:, i])
         cmd.throttle, cmd.delta = utils.pure_pursuit_steer_control(self.targets[i], x1)
         self.dxu[0, i], self.dxu[1, i] = cmd.throttle, cmd.delta
@@ -531,6 +532,7 @@ class C3BF_algorithm():
                 print("Collision detected")
                 self.reached_goal[i] = True
                 self.dxu[:, i] = 0
+                x[3,i] = 0.0
 
         for idx in range(self.robot_num):
             if idx == i:
@@ -541,7 +543,9 @@ class C3BF_algorithm():
                 else:
                     print("Collision detected")
                     self.reached_goal[i] = True
-                    self.dxu[:, i] = 0
+                    self.dxu[:, i] = 0.0
+                    x[3,i] = 0.0
+        return x
 
 def main(args=None):
     """

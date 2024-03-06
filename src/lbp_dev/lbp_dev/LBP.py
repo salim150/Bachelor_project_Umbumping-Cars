@@ -459,6 +459,9 @@ def update_robot_state(x, u, dt, targets, dilated_traj, u_hist, predicted_trajec
     x1 = motion(x1, u1, dt)
     x[:, i] = x1
     u[:, i] = u1
+
+    # u, x = self.check_collision(x, u, i)
+
     predicted_trajectory[i] = predicted_trajectory1
     u_hist[i] = u_history
 
@@ -551,7 +554,9 @@ class LBP_algorithm():
                     t_prev = time.time()
                     x, u, self.predicted_trajectory, self.u_hist = update_robot_state(x, u, dt, self.targets, self.dilated_traj, self.u_hist, self.predicted_trajectory, i)
                     self.computational_time.append(time.time()-t_prev)
-                u = self.check_collision(x, u, i) 
+
+                u, x = self.check_collision(x, u, i) 
+            
             else:
                 print(u[:, i])
             # If we want the robot to disappear when it reaches the goal, indent one more time
@@ -581,6 +586,7 @@ class LBP_algorithm():
                 print("Collision detected")
                 self.reached_goal[i] = True
                 u[:, i] = np.zeros(2)
+                x[3, i] = 0
 
         for idx in range(self.robot_num):
             if idx == i:
@@ -592,8 +598,9 @@ class LBP_algorithm():
                     print("Collision detected")
                     self.reached_goal[i] = True
                     u[:, i] = np.zeros(2)
+                    x[3, i] = 0
         
-        return u
+        return u, x
 
 def main():
     """

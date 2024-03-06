@@ -26,6 +26,16 @@ class DataProcessor:
     def __init__(self, robot_num, file_name):
         self.robot_num = robot_num
         self.file_name = file_name
+    
+    def calculate_goal_reached_index(self, trajectory, i):
+        last_idx = 0
+        for idx in range(1, len(trajectory[4,i,:])):
+            idx_prev = idx-1
+            if trajectory[4, i, idx] == 0.0 and trajectory[5, i, idx] == 0.0 and idx > last_idx:
+                if trajectory[4, i, idx_prev] != 0.0 or trajectory[5, i, idx_prev] != 0.0:
+                    last_idx = idx
+        
+        return last_idx
 
     def calculate_path_length(self, trajectory, i):
         """
@@ -76,8 +86,9 @@ class DataProcessor:
         :param trajectory: the trajectory
         :return: the acceleration usage
         """
-        a = trajectory[4, i, :]
-        return np.sum(np.abs(a))
+        idx = self.calculate_goal_reached_index(trajectory, i)
+        a = trajectory[4, i, :idx+1]
+        return np.mean(np.abs(a))
     
     def calculate_avg_acceleration_usage(self, trajectory):
         """
@@ -97,8 +108,9 @@ class DataProcessor:
         :param trajectory: the trajectory
         :return: the steering usage
         """
-        steering = trajectory[5, i, :]
-        return np.sum(np.abs(steering))
+        idx = self.calculate_goal_reached_index(trajectory, i)
+        steering = trajectory[5, i, :idx+1]
+        return np.mean(np.abs(steering))
     
     def calculate_avg_steering_usage(self, trajectory):
         """
@@ -118,7 +130,8 @@ class DataProcessor:
         :param trajectory: the trajectory
         :return: the average speed
         """
-        v = trajectory[3, i, :]
+        idx = self.calculate_goal_reached_index(trajectory, i)
+        v = trajectory[3, i, :idx+1]
         return np.mean(v)
     
     def calculate_avg_speed(self, trajectory):

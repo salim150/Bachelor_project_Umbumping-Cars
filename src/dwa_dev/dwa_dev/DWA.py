@@ -534,11 +534,12 @@ class DWA_algorithm():
         self.dilated_traj[i] = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1])).buffer(dilation_factor, cap_style=3)
 
         # Collision check
-        u = self.check_collision(x, u, i)
-
         x1 = motion(x1, u1, dt)
         x[:, i] = x1
         u[:, i] = u1
+        
+        u, x = self.check_collision(x, u, i)
+        
         self.predicted_trajectory[i] = predicted_trajectory1
         self.u_hist[i] = u_history
         
@@ -664,6 +665,8 @@ class DWA_algorithm():
                 print("Collision detected")
                 self.reached_goal[i] = True
                 u[:, i] = np.zeros(2)
+                x[3, i] = 0
+
 
         for idx in range(self.robot_num):
             if idx == i:
@@ -675,7 +678,8 @@ class DWA_algorithm():
                     print("Collision detected")
                     self.reached_goal[i] = True
                     u[:, i] = np.zeros(2)
-        return u
+                    x[3, i] = 0
+        return u, x
 
 def main():
     """
