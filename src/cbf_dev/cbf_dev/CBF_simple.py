@@ -48,7 +48,7 @@ add_noise = False
 np.random.seed(1)
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k', 7: 'tab:orange', 8: 'tab:brown', 9: 'tab:gray', 10: 'tab:olive'}
-with open('/home/giacomo/thesis_ws/src/seeds/seed_1.json', 'r') as file:
+with open('/home/giacomo/thesis_ws/src/seeds/circular_seed_2.json', 'r') as file:
     data = json.load(file)
 
 def motion(x, u, dt):
@@ -269,14 +269,16 @@ class CBF_algorithm():
     
     def go_to_goal(self, x, break_flag):
         for i in range(self.robot_num):
-            t_prev = time.time()
-            self.control_robot(i, x)
-            self.computational_time.append((time.time() - t_prev))
+           
             # Step 9: Check if the distance between the current position and the target is less than 5
             if not self.reached_goal[i]:                
                 # If goal is reached, stop the robot
-                if check_goal_reached(x, self.targets, i, distance=2):
+                t_prev = time.time()
+                self.control_robot(i, x)
+                self.computational_time.append((time.time() - t_prev))
+                if check_goal_reached(x, self.targets, i, distance=2.5):
                     self.reached_goal[i] = True
+                    self.dxu[:, i] = 0
                 else:
                     x[:, i] = motion(x[:, i], self.dxu[:, i], dt)
                     
@@ -437,7 +439,6 @@ class CBF_algorithm():
             self.dxu[0,i] = np.clip(self.dxu[0,i], -min_acc, max_acc)
         self.dxu[1,i] = beta_to_delta(self.dxu[1,i])
 
-
     def check_collision(self, x, i):
         """
         Checks for collision between the robot at index i and other robots.
@@ -450,12 +451,24 @@ class CBF_algorithm():
             Exception: If collision is detected.
 
         """
+        if x[0,i]>=boundary_points[1]-WB or x[0,i]<=boundary_points[0]+WB or x[1,i]>=boundary_points[3]-WB or x[1,i]<=boundary_points[2]+WB:
+            if check_collision_bool:
+                raise Exception('Collision')
+            else:
+                print("Collision detected")
+                self.reached_goal[i] = True
+                self.dxu[:, i] = 0
+
         for idx in range(self.robot_num):
             if idx == i:
                 continue
-            if check_collision_bool:
-                if utils.dist([x[0,i], x[1,i]], [x[0, idx], x[1, idx]]) < WB:
+            if utils.dist([x[0,i], x[1,i]], [x[0, idx], x[1, idx]]) <= WB:
+                if check_collision_bool:
                     raise Exception('Collision')
+                else:
+                    print("Collision detected")
+                    self.reached_goal[i] = True
+                    self.dxu[:, i] = 0
 
 def main(args=None):
     """
@@ -722,7 +735,8 @@ def main_seed(args=None):
             'key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
         
-        x, break_flag = cbf.run_cbf(x, break_flag)
+        # x, break_flag = cbf.run_cbf(x, break_flag)
+        x, break_flag = cbf.go_to_goal(x, break_flag)
         
         utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
@@ -733,6 +747,6 @@ def main_seed(args=None):
             break
 
 if __name__=='__main__':
-    # main_seed()
-    main1() 
+    main_seed()
+    # main1() 
         

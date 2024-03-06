@@ -179,10 +179,11 @@ class DataProcessor:
                 x2 = trajectory[0, j, :]
                 y2 = trajectory[1, j, :]
                 for k in range(len(x)):
-                    if np.sqrt((x[k] - x2[k]) ** 2 + (y[k] - y2[k]) ** 2) < WB:
+                    if np.sqrt((x[k] - x2[k]) ** 2 + (y[k] - y2[k]) ** 2) <= WB:
                         collision += 1
+                        break
             
-            if (x>width_init/2-WB).any() or (x<-width_init/2+WB).any() or (y>height_init/2-WB).any() or (y<-height_init/2+WB).any():
+            if (x>=width_init/2-WB).any() or (x<=-width_init/2+WB).any() or (y>=height_init/2-WB).any() or (y<=-height_init/2+WB).any():
                 collision += 1
         return collision
 

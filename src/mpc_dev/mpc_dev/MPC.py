@@ -42,6 +42,7 @@ min_dist = json_object["min_dist"]
 
 show_animation = True
 debug = False
+boundary_points = np.array([-width_init/2, width_init/2, -height_init/2, height_init/2])
 check_collision_bool = False
 add_noise = False 
 np.random.seed(1)
@@ -53,7 +54,7 @@ options = {}
 options['FIG_SIZE'] = [8,8]
 options['OBSTACLES'] = True
 
-with open('/home/giacomo/thesis_ws/src/seeds/seed_1.json', 'r') as file:
+with open('/home/giacomo/thesis_ws/src/seeds/circular_seed_10.json', 'r') as file:
     seed = json.load(file)
 
 def normalize_angle(angle):
@@ -460,11 +461,13 @@ class ModelPredictiveControl:
     
     def go_to_goal(self, x, u, break_flag):
         for i in range(self.robot_num):
+            self.check_collision(x, u, i)
             if not self.reached_goal[i]:                
                 # If goal is reached, stop the robot
                 if check_goal_reached(x, self.ref, i, distance=1.5):
                     # u[:, i] = np.zeros(2)
                     x[3, i] = 0
+                    u[:,i] = 0
                     self.reached_goal[i] = True
                 else:
                     t_prev = time.time()
@@ -533,7 +536,7 @@ class ModelPredictiveControl:
         x1 = self.plant_model(x1, dt, u1[0], u1[1])
         x[:, i] = x1
         u[:, i] = u1
-        
+       
         if add_noise:
             predicted_state = np.array([noisy_pos])
 
@@ -569,19 +572,49 @@ class ModelPredictiveControl:
         """
         self.x_obs = []
         self.y_obs = []
+
         for idx in range(self.robot_num):
             if idx == i:
                 continue
-            if check_collision_bool:
-                if dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < (L+WB)/2.0:
-                    # if dist([x1[0], x1[1]], [predicted_trajectory[idx][0,0], predicted_trajectory[idx][0,1]]) < 1:
-                    raise Exception('Collision')
             
             next_robot_state = predicted_trajectory[idx]
             self.x_obs.append(next_robot_state[0:-1:5, 0])
             self.y_obs.append(next_robot_state[0:-1:5, 1])
         self.x_obs = [item for sublist in self.x_obs for item in sublist]
         self.y_obs = [item for sublist in self.y_obs for item in sublist]
+
+    def check_collision(self, x, u, i):
+        """
+        Checks for collision between the robot at index i and other robots.
+
+        Args:
+            x (numpy.ndarray): State vector of shape (4, N), where N is the number of time steps.
+            i (int): Index of the robot to check collision for.
+
+        Raises:
+            Exception: If collision is detected.
+
+        """
+        if x[0,i]>=boundary_points[1]-WB or x[0,i]<=boundary_points[0]+WB or x[1,i]>=boundary_points[3]-WB or x[1,i]<=boundary_points[2]+WB:
+            if check_collision_bool:
+                raise Exception('Collision')
+            else:
+                print("Collision detected")
+                x[3, i] = 0
+                u[:,i] = 0
+                self.reached_goal[i] = True
+
+        for idx in range(self.robot_num):
+            if idx == i:
+                continue
+            if utils.dist([x[0,i], x[1,i]], [x[0, idx], x[1, idx]]) <= WB:
+                if check_collision_bool:
+                    raise Exception('Collision')
+                else:
+                    print("Collision detected")
+                    x[3, i] = 0
+                    u[:,i] = 0
+                    self.reached_goal[i] = True
 
 def check_goal_reached(x, targets, i, distance=0.5):
     """
@@ -1172,7 +1205,8 @@ def main_seed():
         plt.gcf().canvas.mpl_connect('key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
 
-        x, u, break_flag = mpc.run_mpc(x, u, break_flag)
+        # x, u, break_flag = mpc.run_mpc(x, u, break_flag)
+        x, u, break_flag = mpc.go_to_goal(x, u, break_flag)
         trajectory = np.dstack([trajectory, x])
 
         plt.title('MPC 2D')
@@ -1192,5 +1226,5 @@ def main_seed():
         plt.show()
 
 if __name__ == '__main__':
-    # main_seed()
-    main2()
+    main_seed()
+    # main2()

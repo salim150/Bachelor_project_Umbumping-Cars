@@ -56,6 +56,7 @@ robot_num = json_object["robot_num"]
 timer_freq = json_object["timer_freq"]
 
 show_animation = True
+boundary_points = np.array([-width_init/2, width_init/2, -height_init/2, height_init/2])
 check_collision_bool = False
 add_noise = False
 np.random.seed(1)
@@ -187,10 +188,14 @@ def calc_obstacle_cost(trajectory, ob):
     Returns:
         float: Obstacle cost.
     """
+    minxp = min(abs(width_init/2-trajectory[:, 0]))
+    minxn = min(abs(-width_init/2-trajectory[:, 0]))
+    minyp = min(abs(height_init/2-trajectory[:, 1]))
+    minyn = min(abs(-height_init/2-trajectory[:, 1]))
+    min_distance = min(minxp, minxn, minyp, minyn)
+
     line = LineString(zip(trajectory[:, 0], trajectory[:, 1]))
     dilated = line.buffer(dilation_factor, cap_style=3)
-
-    min_distance = np.inf
 
     x = trajectory[:, 0]
     y = trajectory[:, 1]
@@ -204,7 +209,7 @@ def calc_obstacle_cost(trajectory, ob):
     if ob:
         for obstacle in ob:
             if dilated.intersects(obstacle):
-                return 100000 # collision        
+                return np.inf # collision        
             elif distance(dilated, obstacle) < min_distance:
                 min_distance = distance(dilated, obstacle)
                 
@@ -529,9 +534,8 @@ class DWA_algorithm():
         self.dilated_traj[i] = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1])).buffer(dilation_factor, cap_style=3)
 
         # Collision check
-        if check_collision_bool:
-            if any([utils.dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < WB for idx in range(self.robot_num) if idx != i]): raise Exception('Collision')
-        
+        u = self.check_collision(x, u, i)
+
         x1 = motion(x1, u1, dt)
         x[:, i] = x1
         u[:, i] = u1
@@ -640,6 +644,38 @@ class DWA_algorithm():
                     best_trajectory = trajectory_buf
                     u_history = u_buf
             return best_u, best_trajectory, u_history
+    
+    def check_collision(self, x, u, i):
+        """
+        Checks for collision between the robot at index i and other robots.
+
+        Args:
+            x (numpy.ndarray): State vector of shape (4, N), where N is the number of time steps.
+            i (int): Index of the robot to check collision for.
+
+        Raises:
+            Exception: If collision is detected.
+
+        """
+        if x[0,i]>= boundary_points[1]-WB or x[0,i]<= boundary_points[0]+WB or x[1,i]>=boundary_points[3]-WB or x[1,i]<=boundary_points[2]+WB:
+            if check_collision_bool:
+                raise Exception('Collision')
+            else:
+                print("Collision detected")
+                self.reached_goal[i] = True
+                u[:, i] = np.zeros(2)
+
+        for idx in range(self.robot_num):
+            if idx == i:
+                continue
+            if utils.dist([x[0,i], x[1,i]], [x[0, idx], x[1, idx]]) <= WB:
+                if check_collision_bool:
+                    raise Exception('Collision')
+                else:
+                    print("Collision detected")
+                    self.reached_goal[i] = True
+                    u[:, i] = np.zeros(2)
+        return u
 
 def main():
     """

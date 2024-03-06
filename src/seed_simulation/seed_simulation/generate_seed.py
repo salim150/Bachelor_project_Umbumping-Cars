@@ -16,7 +16,7 @@ with open(path, 'r') as openfile:
     # Reading from json file
     json_object = json.load(openfile)
 
-robot_num = json_object["robot_num"]
+# robot_num = json_object["robot_num"]
 safety_init = json_object["safety"]
 width_init = json_object["width"]
 height_init = json_object["height"]
@@ -33,7 +33,7 @@ def save_dict_to_file(dict, filename='src/seeds/seed_'):
     with open(f'{filename}{i}.json', 'w') as fp:
         json.dump(dict, fp, indent=3)
 
-def random_seed():
+def random_seed(robot_num):
     # generate a path for robot_num robots
     # save the generated trajectories to a dictionary
     # save the dictionary to a file
@@ -58,7 +58,7 @@ def random_seed():
     seed['robot_num'] = robot_num
     save_dict_to_file(seed, filename='src/seeds/seed_')
 
-def circular_seed(R=10.0):
+def circular_seed(robot_num, R=10.0):
     # generate a path for robot_num robots
     # save the generated trajectories to a dictionary
     # save the dictionary to a file
@@ -95,5 +95,5 @@ def circular_seed(R=10.0):
 
 if __name__ == "__main__":
 
-    circular_seed(R=8.0)
+    circular_seed(R=8.0, robot_num=7)
     # random_seed()

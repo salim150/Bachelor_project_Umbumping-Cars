@@ -48,7 +48,7 @@ add_noise = False
 np.random.seed(1)
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k', 7: 'tab:orange', 8: 'tab:brown', 9: 'tab:gray', 10: 'tab:olive'}
-with open('/home/giacomo/thesis_ws/src/seeds/circular_seed_1.json', 'r') as file:
+with open('/home/giacomo/thesis_ws/src/seeds/circular_seed_11.json', 'r') as file:
     data = json.load(file)
 
 def motion(x, u, dt):
@@ -271,17 +271,18 @@ class C3BF_algorithm():
     
     def go_to_goal(self, x, break_flag):
         for i in range(self.robot_num):
-            t_prev = time.time()
-            self.control_robot(i, x)
-            self.computational_time.append((time.time() - t_prev))
             # Step 9: Check if the distance between the current position and the target is less than 5
-            if not self.reached_goal[i]:                
+            if not self.reached_goal[i]: 
+                t_prev = time.time()
+                self.control_robot(i, x)
+                self.computational_time.append((time.time() - t_prev))               
                 # If goal is reached, stop the robot
                 if check_goal_reached(x, self.targets, i, distance=2):
                     self.reached_goal[i] = True
+                    self.dxu[:,i]= 0
                 else:
                     x[:, i] = motion(x[:, i], self.dxu[:, i], dt)
-                    
+                  
             # If we want the robot to disappear when it reaches the goal, indent one more time
             if all(self.reached_goal):
                 break_flag = True
@@ -523,12 +524,24 @@ class C3BF_algorithm():
             Exception: If collision is detected.
 
         """
+        if x[0,i]>=boundary_points[1]-WB or x[0,i]<=boundary_points[0]+WB or x[1,i]>=boundary_points[3]-WB or x[1,i]<=boundary_points[2]+WB:
+            if check_collision_bool:
+                raise Exception('Collision')
+            else:
+                print("Collision detected")
+                self.reached_goal[i] = True
+                self.dxu[:, i] = 0
+
         for idx in range(self.robot_num):
             if idx == i:
                 continue
-            if check_collision_bool:
-                if utils.dist([x[0,i], x[1,i]], [x[0, idx], x[1, idx]]) < WB:
+            if utils.dist([x[0,i], x[1,i]], [x[0, idx], x[1, idx]]) <= WB:
+                if check_collision_bool:
                     raise Exception('Collision')
+                else:
+                    print("Collision detected")
+                    self.reached_goal[i] = True
+                    self.dxu[:, i] = 0
 
 def main(args=None):
     """
@@ -795,7 +808,8 @@ def main_seed(args=None):
             'key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
         
-        x, break_flag = c3bf.run_3cbf(x, break_flag) 
+        # x, break_flag = c3bf.run_3cbf(x, break_flag) 
+        x, break_flag = c3bf.go_to_goal(x, break_flag) 
         
         utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
