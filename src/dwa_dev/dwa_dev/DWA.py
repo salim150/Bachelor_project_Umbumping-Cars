@@ -49,13 +49,14 @@ safety_init = json_object["safety"]
 width_init = json_object["width"]
 height_init = json_object["height"]
 min_dist = json_object["min_dist"]
+to_goal_stop_distance = json_object["to_goal_stop_distance"]
 update_dist = 2
 # N=3
 
 robot_num = json_object["robot_num"]
 timer_freq = json_object["timer_freq"]
 
-show_animation = True
+show_animation = json_object["show_animation"]
 boundary_points = np.array([-width_init/2, width_init/2, -height_init/2, height_init/2])
 check_collision_bool = False
 add_noise = False
@@ -68,32 +69,6 @@ with open('/home/giacomo/thesis_ws/src/trajectories.json', 'r') as file:
 
 with open('/home/giacomo/thesis_ws/src/seeds/seed_1.json', 'r') as file:
     seed = json.load(file)
-
-def motion(x, u, dt):
-    """
-    Motion model.
-
-    Args:
-        x (list): Current state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)].
-        u (list): Control inputs (throttle, delta).
-        dt (float): Time tick for motion prediction.
-
-    Returns:
-        list: Updated state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)].
-    """
-    delta = u[1]
-    delta = np.clip(delta, -max_steer, max_steer)
-    throttle = u[0]
-    throttle = np.clip(throttle, min_acc, max_acc)
-
-    x[0] = x[0] + x[3] * math.cos(x[2]) * dt
-    x[1] = x[1] + x[3] * math.sin(x[2]) * dt
-    x[2] = x[2] + x[3] / L * math.tan(delta) * dt
-    x[2] = normalize_angle(x[2])
-    x[3] = x[3] + throttle * dt
-    x[3] = np.clip(x[3], min_speed, max_speed)
-
-    return x
 
 def normalize_angle(angle):
     """
@@ -172,7 +147,7 @@ def predict_trajectory(x_init, a, delta):
     trajectory = np.array(x)
     time = 0
     while time < predict_time:
-        x = motion(x, [a, delta], dt)
+        x = utils.motion(x, [a, delta], dt)
         trajectory = np.vstack((trajectory, x))
         time += dt
     return trajectory
@@ -483,7 +458,7 @@ class DWA_algorithm():
             # Step 9: Check if the distance between the current position and the target is less than 5
             if not self.reached_goal[i]:                
                 # If goal is reached, stop the robot
-                if check_goal_reached(x, self.targets, i, distance=3):
+                if check_goal_reached(x, self.targets, i, distance=to_goal_stop_distance):
                     u[:, i] = np.zeros(2)
                     x[3, i] = 0
                     self.reached_goal[i] = True
@@ -534,7 +509,7 @@ class DWA_algorithm():
         self.dilated_traj[i] = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1])).buffer(dilation_factor, cap_style=3)
 
         # Collision check
-        x1 = motion(x1, u1, dt)
+        x1 = utils.motion(x1, u1, dt)
         x[:, i] = x1
         u[:, i] = u1
         
@@ -644,6 +619,14 @@ class DWA_algorithm():
                     best_u = u_buf[0]
                     best_trajectory = trajectory_buf
                     u_history = u_buf
+                    
+            elif min_cost == np.inf:
+                # emergency stop
+                print("Emergency stop")
+                best_u = [min_acc, 0]
+                best_trajectory = np.array([x[0:3], x[0:3]])
+                u_history = [min_acc, 0]
+
             return best_u, best_trajectory, u_history
     
     def check_collision(self, x, u, i):

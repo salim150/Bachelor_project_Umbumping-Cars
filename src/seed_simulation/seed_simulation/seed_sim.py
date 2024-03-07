@@ -31,11 +31,22 @@ with open(path, 'r') as openfile:
 # robot_num = json_object["robot_num"]
 width_init = json_object["width"]
 height_init = json_object["height"]
-show_animation = True
+show_animation = json_object["show_animation"]
 go_to_goal_bool = True
 iterations = 1000
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
+
+def mypause(interval):
+    backend = plt.rcParams['backend']
+    if backend in matplotlib.rcsetup.interactive_bk:
+        figManager = matplotlib._pylab_helpers.Gcf.get_active()
+        if figManager is not None:
+            canvas = figManager.canvas
+            if canvas.figure.stale:
+                canvas.draw()
+            canvas.start_event_loop(interval)
+            return
 
 def dwa_sim(seed, robot_num):
 
@@ -93,18 +104,22 @@ def dwa_sim(seed, robot_num):
     for i in range(robot_num):
         dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
     
+    
+    plt.ion()
     fig = plt.figure(1, dpi=90)
     figManager = plt.get_current_fig_manager()
     figManager.window.move(px, 0)
-    figManager.window.showMaximized()
-    figManager.window.setFocus()
+    # figManager.window.showMaximized()
+    # figManager.window.setFocus()
     ax = fig.add_subplot(111)
+    plt.show(block=False)
     
     u_hist = dict.fromkeys(range(robot_num),[[0,0] for _ in range(int(predict_time/dt))])    
     # Step 7: Create an instance of the DWA_algorithm class
     dwa = DWA.DWA_algorithm(robot_num, paths, paths, targets, dilated_traj, predicted_trajectory, ax, u_hist)
     
     for z in range(iterations):
+        
         plt.cla()
         plt.gcf().canvas.mpl_connect('key_release_event', lambda event: [exit(0) if event.key == 'escape' else None])
         
@@ -113,11 +128,13 @@ def dwa_sim(seed, robot_num):
         else:
             x, u, break_flag = dwa.run_dwa(x, u, break_flag)
         trajectory = np.dstack([trajectory, np.concatenate((x,u))])
-            
+
+          
         utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
         plt.grid(True)
-        plt.pause(0.0001)
+        # plt.pause(0.0001)
+        mypause(0.0001)
 
         if break_flag:
             break
@@ -130,9 +147,9 @@ def dwa_sim(seed, robot_num):
             DWA.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
             DWA.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
-        plt.pause(0.0001)
+        mypause(0.0001)
         plt.show(block=False)
-        plt.pause(3)
+        mypause(3)
         plt.close()
 
     return trajectory, dwa.computational_time
@@ -192,12 +209,14 @@ def mpc_sim(seed, robot_num):
         ref.append([cx[i][0], cy[i][0]])
     
     # input [throttle, steer (delta)]
+    plt.ion()
     fig = plt.figure(1, dpi=90)
     figManager = plt.get_current_fig_manager()
     figManager.window.move(px, 0)
-    figManager.window.showMaximized()
-    figManager.window.setFocus()
+    # figManager.window.showMaximized()
+    # figManager.window.setFocus()
     ax = fig.add_subplot(111)
+    plt.show(block=False)
 
     # mpc = MPC_algorithm(cx, cy, ref, mpc, bounds, constraints, predicted_trajectory)
     mpc.cx = cx
@@ -219,7 +238,7 @@ def mpc_sim(seed, robot_num):
         utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
         plt.grid(True)
-        plt.pause(0.0001)
+        mypause(0.0001)
 
         if break_flag:
             break
@@ -231,9 +250,9 @@ def mpc_sim(seed, robot_num):
             MPC.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
             MPC.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
-        plt.pause(0.0001)
+        mypause(0.0001)
         plt.show(block=False)
-        plt.pause(3)
+        mypause(3)
         plt.close()
 
     return trajectory, mpc.computational_time
@@ -272,12 +291,14 @@ def c3bf_sim(seed, robot_num):
     x = np.array([x0, y, yaw, v])
     u = np.zeros((2, robot_num))
 
+    plt.ion()
     fig = plt.figure(1, dpi=90)
     figManager = plt.get_current_fig_manager()
     figManager.window.move(px, 0)
-    figManager.window.showMaximized()
-    figManager.window.setFocus()
+    # figManager.window.showMaximized()
+    # figManager.window.setFocus()
     ax = fig.add_subplot(111)
+    plt.show(block=False)
 
     trajectory = np.zeros((x.shape[0]+u.shape[0], robot_num, 1))
     trajectory[:, :, 0] = np.concatenate((x,u))
@@ -306,7 +327,7 @@ def c3bf_sim(seed, robot_num):
         utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
         plt.grid(True)
-        plt.pause(0.0001)
+        mypause(0.0001)
 
         if break_flag:
             break
@@ -318,9 +339,9 @@ def c3bf_sim(seed, robot_num):
             utils.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
             utils.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
-        plt.pause(0.0001)
+        mypause(0.0001)
         plt.show(block=False)
-        plt.pause(3)
+        mypause(3)
         plt.close()
 
     return trajectory, c3bf.computational_time, c3bf.solver_failure
@@ -359,12 +380,14 @@ def cbf_sim(seed, robot_num):
     x = np.array([x0, y, yaw, v])
     u = np.zeros((2, robot_num))
 
+    plt.ion()
     fig = plt.figure(1, dpi=90)
     figManager = plt.get_current_fig_manager()
     figManager.window.move(px, 0)
-    figManager.window.showMaximized()
-    figManager.window.setFocus()
+    # figManager.window.showMaximized()
+    # figManager.window.setFocus()
     ax = fig.add_subplot(111)
+    plt.show(block=False)
 
     trajectory = np.zeros((x.shape[0]+u.shape[0], robot_num, 1))
     trajectory[:, :, 0] = np.concatenate((x,u))
@@ -394,7 +417,7 @@ def cbf_sim(seed, robot_num):
         utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
         plt.grid(True)
-        plt.pause(0.0001)
+        mypause(0.0001)
 
         if break_flag:
             break
@@ -406,9 +429,9 @@ def cbf_sim(seed, robot_num):
             utils.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
             utils.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
-        plt.pause(0.0001)
+        mypause(0.0001)
         plt.show(block=False)
-        plt.pause(3)
+        mypause(3)
         plt.close()
 
     return trajectory, cbf.computational_time, cbf.solver_failure
@@ -461,12 +484,15 @@ def lbp_sim(seed, robot_num):
         dilated_traj.append(Point(x[0, i], x[1, i]).buffer(dilation_factor, cap_style=3))
 
     u_hist = dict.fromkeys(range(robot_num),[0]*int(predict_time/dt))
+
+    plt.ion()
     fig = plt.figure(1, dpi=90)
     figManager = plt.get_current_fig_manager()
     figManager.window.move(px, 0)
-    figManager.window.showMaximized()
-    figManager.window.setFocus()
+    # figManager.window.showMaximized()
+    # figManager.window.setFocus()
     ax = fig.add_subplot(111)
+    plt.show(block=False)
     
     lbp = LBP.LBP_algorithm(predicted_trajectory, paths, targets, dilated_traj,
                         predicted_trajectory, ax, u_hist, robot_num=robot_num)
@@ -485,7 +511,7 @@ def lbp_sim(seed, robot_num):
         utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
         plt.grid(True)
-        plt.pause(0.0001)
+        mypause(0.0001)
 
         if break_flag:
             break
@@ -497,9 +523,9 @@ def lbp_sim(seed, robot_num):
             LBP.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
             LBP.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
             plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
-        plt.pause(0.0001)
+        mypause(0.0001)
         plt.show(block=False)
-        plt.pause(3)
+        mypause(3)
         plt.close()
     
     return trajectory, lbp.computational_time
@@ -508,7 +534,7 @@ def main():
     # Load the seed from a file
     path = pathlib.Path('/home/giacomo/thesis_ws/src/seeds/')
     dir_list = os.listdir(path)
-    dir_list = ['circular_seed_11.json']
+    # dir_list = ['circular_seed_11.json']
 
     csv_file = '/home/giacomo/thesis_ws/src/seed_simulation/seed_simulation/seed_sim.csv'
     df = pd.read_csv(csv_file)
@@ -534,30 +560,30 @@ def main():
 
         assert robot_num == len(seed['initial_position']['x']), "The number of robots in the seed file does not match the number of robots in the seed file"
         
-        data_process = DataProcessor(robot_num, file_name=filename)
+        data_process = DataProcessor(robot_num, file_name=filename, seed=seed)
         data = []
 
-        # dwa_trajectory, dwa_computational_time = dwa_sim(seed, robot_num)   
-        # print(f"DWA average computational time: {sum(dwa_computational_time) / len(dwa_computational_time)}\n")
-        # dwa_data = data_process.post_process_simultation(dwa_trajectory, dwa_computational_time, method='DWA')
-        # data.append(dwa_data)
+        dwa_trajectory, dwa_computational_time = dwa_sim(seed, robot_num)   
+        print(f"DWA average computational time: {sum(dwa_computational_time) / len(dwa_computational_time)}\n")
+        dwa_data = data_process.post_process_simultation(dwa_trajectory, dwa_computational_time, method='DWA')
+        data.append(dwa_data)
 
-        # mpc_trajectory, mpc_computational_time = mpc_sim(seed, robot_num)
-        # print(f"MPC average computational time: {sum(mpc_computational_time) / len(mpc_computational_time)}\n")
-        # mpc_data = data_process.post_process_simultation(mpc_trajectory, mpc_computational_time, method="MPC")
-        # data.append(mpc_data)
+        mpc_trajectory, mpc_computational_time = mpc_sim(seed, robot_num)
+        print(f"MPC average computational time: {sum(mpc_computational_time) / len(mpc_computational_time)}\n")
+        mpc_data = data_process.post_process_simultation(mpc_trajectory, mpc_computational_time, method="MPC")
+        data.append(mpc_data)
 
-        # c3bf_trajectory, c3bf_computational_time, c3bf_solver_failure = c3bf_sim(seed, robot_num)
-        # print(f"C3BF average computational time: {sum(c3bf_computational_time) / len(c3bf_computational_time)}\n")
-        # c3bf_data = data_process.post_process_simultation(c3bf_trajectory, c3bf_computational_time, method='C3BF', 
-        #                                                   solver_failure=c3bf_solver_failure)
-        # data.append(c3bf_data)
+        c3bf_trajectory, c3bf_computational_time, c3bf_solver_failure = c3bf_sim(seed, robot_num)
+        print(f"C3BF average computational time: {sum(c3bf_computational_time) / len(c3bf_computational_time)}\n")
+        c3bf_data = data_process.post_process_simultation(c3bf_trajectory, c3bf_computational_time, method='C3BF', 
+                                                          solver_failure=c3bf_solver_failure)
+        data.append(c3bf_data)
 
-        # cbf_trajectory, cbf_computational_time, cbf_solver_failure = cbf_sim(seed, robot_num)
-        # print(f"CBF average computational time: {sum(cbf_computational_time) / len(cbf_computational_time)}\n")
-        # cbf_data = data_process.post_process_simultation(cbf_trajectory, cbf_computational_time, method="CBF", 
-        #                                                  solver_failure=cbf_solver_failure)
-        # data.append(cbf_data)
+        cbf_trajectory, cbf_computational_time, cbf_solver_failure = cbf_sim(seed, robot_num)
+        print(f"CBF average computational time: {sum(cbf_computational_time) / len(cbf_computational_time)}\n")
+        cbf_data = data_process.post_process_simultation(cbf_trajectory, cbf_computational_time, method="CBF", 
+                                                         solver_failure=cbf_solver_failure)
+        data.append(cbf_data)
 
         lbp_trajectory, lbp_computational_time = lbp_sim(seed, robot_num)
         print(f"LBP average computational time: {sum(lbp_computational_time) / len(lbp_computational_time)}\n")

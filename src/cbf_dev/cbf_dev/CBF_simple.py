@@ -42,41 +42,15 @@ safety_init = json_object["safety"]
 min_dist = json_object["min_dist"]
 width_init = json_object["width"]
 height_init = json_object["height"]
+to_goal_stop_distance = json_object["to_goal_stop_distance"]
 boundary_points = np.array([-width_init/2, width_init/2, -height_init/2, height_init/2])
 check_collision_bool = False
 add_noise = False
 np.random.seed(1)
 
-color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k', 7: 'tab:orange', 8: 'tab:brown', 9: 'tab:gray', 10: 'tab:olive'}
-with open('/home/giacomo/thesis_ws/src/seeds/circular_seed_2.json', 'r') as file:
+color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k', 7: 'tab:orange', 8: 'tab:brown', 9: 'tab:gray', 10: 'tab:olive', 11: 'tab:pink', 12: 'tab:purple', 13: 'tab:red', 14: 'tab:blue', 15: 'tab:green'}
+with open('/home/giacomo/thesis_ws/src/seeds/seed_6.json', 'r') as file:
     data = json.load(file)
-
-def motion(x, u, dt):
-    """
-    Motion model for a robot.
-
-    Args:
-        x (list): Initial state of the robot [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)].
-        u (list): Control inputs [throttle, delta].
-        dt (float): Time step.
-
-    Returns:
-        list: Updated state of the robot.
-
-    """
-    delta = u[1]
-    delta = np.clip(delta, -max_steer, max_steer)
-    throttle = u[0]
-    throttle = np.clip(throttle, car_min_acc, car_max_acc)
-
-    x[0] = x[0] + x[3] * math.cos(x[2]) * dt
-    x[1] = x[1] + x[3] * math.sin(x[2]) * dt
-    x[2] = x[2] + x[3] / L * math.tan(delta) * dt
-    x[2] = utils.normalize_angle(x[2])
-    x[3] = x[3] + throttle * dt
-    x[3] = np.clip(x[3], min_speed, max_speed)
-
-    return x
 
 def delta_to_beta(delta):
     """
@@ -259,11 +233,11 @@ class CBF_algorithm():
                     return x, break_flag
                 self.targets[i] = (self.paths[i][0].x, self.paths[i][0].y)
 
-            x[:, i] = motion(x[:, i], self.dxu[:, i], dt)
+            x[:, i] = utils.motion(x[:, i], self.dxu[:, i], dt)
             plot_robot(x[0, i], x[1, i], x[2, i], i)
             utils.plot_arrow(x[0, i], x[1, i], x[2, i] + self.dxu[1, i], length=3, width=0.5)
             utils.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
-            plt.plot(self.targets[i][0], self.targets[i][1], "x"+color_dict[i])
+            plt.plot(self.targets[i][0], self.targets[i][1], "x", color=color_dict[i])
         
         return x, break_flag
     
@@ -276,12 +250,12 @@ class CBF_algorithm():
                 t_prev = time.time()
                 self.control_robot(i, x)
                 self.computational_time.append((time.time() - t_prev))
-                if check_goal_reached(x, self.targets, i, distance=2.5):
+                if check_goal_reached(x, self.targets, i, distance=to_goal_stop_distance):
                     self.reached_goal[i] = True
                     self.dxu[:, i] = 0
                     x[3,i] = 0
                 else:
-                    x[:, i] = motion(x[:, i], self.dxu[:, i], dt)
+                    x[:, i] = utils.motion(x[:, i], self.dxu[:, i], dt)
                     
             # If we want the robot to disappear when it reaches the goal, indent one more time
             if all(self.reached_goal):
@@ -739,8 +713,8 @@ def main_seed(args=None):
             'key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
         
-        # x, break_flag = cbf.run_cbf(x, break_flag)
-        x, break_flag = cbf.go_to_goal(x, break_flag)
+        x, break_flag = cbf.run_cbf(x, break_flag)
+        # x, break_flag = cbf.go_to_goal(x, break_flag)
         
         utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")

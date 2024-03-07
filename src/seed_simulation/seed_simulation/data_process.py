@@ -21,11 +21,13 @@ safety_init = json_object["safety"]
 width_init = json_object["width"]
 height_init = json_object["height"]
 min_dist = json_object["min_dist"]
+to_goal_stop_distance = json_object["to_goal_stop_distance"]
 
 class DataProcessor:
-    def __init__(self, robot_num, file_name):
+    def __init__(self, robot_num, file_name, seed):
         self.robot_num = robot_num
         self.file_name = file_name
+        self.seed = seed
     
     def calculate_goal_reached_index(self, trajectory, i):
         last_idx = 0
@@ -36,13 +38,36 @@ class DataProcessor:
                     last_idx = idx
         
         return last_idx
+    
+    def get_initial_length(self, trajectory, i):
+        initial_state = self.seed['initial_position']
+        x0 = initial_state['x']
+        y = initial_state['y']
+        yaw = initial_state['yaw']
+        v = initial_state['v']
+
+        # Step 3: Create an array x with the initial values
+        x = np.array([x0, y, yaw, v])
+
+        traj = self.seed['trajectories']
+        paths = [[(traj[str(idx)][i][0], traj[str(idx)][i][1]) for i in range(len(traj[str(idx)]))] for idx in range(self.robot_num)]
+
+        # Step 5: Extract the target coordinates from the paths
+        targets = [[path[0][0], path[0][1]] for path in paths]
+
+        # Step 6: Calculate the distance between the initial position and the target position
+        initial_length = np.sqrt((x[0, i] - targets[i][0]) ** 2 + (x[1,i] - targets[i][1]) ** 2)
+
+        return initial_length - to_goal_stop_distance
 
     def calculate_path_length(self, trajectory, i):
         """
-        Calculate the path length of the trajectory or robot i
+        Calculate the percentage increase of the path length of the trajectory or robot i with respect to
+        initial distance to the goal.
         :param trajectory: the trajectory
         :return: the path length
         """
+        initial_length = self.get_initial_length(trajectory, i)
         x_list = trajectory[0, i, :]
         y_list = trajectory[1, i, :]
 
@@ -66,11 +91,12 @@ class DataProcessor:
 
             path_length += np.sqrt(dx ** 2 + dy ** 2)
         
-        return path_length
+        return (path_length/initial_length-1)*100
     
     def calculate_avg_path_length(self, trajectory):
         """
-        Calculate the average path length of the trajectory over all the robots
+        Calculate the average percentage increase of the path length of the trajectory or robot i with respect to
+        initial distance to the goal.
         :param trajectory: the trajectory
         :return: the average path length
         """

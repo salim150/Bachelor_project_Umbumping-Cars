@@ -95,5 +95,6 @@ def circular_seed(robot_num, R=10.0):
 
 if __name__ == "__main__":
 
-    circular_seed(R=8.0, robot_num=7)
+    # circular_seed(R=10.0, robot_num=12)
+    random_seed(robot_num=15)
     # random_seed()

@@ -45,6 +45,7 @@ safety_init = json_object["safety"]
 width_init = json_object["width"]
 height_init = json_object["height"]
 min_dist = json_object["min_dist"]
+to_goal_stop_distance = json_object["to_goal_stop_distance"]
 update_dist = 2
 N=3
 
@@ -61,32 +62,6 @@ with open('/home/giacomo/thesis_ws/src/lbp_dev/lbp_dev/LBP.json', 'r') as file:
 
 with open('/home/giacomo/thesis_ws/src/seeds/circular_seed_11.json', 'r') as file:
     seed = json.load(file)
-
-def motion(x, u, dt):
-    """
-    Motion model for a vehicle.
-
-    Args:
-        x (list): Initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)].
-        u (list): Control inputs [throttle, delta].
-        dt (float): Time step (s).
-
-    Returns:
-        list: Updated state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)].
-    """
-    delta = u[1]
-    delta = np.clip(delta, -max_steer, max_steer)
-    throttle = u[0]
-    throttle = np.clip(throttle, min_acc, max_acc)
-
-    x[0] = x[0] + x[3] * math.cos(x[2]) * dt
-    x[1] = x[1] + x[3] * math.sin(x[2]) * dt
-    x[2] = x[2] + x[3] / L * math.tan(delta) * dt
-    x[3] = x[3] + throttle * dt
-    x[2] = normalize_angle(x[2])
-    x[3] = np.clip(x[3], min_speed, max_speed)
-
-    return x
 
 def normalize_angle(angle):
     """
@@ -147,7 +122,7 @@ def predict_trajectory(x_init, a, delta):
     trajectory = np.array(x)
     time = 0
     while time < predict_time:
-        x = motion(x, [a, delta], dt)
+        x = utils.motion(x, [a, delta], dt)
         trajectory = np.vstack((trajectory, x))
         time += dt
     return trajectory
@@ -258,6 +233,14 @@ def calc_control_and_trajectory(x, v_search, goal, ob, u_buf, trajectory_buf):
             best_trajectory = trajectory_buf
             u_history = u_buf
 
+    elif min_cost == np.inf:
+        # emergency stop
+        print("Emergency stop")
+        best_u = [min_acc, 0]
+        best_trajectory = np.array([x[0:3], x[0:3]])
+        u_history = [min_acc, 0]
+
+
     return best_u, best_trajectory, u_history
 
 def calc_obstacle_cost(trajectory, ob):
@@ -294,7 +277,7 @@ def calc_obstacle_cost(trajectory, ob):
     if ob:
         for obstacle in ob:
             if dilated.intersects(obstacle):
-                return 100000 # collision        
+                return np.inf # collision        
             elif distance(dilated, obstacle) < min_distance:
                 min_distance = distance(dilated, obstacle)
                 
@@ -456,7 +439,7 @@ def update_robot_state(x, u, dt, targets, dilated_traj, u_hist, predicted_trajec
     if check_collision_bool:
         if any([utils.dist([x1[0], x1[1]], [x[0, idx], x[1, idx]]) < WB for idx in range(robot_num) if idx != i]): raise Exception('Collision')
 
-    x1 = motion(x1, u1, dt)
+    x1 = utils.motion(x1, u1, dt)
     x[:, i] = x1
     u[:, i] = u1
 
@@ -546,7 +529,7 @@ class LBP_algorithm():
             # Step 9: Check if the distance between the current position and the target is less than 5
             if not self.reached_goal[i]:        
                 # If goal is reached, stop the robot
-                if check_goal_reached(x, self.targets, i, distance=1):
+                if check_goal_reached(x, self.targets, i, distance=to_goal_stop_distance):
                     u[:, i] = np.zeros(2)
                     x[3, i] = 0
                     self.reached_goal[i] = True
@@ -557,8 +540,8 @@ class LBP_algorithm():
 
                 u, x = self.check_collision(x, u, i) 
             
-            else:
-                print(u[:, i])
+            # else:
+            #     print(u[:, i])
             # If we want the robot to disappear when it reaches the goal, indent one more time
             if all(self.reached_goal):
                 break_flag = True
@@ -897,7 +880,7 @@ def main_seed():
         plt.show()
 
 if __name__ == '__main__':
-    # main()
+    # main1()
     main_seed()
 
     

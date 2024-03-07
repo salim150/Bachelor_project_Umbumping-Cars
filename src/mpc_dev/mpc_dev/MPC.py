@@ -39,6 +39,7 @@ safety_init = json_object["safety"]
 width_init = json_object["width"]
 height_init = json_object["height"]
 min_dist = json_object["min_dist"]
+to_goal_stop_distance = json_object["to_goal_stop_distance"]
 
 show_animation = True
 debug = False
@@ -464,7 +465,7 @@ class ModelPredictiveControl:
             self.check_collision(x, u, i)
             if not self.reached_goal[i]:                
                 # If goal is reached, stop the robot
-                if check_goal_reached(x, self.ref, i, distance=1.5):
+                if check_goal_reached(x, self.ref, i, distance=to_goal_stop_distance):
                     # u[:, i] = np.zeros(2)
                     x[3, i] = 0
                     u[:,i] = 0
@@ -533,7 +534,8 @@ class ModelPredictiveControl:
         if u1[0]>max_acc or u1[0]<min_acc:
             print(f'Acceleration out of bounds: {u1[0]}')
             u1[0] = np.clip(u1[0], min_acc, max_acc)
-        x1 = self.plant_model(x1, dt, u1[0], u1[1])
+        # x1 = self.plant_model(x1, dt, u1[0], u1[1])
+        x1 = utils.motion(x1, u1, dt)
         x[:, i] = x1
         u[:, i] = u1
        

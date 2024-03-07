@@ -26,6 +26,8 @@ with open(path, 'r') as openfile:
 max_steer = json_object["CBF_simple"]["max_steer"]   # [rad] max steering angle
 max_speed = json_object["Car_model"]["max_speed"] # [m/s]
 min_speed = json_object["Car_model"]["min_speed"]  # [m/s]
+car_max_acc = json_object["Controller"]["max_acc"]
+car_min_acc = json_object["Controller"]["min_acc"]
 dt = json_object["Controller"]["dt"] 
 safety_init = json_object["safety"]
 width_init = json_object["width"]
@@ -42,6 +44,33 @@ m = json_object["Car_model"]["m"]  # kg
 c_a = json_object["Car_model"]["c_a"]
 c_r1 = json_object["Car_model"]["c_r1"]
 WB = json_object["Controller"]["WB"]
+
+def motion(x, u, dt):
+    """
+    Motion model for a robot.
+
+    Args:
+        x (list): Initial state of the robot [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)].
+        u (list): Control inputs [throttle, delta].
+        dt (float): Time step.
+
+    Returns:
+        list: Updated state of the robot.
+
+    """
+    delta = u[1]
+    delta = np.clip(delta, -max_steer, max_steer)
+    throttle = u[0]
+    throttle = np.clip(throttle, car_min_acc, car_max_acc)
+
+    x[0] = x[0] + x[3] * math.cos(x[2]) * dt
+    x[1] = x[1] + x[3] * math.sin(x[2]) * dt
+    x[2] = x[2] + x[3] / Lr * np.sin(np.arctan2(Lr/L * np.tan(delta),1)) * dt
+    x[2] = normalize_angle(x[2])
+    x[3] = x[3] + throttle * dt
+    x[3] = np.clip(x[3], min_speed, max_speed)
+
+    return x
 
 def linear_model_callback(initial_state: State, cmd: ControlInputs):
     """
@@ -460,8 +489,9 @@ def create_seed(len_path=5):
     Generates a random path by creating a list of waypoints within the specified boundaries.
     """
     path = []
+    safety = 2
     while len(path)<len_path:
-        path.append([float(random.randint(-width_init/2, width_init/2)), float(random.randint(-height_init/2, height_init/2))])
+        path.append([float(random.randint(-width_init/2+safety, width_init/2-safety)), float(random.randint(-height_init/2+safety, height_init/2-safety))])
     return path
     
 def plot_robot(x, y, yaw, i): 
