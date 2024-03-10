@@ -52,7 +52,8 @@ N=3
 show_animation = True
 boundary_points = np.array([-width_init/2, width_init/2, -height_init/2, height_init/2])
 check_collision_bool = False
-add_noise = False
+add_noise = json_object["add_noise"]
+noise_scale_param = json_object["noise_scale_param"]
 np.random.seed(1)
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
@@ -216,7 +217,7 @@ def calc_control_and_trajectory(x, v_search, goal, ob, u_buf, trajectory_buf):
     
     #TODO: this section has a small bug due to popping elements from the buffer, it gets to a point where there 
     # are no more elements in the buffer to use
-    if len(u_buf) > 2:
+    if len(u_buf) > 4:
         u_buf.pop(0)
     
         trajectory_buf = trajectory_buf[1:]
@@ -236,7 +237,10 @@ def calc_control_and_trajectory(x, v_search, goal, ob, u_buf, trajectory_buf):
     elif min_cost == np.inf:
         # emergency stop
         print("Emergency stop")
-        best_u = [min_acc, 0]
+        if x[3]>0:
+            best_u = [min_acc, 0]
+        else:
+            best_u = [max_acc, 0]
         best_trajectory = np.array([x[0:3], x[0:3]])
         u_history = [min_acc, 0]
 
@@ -427,7 +431,7 @@ def update_robot_state(x, u, dt, targets, dilated_traj, u_hist, predicted_trajec
     x1 = x[:, i]
     ob = [dilated_traj[idx] for idx in range(len(dilated_traj)) if idx != i]
     if add_noise:
-        noise = np.concatenate([np.random.normal(0, 0.21, 2).reshape(1, 2), np.random.normal(0, np.radians(5), 1).reshape(1,1), np.zeros((1,1))], axis=1)
+        noise = np.concatenate([np.random.normal(0, 0.21*noise_scale_param, 2).reshape(1, 2), np.random.normal(0, np.radians(5)*noise_scale_param, 1).reshape(1,1), np.random.normal(0, 0.2*noise_scale_param, 1).reshape(1,1)], axis=1)
         noisy_pos = x1 + noise[0]
         u1, predicted_trajectory1, u_history = lbp_control(noisy_pos, targets[i], ob, u_hist[i], predicted_trajectory[i])
         plt.plot(noisy_pos[0], noisy_pos[1], "x"+color_dict[i], markersize=10)

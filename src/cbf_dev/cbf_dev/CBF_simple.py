@@ -45,7 +45,9 @@ height_init = json_object["height"]
 to_goal_stop_distance = json_object["to_goal_stop_distance"]
 boundary_points = np.array([-width_init/2, width_init/2, -height_init/2, height_init/2])
 check_collision_bool = False
-add_noise = False
+add_noise = json_object["add_noise"]
+noise_scale_param = json_object["noise_scale_param"]
+
 np.random.seed(1)
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k', 7: 'tab:orange', 8: 'tab:brown', 9: 'tab:gray', 10: 'tab:olive', 11: 'tab:pink', 12: 'tab:purple', 13: 'tab:red', 14: 'tab:blue', 15: 'tab:green'}
@@ -215,7 +217,7 @@ class CBF_algorithm():
         for i in range(self.robot_num):
             t_prev = time.time()
             if add_noise:
-                noise = np.concatenate([np.random.normal(0, 0.3, 2).reshape(2, 1), np.random.normal(0, np.radians(5), 1).reshape(1,1), np.zeros((1,1))], axis=0)
+                noise = np.concatenate([np.random.normal(0, 0.21*noise_scale_param, 2).reshape(2, 1), np.random.normal(0, np.radians(5)*noise_scale_param, 1).reshape(1,1), np.random.normal(0, 0.2*noise_scale_param, 1).reshape(1,1)], axis=0)
                 noisy_pos = x + noise
                 self.control_robot(i, noisy_pos)
                 plt.plot(noisy_pos[0,i], noisy_pos[1,i], "x"+color_dict[i], markersize=10)
@@ -351,6 +353,9 @@ class CBF_algorithm():
         # Add the input constraint
         G = np.vstack([G, [[0, 1], [0, -1]]])
         H = np.vstack([H, delta_to_beta(max_steer), -delta_to_beta(-max_steer)])
+        # TODO: check whether to keep the following constraints
+        G = np.vstack([G, [[0, x[3,i]/Lr], [0, x[3,i]/Lr]]])
+        H = np.vstack([H, np.deg2rad(50), np.deg2rad(50)])
         G = np.vstack([G, [[1, 0], [-1, 0]]])
         H = np.vstack([H, max_acc, -min_acc])
 

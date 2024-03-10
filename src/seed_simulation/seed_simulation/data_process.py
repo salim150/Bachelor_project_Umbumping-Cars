@@ -14,7 +14,6 @@ with open(path, 'r') as openfile:
     # Reading from json file
     json_object = json.load(openfile)
 
-
 L = json_object["Car_model"]["L"] # [m] Wheel base of vehicle
 WB = json_object["Controller"]["WB"] # Wheel base
 safety_init = json_object["safety"]
@@ -22,6 +21,8 @@ width_init = json_object["width"]
 height_init = json_object["height"]
 min_dist = json_object["min_dist"]
 to_goal_stop_distance = json_object["to_goal_stop_distance"]
+add_noise = json_object["add_noise"]
+noise_scale_param = json_object["noise_scale_param"]
 
 class DataProcessor:
     def __init__(self, robot_num, file_name, seed):
@@ -241,6 +242,11 @@ class DataProcessor:
         avg_initial_dist = self.calculate_avg_initial_dist(trajectory)
         collision_number = self.count_collision(trajectory)
 
+        if add_noise:
+            noise_scaling = noise_scale_param
+        else:
+            noise_scaling = 0.0
+
         data = {
             "Path Length": avg_path_length,
             "Acceleration Usage": acceleration_usage,
@@ -252,7 +258,8 @@ class DataProcessor:
             "Robot Number": self.robot_num,
             "File Name": self.file_name,
             "Method": method,
-            "Collision Number": collision_number
+            "Collision Number": collision_number,
+            "Noise Scaling": noise_scaling
         }
 
         print("Data Processed Successfully!\n")
@@ -264,4 +271,4 @@ class DataProcessor:
         :param df: the dataframe
         :return: the dataframe without duplicates
         """
-        return df.drop_duplicates(subset=["Robot Number", "File Name", "Method"], keep="last")
+        return df.drop_duplicates(subset=["Robot Number", "File Name", "Method", "Noise Scaling"], keep="last")

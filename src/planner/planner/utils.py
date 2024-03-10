@@ -66,6 +66,8 @@ def motion(x, u, dt):
     x[0] = x[0] + x[3] * math.cos(x[2]) * dt
     x[1] = x[1] + x[3] * math.sin(x[2]) * dt
     x[2] = x[2] + x[3] / Lr * np.sin(np.arctan2(Lr/L * np.tan(delta),1)) * dt
+    # x[2] = x[2] + x[3] / L * math.tan(delta) * dt
+
     x[2] = normalize_angle(x[2])
     x[3] = x[3] + throttle * dt
     x[3] = np.clip(x[3], min_speed, max_speed)

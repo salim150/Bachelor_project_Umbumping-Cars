@@ -45,7 +45,9 @@ show_animation = True
 debug = False
 boundary_points = np.array([-width_init/2, width_init/2, -height_init/2, height_init/2])
 check_collision_bool = False
-add_noise = False 
+add_noise = json_object["add_noise"]
+noise_scale_param = json_object["noise_scale_param"]
+
 np.random.seed(1)
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
@@ -509,7 +511,7 @@ class ModelPredictiveControl:
         u1 = np.append(u1, u1[-2])  
 
         if add_noise:
-            noise = np.concatenate([np.random.normal(0, 0.3, 2).reshape(1, 2), np.random.normal(0, np.radians(5), 1).reshape(1,1), np.zeros((1,1))], axis=1)
+            noise = np.concatenate([np.random.normal(0, 0.21*noise_scale_param, 2).reshape(1, 2), np.random.normal(0, np.radians(5)*noise_scale_param, 1).reshape(1,1), np.random.normal(0, 0.2*noise_scale_param, 1).reshape(1,1)], axis=1)
             noisy_pos = x1 + noise[0]
             plt.plot(noisy_pos[0], noisy_pos[1], "x" + color_dict[i], markersize=10)
             self.update_obstacles(i, noisy_pos, x, self.predicted_trajectory) 

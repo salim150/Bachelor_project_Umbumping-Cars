@@ -59,7 +59,8 @@ timer_freq = json_object["timer_freq"]
 show_animation = json_object["show_animation"]
 boundary_points = np.array([-width_init/2, width_init/2, -height_init/2, height_init/2])
 check_collision_bool = False
-add_noise = False
+add_noise = json_object["add_noise"]
+noise_scale_param = json_object["noise_scale_param"]
 np.random.seed(1)
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
@@ -500,7 +501,7 @@ class DWA_algorithm():
         x1 = x[:, i]
         ob = [self.dilated_traj[idx] for idx in range(len(self.dilated_traj)) if idx != i]
         if add_noise:
-            noise = np.concatenate([np.random.normal(0, 0.21, 2).reshape(1, 2), np.random.normal(0, np.radians(5), 1).reshape(1,1), np.zeros((1,1))], axis=1)
+            noise = np.concatenate([np.random.normal(0, 0.21*noise_scale_param, 2).reshape(1, 2), np.random.normal(0, np.radians(5)*noise_scale_param, 1).reshape(1,1), np.random.normal(0, 0.2*noise_scale_param, 1).reshape(1,1)], axis=1)
             noisy_pos = x1 + noise[0]
             u1, predicted_trajectory1, u_history = self.dwa_control(noisy_pos, ob, i)
             plt.plot(noisy_pos[0], noisy_pos[1], "x"+color_dict[i], markersize=10)
@@ -619,11 +620,14 @@ class DWA_algorithm():
                     best_u = u_buf[0]
                     best_trajectory = trajectory_buf
                     u_history = u_buf
-                    
+
             elif min_cost == np.inf:
                 # emergency stop
                 print("Emergency stop")
-                best_u = [min_acc, 0]
+                if x[3]>0:
+                    best_u = [min_acc, 0]
+                else:
+                    best_u = [max_acc, 0]
                 best_trajectory = np.array([x[0:3], x[0:3]])
                 u_history = [min_acc, 0]
 
