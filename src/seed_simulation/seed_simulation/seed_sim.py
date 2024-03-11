@@ -35,7 +35,7 @@ show_animation = json_object["show_animation"]
 go_to_goal_bool = True
 iterations = 1000
 
-color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
+color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k', 7: 'tab:orange', 8: 'tab:brown', 9: 'tab:gray', 10: 'tab:olive', 11: 'tab:pink', 12: 'tab:purple', 13: 'tab:red', 14: 'tab:blue', 15: 'tab:green'}
 
 def mypause(interval):
     backend = plt.rcParams['backend']
@@ -146,7 +146,7 @@ def dwa_sim(seed, robot_num):
             DWA.plot_robot(x[0, i], x[1, i], x[2, i], i)
             DWA.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
             DWA.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
-            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
+            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-", color=color_dict[i])
         mypause(0.0001)
         plt.show(block=False)
         mypause(3)
@@ -249,7 +249,7 @@ def mpc_sim(seed, robot_num):
             MPC.plot_robot(x[0, i], x[1, i], x[2, i], i)
             MPC.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
             MPC.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
-            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
+            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-", color=color_dict[i])
         mypause(0.0001)
         plt.show(block=False)
         mypause(3)
@@ -338,7 +338,7 @@ def c3bf_sim(seed, robot_num):
             C3BF.plot_robot(x[0, i], x[1, i], x[2, i], i)
             utils.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
             utils.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
-            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
+            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-", color=color_dict[i])
         mypause(0.0001)
         plt.show(block=False)
         mypause(3)
@@ -428,7 +428,7 @@ def cbf_sim(seed, robot_num):
             CBF.plot_robot(x[0, i], x[1, i], x[2, i], i)
             utils.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
             utils.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
-            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
+            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-", color=color_dict[i])
         mypause(0.0001)
         plt.show(block=False)
         mypause(3)
@@ -522,7 +522,7 @@ def lbp_sim(seed, robot_num):
             LBP.plot_robot(x[0, i], x[1, i], x[2, i], i)
             LBP.plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)
             LBP.plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
-            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-"+color_dict[i])
+            plt.plot(trajectory[0, i, :], trajectory[1, i, :], "-", color=color_dict[i])
         mypause(0.0001)
         plt.show(block=False)
         mypause(3)
@@ -544,9 +544,9 @@ def main():
     for filename in dir_list:
         
         # Skipping file that are already in the csv file
-        # if filename in list(df["File Name"]):
-        #     print(f"Skipping {filename} as it already exists in the csv file\n")
-        #     continue
+        if filename in list(df["File Name"]):
+            print(f"Skipping {filename} as it already exists in the csv file\n")
+            continue
 
         if 'circular' not in filename:
             continue
