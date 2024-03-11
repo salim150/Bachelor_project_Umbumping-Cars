@@ -232,9 +232,9 @@ def calc_to_goal_heading_cost(trajectory, goal):
     # either using the angle difference or the distance --> if we want to use the angle difference, we need to normalize the angle before taking the difference
     error_angle = normalize_angle(math.atan2(dy, dx))
     cost_angle = error_angle - normalize_angle(trajectory[-1, 2])
-    cost = abs(math.atan2(math.sin(cost_angle), math.cos(cost_angle)))
+    cost_angle = abs(cost_angle)
 
-    return cost
+    return cost_angle
 
 def plot_arrow(x, y, yaw, length=0.5, width=0.1):  # pragma: no cover
     """
@@ -605,7 +605,7 @@ class DWA_algorithm():
                             best_trajectory = trajectory
                             u_history = [delta]*len(trajectory)
             # print(time.time()-old_time)
-            if len(u_buf) > 2:              
+            if len(u_buf) > 4:              
                 u_buf.pop(0)
                 trajectory_buf = trajectory_buf[1:]
 

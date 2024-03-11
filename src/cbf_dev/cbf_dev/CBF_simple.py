@@ -249,9 +249,19 @@ class CBF_algorithm():
             # Step 9: Check if the distance between the current position and the target is less than 5
             if not self.reached_goal[i]:                
                 # If goal is reached, stop the robot
-                t_prev = time.time()
-                self.control_robot(i, x)
-                self.computational_time.append((time.time() - t_prev))
+                if add_noise: 
+                    noise = np.concatenate([np.random.normal(0, 0.21*noise_scale_param, 2).reshape(2, 1), np.random.normal(0, np.radians(5)*noise_scale_param, 1).reshape(1,1), np.random.normal(0, 0.2*noise_scale_param, 1).reshape(1,1)], axis=0)
+                    noisy_pos = x + noise
+                    t_prev = time.time()
+                    self.control_robot(i, noisy_pos)
+                    self.computational_time.append((time.time() - t_prev))
+                    plt.plot(noisy_pos[0,i], noisy_pos[1,i], "x"+color_dict[i], markersize=10)
+                else:
+                    t_prev = time.time()
+                    self.control_robot(i, x)
+                    self.computational_time.append((time.time() - t_prev)) 
+                
+                # If goal is reached, stop the robot
                 if check_goal_reached(x, self.targets, i, distance=to_goal_stop_distance):
                     self.reached_goal[i] = True
                     self.dxu[:, i] = 0
@@ -718,8 +728,8 @@ def main_seed(args=None):
             'key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
         
-        x, break_flag = cbf.run_cbf(x, break_flag)
-        # x, break_flag = cbf.go_to_goal(x, break_flag)
+        # x, break_flag = cbf.run_cbf(x, break_flag)
+        x, break_flag = cbf.go_to_goal(x, break_flag)
         
         utils.plot_map(width=width_init, height=height_init)
         plt.axis("equal")
