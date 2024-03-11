@@ -49,9 +49,9 @@ safety_init = json_object["safety"]
 width_init = json_object["width"]
 height_init = json_object["height"]
 N=3
-save_flag = False
+save_flag = True
 show_animation = True
-plot_flag = True
+plot_flag = False
 timer_freq = json_object["timer_freq"]
 
 class RobotType(Enum):
@@ -156,12 +156,14 @@ def find_nearest(array, value):
 
 def main():
     print(__file__ + " start!!")
-
+    print("Max speed: ", max_speed)
+    print("Min speed: ", min_speed)
     if save_flag:
         complete_trajectories = {}
 
         # initial state [x(m), y(m), yaw(rad), v(m/s)]
-        for v in np.arange(min_speed, max_speed, v_resolution):
+        for v in np.arange(min_speed, max_speed+v_resolution, v_resolution):
+            print(v)
             x_init = np.array([0.0, 0.0, np.radians(90.0), v])
             traj, u_total = generate_trajectories(x_init)
 
@@ -206,14 +208,14 @@ def main():
         # print(complete_trajectories)
         
         # saving the complete trajectories to a csv file
-        with open('trajectories.json', 'w') as file:
+        with open('src/dwa_dev/trajectories.json', 'w') as file:
             json.dump(complete_trajectories, file, indent=4)
 
         print("\nThe JSON data has been written to 'data.json'")
 
 
     # reading the first element of data.jason, rotating and traslating the geometry to and arbitrary position and plotting it
-    with open('trajectories.json', 'r') as file:
+    with open('src/dwa_dev/trajectories.json', 'r') as file:
         data = json.load(file)
 
     fig = plt.figure(1, dpi=90)

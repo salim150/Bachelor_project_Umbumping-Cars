@@ -599,7 +599,7 @@ class ModelPredictiveControl:
             Exception: If collision is detected.
 
         """
-        if x[0,i]>=boundary_points[1]-WB or x[0,i]<=boundary_points[0]+WB or x[1,i]>=boundary_points[3]-WB or x[1,i]<=boundary_points[2]+WB:
+        if x[0,i]>=boundary_points[1]-WB/2 or x[0,i]<=boundary_points[0]+WB/2 or x[1,i]>=boundary_points[3]-WB/2 or x[1,i]<=boundary_points[2]+WB/2:
             if check_collision_bool:
                 raise Exception('Collision')
             else:
@@ -611,7 +611,7 @@ class ModelPredictiveControl:
         for idx in range(self.robot_num):
             if idx == i:
                 continue
-            if utils.dist([x[0,i], x[1,i]], [x[0, idx], x[1, idx]]) <= WB:
+            if utils.dist([x[0,i], x[1,i]], [x[0, idx], x[1, idx]]) <= WB/2:
                 if check_collision_bool:
                     raise Exception('Collision')
                 else:

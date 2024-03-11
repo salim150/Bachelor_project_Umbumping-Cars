@@ -65,7 +65,7 @@ np.random.seed(1)
 
 color_dict = {0: 'r', 1: 'b', 2: 'g', 3: 'y', 4: 'm', 5: 'c', 6: 'k'}
 
-with open('/home/giacomo/thesis_ws/src/trajectories.json', 'r') as file:
+with open('/home/giacomo/thesis_ws/src/dwa_dev/trajectories.json', 'r') as file:
     data = json.load(file)
 
 with open('/home/giacomo/thesis_ws/src/seeds/seed_1.json', 'r') as file:
@@ -177,9 +177,9 @@ def calc_obstacle_cost(trajectory, ob):
     y = trajectory[:, 1]
 
     # check if the trajectory is out of bounds
-    if any(element < -width_init/2+WB or element > width_init/2-WB for element in x):
+    if any(element < -width_init/2+WB/2 or element > width_init/2-WB/2 for element in x):
         return np.inf
-    if any(element < -height_init/2+WB or element > height_init/2-WB for element in y):
+    if any(element < -height_init/2+WB/2 or element > height_init/2-WB/2 for element in y):
         return np.inf
 
     if ob:
@@ -563,7 +563,7 @@ class DWA_algorithm():
             trajectory_buf = self.predicted_trajectory[i]
 
             # evaluate all trajectory with sampled input in dynamic window
-            nearest = find_nearest(np.arange(min_speed, max_speed, v_resolution), x[3])
+            nearest = find_nearest(np.arange(min_speed, max_speed+v_resolution, v_resolution), x[3])
 
             for a in np.arange(dw[0], dw[1]+v_resolution, v_resolution):
                 for delta in np.arange(dw[2], dw[3]+delta_resolution, delta_resolution):
@@ -645,7 +645,7 @@ class DWA_algorithm():
             Exception: If collision is detected.
 
         """
-        if x[0,i]>= boundary_points[1]-WB or x[0,i]<= boundary_points[0]+WB or x[1,i]>=boundary_points[3]-WB or x[1,i]<=boundary_points[2]+WB:
+        if x[0,i]>= boundary_points[1]-WB/2 or x[0,i]<= boundary_points[0]+WB/2 or x[1,i]>=boundary_points[3]-WB/2 or x[1,i]<=boundary_points[2]+WB/2:
             if check_collision_bool:
                 raise Exception('Collision')
             else:
@@ -658,7 +658,7 @@ class DWA_algorithm():
         for idx in range(self.robot_num):
             if idx == i:
                 continue
-            if utils.dist([x[0,i], x[1,i]], [x[0, idx], x[1, idx]]) <= WB:
+            if utils.dist([x[0,i], x[1,i]], [x[0, idx], x[1, idx]]) <= WB/2:
                 if check_collision_bool:
                     raise Exception('Collision')
                 else:

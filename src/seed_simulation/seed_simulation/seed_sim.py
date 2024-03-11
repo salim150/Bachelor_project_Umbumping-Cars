@@ -534,7 +534,7 @@ def main():
     # Load the seed from a file
     path = pathlib.Path('/home/giacomo/thesis_ws/src/seeds/')
     dir_list = os.listdir(path)
-    dir_list = ['circular_seed_11.json']
+    # dir_list = ['circular_seed_0.json']
 
     csv_file = '/home/giacomo/thesis_ws/src/seed_simulation/seed_simulation/seed_sim.csv'
     df = pd.read_csv(csv_file)
@@ -563,15 +563,15 @@ def main():
         data_process = DataProcessor(robot_num, file_name=filename, seed=seed)
         data = []
 
-        # dwa_trajectory, dwa_computational_time = dwa_sim(seed, robot_num)   
-        # print(f"DWA average computational time: {sum(dwa_computational_time) / len(dwa_computational_time)}\n")
-        # dwa_data = data_process.post_process_simultation(dwa_trajectory, dwa_computational_time, method='DWA')
-        # data.append(dwa_data)
+        dwa_trajectory, dwa_computational_time = dwa_sim(seed, robot_num)   
+        print(f"DWA average computational time: {sum(dwa_computational_time) / len(dwa_computational_time)}\n")
+        dwa_data = data_process.post_process_simultation(dwa_trajectory, dwa_computational_time, method='DWA')
+        data.append(dwa_data)
 
-        # mpc_trajectory, mpc_computational_time = mpc_sim(seed, robot_num)
-        # print(f"MPC average computational time: {sum(mpc_computational_time) / len(mpc_computational_time)}\n")
-        # mpc_data = data_process.post_process_simultation(mpc_trajectory, mpc_computational_time, method="MPC")
-        # data.append(mpc_data)
+        mpc_trajectory, mpc_computational_time = mpc_sim(seed, robot_num)
+        print(f"MPC average computational time: {sum(mpc_computational_time) / len(mpc_computational_time)}\n")
+        mpc_data = data_process.post_process_simultation(mpc_trajectory, mpc_computational_time, method="MPC")
+        data.append(mpc_data)
 
         c3bf_trajectory, c3bf_computational_time, c3bf_solver_failure = c3bf_sim(seed, robot_num)
         print(f"C3BF average computational time: {sum(c3bf_computational_time) / len(c3bf_computational_time)}\n")
@@ -585,10 +585,10 @@ def main():
                                                          solver_failure=cbf_solver_failure)
         data.append(cbf_data)
 
-        # lbp_trajectory, lbp_computational_time = lbp_sim(seed, robot_num)
-        # print(f"LBP average computational time: {sum(lbp_computational_time) / len(lbp_computational_time)}\n")
-        # lbp_data = data_process.post_process_simultation(lbp_trajectory, lbp_computational_time, method="LBP")
-        # data.append(lbp_data)
+        lbp_trajectory, lbp_computational_time = lbp_sim(seed, robot_num)
+        print(f"LBP average computational time: {sum(lbp_computational_time) / len(lbp_computational_time)}\n")
+        lbp_data = data_process.post_process_simultation(lbp_trajectory, lbp_computational_time, method="LBP")
+        data.append(lbp_data)
 
         df1 = pd.DataFrame(data)
         frames = [df, df1]
