@@ -555,7 +555,7 @@ def main():
     # Load the seed from a file
     path = pathlib.Path('/home/giacomo/thesis_ws/src/seeds/')
     dir_list = os.listdir(path)
-    # dir_list = ['circular_seed_30.json']
+    dir_list = ['circular_seed_54.json', 'circular_seed_55.json', 'circular_seed_56.json']
 
     csv_file = '/home/giacomo/thesis_ws/src/seed_simulation/seed_simulation/seed_sim.csv'
     df = pd.read_csv(csv_file)
@@ -564,11 +564,6 @@ def main():
     # Analyze the results
     for filename in dir_list:
         
-        # Skipping file that are already in the csv file
-        # if filename in list(df["File Name"]):
-        #     print(f"Skipping {filename} as it already exists in the csv file\n")
-        #     continue
-
         if 'circular' not in filename:
             continue
 
