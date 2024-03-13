@@ -49,7 +49,7 @@ to_goal_stop_distance = json_object["to_goal_stop_distance"]
 update_dist = 2
 N=3
 
-show_animation = True
+show_animation = json_object["show_animation"]
 boundary_points = np.array([-width_init/2, width_init/2, -height_init/2, height_init/2])
 check_collision_bool = False
 add_noise = json_object["add_noise"]
@@ -434,7 +434,7 @@ def update_robot_state(x, u, dt, targets, dilated_traj, u_hist, predicted_trajec
         noise = np.concatenate([np.random.normal(0, 0.21*noise_scale_param, 2).reshape(1, 2), np.random.normal(0, np.radians(5)*noise_scale_param, 1).reshape(1,1), np.random.normal(0, 0.2*noise_scale_param, 1).reshape(1,1)], axis=1)
         noisy_pos = x1 + noise[0]
         u1, predicted_trajectory1, u_history = lbp_control(noisy_pos, targets[i], ob, u_hist[i], predicted_trajectory[i])
-        plt.plot(noisy_pos[0], noisy_pos[1], "x"+color_dict[i], markersize=10)
+        plt.plot(noisy_pos[0], noisy_pos[1], "x", color=color_dict[i], markersize=10)
     else:
         u1, predicted_trajectory1, u_history = lbp_control(x1, targets[i], ob, u_hist[i], predicted_trajectory[i])
     dilated_traj[i] = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1])).buffer(dilation_factor, cap_style=3)

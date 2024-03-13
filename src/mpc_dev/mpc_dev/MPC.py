@@ -41,7 +41,7 @@ height_init = json_object["height"]
 min_dist = json_object["min_dist"]
 to_goal_stop_distance = json_object["to_goal_stop_distance"]
 
-show_animation = True
+show_animation = json_object["show_animation"]
 debug = False
 boundary_points = np.array([-width_init/2, width_init/2, -height_init/2, height_init/2])
 check_collision_bool = False
@@ -513,7 +513,7 @@ class ModelPredictiveControl:
         if add_noise:
             noise = np.concatenate([np.random.normal(0, 0.21*noise_scale_param, 2).reshape(1, 2), np.random.normal(0, np.radians(5)*noise_scale_param, 1).reshape(1,1), np.random.normal(0, 0.2*noise_scale_param, 1).reshape(1,1)], axis=1)
             noisy_pos = x1 + noise[0]
-            plt.plot(noisy_pos[0], noisy_pos[1], "x" + color_dict[i], markersize=10)
+            plt.plot(noisy_pos[0], noisy_pos[1], "x", color=color_dict[i], markersize=10)
             self.update_obstacles(i, noisy_pos, x, self.predicted_trajectory) 
             self.bounds, self.constraints = self.set_bounds_and_constraints()
             self.initial_state = noisy_pos
@@ -787,10 +787,10 @@ def plot_robot(x, y, yaw, i):
                 np.array(outline[1, :]).flatten(), color_dict[i])
     
 def plot_robot_trajectory(x, u, cx, cy, predicted_trajectory, targets, i):
-    plt.plot(predicted_trajectory[i][:, 0], predicted_trajectory[i][:, 1], "-"+color_dict[i], label="Trajectory")
+    plt.plot(predicted_trajectory[i][:, 0], predicted_trajectory[i][:, 1], "-", color=color_dict[i], label="Trajectory")
     # plt.plot(x[0, i], x[1, i], "xr")
-    plt.plot(targets[i][0], targets[i][1], "x"+color_dict[i], label="Target")
-    plt.plot(cx[i], cy[i], "--"+color_dict[i], label="Course")
+    plt.plot(targets[i][0], targets[i][1], "x", color=color_dict[i], label="Target")
+    plt.plot(cx[i], cy[i], "--", color=color_dict[i], label="Course")
     plot_robot(x[0, i], x[1, i], x[2, i], i)
     plot_arrow(x[0, i], x[1, i], x[2, i], length=1, width=0.5)
     plot_arrow(x[0, i], x[1, i], x[2, i] + u[1, i], length=3, width=0.5)

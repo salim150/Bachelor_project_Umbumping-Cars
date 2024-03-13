@@ -503,7 +503,7 @@ class DWA_algorithm():
             noise = np.concatenate([np.random.normal(0, 0.21*noise_scale_param, 2).reshape(1, 2), np.random.normal(0, np.radians(5)*noise_scale_param, 1).reshape(1,1), np.random.normal(0, 0.2*noise_scale_param, 1).reshape(1,1)], axis=1)
             noisy_pos = x1 + noise[0]
             u1, predicted_trajectory1, u_history = self.dwa_control(noisy_pos, ob, i)
-            plt.plot(noisy_pos[0], noisy_pos[1], "x"+color_dict[i], markersize=10)
+            plt.plot(noisy_pos[0], noisy_pos[1], "x", color=color_dict[i], markersize=10)
         else:
             u1, predicted_trajectory1, u_history = self.dwa_control(x1, ob, i)
         self.dilated_traj[i] = LineString(zip(predicted_trajectory1[:, 0], predicted_trajectory1[:, 1])).buffer(dilation_factor, cap_style=3)

@@ -6,34 +6,30 @@ import seaborn as sns
 # Read the CSV file
 data = pd.read_csv('src/seed_simulation/seed_simulation/seed_sim.csv')
 # data = data.to_numpy()
+fontsize = 10
+plt.rcParams['font.family'] = ['serif']
+plt.rcParams['font.serif'] = ['Times New Roman']
+plt.rcParams['font.size'] = fontsize
 
 class Plotter:
     def __init__(self, data):
         self.data = data
 
-    def plot(self, x, y, hue):
+    def plot(self, x, y, hue, title):
         
         sns.lineplot(data=self.data, x=x, y=y, hue=hue)
+        # plt.xlabel("x [m]", fontdict={'size': fontsize, 'family': 'serif'})
+        # plt.ylabel("y [m]", fontdict={'size': fontsize, 'family': 'serif'})
+        plt.title(title, fontdict={'size': fontsize, 'family': 'serif'})
         plt.show()
 
+quantities = ['Path Length', 'Acceleration Usage', 'Steering Usage', 'Average Speed', 'Avg Computational Time',	'Solver Failure', 'Collision Number']
+methods = ['MPC', 'LBP', 'CBF', 'C3BF', 'DWA']
 
-# Plot the quantities as a function of variables and noise
-# dwa_data = data.loc[data["Method"] == 'DWA']
-# dwa_plotter = Plotter(dwa_data)
-# dwa_plotter.plot("Robot Number", 'Collision Number', 'Noise Scaling')
+for method in methods:
+    for quantity in quantities:
+        mpc_data = data.loc[data["Method"] == method]
+        mpc_plotter = Plotter(mpc_data)
+        mpc_plotter.plot("Robot Number", quantity, 'Noise Scaling', quantity+" vs Robot Number " + '(' + method + ')')
 
-# mpc_data = data.loc[data["Method"] == 'MPC']
-# mpc_plotter = Plotter(mpc_data)
-# mpc_plotter.plot("Robot Number", 'Path Length', 'Noise Scaling')
 
-# lbp_data = data.loc[data["Method"] == 'LBP']
-# lbp_plotter = Plotter(lbp_data)
-# lbp_plotter.plot("Robot Number", 'Path Length', 'Noise Scaling')
-
-# cbf_data = data.loc[data["Method"] == 'CBF']
-# cbf_plotter = Plotter(cbf_data)
-# cbf_plotter.plot("Robot Number", 'Path Length', 'Noise Scaling')
-
-c3bf_data = data.loc[data["Method"] == 'C3BF']
-c3bf_plotter = Plotter(c3bf_data)
-c3bf_plotter.plot("Robot Number", 'Collision Number', 'Noise Scaling')
