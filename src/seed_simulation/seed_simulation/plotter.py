@@ -96,6 +96,15 @@ quantities = ['Path Length', 'Acceleration Usage', 'Steering Usage', 'Average Sp
 methods = ['MPC', 'LBP', 'CBF', 'C3BF', 'DWA']
 noises = [0.0, 0.1, 0.2, 0.4]
 
+data_plotter = Plotter(data)
+data_plotter.plot_bars("File Name", "Collision Number", "Method", "Collision number as a function of the seed file")
+# for idx in range(0,58):
+#     file_data = data.loc[data["File Name"] == "circular_seed_"+str(idx)+".json"]
+#     # plt.scatter(file_data["Robot Number"].iloc[0], max(file_data["Collision Number"]))
+
+# plt.show()
+
+
 for method in methods:
     for quantity in quantities:
         mpc_data = data.loc[data["Method"] == method]

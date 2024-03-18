@@ -555,7 +555,7 @@ def main():
     # Load the seed from a file
     path = pathlib.Path('/home/giacomo/thesis_ws/src/seeds/')
     dir_list = os.listdir(path)
-    dir_list = ['circular_seed_54.json', 'circular_seed_55.json', 'circular_seed_56.json']
+    # dir_list = ['circular_seed_54.json', 'circular_seed_55.json', 'circular_seed_56.json']
 
     csv_file = '/home/giacomo/thesis_ws/src/seed_simulation/seed_simulation/seed_sim.csv'
     df = pd.read_csv(csv_file)

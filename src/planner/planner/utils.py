@@ -249,9 +249,9 @@ def state_to_array(state: State):
 
     return array
 
-def plot_arrow(x, y, yaw, length=0.5, width=0.1):  # pragma: no cover
+def plot_arrow(x, y, yaw, length=0.5, width=0.1, color=None):  # pragma: no cover
         plt.arrow(x, y, length * math.cos(yaw), length * math.sin(yaw),
-                head_length=width, head_width=width)
+                head_length=width, head_width=width, color=color)
         
 def plot_map(width=100, height=100):
         corner_x = [-width/2.0, width/2.0, width/2.0, -width/2.0, -width/2.0]

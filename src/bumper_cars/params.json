@@ -109,6 +109,6 @@
     "to_goal_stop_distance": 2.5,
     "show_animation": false,
     "add_noise": true,
-    "noise_scale_param": 0.2
+    "noise_scale_param": 0.0
     
 }
